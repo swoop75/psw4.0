@@ -18,6 +18,9 @@ class Router {
         }
 
         // Require the controller
+        // First, load the base controller which all other controllers will extend
+        require_once '../app/core/Controller.php';
+        // Then, load the specific controller for the page
         require_once '../app/controllers/'. $this->currentController . '.php';
 
         // Instantiate controller class
