@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logo Left of Title - PSW</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .demo-container {
+            max-width: 1000px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 4rem 3rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .demo-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #00C896;
+            margin-bottom: 3rem;
+        }
+        
+        /* Logo Left of Title Layout */
+        .title-with-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .logo-left {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #00C896 0%, #1A73E8 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 20px 40px rgba(0, 200, 150, 0.4);
+            position: relative;
+            animation: float 3s ease-in-out infinite;
+            flex-shrink: 0;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        
+        .logo-left::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            background: linear-gradient(135deg, #00C896, #1A73E8, #FF6D01);
+            border-radius: 50%;
+            z-index: -1;
+            animation: rotate 4s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .logo-left i {
+            font-size: 48px;
+            color: white;
+            z-index: 2;
+        }
+        
+        .logo-left img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            z-index: 2;
+        }
+        
+        .title-text {
+            text-align: left;
+            flex-grow: 1;
+        }
+        
+        .title-main {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00C896 0%, #1A73E8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+            margin-bottom: 0.5rem;
+            letter-spacing: -2px;
+        }
+        
+        .title-location {
+            font-size: 2rem;
+            font-weight: 400;
+            color: #6B7280;
+            font-style: italic;
+            line-height: 1.2;
+        }
+        
+        /* Alternative Layouts */
+        .layout-option {
+            margin: 3rem 0;
+            padding: 2rem;
+            background: rgba(248, 250, 252, 0.8);
+            border-radius: 16px;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .layout-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1F2937;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Compact Version */
+        .title-with-logo.compact {
+            gap: 1.5rem;
+        }
+        
+        .title-with-logo.compact .logo-left {
+            width: 100px;
+            height: 100px;
+        }
+        
+        .title-with-logo.compact .logo-left i {
+            font-size: 40px;
+        }
+        
+        .title-with-logo.compact .logo-left img {
+            width: 70px;
+            height: 70px;
+        }
+        
+        .title-with-logo.compact .title-main {
+            font-size: 3.5rem;
+        }
+        
+        .title-with-logo.compact .title-location {
+            font-size: 1.75rem;
+        }
+        
+        /* Vertical Stack Version */
+        .title-with-logo.vertical {
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .title-with-logo.vertical .title-text {
+            text-align: center;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .demo-container {
+                padding: 2rem 1.5rem;
+            }
+            
+            .title-with-logo {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+            
+            .title-text {
+                text-align: center;
+            }
+            
+            .logo-left {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .logo-left i {
+                font-size: 40px;
+            }
+            
+            .logo-left img {
+                width: 70px;
+                height: 70px;
+            }
+            
+            .title-main {
+                font-size: 2.5rem !important;
+                letter-spacing: -1px;
+            }
+            
+            .title-location {
+                font-size: 1.5rem !important;
+            }
+        }
+        
+        .implementation-note {
+            background: linear-gradient(135deg, #E6F9F5 0%, #E3F2FD 100%);
+            border: 2px solid #00C896;
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 3rem 0;
+            text-align: left;
+        }
+        
+        .implementation-note h4 {
+            color: #00A682;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+        
+        .implementation-note p {
+            color: #1F2937;
+            margin-bottom: 1rem;
+        }
+        
+        .implementation-note code {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #00A682;
+            font-weight: 600;
+        }
+        
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #00C896 0%, #1A73E8 100%);
+            color: white;
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 2rem;
+        }
+        
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 200, 150, 0.4);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1 class="demo-title">Logo Left of Title - Layout Options</h1>
+        
+        <!-- Main Layout: Logo Left of Title -->
+        <div class="layout-option">
+            <h3 class="layout-title">🎯 Recommended: Logo Left of Title</h3>
+            <div class="title-with-logo">
+                <div class="logo-left">
+                    <!-- Your logo will go here -->
+                    <img src="assets/img/psw-logo.png" alt="PSW Logo" onerror="this.innerHTML='<i class=&quot;fas fa-chart-line&quot;></i>'">
+                </div>
+                <div class="title-text">
+                    <div class="title-main">Pengemaskinen</div>
+                    <div class="title-location">Sverige + Worldwide</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Compact Version -->
+        <div class="layout-option">
+            <h3 class="layout-title">📱 Compact Version</h3>
+            <div class="title-with-logo compact">
+                <div class="logo-left">
+                    <img src="assets/img/psw-logo.png" alt="PSW Logo" onerror="this.innerHTML='<i class=&quot;fas fa-chart-line&quot;></i>'">
+                </div>
+                <div class="title-text">
+                    <div class="title-main">Pengemaskinen</div>
+                    <div class="title-location">Sverige + Worldwide</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Vertical Stack for Mobile -->
+        <div class="layout-option">
+            <h3 class="layout-title">📱 Mobile: Vertical Stack</h3>
+            <div class="title-with-logo vertical">
+                <div class="logo-left">
+                    <img src="assets/img/psw-logo.png" alt="PSW Logo" onerror="this.innerHTML='<i class=&quot;fas fa-chart-line&quot;></i>'">
+                </div>
+                <div class="title-text">
+                    <div class="title-main">Pengemaskinen</div>
+                    <div class="title-location">Sverige + Worldwide</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="implementation-note">
+            <h4>💡 How to Implement</h4>
+            <p>To add this layout to your landing page:</p>
+            <p>1. Replace the current <code>.hero-title</code> section with the <code>.title-with-logo</code> structure</p>
+            <p>2. The layout automatically becomes vertical on mobile devices</p>
+            <p>3. Your logo at <code>assets/img/psw-logo.png</code> will be displayed with beautiful animations</p>
+            <p>4. The title keeps the same 2-line layout: "Pengemaskinen" and "Sverige + Worldwide"</p>
+        </div>
+        
+        <a href="logo_placement_guide.html" class="back-button">
+            <i class="fas fa-arrow-left"></i>
+            Back to Logo Guide
+        </a>
+    </div>
+
+    <script>
+        console.log('🎨 Logo left of title demo loaded!');
+        
+        // Add interactive hover effects
+        document.addEventListener('DOMContentLoaded', function() {
+            const logos = document.querySelectorAll('.logo-left');
+            
+            logos.forEach(logo => {
+                logo.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px) scale(1.05)';
+                });
+                
+                logo.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0px) scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
