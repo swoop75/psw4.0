@@ -436,17 +436,7 @@
         </div>
     </div>
     
-    <?php if (!Auth::isLoggedIn()): ?>
-        <div class="login-prompt">
-            <div class="login-card">
-                <h2>
-                    <i class="fas fa-sign-in-alt"></i>
-                    Access Your Portfolio
-                </h2>
-                <p>Login to view your personalized dividend portfolio dashboard and detailed analytics.</p>
-            </div>
-        </div>
-    <?php else: ?>
+    <?php if (Auth::isLoggedIn()): ?>
         <div class="dashboard-cta">
             <a href="<?php echo BASE_URL; ?>/dashboard.php" class="hero-button">
                 <i class="fas fa-tachometer-alt"></i>
