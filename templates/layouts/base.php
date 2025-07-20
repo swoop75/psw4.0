@@ -14,7 +14,7 @@
     <meta name="description" content="<?php echo $pageDescription ?? 'Pengamaskinen Sverige + Worldwide - Dividend Portfolio Management'; ?>">
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="<?php echo ASSETS_URL; ?>/css/improved-main.css">
+    <link rel="stylesheet" href="<?php echo ASSETS_URL; ?>/css/improved-main.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Additional CSS -->
@@ -160,7 +160,7 @@
     </footer>
 
     <!-- JavaScript -->
-    <script src="<?php echo ASSETS_URL; ?>/js/improved-main.js"></script>
+    <script src="<?php echo ASSETS_URL; ?>/js/improved-main.js?v=<?php echo time(); ?>"></script>
     
     <!-- Additional JavaScript -->
     <?php if (isset($additionalJS)): ?>
