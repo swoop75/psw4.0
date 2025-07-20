@@ -484,3 +484,10 @@
 {"timestamp":"2025-07-20 22:54:24","level":"ERROR","user_id":1,"ip":"100.91.97.82","message":"Country allocation error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ld.dividend_total_sek' in 'field list'"}
 {"timestamp":"2025-07-20 22:54:24","level":"ERROR","user_id":1,"ip":"100.91.97.82","message":"Currency allocation error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ld.dividend_total_sek' in 'field list'"}
 {"timestamp":"2025-07-20 22:54:24","level":"INFO","user_id":1,"ip":"100.91.97.82","message":"User action: dashboard_viewed","context":{"action":"dashboard_viewed","details":"User accessed dashboard","user_id":1}}
+{"timestamp":"2025-07-20 22:55:54","level":"ERROR","user_id":1,"ip":"100.91.97.82","message":"Dividend statistics error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'dividend_total_sek' in 'field list'"}
+{"timestamp":"2025-07-20 22:55:54","level":"ERROR","user_id":1,"ip":"100.91.97.82","message":"Portfolio summary error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'dividend_total_sek' in 'where clause'"}
+{"timestamp":"2025-07-20 22:55:54","level":"ERROR","user_id":1,"ip":"100.91.97.82","message":"Portfolio metrics error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'dividend_total_sek' in 'where clause'"}
+{"timestamp":"2025-07-20 22:55:54","level":"ERROR","user_id":1,"ip":"100.91.97.82","message":"Recent dividends error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ld.ex_date' in 'field list'"}
+{"timestamp":"2025-07-20 22:55:54","level":"ERROR","user_id":1,"ip":"100.91.97.82","message":"Country allocation error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ld.dividend_total_sek' in 'field list'"}
+{"timestamp":"2025-07-20 22:55:54","level":"ERROR","user_id":1,"ip":"100.91.97.82","message":"Currency allocation error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ld.dividend_total_sek' in 'field list'"}
+{"timestamp":"2025-07-20 22:55:54","level":"INFO","user_id":1,"ip":"100.91.97.82","message":"User action: dashboard_viewed","context":{"action":"dashboard_viewed","details":"User accessed dashboard","user_id":1}}
