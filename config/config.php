@@ -19,8 +19,8 @@ define('STORAGE_PATH', BASE_PATH . '/storage');
 define('ASSETS_PATH', BASE_PATH . '/assets');
 
 // URL configuration
-define('BASE_URL', 'http://localhost/psw4.0/public');
-define('ASSETS_URL', BASE_URL . '/../assets');
+define('BASE_URL', 'http://100.117.171.98');
+define('ASSETS_URL', BASE_URL . '/assets');
 
 // Security settings
 define('SESSION_TIMEOUT', 3600); // 1 hour
