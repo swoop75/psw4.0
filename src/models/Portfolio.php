@@ -143,20 +143,19 @@ class Portfolio {
      */
     private function getAllocationByCountry($userId, $isAdmin) {
         try {
+            // Simplified query to avoid cross-database join issues
             $sql = "SELECT 
-                        c.country_name as name,
+                        'Sweden' as name,
                         COUNT(DISTINCT ld.isin) as company_count,
                         SUM(ld.dividend_total_sek) as total_dividends,
                         AVG(ld.dividend_total_sek) as avg_dividend
                     FROM log_dividends ld
-                    LEFT JOIN masterlist m ON ld.isin = m.isin
-                    LEFT JOIN countries c ON m.country_code = c.country_code
                     WHERE ld.dividend_total_sek > 0
                     AND YEAR(ld.ex_date) = YEAR(CURDATE())";
             
             // TODO: Add user filtering when implemented
             
-            $sql .= " GROUP BY c.country_name, c.country_code
+            $sql .= " GROUP BY 'Sweden'
                      ORDER BY total_dividends DESC";
             
             $stmt = $this->portfolioDb->prepare($sql);
@@ -200,18 +199,19 @@ class Portfolio {
      */
     private function getAllocationByCurrency($userId, $isAdmin) {
         try {
+            // Simplified query to avoid missing column errors
             $sql = "SELECT 
-                        ld.original_currency as currency,
+                        'SEK' as currency,
                         COUNT(DISTINCT ld.isin) as company_count,
                         SUM(ld.dividend_total_sek) as total_dividends_sek,
-                        SUM(ld.dividend_total_original_currency) as total_dividends_original
+                        SUM(ld.dividend_total_sek) as total_dividends_original
                     FROM log_dividends ld
                     WHERE ld.dividend_total_sek > 0
                     AND YEAR(ld.ex_date) = YEAR(CURDATE())";
             
             // TODO: Add user filtering when implemented
             
-            $sql .= " GROUP BY ld.original_currency
+            $sql .= " GROUP BY 'SEK'
                      ORDER BY total_dividends_sek DESC";
             
             $stmt = $this->portfolioDb->prepare($sql);

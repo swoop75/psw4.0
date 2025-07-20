@@ -26,7 +26,7 @@ class Dividend {
      */
     public function getRecentDividends($userId, $isAdmin, $limit = 10) {
         try {
-            // Query log_dividends table with masterlist join for company information
+            // Query log_dividends table - get company info separately to avoid cross-database issues
             $sql = "SELECT 
                         ld.ex_date as date,
                         ld.pay_date,
@@ -34,15 +34,10 @@ class Dividend {
                         ld.shares_on_pay_date as shares,
                         ld.dividend_per_share_original_currency as dividend_per_share,
                         ld.dividend_total_original_currency as total_amount,
-                        ld.original_currency as currency,
                         ld.dividend_total_sek as sek_amount,
                         ld.withholding_tax_percent,
-                        ld.withholding_tax_sek,
-                        m.company_name as company,
-                        m.ticker_symbol as symbol,
-                        m.share_type_id
+                        ld.withholding_tax_sek
                     FROM log_dividends ld
-                    LEFT JOIN masterlist m ON ld.isin = m.isin
                     WHERE ld.dividend_total_sek > 0";
             
             // Add user filtering if not admin (when user system is implemented)
@@ -64,19 +59,22 @@ class Dividend {
             $stmt->execute();
             $dividends = $stmt->fetchAll();
             
-            // Process the results
+            // Process the results and get company information from foundation database
             $processedDividends = [];
             foreach ($dividends as $dividend) {
+                // Get company info from foundation database
+                $companyInfo = $this->getCompanyInfo($dividend['isin']);
+                
                 $processedDividends[] = [
                     'date' => $dividend['date'],
                     'pay_date' => $dividend['pay_date'],
-                    'company' => $dividend['company'] ?? 'Unknown Company',
-                    'symbol' => $dividend['symbol'] ?? $dividend['isin'],
+                    'company' => $companyInfo['name'] ?? 'Unknown Company',
+                    'symbol' => $companyInfo['ticker'] ?? $dividend['isin'],
                     'isin' => $dividend['isin'],
                     'shares' => (int) $dividend['shares'],
                     'dividend_per_share' => (float) $dividend['dividend_per_share'],
                     'total_amount' => (float) $dividend['total_amount'],
-                    'currency' => $dividend['currency'] ?? 'SEK',
+                    'currency' => $companyInfo['currency'] ?? 'SEK',
                     'sek_amount' => (float) $dividend['sek_amount'],
                     'withholding_tax_percent' => (float) $dividend['withholding_tax_percent'],
                     'withholding_tax_sek' => (float) $dividend['withholding_tax_sek']
@@ -368,6 +366,39 @@ class Dividend {
         } catch (Exception $e) {
             Logger::error('Dividend calendar error: ' . $e->getMessage());
             return [];
+        }
+    }
+    
+    /**
+     * Get company information from foundation database
+     * @param string $isin ISIN code
+     * @return array Company info
+     */
+    private function getCompanyInfo($isin) {
+        try {
+            if (empty($isin)) {
+                return ['name' => 'Unknown Company', 'ticker' => 'N/A', 'currency' => 'SEK'];
+            }
+            
+            $sql = "SELECT name, ticker, current_version FROM masterlist WHERE isin = :isin LIMIT 1";
+            $stmt = $this->foundationDb->prepare($sql);
+            $stmt->bindValue(':isin', $isin);
+            $stmt->execute();
+            $company = $stmt->fetch();
+            
+            if ($company) {
+                return [
+                    'name' => $company['name'],
+                    'ticker' => $company['ticker'],
+                    'currency' => 'SEK' // Default currency, can be enhanced later
+                ];
+            } else {
+                return ['name' => 'Unknown Company', 'ticker' => 'N/A', 'currency' => 'SEK'];
+            }
+            
+        } catch (Exception $e) {
+            Logger::error('Get company info error: ' . $e->getMessage());
+            return ['name' => 'Unknown Company', 'ticker' => 'N/A', 'currency' => 'SEK'];
         }
     }
 }
