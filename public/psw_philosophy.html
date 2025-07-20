@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Investment Philosophy - PSW</title>
+    
+    <!-- Beautiful Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+            color: #1F2937;
+        }
+        
+        /* Top Header */
+        .top-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 200, 150, 0.1);
+            padding: 1rem 2rem;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+        }
+        
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-decoration: none;
+        }
+        
+        .logo-mini {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #00C896 0%, #1A73E8 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0, 200, 150, 0.3);
+        }
+        
+        .logo-mini i {
+            font-size: 24px;
+            color: white;
+        }
+        
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00C896 0%, #1A73E8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .nav-link {
+            color: #6B7280;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: #00C896;
+        }
+        
+        .nav-link.active {
+            color: #00C896;
+            font-weight: 600;
+        }
+        
+        .login-button {
+            background: linear-gradient(135deg, #00C896 0%, #1A73E8 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 200, 150, 0.3);
+            text-decoration: none;
+        }
+        
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 200, 150, 0.4);
+            color: white;
+        }
+        
+        /* Main Content */
+        .main-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 8rem 2rem 4rem;
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .page-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00C896 0%, #1A73E8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            letter-spacing: -2px;
+        }
+        
+        .page-subtitle {
+            font-size: 1.5rem;
+            color: #6B7280;
+            font-weight: 400;
+        }
+        
+        .content-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 3rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 2rem;
+        }
+        
+        .intro-text {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: #374151;
+            margin-bottom: 2.5rem;
+            font-weight: 400;
+        }
+        
+        .philosophy-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #4B5563;
+            margin-bottom: 2rem;
+        }
+        
+        .philosophy-text p {
+            margin-bottom: 1.5rem;
+        }
+        
+        .highlights-section {
+            background: linear-gradient(135deg, #E6F9F5 0%, #E3F2FD 100%);
+            border: 2px solid #00C896;
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin: 2.5rem 0;
+        }
+        
+        .highlights-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #00A682;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .highlights-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .highlights-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+        
+        .highlight-icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #00C896 0%, #1A73E8 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 0.1rem;
+        }
+        
+        .highlight-icon i {
+            font-size: 12px;
+            color: white;
+        }
+        
+        .highlight-text {
+            color: #1F2937;
+        }
+        
+        .highlight-text strong {
+            color: #00A682;
+            font-weight: 600;
+        }
+        
+        .freedom-badge {
+            background: linear-gradient(135deg, #00C896 0%, #34A853 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin: 2rem 0;
+            box-shadow: 0 10px 30px rgba(0, 200, 150, 0.3);
+        }
+        
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.8);
+            color: #00C896;
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            border: 2px solid #00C896;
+            transition: all 0.3s ease;
+            margin-top: 2rem;
+        }
+        
+        .back-button:hover {
+            background: rgba(0, 200, 150, 0.1);
+            transform: translateY(-2px);
+            color: #00A682;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .top-header {
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                gap: 1rem;
+            }
+            
+            .nav-link {
+                display: none;
+            }
+            
+            .nav-link.active {
+                display: block;
+            }
+            
+            .main-content {
+                padding: 6rem 1rem 2rem;
+            }
+            
+            .page-title {
+                font-size: 2.5rem;
+                letter-spacing: -1px;
+            }
+            
+            .page-subtitle {
+                font-size: 1.25rem;
+            }
+            
+            .content-card {
+                padding: 2rem;
+                border-radius: 16px;
+            }
+            
+            .intro-text {
+                font-size: 1.1rem;
+            }
+            
+            .philosophy-text {
+                font-size: 1rem;
+            }
+            
+            .highlights-section {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Header -->
+    <header class="top-header">
+        <div class="header-container">
+            <a href="beautiful_landing_v2.html" class="logo-header">
+                <div class="logo-mini">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <span class="logo-text">PSW 4.0</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="beautiful_landing_v2.html" class="nav-link">Home</a>
+                <a href="#" class="nav-link">About</a>
+                <a href="psw_philosophy.html" class="nav-link active">Philosophy</a>
+                <a href="#" class="nav-link">Portfolio</a>
+                <a href="#" class="login-button">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Login
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">My Investment Philosophy</h1>
+            <p class="page-subtitle">A Disciplined Approach to Dividend Investing</p>
+        </div>
+
+        <div class="content-card">
+            <div class="intro-text">
+                Welcome to my dividend investing journey—this is PSW: Pengamaskinen Sverige + Worldwide.
+            </div>
+            
+            <div class="philosophy-text">
+                <p>At the heart of my strategy is a simple goal: <strong>building consistent income through dividends</strong>. My portfolio includes more than 500 companies, all selected through a highly disciplined, data-driven approach.</p>
+                
+                <p>I don't chase market predictions or get caught up in short-term noise. Emotions and gut feelings take a backseat. Instead, I've designed a structured system that ranks and scores companies, guiding every buy (and the occasional sell) based on clear, predefined rules. I only trade on weekends to stay focused and keep daily market swings from clouding my judgment.</p>
+                
+                <p>Rather than trimming positions, I prefer to channel new cash and reinvested dividends into smaller holdings. It's all about steady, reliable growth—and for me, dividends are what it's all about.</p>
+            </div>
+            
+            <div class="highlights-section">
+                <h3 class="highlights-title">
+                    <i class="fas fa-star"></i>
+                    Highlights of the PSW Approach
+                </h3>
+                
+                <ul class="highlights-list">
+                    <li>
+                        <div class="highlight-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="highlight-text">
+                            <strong>Focus on Dividends & Income:</strong> My core goal is to build a steady stream of income.
+                        </div>
+                    </li>
+                    
+                    <li>
+                        <div class="highlight-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <div class="highlight-text">
+                            <strong>Data-Driven System:</strong> Investment decisions are based on objective rules and scoring, not predictions.
+                        </div>
+                    </li>
+                    
+                    <li>
+                        <div class="highlight-icon">
+                            <i class="fas fa-calendar-week"></i>
+                        </div>
+                        <div class="highlight-text">
+                            <strong>Disciplined & Emotion-Free:</strong> Orders are placed only on weekends to avoid market distractions and emotional trading.
+                        </div>
+                    </li>
+                    
+                    <li>
+                        <div class="highlight-icon">
+                            <i class="fas fa-seedling"></i>
+                        </div>
+                        <div class="highlight-text">
+                            <strong>Long-Term Growth:</strong> I rarely sell and reinvest all new cash and dividends into smaller positions to maximize portfolio growth.
+                        </div>
+                    </li>
+                    
+                    <li>
+                        <div class="highlight-icon">
+                            <i class="fas fa-globe-americas"></i>
+                        </div>
+                        <div class="highlight-text">
+                            <strong>Global Reach:</strong> Investments span across the globe, not limited to any single market.
+                        </div>
+                    </li>
+                    
+                    <li>
+                        <div class="highlight-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="highlight-text">
+                            <strong>Over 500 Companies:</strong> A highly diversified portfolio designed for resilience.
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="freedom-badge">
+                <i class="fas fa-trophy"></i>
+                Freedom level: > 100% FI(RE). Committed to achieving complete financial independence through dividends.
+            </div>
+            
+            <a href="beautiful_landing_v2.html" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                Back to Home
+            </a>
+        </div>
+    </main>
+
+    <script>
+        console.log('📚 PSW Philosophy page loaded successfully!');
+        
+        // Add smooth scroll behavior
+        document.addEventListener('DOMContentLoaded', function() {
+            // Smooth scrolling for navigation
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+            
+            // Add reading progress indicator
+            const progressBar = document.createElement('div');
+            progressBar.style.cssText = `
+                position: fixed;
+                top: 80px;
+                left: 0;
+                width: 0%;
+                height: 3px;
+                background: linear-gradient(135deg, #00C896 0%, #1A73E8 100%);
+                z-index: 1001;
+                transition: width 0.1s ease;
+            `;
+            document.body.appendChild(progressBar);
+            
+            window.addEventListener('scroll', () => {
+                const scrolled = window.scrollY;
+                const maxScroll = document.body.scrollHeight - window.innerHeight;
+                const progress = (scrolled / maxScroll) * 100;
+                progressBar.style.width = Math.min(progress, 100) + '%';
+            });
+            
+            console.log('✨ Philosophy page interactions ready!');
+        });
+    </script>
+</body>
+</html>

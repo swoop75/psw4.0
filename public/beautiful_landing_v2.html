@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengemaskinen Sverige + Worldwide</title>
+    
+    <!-- Beautiful Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Top Header with Login */
+        .top-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 200, 150, 0.1);
+            padding: 1rem 2rem;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+        }
+        
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-decoration: none;
+        }
+        
+        .logo-mini {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #00C896 0%, #1A73E8 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0, 200, 150, 0.3);
+        }
+        
+        .logo-mini i {
+            font-size: 24px;
+            color: white;
+        }
+        
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00C896 0%, #1A73E8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .login-button {
+            background: linear-gradient(135deg, #00C896 0%, #1A73E8 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 200, 150, 0.3);
+            text-decoration: none;
+        }
+        
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 200, 150, 0.4);
+            color: white;
+        }
+        
+        /* Navigation Links */
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .nav-link {
+            color: #6B7280;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: #00C896;
+        }
+        
+        .hero-section {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 8rem 2rem 4rem;
+            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        /* Animated Logo */
+        .hero-logo {
+            margin-bottom: 3rem;
+        }
+        
+        .logo-circle {
+            width: 140px;
+            height: 140px;
+            background: linear-gradient(135deg, #00C896 0%, #1A73E8 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            box-shadow: 0 20px 40px rgba(0, 200, 150, 0.4);
+            position: relative;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .logo-circle::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            background: linear-gradient(135deg, #00C896, #1A73E8, #FF6D01);
+            border-radius: 50%;
+            z-index: -1;
+            animation: rotate 4s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .logo-circle i {
+            font-size: 64px;
+            color: white;
+            z-index: 2;
+        }
+        
+        /* Beautiful Typography */
+        .hero-title {
+            margin-bottom: 4rem;
+            line-height: 1.1;
+        }
+        
+        .title-main {
+            display: block;
+            font-size: 5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00C896 0%, #1A73E8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            letter-spacing: -3px;
+            animation: slideInUp 1s ease 0.2s both;
+        }
+        
+        .title-location {
+            display: block;
+            font-size: 2.5rem;
+            font-weight: 400;
+            color: #6B7280;
+            font-style: italic;
+            animation: slideInUp 1s ease 0.4s both;
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Beautiful Features */
+        .features-container {
+            max-width: 700px;
+            margin: 0 auto 4rem;
+            text-align: left;
+        }
+        
+        .feature-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+            padding: 2rem;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease forwards;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .feature-row:nth-child(1) { animation-delay: 0.6s; }
+        .feature-row:nth-child(2) { animation-delay: 0.8s; }
+        .feature-row:nth-child(3) { animation-delay: 1.0s; }
+        .feature-row:nth-child(4) { animation-delay: 1.2s; }
+        .feature-row:nth-child(5) { animation-delay: 1.4s; }
+        .feature-row:nth-child(6) { animation-delay: 1.6s; }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .feature-row:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateX(10px);
+            box-shadow: 0 20px 40px rgba(0, 200, 150, 0.15);
+        }
+        
+        .feature-icon-circle {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #00C896 0%, #1A73E8 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 10px 30px rgba(0, 200, 150, 0.3);
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-row:hover .feature-icon-circle {
+            transform: scale(1.1) rotate(5deg);
+        }
+        
+        .feature-icon-circle i {
+            font-size: 2rem;
+            color: white;
+        }
+        
+        .feature-text h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1F2937;
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+        
+        .feature-text p {
+            color: #6B7280;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+        
+        /* CTA Buttons */
+        .cta-section {
+            margin-top: 4rem;
+            animation: slideInUp 1s ease 1.8s both;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .cta-button {
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .cta-primary {
+            background: linear-gradient(135deg, #00C896 0%, #1A73E8 100%);
+            color: white;
+            box-shadow: 0 10px 30px rgba(0, 200, 150, 0.3);
+        }
+        
+        .cta-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0, 200, 150, 0.4);
+            color: white;
+        }
+        
+        .cta-secondary {
+            background: rgba(255, 255, 255, 0.8);
+            color: #1F2937;
+            border: 2px solid #00C896;
+            backdrop-filter: blur(10px);
+        }
+        
+        .cta-secondary:hover {
+            background: rgba(0, 200, 150, 0.1);
+            transform: translateY(-3px);
+            color: #00A682;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .top-header {
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                gap: 1rem;
+            }
+            
+            .nav-link {
+                display: none;
+            }
+            
+            .hero-section {
+                padding: 6rem 1rem 2rem;
+            }
+            
+            .logo-circle {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .logo-circle i {
+                font-size: 48px;
+            }
+            
+            .title-main {
+                font-size: 3.5rem;
+                letter-spacing: -2px;
+            }
+            
+            .title-location {
+                font-size: 1.8rem;
+            }
+            
+            .feature-row {
+                flex-direction: column;
+                text-align: center;
+                gap: 1.5rem;
+                padding: 1.5rem;
+            }
+            
+            .feature-row:hover {
+                transform: translateY(-5px);
+            }
+            
+            .feature-icon-circle {
+                margin: 0 auto;
+            }
+            
+            .feature-text h3,
+            .feature-text p {
+                text-align: center;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .cta-button {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Header with Login -->
+    <header class="top-header">
+        <div class="header-container">
+            <a href="#" class="logo-header">
+                <div class="logo-mini">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <span class="logo-text">PSW 4.0</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="#" class="nav-link">About</a>
+                <a href="psw_philosophy.html" class="nav-link">Philosophy</a>
+                <a href="#" class="nav-link">Portfolio</a>
+                <a href="#" class="login-button">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Login
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="hero-section">
+        <!-- Animated Logo -->
+        <div class="hero-logo">
+            <div class="logo-circle">
+                <i class="fas fa-chart-line"></i>
+            </div>
+        </div>
+        
+        <!-- Stunning Typography -->
+        <h1 class="hero-title">
+            <span class="title-main">Pengemaskinen</span>
+            <span class="title-location">Sverige + Worldwide</span>
+        </h1>
+        
+        <!-- Beautiful Feature List -->
+        <div class="features-container">
+            <div class="feature-row">
+                <div class="feature-icon-circle">
+                    <i class="fas fa-chart-pie"></i>
+                </div>
+                <div class="feature-text">
+                    <h3>Portfolio Tracking & Analytics</h3>
+                    <p>Complete overview of your dividend investments with detailed performance metrics and real-time tracking across all your holdings</p>
+                </div>
+            </div>
+            
+            <div class="feature-row">
+                <div class="feature-icon-circle">
+                    <i class="fas fa-coins"></i>
+                </div>
+                <div class="feature-text">
+                    <h3>Dividend Income Management</h3>
+                    <p>Track payments, forecast future income, and analyze yield patterns with comprehensive historical data and projections</p>
+                </div>
+            </div>
+            
+            <div class="feature-row">
+                <div class="feature-icon-circle">
+                    <i class="fas fa-globe-americas"></i>
+                </div>
+                <div class="feature-text">
+                    <h3>Global Market Coverage</h3>
+                    <p>Monitor Swedish and international dividend stocks from multiple exchanges worldwide with real-time data</p>
+                </div>
+            </div>
+            
+            <div class="feature-row">
+                <div class="feature-icon-circle">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div class="feature-text">
+                    <h3>Company Research Hub</h3>
+                    <p>In-depth analysis, financial statements, dividend history, and custom scoring metrics for informed investment decisions</p>
+                </div>
+            </div>
+            
+            <div class="feature-row">
+                <div class="feature-icon-circle">
+                    <i class="fas fa-shield-check"></i>
+                </div>
+                <div class="feature-text">
+                    <h3>Professional & Secure</h3>
+                    <p>Enterprise-grade security with role-based access control, comprehensive audit logging, and data protection</p>
+                </div>
+            </div>
+            
+            <div class="feature-row">
+                <div class="feature-icon-circle">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <div class="feature-text">
+                    <h3>Advanced Reporting</h3>
+                    <p>Generate detailed reports and export data for tax reporting, portfolio analysis, and comprehensive documentation</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Call-to-Action Buttons -->
+        <div class="cta-section">
+            <div class="cta-buttons">
+                <a href="psw_philosophy.html" class="cta-button cta-secondary">
+                    <i class="fas fa-book-open"></i>
+                    Read My Philosophy
+                </a>
+                <a href="#" class="cta-button cta-primary">
+                    <i class="fas fa-chart-line"></i>
+                    View Portfolio
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('🎨 Beautiful Pengemaskinen landing page v2 loaded successfully!');
+        
+        // Enhanced interactions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Parallax effect for logo
+            const logo = document.querySelector('.logo-circle');
+            document.addEventListener('mousemove', function(e) {
+                const x = (e.clientX / window.innerWidth) * 100;
+                const y = (e.clientY / window.innerHeight) * 100;
+                
+                logo.style.transform = `translate(${(x-50)*0.05}px, ${(y-50)*0.05}px)`;
+            });
+            
+            // Enhanced feature interactions
+            const featureRows = document.querySelectorAll('.feature-row');
+            featureRows.forEach((row, index) => {
+                row.addEventListener('mouseenter', function() {
+                    const icon = this.querySelector('.feature-icon-circle i');
+                    icon.style.transform = 'scale(1.2)';
+                });
+                
+                row.addEventListener('mouseleave', function() {
+                    const icon = this.querySelector('.feature-icon-circle i');
+                    icon.style.transform = 'scale(1)';
+                });
+            });
+            
+            // Smooth scrolling for navigation
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+            
+            console.log('✨ All animations and interactions ready!');
+        });
+    </script>
+</body>
+</html>
