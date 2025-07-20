@@ -21,7 +21,7 @@
         <div class="container">
             <div class="logo-container">
                 <!-- Placeholder for logo -->
-                <img src="https://via.placeholder.com/150x50.png?text=PSW+4.0+Logo" alt="PSW 4.0 Logo" class="logo">
+                <img src="<?php echo URLROOT; ?>/assets/images/logo.png" alt="PSW 4.0 Logo" class="logo">
             </div>
             <nav class="main-nav">
                 <!-- This area will be populated with the menu when the user is logged in -->
