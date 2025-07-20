@@ -1,2 +1,1 @@
 //PSW 4.0 Development Log
-2025-07-15 10:00: Initial project structure setup. Created core directories (app, public, config, templates) and foundational files (Router, front controller, initial CSS/JS, and landing page template) based on MVC principles.
