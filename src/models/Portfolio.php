@@ -27,20 +27,60 @@ class Portfolio {
      */
     public function getPortfolioSummary($userId, $isAdmin) {
         try {
-            // For now, return mock data since we need to understand the exact table structure
-            // TODO: Replace with actual database queries once table relationships are confirmed
+            // Since holdings tables aren't implemented yet, we'll use dividend data for metrics
+            $dividendModel = new Dividend();
+            $dividendStats = $dividendModel->getDividendStatistics($userId, $isAdmin);
             
-            return [
-                'total_value' => 2547863.45,
-                'daily_change' => 12456.78,
-                'daily_change_percent' => 0.49,
-                'total_dividends_ytd' => 89234.56,
-                'total_dividends_all_time' => 456789.12,
-                'current_yield' => 4.23,
-                'expected_monthly_income' => 8567.34,
-                'total_holdings' => 127,
-                'total_companies' => 89
+            // Get company count from dividend data
+            $companyCountSql = "SELECT COUNT(DISTINCT isin) as unique_companies
+                               FROM log_dividends 
+                               WHERE dividend_total_sek > 0";
+            
+            $stmt = $this->portfolioDb->prepare($companyCountSql);
+            $stmt->execute();
+            $companyResult = $stmt->fetch();
+            $uniqueCompanies = (int) ($companyResult['unique_companies'] ?? 0);
+            
+            // Calculate estimated portfolio value based on dividend yield assumptions
+            // This is a rough estimate until holdings data is available
+            $estimatedYield = 4.5; // Assume 4.5% average yield
+            $estimatedPortfolioValue = $dividendStats['current_annual_run_rate'] > 0 
+                ? ($dividendStats['current_annual_run_rate'] / $estimatedYield) * 100 
+                : 0;
+            
+            // Mock daily change for now (would come from portfolio value tracking)
+            $dailyChangePercent = (rand(-150, 150) / 100); // -1.5% to +1.5%
+            $dailyChange = $estimatedPortfolioValue * ($dailyChangePercent / 100);
+            
+            // Calculate expected monthly income from annual run rate
+            $expectedMonthlyIncome = $dividendStats['current_annual_run_rate'] / 12;
+            
+            // Estimate current yield
+            $currentYield = $estimatedPortfolioValue > 0 
+                ? ($dividendStats['current_annual_run_rate'] / $estimatedPortfolioValue) * 100 
+                : 0;
+            
+            $result = [
+                'total_value' => $estimatedPortfolioValue,
+                'daily_change' => $dailyChange,
+                'daily_change_percent' => $dailyChangePercent,
+                'total_dividends_ytd' => $dividendStats['ytd_total'],
+                'total_dividends_all_time' => $dividendStats['all_time_total'],
+                'current_yield' => $currentYield,
+                'expected_monthly_income' => $expectedMonthlyIncome,
+                'total_holdings' => $dividendStats['ytd_count'], // Use YTD dividend count as proxy
+                'total_companies' => $uniqueCompanies,
+                'dividend_payments_ytd' => $dividendStats['ytd_count'],
+                'dividend_payments_all_time' => $dividendStats['all_time_count']
             ];
+            
+            Logger::debug('Calculated portfolio summary from dividend data', [
+                'estimated_value' => $estimatedPortfolioValue,
+                'ytd_dividends' => $dividendStats['ytd_total'],
+                'unique_companies' => $uniqueCompanies
+            ]);
+            
+            return $result;
             
         } catch (Exception $e) {
             Logger::error('Portfolio summary error: ' . $e->getMessage());
@@ -56,36 +96,149 @@ class Portfolio {
      */
     public function getAllocationData($userId, $isAdmin) {
         try {
-            // Mock data for dashboard - replace with actual queries
+            // Use dividend data to approximate allocation until holdings are implemented
+            
+            // Get allocation by country based on dividend payments
+            $countryAllocation = $this->getAllocationByCountry($userId, $isAdmin);
+            
+            // Get allocation by currency (proxy for some geographic distribution)
+            $currencyAllocation = $this->getAllocationByCurrency($userId, $isAdmin);
+            
+            // Mock sector data (would need sector information in masterlist or separate table)
+            $sectorAllocation = [
+                ['name' => 'Financial Services', 'value' => 0, 'percentage' => 0],
+                ['name' => 'Real Estate', 'value' => 0, 'percentage' => 0],
+                ['name' => 'Utilities', 'value' => 0, 'percentage' => 0],
+                ['name' => 'Energy', 'value' => 0, 'percentage' => 0],
+                ['name' => 'Consumer Staples', 'value' => 0, 'percentage' => 0],
+                ['name' => 'Healthcare', 'value' => 0, 'percentage' => 0],
+                ['name' => 'Other', 'value' => 0, 'percentage' => 0]
+            ];
+            
+            // Asset class allocation (would need share_type and asset class mapping)
+            $assetClassAllocation = [
+                ['name' => 'Common Stock', 'value' => 0, 'percentage' => 0],
+                ['name' => 'REITs', 'value' => 0, 'percentage' => 0],
+                ['name' => 'BDCs', 'value' => 0, 'percentage' => 0],
+                ['name' => 'ETFs', 'value' => 0, 'percentage' => 0]
+            ];
+            
             return [
-                'by_sector' => [
-                    ['name' => 'Financial Services', 'value' => 645123.45, 'percentage' => 25.3],
-                    ['name' => 'Real Estate', 'value' => 534567.89, 'percentage' => 21.0],
-                    ['name' => 'Utilities', 'value' => 382345.67, 'percentage' => 15.0],
-                    ['name' => 'Energy', 'value' => 318901.23, 'percentage' => 12.5],
-                    ['name' => 'Consumer Staples', 'value' => 254786.34, 'percentage' => 10.0],
-                    ['name' => 'Healthcare', 'value' => 203829.56, 'percentage' => 8.0],
-                    ['name' => 'Other', 'value' => 208309.31, 'percentage' => 8.2]
-                ],
-                'by_country' => [
-                    ['name' => 'Sweden', 'value' => 1273931.73, 'percentage' => 50.0],
-                    ['name' => 'United States', 'value' => 636965.86, 'percentage' => 25.0],
-                    ['name' => 'Norway', 'value' => 254786.34, 'percentage' => 10.0],
-                    ['name' => 'Denmark', 'value' => 127393.17, 'percentage' => 5.0],
-                    ['name' => 'United Kingdom', 'value' => 127393.17, 'percentage' => 5.0],
-                    ['name' => 'Other', 'value' => 127393.18, 'percentage' => 5.0]
-                ],
-                'by_asset_class' => [
-                    ['name' => 'Common Stock', 'value' => 1783504.42, 'percentage' => 70.0],
-                    ['name' => 'REITs', 'value' => 382345.67, 'percentage' => 15.0],
-                    ['name' => 'BDCs', 'value' => 254786.34, 'percentage' => 10.0],
-                    ['name' => 'ETFs', 'value' => 127393.17, 'percentage' => 5.0]
-                ]
+                'by_sector' => $sectorAllocation,
+                'by_country' => $countryAllocation,
+                'by_asset_class' => $assetClassAllocation
             ];
             
         } catch (Exception $e) {
             Logger::error('Allocation data error: ' . $e->getMessage());
             throw $e;
+        }
+    }
+    
+    /**
+     * Get allocation by country based on dividend payments
+     * @param int|null $userId User ID
+     * @param bool $isAdmin Is user admin
+     * @return array Country allocation
+     */
+    private function getAllocationByCountry($userId, $isAdmin) {
+        try {
+            $sql = "SELECT 
+                        c.country_name as name,
+                        COUNT(DISTINCT ld.isin) as company_count,
+                        SUM(ld.dividend_total_sek) as total_dividends,
+                        AVG(ld.dividend_total_sek) as avg_dividend
+                    FROM log_dividends ld
+                    LEFT JOIN masterlist m ON ld.isin = m.isin
+                    LEFT JOIN countries c ON m.country_code = c.country_code
+                    WHERE ld.dividend_total_sek > 0
+                    AND YEAR(ld.ex_date) = YEAR(CURDATE())";
+            
+            // TODO: Add user filtering when implemented
+            
+            $sql .= " GROUP BY c.country_name, c.country_code
+                     ORDER BY total_dividends DESC";
+            
+            $stmt = $this->portfolioDb->prepare($sql);
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+            
+            // Calculate percentages
+            $totalDividends = array_sum(array_column($results, 'total_dividends'));
+            $allocation = [];
+            
+            foreach ($results as $result) {
+                $dividends = (float) $result['total_dividends'];
+                $percentage = $totalDividends > 0 ? ($dividends / $totalDividends) * 100 : 0;
+                
+                $allocation[] = [
+                    'name' => $result['name'] ?? 'Unknown',
+                    'value' => $dividends,
+                    'percentage' => round($percentage, 1),
+                    'company_count' => (int) $result['company_count']
+                ];
+            }
+            
+            Logger::debug('Calculated country allocation from dividend data', [
+                'countries' => count($allocation),
+                'total_dividends' => $totalDividends
+            ]);
+            
+            return $allocation;
+            
+        } catch (Exception $e) {
+            Logger::error('Country allocation error: ' . $e->getMessage());
+            return [];
+        }
+    }
+    
+    /**
+     * Get allocation by currency based on dividend payments
+     * @param int|null $userId User ID
+     * @param bool $isAdmin Is user admin
+     * @return array Currency allocation
+     */
+    private function getAllocationByCurrency($userId, $isAdmin) {
+        try {
+            $sql = "SELECT 
+                        ld.original_currency as currency,
+                        COUNT(DISTINCT ld.isin) as company_count,
+                        SUM(ld.dividend_total_sek) as total_dividends_sek,
+                        SUM(ld.dividend_total_original_currency) as total_dividends_original
+                    FROM log_dividends ld
+                    WHERE ld.dividend_total_sek > 0
+                    AND YEAR(ld.ex_date) = YEAR(CURDATE())";
+            
+            // TODO: Add user filtering when implemented
+            
+            $sql .= " GROUP BY ld.original_currency
+                     ORDER BY total_dividends_sek DESC";
+            
+            $stmt = $this->portfolioDb->prepare($sql);
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+            
+            // Calculate percentages
+            $totalDividends = array_sum(array_column($results, 'total_dividends_sek'));
+            $allocation = [];
+            
+            foreach ($results as $result) {
+                $dividends = (float) $result['total_dividends_sek'];
+                $percentage = $totalDividends > 0 ? ($dividends / $totalDividends) * 100 : 0;
+                
+                $allocation[] = [
+                    'name' => $result['currency'] ?? 'Unknown',
+                    'value' => $dividends,
+                    'percentage' => round($percentage, 1),
+                    'company_count' => (int) $result['company_count']
+                ];
+            }
+            
+            return $allocation;
+            
+        } catch (Exception $e) {
+            Logger::error('Currency allocation error: ' . $e->getMessage());
+            return [];
         }
     }
     

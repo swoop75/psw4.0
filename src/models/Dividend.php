@@ -26,59 +26,71 @@ class Dividend {
      */
     public function getRecentDividends($userId, $isAdmin, $limit = 10) {
         try {
-            // Mock data for recent dividends - replace with actual query to log_dividends
-            return [
-                [
-                    'date' => '2025-07-15',
-                    'company' => 'Microsoft Corporation',
-                    'symbol' => 'MSFT',
-                    'shares' => 125,
-                    'dividend_per_share' => 0.75,
-                    'total_amount' => 93.75,
-                    'currency' => 'USD',
-                    'sek_amount' => 1034.25
-                ],
-                [
-                    'date' => '2025-07-12',
-                    'company' => 'Johnson & Johnson',
-                    'symbol' => 'JNJ',
-                    'shares' => 200,
-                    'dividend_per_share' => 1.19,
-                    'total_amount' => 238.00,
-                    'currency' => 'USD',
-                    'sek_amount' => 2627.40
-                ],
-                [
-                    'date' => '2025-07-10',
-                    'company' => 'Volvo AB',
-                    'symbol' => 'VOLV-B.ST',
-                    'shares' => 500,
-                    'dividend_per_share' => 2.50,
-                    'total_amount' => 1250.00,
-                    'currency' => 'SEK',
-                    'sek_amount' => 1250.00
-                ],
-                [
-                    'date' => '2025-07-08',
-                    'company' => 'Coca-Cola Company',
-                    'symbol' => 'KO',
-                    'shares' => 150,
-                    'dividend_per_share' => 0.46,
-                    'total_amount' => 69.00,
-                    'currency' => 'USD',
-                    'sek_amount' => 761.70
-                ],
-                [
-                    'date' => '2025-07-05',
-                    'company' => 'Ericsson AB',
-                    'symbol' => 'ERIC-B.ST',
-                    'shares' => 800,
-                    'dividend_per_share' => 1.00,
-                    'total_amount' => 800.00,
-                    'currency' => 'SEK',
-                    'sek_amount' => 800.00
-                ]
-            ];
+            // Query log_dividends table with masterlist join for company information
+            $sql = "SELECT 
+                        ld.ex_date as date,
+                        ld.pay_date,
+                        ld.isin,
+                        ld.shares_on_pay_date as shares,
+                        ld.dividend_per_share_original_currency as dividend_per_share,
+                        ld.dividend_total_original_currency as total_amount,
+                        ld.original_currency as currency,
+                        ld.dividend_total_sek as sek_amount,
+                        ld.withholding_tax_percent,
+                        ld.withholding_tax_sek,
+                        m.company_name as company,
+                        m.ticker_symbol as symbol,
+                        m.share_type_id
+                    FROM log_dividends ld
+                    LEFT JOIN masterlist m ON ld.isin = m.isin
+                    WHERE ld.dividend_total_sek > 0";
+            
+            // Add user filtering if not admin (when user system is implemented)
+            if (!$isAdmin && $userId) {
+                // TODO: Add user filtering when portfolio holdings are implemented
+                // $sql .= " AND ld.user_id = :user_id";
+            }
+            
+            $sql .= " ORDER BY ld.ex_date DESC, ld.pay_date DESC LIMIT :limit";
+            
+            $stmt = $this->portfolioDb->prepare($sql);
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            
+            // TODO: Bind user_id when user filtering is implemented
+            // if (!$isAdmin && $userId) {
+            //     $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+            // }
+            
+            $stmt->execute();
+            $dividends = $stmt->fetchAll();
+            
+            // Process the results
+            $processedDividends = [];
+            foreach ($dividends as $dividend) {
+                $processedDividends[] = [
+                    'date' => $dividend['date'],
+                    'pay_date' => $dividend['pay_date'],
+                    'company' => $dividend['company'] ?? 'Unknown Company',
+                    'symbol' => $dividend['symbol'] ?? $dividend['isin'],
+                    'isin' => $dividend['isin'],
+                    'shares' => (int) $dividend['shares'],
+                    'dividend_per_share' => (float) $dividend['dividend_per_share'],
+                    'total_amount' => (float) $dividend['total_amount'],
+                    'currency' => $dividend['currency'] ?? 'SEK',
+                    'sek_amount' => (float) $dividend['sek_amount'],
+                    'withholding_tax_percent' => (float) $dividend['withholding_tax_percent'],
+                    'withholding_tax_sek' => (float) $dividend['withholding_tax_sek']
+                ];
+            }
+            
+            Logger::debug('Retrieved recent dividends from database', [
+                'count' => count($processedDividends),
+                'limit' => $limit,
+                'user_id' => $userId,
+                'is_admin' => $isAdmin
+            ]);
+            
+            return $processedDividends;
             
         } catch (Exception $e) {
             Logger::error('Recent dividends error: ' . $e->getMessage());
@@ -220,19 +232,101 @@ class Dividend {
      */
     public function getDividendStatistics($userId, $isAdmin) {
         try {
+            $currentYear = date('Y');
+            
+            // YTD statistics
+            $ytdSql = "SELECT 
+                        COUNT(*) as ytd_count,
+                        SUM(dividend_total_sek) as ytd_total
+                    FROM log_dividends 
+                    WHERE YEAR(ex_date) = :current_year 
+                    AND dividend_total_sek > 0";
+            
+            // All-time statistics  
+            $allTimeSql = "SELECT 
+                            COUNT(*) as all_time_count,
+                            SUM(dividend_total_sek) as all_time_total
+                        FROM log_dividends 
+                        WHERE dividend_total_sek > 0";
+            
+            // Monthly statistics for current year
+            $monthlySql = "SELECT 
+                            MONTH(ex_date) as month,
+                            SUM(dividend_total_sek) as monthly_total
+                        FROM log_dividends 
+                        WHERE YEAR(ex_date) = :current_year 
+                        AND dividend_total_sek > 0
+                        GROUP BY MONTH(ex_date)
+                        ORDER BY monthly_total DESC";
+            
+            // TODO: Add user filtering when portfolio system is implemented
+            
+            // Execute YTD query
+            $ytdStmt = $this->portfolioDb->prepare($ytdSql);
+            $ytdStmt->bindValue(':current_year', $currentYear, PDO::PARAM_INT);
+            $ytdStmt->execute();
+            $ytdResult = $ytdStmt->fetch();
+            
+            // Execute all-time query
+            $allTimeStmt = $this->portfolioDb->prepare($allTimeSql);
+            $allTimeStmt->execute();
+            $allTimeResult = $allTimeStmt->fetch();
+            
+            // Execute monthly query
+            $monthlyStmt = $this->portfolioDb->prepare($monthlySql);
+            $monthlyStmt->bindValue(':current_year', $currentYear, PDO::PARAM_INT);
+            $monthlyStmt->execute();
+            $monthlyResults = $monthlyStmt->fetchAll();
+            
+            // Calculate averages and metrics
+            $ytdTotal = (float) ($ytdResult['ytd_total'] ?? 0);
+            $ytdCount = (int) ($ytdResult['ytd_count'] ?? 0);
+            $allTimeTotal = (float) ($allTimeResult['all_time_total'] ?? 0);
+            $allTimeCount = (int) ($allTimeResult['all_time_count'] ?? 0);
+            
+            // Calculate monthly average (current year)
+            $currentMonth = (int) date('n');
+            $averageMonthly = $currentMonth > 0 ? $ytdTotal / $currentMonth : 0;
+            
+            // Find highest monthly amount
+            $highestMonthly = 0;
+            if (!empty($monthlyResults)) {
+                $highestMonthly = (float) $monthlyResults[0]['monthly_total'];
+            }
+            
+            // Calculate annual run rate based on YTD performance
+            $currentDayOfYear = (int) date('z') + 1;
+            $daysInYear = date('L') ? 366 : 365;
+            $annualRunRate = $currentDayOfYear > 0 ? ($ytdTotal / $currentDayOfYear) * $daysInYear : 0;
+            
+            Logger::debug('Calculated dividend statistics', [
+                'ytd_total' => $ytdTotal,
+                'ytd_count' => $ytdCount,
+                'all_time_total' => $allTimeTotal,
+                'monthly_records' => count($monthlyResults)
+            ]);
+            
             return [
-                'ytd_total' => 89234.56,
-                'ytd_count' => 156,
-                'all_time_total' => 456789.12,
-                'all_time_count' => 890,
-                'average_monthly' => 8567.34,
-                'highest_monthly' => 12456.78,
-                'current_annual_run_rate' => 102808.08
+                'ytd_total' => $ytdTotal,
+                'ytd_count' => $ytdCount,
+                'all_time_total' => $allTimeTotal,
+                'all_time_count' => $allTimeCount,
+                'average_monthly' => $averageMonthly,
+                'highest_monthly' => $highestMonthly,
+                'current_annual_run_rate' => $annualRunRate
             ];
             
         } catch (Exception $e) {
             Logger::error('Dividend statistics error: ' . $e->getMessage());
-            return [];
+            return [
+                'ytd_total' => 0,
+                'ytd_count' => 0,
+                'all_time_total' => 0,
+                'all_time_count' => 0,
+                'average_monthly' => 0,
+                'highest_monthly' => 0,
+                'current_annual_run_rate' => 0
+            ];
         }
     }
     

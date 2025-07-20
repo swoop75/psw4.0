@@ -8,16 +8,19 @@
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../models/Portfolio.php';
 require_once __DIR__ . '/../models/Dividend.php';
+require_once __DIR__ . '/../models/Company.php';
 require_once __DIR__ . '/../middleware/Auth.php';
 require_once __DIR__ . '/../utils/Logger.php';
 
 class DashboardController {
     private $portfolioModel;
     private $dividendModel;
+    private $companyModel;
     
     public function __construct() {
         $this->portfolioModel = new Portfolio();
         $this->dividendModel = new Dividend();
+        $this->companyModel = new Company();
     }
     
     /**
