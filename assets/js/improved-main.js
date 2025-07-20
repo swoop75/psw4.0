@@ -72,6 +72,7 @@ PSW = {
 
         let isOpen = false;
         let closeTimer = null;
+        let autofillInProgress = false;
 
         // Toggle dropdown
         const toggleDropdown = (show) => {
@@ -120,10 +121,31 @@ PSW = {
             });
         }
 
-        // Close on outside click
+        // Close on outside click (with LastPass/password manager support)
         document.addEventListener('click', (e) => {
-            if (!loginToggle.contains(e.target) && !loginDropdown.contains(e.target)) {
-                toggleDropdown(false);
+            // Don't close if clicking on LastPass or other password manager elements
+            const isPasswordManagerElement = e.target.closest('[data-lastpass-root]') || 
+                                           e.target.closest('#lastpass-vault') ||
+                                           e.target.closest('.lp-element') ||
+                                           e.target.closest('[data-1password]') ||
+                                           e.target.closest('[data-bitwarden]') ||
+                                           e.target.classList.contains('lastpass-element') ||
+                                           e.target.id?.includes('lastpass') ||
+                                           e.target.id?.includes('1password') ||
+                                           e.target.id?.includes('bitwarden');
+            
+            // Don't close if it's a password manager element, inside our dropdown, or autofill is in progress
+            if (!isPasswordManagerElement && 
+                !autofillInProgress &&
+                !loginToggle.contains(e.target) && 
+                !loginDropdown.contains(e.target)) {
+                
+                // Add small delay to allow autofill to complete
+                setTimeout(() => {
+                    if (!autofillInProgress) {
+                        toggleDropdown(false);
+                    }
+                }, 150);
             }
         });
 
@@ -132,6 +154,40 @@ PSW = {
             if (e.key === 'Escape' && isOpen) {
                 toggleDropdown(false);
                 loginToggle.focus();
+            }
+        });
+
+        // Prevent modal closing during autofill
+        const usernameInput = loginDropdown.querySelector('#username, input[name="username"]');
+        const passwordInput = loginDropdown.querySelector('#password, input[name="password"]');
+        
+        [usernameInput, passwordInput].forEach(input => {
+            if (input) {
+                // Detect autofill start
+                input.addEventListener('focus', () => {
+                    autofillInProgress = true;
+                    setTimeout(() => {
+                        autofillInProgress = false;
+                    }, 2000); // Give 2 seconds for autofill to complete
+                });
+                
+                // Also detect when value changes (autofill)
+                input.addEventListener('input', () => {
+                    autofillInProgress = true;
+                    setTimeout(() => {
+                        autofillInProgress = false;
+                    }, 1000);
+                });
+                
+                // Detect autofill via animation (WebKit browsers)
+                input.addEventListener('animationstart', (e) => {
+                    if (e.animationName === 'autofill') {
+                        autofillInProgress = true;
+                        setTimeout(() => {
+                            autofillInProgress = false;
+                        }, 1500);
+                    }
+                });
             }
         });
 
