@@ -27,10 +27,11 @@ class User {
             $sql = "SELECT u.user_id, u.username, u.email, u.password_hash, u.role_id, r.role_name 
                     FROM users u 
                     JOIN roles r ON u.role_id = r.role_id 
-                    WHERE u.username = :username OR u.email = :username";
+                    WHERE u.username = :username OR u.email = :email";
             
             $stmt = $this->db->prepare($sql);
             $stmt->bindParam(':username', $username);
+            $stmt->bindParam(':email', $username);
             $stmt->execute();
             
             $user = $stmt->fetch();
