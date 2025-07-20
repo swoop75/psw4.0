@@ -12,7 +12,8 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(git pull:*)",
-      "Bash(start http://100.117.171.98/public/buylist_management.php)"
+      "Bash(start http://100.117.171.98/public/buylist_management.php)",
+      "Bash(ls:*)"
     ],
     "deny": []
   }

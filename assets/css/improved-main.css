@@ -775,6 +775,97 @@ a:hover {
     }
 }
 
+/* Main Container Styles */
+.main-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-6);
+    min-height: calc(100vh - 200px);
+}
+
+/* Enhanced Landing Page */
+.cta-section {
+    text-align: center;
+    margin-top: var(--space-16);
+    padding: var(--space-8);
+}
+
+.cta-section .text-muted {
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-6);
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-6);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    text-decoration: none;
+    border: none;
+    border-radius: var(--radius-lg);
+    font-weight: var(--font-medium);
+    font-size: var(--text-base);
+    transition: all var(--transition-normal);
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    color: white;
+}
+
+.btn-lg {
+    padding: var(--space-5) var(--space-8);
+    font-size: var(--text-lg);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+}
+
+/* Footer Styles */
+.footer {
+    background: var(--bg-tertiary);
+    border-top: 1px solid var(--border-light);
+    margin-top: var(--space-20);
+    padding: var(--space-8) 0;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-6);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+}
+
+/* Error Container Styles */
+.error-container {
+    padding: var(--space-16);
+    text-align: center;
+    background: var(--bg-primary);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-md);
+    margin: var(--space-8) auto;
+    max-width: 600px;
+}
+
+.error-container h1 {
+    color: var(--accent-red);
+    margin-bottom: var(--space-6);
+}
+
+/* Ensure modern styling is applied consistently */
+* {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
 /* Dark mode support (for future implementation) */
 @media (prefers-color-scheme: dark) {
     :root {
