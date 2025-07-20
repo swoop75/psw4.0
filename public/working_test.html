@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSW 4.0 - Working Test</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .hero-section {
+            max-width: 800px;
+            text-align: center;
+            padding: 3rem 2rem;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .logo-circle {
+            width: 140px;
+            height: 140px;
+            background: linear-gradient(135deg, #00C896 0%, #1A73E8 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 3rem;
+            box-shadow: 0 20px 40px rgba(0, 200, 150, 0.3);
+            animation: pulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .logo-circle i {
+            font-size: 64px;
+            color: white;
+        }
+        
+        .title-main {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00C896 0%, #1A73E8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            letter-spacing: -2px;
+        }
+        
+        .title-location {
+            font-size: 2rem;
+            font-weight: 400;
+            color: #6B7280;
+            font-style: italic;
+            margin-bottom: 3rem;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        
+        .feature-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            border-color: #00C896;
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 200, 150, 0.2);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #00C896 0%, #1A73E8 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+        }
+        
+        .feature-icon i {
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1F2937;
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature-desc {
+            color: #6B7280;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .success-banner {
+            background: linear-gradient(135deg, #00C896 0%, #34A853 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 3rem;
+        }
+        
+        .success-banner h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.5rem;
+        }
+        
+        .success-banner p {
+            margin: 0;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="hero-section">
+        <!-- Animated Logo -->
+        <div class="logo-circle">
+            <i class="fas fa-chart-line"></i>
+        </div>
+        
+        <!-- Beautiful Headlines -->
+        <h1 class="title-main">Pengemaskinen</h1>
+        <h2 class="title-location">Sverige + Worldwide</h2>
+        
+        <!-- Feature Grid -->
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-pie"></i>
+                </div>
+                <div class="feature-title">Portfolio Analytics</div>
+                <div class="feature-desc">Complete dividend tracking</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-coins"></i>
+                </div>
+                <div class="feature-title">Income Management</div>
+                <div class="feature-desc">Forecast & analyze yields</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-globe-americas"></i>
+                </div>
+                <div class="feature-title">Global Coverage</div>
+                <div class="feature-desc">Swedish & international stocks</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-check"></i>
+                </div>
+                <div class="feature-title">Professional & Secure</div>
+                <div class="feature-desc">Enterprise-grade platform</div>
+            </div>
+        </div>
+        
+        <!-- Success Message -->
+        <div class="success-banner">
+            <h3><i class="fas fa-check-circle"></i> Success!</h3>
+            <p>Beautiful design is working! This shows the requested layout with logo, headline, and feature bullets.</p>
+        </div>
+    </div>
+    
+    <script>
+        console.log('🎨 Beautiful PSW 4.0 landing page loaded successfully!');
+        
+        // Add some interactive effects
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.querySelector('.feature-icon').style.transform = 'scale(1.1) rotate(5deg)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.querySelector('.feature-icon').style.transform = 'scale(1) rotate(0deg)';
+            });
+        });
+    </script>
+</body>
+</html>

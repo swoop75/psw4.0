@@ -13,7 +13,9 @@
       "Bash(git push:*)",
       "Bash(git pull:*)",
       "Bash(start http://100.117.171.98/public/buylist_management.php)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(copy \"C:\\Users\\laoan\\Documents\\GitHub\\psw\\psw4.0\\test_simple.html\" \"D:\"\")",
+      "Bash(cp:*)"
     ],
     "deny": []
   }
