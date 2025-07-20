@@ -92,15 +92,11 @@ class BuylistController {
             $offset = ($page - 1) * $limit;
             $totalPages = ceil($totalRecords / $limit);
             
-            // Get buylist entries with company and status info
+            // Get buylist entries with status info
             $sql = "SELECT b.*, 
-                           bs.status_name, bs.status_color,
-                           m.name as company_name, m.ticker, m.country, m.market,
-                           st.code as share_type_code
+                           bs.status_name, bs.status_color
                     FROM buylist b 
                     LEFT JOIN buylist_status bs ON b.status_id = bs.status_id 
-                    LEFT JOIN masterlist m ON b.isin = m.isin 
-                    LEFT JOIN share_types st ON m.share_type_id = st.share_type_id
                     $whereClause 
                     ORDER BY b.priority_level DESC, b.updated_at DESC 
                     LIMIT :limit OFFSET :offset";
@@ -146,13 +142,9 @@ class BuylistController {
             }
             
             $sql = "SELECT b.*, 
-                           bs.status_name, bs.status_color,
-                           m.name as company_name, m.ticker, m.country, m.market,
-                           st.code as share_type_code, st.description as share_type_description
+                           bs.status_name, bs.status_color
                     FROM buylist b 
                     LEFT JOIN buylist_status bs ON b.status_id = bs.status_id 
-                    LEFT JOIN masterlist m ON b.isin = m.isin 
-                    LEFT JOIN share_types st ON m.share_type_id = st.share_type_id
                     WHERE b.buylist_id = :buylist_id AND b.user_id = :user_id";
             
             $stmt = $this->foundationDb->prepare($sql);
@@ -181,28 +173,23 @@ class BuylistController {
             }
             
             // Validate required fields
-            if (empty($data['isin'])) {
-                throw new Exception('ISIN is required');
+            if (empty($data['company_name'])) {
+                throw new Exception('Company name is required');
+            }
+            
+            if (empty($data['ticker'])) {
+                throw new Exception('Ticker is required');
             }
             
             if (empty($data['status_id'])) {
                 throw new Exception('Status is required');
             }
             
-            // Check if company exists in masterlist
-            $stmt = $this->foundationDb->prepare("SELECT name FROM masterlist WHERE isin = :isin");
-            $stmt->bindValue(':isin', $data['isin']);
-            $stmt->execute();
-            $company = $stmt->fetch();
-            
-            if (!$company) {
-                throw new Exception('Company not found in masterlist');
-            }
-            
-            // Check if user already has this ISIN in buylist
-            $stmt = $this->foundationDb->prepare("SELECT buylist_id FROM buylist WHERE user_id = :user_id AND isin = :isin");
+            // Check if user already has this company in buylist
+            $stmt = $this->foundationDb->prepare("SELECT buylist_id FROM buylist WHERE user_id = :user_id AND company_name = :company_name AND ticker = :ticker");
             $stmt->bindValue(':user_id', $userId);
-            $stmt->bindValue(':isin', $data['isin']);
+            $stmt->bindValue(':company_name', $data['company_name']);
+            $stmt->bindValue(':ticker', $data['ticker']);
             $stmt->execute();
             
             if ($stmt->fetch()) {
@@ -211,7 +198,14 @@ class BuylistController {
             
             // Prepare data for insertion
             $insertData = [
-                'isin' => Security::sanitizeInput($data['isin']),
+                'isin' => !empty($data['isin']) ? Security::sanitizeInput($data['isin']) : null,
+                'company_name' => Security::sanitizeInput($data['company_name']),
+                'ticker' => strtoupper(Security::sanitizeInput($data['ticker'])),
+                'country' => !empty($data['country']) ? strtoupper(Security::sanitizeInput($data['country'])) : null,
+                'currency' => !empty($data['currency']) ? strtoupper(Security::sanitizeInput($data['currency'])) : 'SEK',
+                'exchange' => !empty($data['exchange']) ? Security::sanitizeInput($data['exchange']) : null,
+                'company_website' => !empty($data['company_website']) ? Security::sanitizeInput($data['company_website']) : null,
+                'business_description' => !empty($data['business_description']) ? Security::sanitizeInput($data['business_description']) : null,
                 'user_id' => $userId,
                 'status_id' => (int)$data['status_id'],
                 'target_price' => !empty($data['target_price']) ? (float)$data['target_price'] : null,
@@ -530,6 +524,121 @@ class BuylistController {
             
         } catch (Exception $e) {
             Logger::error('Log field change error: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Add buylist entry to masterlist
+     * @param int $buylistId Buylist entry ID
+     * @param array $masterlistData Additional masterlist data
+     * @return bool Success status
+     */
+    public function addToMasterlist($buylistId, $masterlistData = []) {
+        try {
+            $userId = Auth::getUserId();
+            if (!$userId) {
+                throw new Exception('User not authenticated');
+            }
+            
+            // Get buylist entry
+            $buylistEntry = $this->getBuylistEntry($buylistId);
+            if (!$buylistEntry) {
+                throw new Exception('Buylist entry not found');
+            }
+            
+            // Check if already added to masterlist
+            if ($buylistEntry['added_to_masterlist']) {
+                throw new Exception('This company has already been added to masterlist');
+            }
+            
+            // Generate ISIN if not provided
+            $isin = $buylistEntry['isin'];
+            if (empty($isin)) {
+                // Generate a temporary ISIN-like identifier
+                $isin = $buylistEntry['country'] . str_pad(rand(1, 9999999999), 10, '0', STR_PAD_LEFT);
+            }
+            
+            // Check if company already exists in masterlist
+            $stmt = $this->foundationDb->prepare("SELECT isin FROM masterlist WHERE isin = :isin OR (name = :name AND ticker = :ticker)");
+            $stmt->bindValue(':isin', $isin);
+            $stmt->bindValue(':name', $buylistEntry['company_name']);
+            $stmt->bindValue(':ticker', $buylistEntry['ticker']);
+            $stmt->execute();
+            $existingMasterlist = $stmt->fetch();
+            
+            if ($existingMasterlist) {
+                // Company already exists in masterlist
+                $this->logMasterlistAction($buylistId, $existingMasterlist['isin'], 'already_exists', $userId);
+                
+                // Update buylist entry
+                $this->foundationDb->prepare("UPDATE buylist SET added_to_masterlist = 1, added_to_masterlist_date = NOW() WHERE buylist_id = :buylist_id")
+                    ->execute([':buylist_id' => $buylistId]);
+                
+                return true;
+            }
+            
+            // Add to masterlist
+            $masterlistInsertData = [
+                'isin' => $isin,
+                'ticker' => $buylistEntry['ticker'],
+                'name' => $buylistEntry['company_name'],
+                'country' => $buylistEntry['country'] ?: 'SE',
+                'market' => $masterlistData['market'] ?? null,
+                'share_type_id' => $masterlistData['share_type_id'] ?? 1,
+                'delisted' => 0,
+                'current_version' => 1
+            ];
+            
+            $masterlistFields = array_keys($masterlistInsertData);
+            $masterlistPlaceholders = ':' . implode(', :', $masterlistFields);
+            
+            $sql = "INSERT INTO masterlist (" . implode(', ', $masterlistFields) . ") VALUES ($masterlistPlaceholders)";
+            $stmt = $this->foundationDb->prepare($sql);
+            
+            foreach ($masterlistInsertData as $key => $value) {
+                $stmt->bindValue(":$key", $value);
+            }
+            
+            $masterlistSuccess = $stmt->execute();
+            
+            if ($masterlistSuccess) {
+                // Update buylist entry
+                $this->foundationDb->prepare("UPDATE buylist SET added_to_masterlist = 1, added_to_masterlist_date = NOW(), isin = :isin WHERE buylist_id = :buylist_id")
+                    ->execute([':isin' => $isin, ':buylist_id' => $buylistId]);
+                
+                // Log the action
+                $this->logMasterlistAction($buylistId, $isin, 'added_to_masterlist', $userId);
+                
+                Logger::logUserAction('buylist_to_masterlist', 'Added buylist entry to masterlist: ' . $buylistEntry['company_name'], [
+                    'buylist_id' => $buylistId,
+                    'isin' => $isin
+                ]);
+                
+                return true;
+            }
+            
+            return false;
+            
+        } catch (Exception $e) {
+            Logger::error('Add to masterlist error: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+    
+    /**
+     * Log masterlist action
+     * @param int $buylistId Buylist ID
+     * @param string $isin ISIN
+     * @param string $actionType Action type
+     * @param int $userId User ID
+     */
+    private function logMasterlistAction($buylistId, $isin, $actionType, $userId) {
+        try {
+            $sql = "INSERT INTO buylist_masterlist_log (buylist_id, masterlist_isin, action_type, action_by) VALUES (?, ?, ?, ?)";
+            $stmt = $this->foundationDb->prepare($sql);
+            $stmt->execute([$buylistId, $isin, $actionType, $userId]);
+        } catch (Exception $e) {
+            Logger::error('Log masterlist action error: ' . $e->getMessage());
         }
     }
     

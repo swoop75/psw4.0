@@ -40,6 +40,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WI
                 echo json_encode(['success' => $result, 'message' => $result ? 'Entry added to buylist successfully' : 'Failed to add entry']);
                 break;
                 
+            case 'add_to_masterlist':
+                $buylistId = $_POST['buylist_id'] ?? '';
+                $masterlistData = [
+                    'market' => $_POST['market'] ?? null,
+                    'share_type_id' => $_POST['share_type_id'] ?? 1
+                ];
+                $result = $controller->addToMasterlist($buylistId, $masterlistData);
+                echo json_encode(['success' => $result, 'message' => $result ? 'Company added to masterlist successfully' : 'Failed to add to masterlist']);
+                break;
+                
             case 'update':
                 $buylistId = $_POST['buylist_id'] ?? '';
                 unset($_POST['action'], $_POST['csrf_token'], $_POST['buylist_id']);
@@ -260,10 +270,20 @@ $csrfToken = Security::generateCSRFToken();
                                             <div class="company-name">
                                                 <strong><?= htmlspecialchars($entry['company_name']) ?></strong>
                                                 <span class="ticker"><?= htmlspecialchars($entry['ticker']) ?></span>
+                                                <?php if ($entry['added_to_masterlist']): ?>
+                                                    <span class="masterlist-badge">
+                                                        <i class="fas fa-check"></i> In Masterlist
+                                                    </span>
+                                                <?php endif; ?>
                                             </div>
                                             <div class="company-details">
-                                                <span class="isin"><?= htmlspecialchars($entry['isin']) ?></span>
-                                                <span class="country"><?= htmlspecialchars($entry['country']) ?></span>
+                                                <?php if ($entry['isin']): ?>
+                                                    <span class="isin"><?= htmlspecialchars($entry['isin']) ?></span>
+                                                <?php endif; ?>
+                                                <span class="country"><?= htmlspecialchars($entry['country'] ?: 'N/A') ?></span>
+                                                <?php if ($entry['exchange']): ?>
+                                                    <span class="exchange"><?= htmlspecialchars($entry['exchange']) ?></span>
+                                                <?php endif; ?>
                                             </div>
                                         </div>
                                     </td>
@@ -292,6 +312,11 @@ $csrfToken = Security::generateCSRFToken();
                                     </td>
                                     <td>
                                         <div class="action-buttons">
+                                            <?php if (!$entry['added_to_masterlist']): ?>
+                                                <button class="btn-icon btn-success" onclick="addToMasterlist(<?= $entry['buylist_id'] ?>, '<?= htmlspecialchars($entry['company_name']) ?>')" title="Add to Masterlist">
+                                                    <i class="fas fa-plus-circle"></i>
+                                                </button>
+                                            <?php endif; ?>
                                             <button class="btn-icon" onclick="editEntry(<?= $entry['buylist_id'] ?>)" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </button>
@@ -367,13 +392,59 @@ $csrfToken = Security::generateCSRFToken();
                 
                 <!-- Basic Info Tab -->
                 <div id="basicTab" class="tab-content active">
-                    <div class="form-group">
-                        <label for="companySearch">Company *</label>
-                        <div class="company-search-container">
-                            <input type="text" id="companySearch" placeholder="Search for company..." required>
-                            <input type="hidden" id="isin" name="isin" required>
-                            <div id="companyResults" class="search-results"></div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="company_name">Company Name *</label>
+                            <input type="text" id="company_name" name="company_name" required maxlength="200" placeholder="e.g., Tesla Inc">
                         </div>
+                        <div class="form-group">
+                            <label for="ticker">Ticker *</label>
+                            <input type="text" id="ticker" name="ticker" required maxlength="20" placeholder="e.g., TSLA">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="country">Country</label>
+                            <select id="country" name="country">
+                                <option value="">Select Country</option>
+                                <option value="SE">Sweden</option>
+                                <option value="US">United States</option>
+                                <option value="FI">Finland</option>
+                                <option value="NO">Norway</option>
+                                <option value="DK">Denmark</option>
+                                <option value="NL">Netherlands</option>
+                                <option value="DE">Germany</option>
+                                <option value="GB">United Kingdom</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="currency">Currency</label>
+                            <select id="currency" name="currency">
+                                <option value="SEK">SEK</option>
+                                <option value="USD">USD</option>
+                                <option value="EUR">EUR</option>
+                                <option value="NOK">NOK</option>
+                                <option value="DKK">DKK</option>
+                                <option value="GBP">GBP</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="exchange">Exchange</label>
+                            <input type="text" id="exchange" name="exchange" maxlength="50" placeholder="e.g., NASDAQ, NYSE, OMX">
+                        </div>
+                        <div class="form-group">
+                            <label for="isin">ISIN (Optional)</label>
+                            <input type="text" id="isin" name="isin" maxlength="12" placeholder="e.g., US88160R1014">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="business_description">Business Description</label>
+                        <textarea id="business_description" name="business_description" rows="2" placeholder="Brief description of what the company does..."></textarea>
                     </div>
                     
                     <div class="form-row">
@@ -507,6 +578,58 @@ $csrfToken = Security::generateCSRFToken();
                     <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
                     <button type="submit" class="btn btn-primary">
                         <span id="submitText">Add to Buylist</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add to Masterlist Modal -->
+    <div id="masterlistModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add to Masterlist</h3>
+                <button class="modal-close" onclick="closeMasterlistModal()">&times;</button>
+            </div>
+            <form id="masterlistForm">
+                <input type="hidden" name="action" value="add_to_masterlist">
+                <input type="hidden" id="masterlistBuylistId" name="buylist_id" value="">
+                <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
+                
+                <div class="modal-body">
+                    <p>Add <strong id="masterlistCompanyName"></strong> to your masterlist?</p>
+                    <p class="text-muted">This will make the company available in your portfolio tracking.</p>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="masterlist_market">Market Category</label>
+                            <select id="masterlist_market" name="market">
+                                <option value="">Select Market</option>
+                                <option value="Large Cap">Large Cap</option>
+                                <option value="Mid Cap">Mid Cap</option>
+                                <option value="Small Cap">Small Cap</option>
+                                <option value="NYSE">NYSE</option>
+                                <option value="NASDAQ">NASDAQ</option>
+                                <option value="Private">Private/Unlisted</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="masterlist_share_type">Share Type</label>
+                            <select id="masterlist_share_type" name="share_type_id">
+                                <option value="1">A - Ordinary A Share</option>
+                                <option value="2">B - Ordinary B Share</option>
+                                <option value="3">C - Ordinary C Share</option>
+                                <option value="4">Pref - Preference Share</option>
+                                <option value="5">D - Ordinary D Share</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeMasterlistModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus-circle"></i> Add to Masterlist
                     </button>
                 </div>
             </form>

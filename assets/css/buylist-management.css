@@ -253,6 +253,15 @@ body {
     color: #e53e3e;
 }
 
+.btn-icon.btn-success {
+    color: #28a745;
+}
+
+.btn-icon.btn-success:hover {
+    background: #d4edda;
+    color: #155724;
+}
+
 /* Search Box */
 .search-box {
     position: relative;
@@ -372,6 +381,29 @@ select:focus {
 
 .country {
     font-weight: 500;
+}
+
+.exchange {
+    font-weight: 500;
+}
+
+/* Masterlist Badge */
+.masterlist-badge {
+    background: #28a745;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Text Utilities */
+.text-muted {
+    color: #6c757d;
+    font-size: 0.9rem;
 }
 
 /* Status Badges */
