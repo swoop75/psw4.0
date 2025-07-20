@@ -206,6 +206,15 @@ $quickStats = $dashboardData['quick_stats'];
                                 <p>Manage companies</p>
                             </div>
                         </a>
+                        <a href="<?php echo BASE_URL; ?>/buylist_management.php" class="quick-action-card">
+                            <div class="action-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="action-content">
+                                <h4>Buylist</h4>
+                                <p>Watch & targets</p>
+                            </div>
+                        </a>
                         <a href="<?php echo BASE_URL; ?>/user_management.php" class="quick-action-card">
                             <div class="action-icon">
                                 <i class="fas fa-user-cog"></i>

@@ -60,7 +60,7 @@ class BuylistController {
             }
             
             if (!empty($filters['search'])) {
-                $whereConditions[] = "(m.name LIKE :search OR m.ticker LIKE :search OR b.notes LIKE :search)";
+                $whereConditions[] = "(b.company_name LIKE :search OR b.ticker LIKE :search OR b.notes LIKE :search OR b.research_notes LIKE :search)";
                 $params[':search'] = '%' . $filters['search'] . '%';
             }
             
@@ -79,7 +79,6 @@ class BuylistController {
             // Count total records
             $countSql = "SELECT COUNT(*) as total 
                         FROM buylist b 
-                        LEFT JOIN masterlist m ON b.isin = m.isin 
                         $whereClause";
             $countStmt = $this->foundationDb->prepare($countSql);
             foreach ($params as $key => $value) {

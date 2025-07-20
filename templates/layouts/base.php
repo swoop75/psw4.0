@@ -56,6 +56,9 @@
                             <a href="<?php echo BASE_URL; ?>/masterlist_management.php" class="dropdown-link">
                                 <i class="fas fa-building"></i> Masterlist Management
                             </a>
+                            <a href="<?php echo BASE_URL; ?>/buylist_management.php" class="dropdown-link">
+                                <i class="fas fa-star"></i> Buylist Management
+                            </a>
                             <a href="<?php echo BASE_URL; ?>/user_management.php" class="dropdown-link">
                                 <i class="fas fa-user-cog"></i> User Management
                             </a>
