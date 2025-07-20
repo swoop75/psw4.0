@@ -92,7 +92,7 @@ $currentPage = 'user_management';
 include __DIR__ . '/../templates/header.php';
 ?>
 
-<link rel="stylesheet" href="../assets/css/user-management.css">
+<link rel="stylesheet" href="../assets/css/improved-user-management.css">
 
 <div class="user-management-container">
     <!-- Page Header -->

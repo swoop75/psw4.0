@@ -29,7 +29,7 @@ try {
     // Set page variables
     $pageTitle = 'Dashboard - ' . APP_NAME;
     $pageDescription = 'Portfolio overview and key metrics';
-    $additionalCSS = [ASSETS_URL . '/css/dashboard.css'];
+    $additionalCSS = [ASSETS_URL . '/css/improved-dashboard.css'];
     $additionalJS = [ASSETS_URL . '/js/dashboard.js'];
     
     // Prepare content
