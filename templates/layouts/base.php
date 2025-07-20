@@ -53,8 +53,11 @@
                             <a href="<?php echo BASE_URL; ?>/dashboard.php" class="dropdown-link">
                                 <i class="fas fa-tachometer-alt"></i> Dashboard
                             </a>
-                            <a href="<?php echo BASE_URL; ?>/profile.php" class="dropdown-link">
-                                <i class="fas fa-user-cog"></i> Profile Settings
+                            <a href="<?php echo BASE_URL; ?>/masterlist_management.php" class="dropdown-link">
+                                <i class="fas fa-building"></i> Masterlist Management
+                            </a>
+                            <a href="<?php echo BASE_URL; ?>/user_management.php" class="dropdown-link">
+                                <i class="fas fa-user-cog"></i> User Management
                             </a>
                             <hr style="margin: 12px 0; border: none; border-top: 1px solid #e9ecef;">
                             <a href="<?php echo BASE_URL; ?>/logout.php" class="dropdown-link text-danger">

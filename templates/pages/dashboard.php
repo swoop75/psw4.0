@@ -190,6 +190,53 @@ $quickStats = $dashboardData['quick_stats'];
                 </div>
             </div>
 
+            <!-- Quick Actions -->
+            <div class="dashboard-widget">
+                <div class="widget-header">
+                    <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
+                </div>
+                <div class="widget-content">
+                    <div class="quick-actions-grid">
+                        <a href="<?php echo BASE_URL; ?>/masterlist_management.php" class="quick-action-card">
+                            <div class="action-icon">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div class="action-content">
+                                <h4>Masterlist</h4>
+                                <p>Manage companies</p>
+                            </div>
+                        </a>
+                        <a href="<?php echo BASE_URL; ?>/user_management.php" class="quick-action-card">
+                            <div class="action-icon">
+                                <i class="fas fa-user-cog"></i>
+                            </div>
+                            <div class="action-content">
+                                <h4>User Settings</h4>
+                                <p>Update profile</p>
+                            </div>
+                        </a>
+                        <a href="<?php echo BASE_URL; ?>/logs_dividends.php" class="quick-action-card">
+                            <div class="action-icon">
+                                <i class="fas fa-coins"></i>
+                            </div>
+                            <div class="action-content">
+                                <h4>Dividends</h4>
+                                <p>View dividend logs</p>
+                            </div>
+                        </a>
+                        <a href="<?php echo BASE_URL; ?>/dividend_estimate.php" class="quick-action-card">
+                            <div class="action-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div class="action-content">
+                                <h4>Estimates</h4>
+                                <p>Upcoming dividends</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
             <!-- Upcoming Dividends -->
             <div class="dashboard-widget">
                 <div class="widget-header">
