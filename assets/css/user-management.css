@@ -318,6 +318,17 @@
     border-color: #138496;
 }
 
+.btn-secondary {
+    background: #6c757d;
+    border-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #545b62;
+    border-color: #545b62;
+}
+
 /* Security Information */
 .security-info {
     margin-top: 40px;

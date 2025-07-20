@@ -50,6 +50,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $activeTab = 'preferences';
                     break;
                     
+                case 'generate_password':
+                    $result = $controller->generateRandomPassword();
+                    if ($result['success']) {
+                        $success = 'New password generated: <strong>' . $result['password'] . '</strong> - Please save this password!';
+                        $activeTab = 'security';
+                    } else {
+                        $error = $result['message'];
+                    }
+                    break;
+                    
                 default:
                     $error = 'Invalid action.';
             }
@@ -253,6 +263,21 @@ include __DIR__ . '/../templates/header.php';
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-key"></i> Change Password
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Generate Password Form -->
+                <form method="POST" class="generate-password-form" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e9ecef;">
+                    <input type="hidden" name="csrf_token" value="<?php echo Security::generateCsrfToken(); ?>">
+                    <input type="hidden" name="action" value="generate_password">
+                    
+                    <h3>Generate Random Password</h3>
+                    <p>Click the button below to generate a secure random password. The new password will be displayed once and should be saved immediately.</p>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-secondary" onclick="return confirm('This will generate a new random password and immediately update your account. Are you sure?')">
+                            <i class="fas fa-random"></i> Generate Random Password
                         </button>
                     </div>
                 </form>

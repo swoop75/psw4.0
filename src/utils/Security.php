@@ -47,6 +47,15 @@ class Security {
     }
     
     /**
+     * Validate CSRF token (alias for verifyCSRFToken)
+     * @param string $token Token to validate
+     * @return bool True if token is valid
+     */
+    public static function validateCsrfToken($token) {
+        return self::verifyCSRFToken($token);
+    }
+    
+    /**
      * Sanitize input data
      * @param string $input Input string to sanitize
      * @return string Sanitized string

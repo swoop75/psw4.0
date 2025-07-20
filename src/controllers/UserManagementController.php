@@ -530,4 +530,63 @@ class UserManagementController {
             return [];
         }
     }
+    
+    /**
+     * Generate random password and update user
+     * @return array Result with success status and new password
+     */
+    public function generateRandomPassword() {
+        try {
+            $userId = Auth::getUserId();
+            if (!$userId) {
+                throw new Exception('User not logged in');
+            }
+            
+            // Generate secure random password
+            $newPassword = $this->generateSecurePassword();
+            
+            // Update password
+            $passwordHash = Security::hashPassword($newPassword);
+            $success = $this->updateUser($userId, ['password_hash' => $passwordHash]);
+            
+            if ($success) {
+                Logger::logUserAction('password_generated', 'Random password generated for user');
+                return [
+                    'success' => true,
+                    'password' => $newPassword,
+                    'message' => 'Password generated successfully'
+                ];
+            }
+            
+            return ['success' => false, 'message' => 'Failed to update password'];
+            
+        } catch (Exception $e) {
+            Logger::error('Generate password error: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+    
+    /**
+     * Generate a secure random password
+     * @return string Secure random password
+     */
+    private function generateSecurePassword() {
+        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+        $password = '';
+        $length = 12;
+        
+        // Ensure at least one of each type
+        $password .= substr('abcdefghijklmnopqrstuvwxyz', rand(0, 25), 1); // lowercase
+        $password .= substr('ABCDEFGHIJKLMNOPQRSTUVWXYZ', rand(0, 25), 1); // uppercase
+        $password .= substr('0123456789', rand(0, 9), 1); // number
+        $password .= substr('!@#$%^&*', rand(0, 7), 1); // special
+        
+        // Fill the rest randomly
+        for ($i = 4; $i < $length; $i++) {
+            $password .= $chars[rand(0, strlen($chars) - 1)];
+        }
+        
+        // Shuffle the password
+        return str_shuffle($password);
+    }
 }
