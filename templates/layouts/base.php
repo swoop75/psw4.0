@@ -112,19 +112,73 @@
             <div class="nav-container">
                 <?php 
                 $menu = Auth::getAccessibleMenu();
+                
+                // Define page mappings for menu items
+                $pageMapping = [
+                    'dashboard' => 'dashboard.php',
+                    'portfolio' => '#', // No main portfolio page
+                    'allocation' => '#', // No allocation page yet
+                    'dividend_estimate' => 'dividend_estimate.php',
+                    'logs' => '#', // No main logs page
+                    'buying' => '#', // No main buying page
+                    'rules' => '#', // No rules page yet
+                    'administration' => '#' // No main admin page
+                ];
+                
+                // Define submenu page mappings
+                $submenuMapping = [
+                    'portfolio' => [
+                        'company_list' => 'masterlist_management.php',
+                        'company_page' => 'company_detail.php'
+                    ],
+                    'dividend_estimate' => [
+                        'overview' => 'dividend_estimate.php',
+                        'monthly_overview' => 'dividend_estimate.php?view=monthly'
+                    ],
+                    'logs' => [
+                        'dividends' => 'logs_dividends.php',
+                        'trades' => '#',
+                        'corporate_actions' => '#',
+                        'cash_transactions' => '#',
+                        'expenses' => '#'
+                    ],
+                    'buying' => [
+                        'buylist_management' => 'buylist_management.php',
+                        'new_companies' => '#'
+                    ],
+                    'rules' => [
+                        'rulebook' => '#'
+                    ],
+                    'administration' => [
+                        'page_management' => '#',
+                        'admin_management' => '#',
+                        'user_management' => 'user_management.php',
+                        'masterlist_management' => 'masterlist_management.php'
+                    ]
+                ];
+                
                 foreach ($menu as $key => $item):
+                    $mainUrl = $pageMapping[$key] ?? '#';
                 ?>
                     <div class="nav-item">
-                        <a href="<?php echo BASE_URL; ?>/<?php echo $key; ?>.php" class="nav-link">
+                        <a href="<?php echo $mainUrl === '#' ? 'javascript:void(0)' : BASE_URL . '/' . $mainUrl; ?>" class="nav-link <?php echo $mainUrl === '#' ? 'nav-dropdown-only' : ''; ?>">
                             <i class="<?php echo ICONS[$key] ?? 'fas fa-circle'; ?>"></i>
                             <?php echo $item['title']; ?>
+                            <?php if (isset($item['submenu']) && !empty($item['submenu'])): ?>
+                                <i class="fas fa-chevron-down nav-arrow"></i>
+                            <?php endif; ?>
                         </a>
                         
                         <?php if (isset($item['submenu']) && !empty($item['submenu'])): ?>
                             <div class="submenu">
-                                <?php foreach ($item['submenu'] as $subKey => $subItem): ?>
-                                    <a href="<?php echo BASE_URL; ?>/<?php echo $key; ?>_<?php echo $subKey; ?>.php" class="submenu-link">
+                                <?php foreach ($item['submenu'] as $subKey => $subItem): 
+                                    $subUrl = $submenuMapping[$key][$subKey] ?? '#';
+                                ?>
+                                    <a href="<?php echo $subUrl === '#' ? 'javascript:void(0)' : BASE_URL . '/' . $subUrl; ?>" class="submenu-link">
                                         <?php echo $subItem['title']; ?>
+                                        <?php if ($subItem['admin_only']): ?>
+                                            <span class="admin-badge">ADMIN</span>
+                                        <?php endif; ?>
                                     </a>
                                 <?php endforeach; ?>
                             </div>

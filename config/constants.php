@@ -74,7 +74,7 @@ define('MENU_STRUCTURE', [
         'access' => ACCESS_ADMIN,
         'admin_only' => true,
         'submenu' => [
-            'buy_list' => ['title' => 'Buy List', 'admin_only' => true],
+            'buylist_management' => ['title' => 'Buy List', 'admin_only' => true],
             'new_companies' => ['title' => 'New Companies', 'admin_only' => true]
         ]
     ],

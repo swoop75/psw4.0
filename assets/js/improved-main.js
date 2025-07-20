@@ -25,6 +25,7 @@ PSW = {
     init: function() {
         this.initHeader();
         this.initDropdowns();
+        this.initNavigation();
         this.initAnimations();
         this.initUtilities();
         this.initScrollEffects();
@@ -139,6 +140,127 @@ PSW = {
         dropdownLinks.forEach(link => {
             link.addEventListener('click', () => {
                 toggleDropdown(false);
+            });
+        });
+    },
+
+    // Navigation menu functionality
+    initNavigation: function() {
+        const navItems = document.querySelectorAll('.nav-item');
+        
+        navItems.forEach(navItem => {
+            const navLink = navItem.querySelector('.nav-link');
+            const submenu = navItem.querySelector('.submenu');
+            
+            if (!submenu) return;
+            
+            let isHovering = false;
+            let hoverTimer = null;
+            
+            // Show submenu on hover
+            const showSubmenu = () => {
+                if (hoverTimer) {
+                    clearTimeout(hoverTimer);
+                    hoverTimer = null;
+                }
+                isHovering = true;
+                submenu.style.opacity = '1';
+                submenu.style.visibility = 'visible';
+                submenu.style.transform = 'translateY(0)';
+            };
+            
+            // Hide submenu with delay
+            const hideSubmenu = () => {
+                isHovering = false;
+                hoverTimer = setTimeout(() => {
+                    if (!isHovering) {
+                        submenu.style.opacity = '0';
+                        submenu.style.visibility = 'hidden';
+                        submenu.style.transform = 'translateY(-10px)';
+                    }
+                }, 200);
+            };
+            
+            // Mouse enter on nav item
+            navItem.addEventListener('mouseenter', showSubmenu);
+            
+            // Mouse leave on nav item
+            navItem.addEventListener('mouseleave', hideSubmenu);
+            
+            // Mouse enter on submenu (prevent hiding)
+            submenu.addEventListener('mouseenter', () => {
+                if (hoverTimer) {
+                    clearTimeout(hoverTimer);
+                    hoverTimer = null;
+                }
+                isHovering = true;
+            });
+            
+            // Mouse leave on submenu
+            submenu.addEventListener('mouseleave', hideSubmenu);
+            
+            // Click handling for dropdown-only links
+            if (navLink.classList.contains('nav-dropdown-only')) {
+                navLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (submenu.style.opacity === '1') {
+                        hideSubmenu();
+                    } else {
+                        showSubmenu();
+                    }
+                });
+            }
+            
+            // Handle submenu clicks
+            const submenuLinks = submenu.querySelectorAll('.submenu-link');
+            submenuLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    // Add loading state
+                    link.style.opacity = '0.7';
+                    setTimeout(() => {
+                        link.style.opacity = '1';
+                    }, 200);
+                });
+            });
+        });
+        
+        // Keyboard navigation support
+        this.initKeyboardNavigation();
+    },
+    
+    // Keyboard navigation for accessibility
+    initKeyboardNavigation: function() {
+        const navLinks = document.querySelectorAll('.nav-link, .submenu-link');
+        
+        navLinks.forEach((link, index) => {
+            link.addEventListener('keydown', (e) => {
+                switch(e.key) {
+                    case 'ArrowRight':
+                        e.preventDefault();
+                        const nextLink = navLinks[index + 1];
+                        if (nextLink) nextLink.focus();
+                        break;
+                        
+                    case 'ArrowLeft':
+                        e.preventDefault();
+                        const prevLink = navLinks[index - 1];
+                        if (prevLink) prevLink.focus();
+                        break;
+                        
+                    case 'ArrowDown':
+                        e.preventDefault();
+                        const parentNavItem = link.closest('.nav-item');
+                        if (parentNavItem) {
+                            const firstSubmenuLink = parentNavItem.querySelector('.submenu-link');
+                            if (firstSubmenuLink) firstSubmenuLink.focus();
+                        }
+                        break;
+                        
+                    case 'Escape':
+                        e.preventDefault();
+                        link.blur();
+                        break;
+                }
             });
         });
     },
