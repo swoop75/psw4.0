@@ -286,4 +286,14 @@ class User {
             return ['success' => false, 'message' => 'Failed to delete user'];
         }
     }
+    }
+    
+    /**
+     * Get user by ID (alias for consistency)
+     * @param int $userId User ID
+     * @return array < /dev/null | false User data or false if not found
+     */
+    public function getUserById($userId) {
+        return $this->findById($userId);
+    }
 }

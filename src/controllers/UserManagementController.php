@@ -1,0 +1,533 @@
+<?php
+/**
+ * File: src/controllers/UserManagementController.php
+ * Path: C:\Users\laoan\Documents\GitHub\psw\psw4.0\src\controllers\UserManagementController.php
+ * Description: User management controller for PSW 4.0 - handles user profile and settings
+ */
+
+require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../models/User.php';
+require_once __DIR__ . '/../middleware/Auth.php';
+require_once __DIR__ . '/../utils/Logger.php';
+require_once __DIR__ . '/../utils/Security.php';
+
+class UserManagementController {
+    private $userModel;
+    private $foundationDb;
+    
+    public function __construct() {
+        $this->userModel = new User();
+        $this->foundationDb = Database::getConnection('foundation');
+    }
+    
+    /**
+     * Get user by ID - wrapper method
+     * @param int $userId User ID
+     * @return array|false User data or false if not found
+     */
+    public function getUserById($userId) {
+        return $this->userModel->findById($userId);
+    }
+    
+    /**
+     * Update user data
+     * @param int $userId User ID
+     * @param array $data Data to update
+     * @return bool Success status
+     */
+    public function updateUser($userId, $data) {
+        try {
+            $updateFields = [];
+            $params = [':user_id' => $userId];
+            
+            if (isset($data['email'])) {
+                $updateFields[] = 'email = :email';
+                $params[':email'] = $data['email'];
+            }
+            
+            if (isset($data['full_name'])) {
+                $updateFields[] = 'full_name = :full_name';
+                $params[':full_name'] = $data['full_name'];
+            }
+            
+            if (isset($data['password_hash'])) {
+                $updateFields[] = 'password_hash = :password_hash';
+                $params[':password_hash'] = $data['password_hash'];
+            }
+            
+            if (empty($updateFields)) {
+                return false;
+            }
+            
+            $sql = "UPDATE users SET " . implode(', ', $updateFields) . ", updated_at = NOW() WHERE id = :user_id";
+            $stmt = $this->foundationDb->prepare($sql);
+            
+            foreach ($params as $key => $value) {
+                $stmt->bindValue($key, $value);
+            }
+            
+            return $stmt->execute();
+            
+        } catch (Exception $e) {
+            Logger::error('Update user error: ' . $e->getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Get user profile data
+     * @return array User profile information
+     */
+    public function getUserProfile() {
+        try {
+            $userId = Auth::getUserId();
+            if (!$userId) {
+                throw new Exception('User not logged in');
+            }
+            
+            $user = $this->getUserById($userId);
+            if (!$user) {
+                throw new Exception('User not found');
+            }
+            
+            // Get additional profile data
+            $profileData = $this->getProfileExtendedData($userId);
+            
+            return [
+                'user' => [
+                    'id' => $user['id'],
+                    'username' => $user['username'],
+                    'email' => $user['email'],
+                    'full_name' => $user['full_name'],
+                    'role_id' => $user['role_id'],
+                    'role_name' => $user['role_id'] == 1 ? 'Administrator' : 'User',
+                    'created_at' => $user['created_at'],
+                    'last_login' => $user['last_login'],
+                    'is_active' => $user['is_active']
+                ],
+                'profile_stats' => $profileData['stats'],
+                'preferences' => $profileData['preferences'],
+                'activity_log' => $profileData['activity_log']
+            ];
+            
+        } catch (Exception $e) {
+            Logger::error('Get user profile error: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+    
+    /**
+     * Update user profile information
+     * @param array $data Profile update data
+     * @return bool Success status
+     */
+    public function updateProfile($data) {
+        try {
+            $userId = Auth::getUserId();
+            if (!$userId) {
+                throw new Exception('User not logged in');
+            }
+            
+            // Validate and sanitize input
+            $updateData = [];
+            
+            if (isset($data['full_name'])) {
+                $fullName = Security::sanitizeInput($data['full_name']);
+                if (strlen($fullName) > 100) {
+                    throw new Exception('Full name too long');
+                }
+                $updateData['full_name'] = $fullName;
+            }
+            
+            if (isset($data['email'])) {
+                $email = Security::sanitizeInput($data['email']);
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    throw new Exception('Invalid email format');
+                }
+                
+                // Check if email is already taken by another user
+                if ($this->isEmailTaken($email, $userId)) {
+                    throw new Exception('Email address is already in use');
+                }
+                
+                $updateData['email'] = $email;
+            }
+            
+            if (empty($updateData)) {
+                throw new Exception('No valid data to update');
+            }
+            
+            // Update user profile
+            $success = $this->updateUser($userId, $updateData);
+            
+            if ($success) {
+                Logger::logUserAction('profile_updated', 'User profile updated', array_keys($updateData));
+                return true;
+            }
+            
+            return false;
+            
+        } catch (Exception $e) {
+            Logger::error('Update profile error: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+    
+    /**
+     * Change user password
+     * @param array $data Password change data
+     * @return bool Success status
+     */
+    public function changePassword($data) {
+        try {
+            $userId = Auth::getUserId();
+            if (!$userId) {
+                throw new Exception('User not logged in');
+            }
+            
+            $currentPassword = $data['current_password'] ?? '';
+            $newPassword = $data['new_password'] ?? '';
+            $confirmPassword = $data['confirm_password'] ?? '';
+            
+            // Validate current password
+            $user = $this->getUserById($userId);
+            if (!$user || !Security::verifyPassword($currentPassword, $user['password_hash'])) {
+                throw new Exception('Current password is incorrect');
+            }
+            
+            // Validate new password
+            if (strlen($newPassword) < 8) {
+                throw new Exception('New password must be at least 8 characters long');
+            }
+            
+            if ($newPassword !== $confirmPassword) {
+                throw new Exception('New passwords do not match');
+            }
+            
+            // Check password strength
+            if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/', $newPassword)) {
+                throw new Exception('Password must contain at least one lowercase letter, one uppercase letter, and one number');
+            }
+            
+            // Update password
+            $passwordHash = Security::hashPassword($newPassword);
+            $success = $this->updateUser($userId, ['password_hash' => $passwordHash]);
+            
+            if ($success) {
+                Logger::logUserAction('password_changed', 'User password changed');
+                return true;
+            }
+            
+            return false;
+            
+        } catch (Exception $e) {
+            Logger::error('Change password error: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+    
+    /**
+     * Update user preferences
+     * @param array $preferences Preferences data
+     * @return bool Success status
+     */
+    public function updatePreferences($preferences) {
+        try {
+            $userId = Auth::getUserId();
+            if (!$userId) {
+                throw new Exception('User not logged in');
+            }
+            
+            // Validate preferences
+            $validPreferences = [
+                'theme' => ['light', 'dark', 'auto'],
+                'language' => ['en', 'sv'],
+                'currency_display' => ['SEK', 'USD', 'EUR'],
+                'date_format' => ['Y-m-d', 'd/m/Y', 'm/d/Y'],
+                'decimal_places' => [0, 1, 2, 3, 4],
+                'notifications_email' => [true, false],
+                'dashboard_refresh' => [30, 60, 300, 600, 0], // seconds, 0 = manual
+                'table_page_size' => [25, 50, 100, 200]
+            ];
+            
+            $cleanPreferences = [];
+            foreach ($preferences as $key => $value) {
+                if (isset($validPreferences[$key])) {
+                    if (in_array($value, $validPreferences[$key], true)) {
+                        $cleanPreferences[$key] = $value;
+                    }
+                }
+            }
+            
+            if (empty($cleanPreferences)) {
+                throw new Exception('No valid preferences to update');
+            }
+            
+            // Save preferences
+            $success = $this->saveUserPreferences($userId, $cleanPreferences);
+            
+            if ($success) {
+                Logger::logUserAction('preferences_updated', 'User preferences updated', array_keys($cleanPreferences));
+                return true;
+            }
+            
+            return false;
+            
+        } catch (Exception $e) {
+            Logger::error('Update preferences error: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+    
+    /**
+     * Get extended profile data
+     * @param int $userId User ID
+     * @return array Extended profile data
+     */
+    private function getProfileExtendedData($userId) {
+        try {
+            // Get basic stats
+            $stats = [
+                'login_count' => $this->getLoginCount($userId),
+                'last_activity' => $this->getLastActivity($userId),
+                'account_age_days' => $this->getAccountAgeDays($userId),
+                'dividend_payments_count' => $this->getDividendPaymentsCount(),
+                'total_dividend_amount' => $this->getTotalDividendAmount()
+            ];
+            
+            // Get user preferences
+            $preferences = $this->getUserPreferences($userId);
+            
+            // Get recent activity log
+            $activityLog = $this->getRecentActivityLog($userId);
+            
+            return [
+                'stats' => $stats,
+                'preferences' => $preferences,
+                'activity_log' => $activityLog
+            ];
+            
+        } catch (Exception $e) {
+            Logger::error('Get profile extended data error: ' . $e->getMessage());
+            return [
+                'stats' => [],
+                'preferences' => [],
+                'activity_log' => []
+            ];
+        }
+    }
+    
+    /**
+     * Check if email is already taken by another user
+     * @param string $email Email to check
+     * @param int $excludeUserId User ID to exclude from check
+     * @return bool True if email is taken
+     */
+    private function isEmailTaken($email, $excludeUserId) {
+        try {
+            $sql = "SELECT id FROM users WHERE email = :email AND id != :user_id";
+            $stmt = $this->foundationDb->prepare($sql);
+            $stmt->bindValue(':email', $email);
+            $stmt->bindValue(':user_id', $excludeUserId, PDO::PARAM_INT);
+            $stmt->execute();
+            
+            return $stmt->rowCount() > 0;
+            
+        } catch (Exception $e) {
+            Logger::error('Check email taken error: ' . $e->getMessage());
+            return true; // Err on the side of caution
+        }
+    }
+    
+    /**
+     * Get user login count
+     * @param int $userId User ID
+     * @return int Login count
+     */
+    private function getLoginCount($userId) {
+        try {
+            $sql = "SELECT login_count FROM user_stats WHERE user_id = :user_id";
+            $stmt = $this->foundationDb->prepare($sql);
+            $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+            $stmt->execute();
+            
+            $result = $stmt->fetch();
+            return (int) ($result['login_count'] ?? 0);
+            
+        } catch (Exception $e) {
+            return 0;
+        }
+    }
+    
+    /**
+     * Get last activity timestamp
+     * @param int $userId User ID
+     * @return string|null Last activity timestamp
+     */
+    private function getLastActivity($userId) {
+        try {
+            $sql = "SELECT last_activity FROM user_stats WHERE user_id = :user_id";
+            $stmt = $this->foundationDb->prepare($sql);
+            $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+            $stmt->execute();
+            
+            $result = $stmt->fetch();
+            return $result['last_activity'] ?? null;
+            
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+    
+    /**
+     * Get account age in days
+     * @param int $userId User ID
+     * @return int Account age in days
+     */
+    private function getAccountAgeDays($userId) {
+        try {
+            $sql = "SELECT DATEDIFF(NOW(), created_at) as age_days FROM users WHERE id = :user_id";
+            $stmt = $this->foundationDb->prepare($sql);
+            $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+            $stmt->execute();
+            
+            $result = $stmt->fetch();
+            return (int) ($result['age_days'] ?? 0);
+            
+        } catch (Exception $e) {
+            return 0;
+        }
+    }
+    
+    /**
+     * Get dividend payments count from portfolio database
+     * @return int Dividend payments count
+     */
+    private function getDividendPaymentsCount() {
+        try {
+            $portfolioDb = Database::getConnection('portfolio');
+            $sql = "SELECT COUNT(*) as count FROM log_dividends WHERE dividend_total_sek > 0";
+            $stmt = $portfolioDb->prepare($sql);
+            $stmt->execute();
+            
+            $result = $stmt->fetch();
+            return (int) ($result['count'] ?? 0);
+            
+        } catch (Exception $e) {
+            return 0;
+        }
+    }
+    
+    /**
+     * Get total dividend amount from portfolio database
+     * @return float Total dividend amount
+     */
+    private function getTotalDividendAmount() {
+        try {
+            $portfolioDb = Database::getConnection('portfolio');
+            $sql = "SELECT SUM(dividend_total_sek) as total FROM log_dividends WHERE dividend_total_sek > 0";
+            $stmt = $portfolioDb->prepare($sql);
+            $stmt->execute();
+            
+            $result = $stmt->fetch();
+            return (float) ($result['total'] ?? 0);
+            
+        } catch (Exception $e) {
+            return 0.0;
+        }
+    }
+    
+    /**
+     * Get user preferences
+     * @param int $userId User ID
+     * @return array User preferences
+     */
+    private function getUserPreferences($userId) {
+        try {
+            $sql = "SELECT preference_key, preference_value FROM user_preferences WHERE user_id = :user_id";
+            $stmt = $this->foundationDb->prepare($sql);
+            $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+            $stmt->execute();
+            
+            $preferences = [];
+            while ($row = $stmt->fetch()) {
+                $preferences[$row['preference_key']] = json_decode($row['preference_value'], true) ?? $row['preference_value'];
+            }
+            
+            // Set defaults for missing preferences
+            $defaults = [
+                'theme' => 'light',
+                'language' => 'en',
+                'currency_display' => 'SEK',
+                'date_format' => 'Y-m-d',
+                'decimal_places' => 2,
+                'notifications_email' => true,
+                'dashboard_refresh' => 300,
+                'table_page_size' => 50
+            ];
+            
+            return array_merge($defaults, $preferences);
+            
+        } catch (Exception $e) {
+            Logger::error('Get user preferences error: ' . $e->getMessage());
+            return [];
+        }
+    }
+    
+    /**
+     * Save user preferences
+     * @param int $userId User ID
+     * @param array $preferences Preferences to save
+     * @return bool Success status
+     */
+    private function saveUserPreferences($userId, $preferences) {
+        try {
+            $this->foundationDb->beginTransaction();
+            
+            foreach ($preferences as $key => $value) {
+                $sql = "INSERT INTO user_preferences (user_id, preference_key, preference_value) 
+                        VALUES (:user_id, :key, :value) 
+                        ON DUPLICATE KEY UPDATE preference_value = :value";
+                
+                $stmt = $this->foundationDb->prepare($sql);
+                $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+                $stmt->bindValue(':key', $key);
+                $stmt->bindValue(':value', is_array($value) ? json_encode($value) : $value);
+                $stmt->execute();
+            }
+            
+            $this->foundationDb->commit();
+            return true;
+            
+        } catch (Exception $e) {
+            $this->foundationDb->rollBack();
+            Logger::error('Save user preferences error: ' . $e->getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Get recent activity log
+     * @param int $userId User ID
+     * @return array Recent activity log entries
+     */
+    private function getRecentActivityLog($userId) {
+        try {
+            $sql = "SELECT action_type, description, created_at 
+                    FROM user_activity_log 
+                    WHERE user_id = :user_id 
+                    ORDER BY created_at DESC 
+                    LIMIT 20";
+            
+            $stmt = $this->foundationDb->prepare($sql);
+            $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+            $stmt->execute();
+            
+            return $stmt->fetchAll() ?: [];
+            
+        } catch (Exception $e) {
+            Logger::error('Get recent activity log error: ' . $e->getMessage());
+            return [];
+        }
+    }
+}
