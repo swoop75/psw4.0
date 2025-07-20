@@ -240,7 +240,7 @@
         /* Beautiful Features */
         .features-container {
             max-width: 800px;
-            margin: 0 auto 2rem;
+            margin: 0 auto 4rem;
             text-align: left;
         }
         
