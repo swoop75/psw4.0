@@ -368,7 +368,7 @@
             </div>
         </div>
         <div class="hero-title">
-            <span class="title-main">Pengemaskinen</span>
+            <span class="title-main">Pengamaskinen</span>
             <span class="title-location">Sverige + Worldwide</span>
         </div>
     </div>
@@ -447,7 +447,7 @@
 </div>
 
 <script>
-    console.log('🎨 Beautiful Pengemaskinen landing page with ORIGINAL logo loaded!');
+    console.log('🎨 Beautiful Pengamaskinen landing page with ORIGINAL logo loaded!');
     
     // Enhanced interactions
     document.addEventListener('DOMContentLoaded', function() {
