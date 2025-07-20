@@ -50,7 +50,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            height: 80px;
         }
         
         .logo-header {
@@ -484,6 +483,7 @@
         </a>
         
         <div class="nav-links">
+            <a href="/" class="nav-link">Home</a>
             <a href="#" class="nav-link">About</a>
             <a href="<?php echo BASE_URL; ?>/public/psw_philosophy.html" class="nav-link">Philosophy</a>
             <a href="<?php echo BASE_URL; ?>/login.php" class="login-button">
