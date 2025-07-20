@@ -1,0 +1,212 @@
+PSW: Pengamaskinen Sverige + Worldwide Portfolio Dashboard
+Date: 2025-07-07
+Version: 4.1
+
+1. Introduction
+This document serves as the primary design guideline for the Dividend Stock Portfolio Dashboard, a web-based application designed to visualize and analyze a user's dividend stock portfolio and research individual companies. The goal is to provide a clean, detail-rich, and interactive experience for investment-focused individuals who value precise data and clear visualization, drawing inspiration from the data density and clarity of Nordnet.se and Google Finance.
+The dashboard will integrate various API data sources with a MySQL database, running on an Apache server with PHP.
+
+2. Core Design Principles
+Inspired by www.avanza.se and Google Finance.
+
+These principles will guide all design decisions:
+•	Data Clarity & Precision: Every piece of data presented must be clear, legible, and accurate. Numbers are paramount, and their meaning should be immediately understandable.
+•	Information Density with Simplicity: Present a significant amount of data without overwhelming the user. Achieve this through a clean layout, thoughtful use of white space, and logical grouping of related information, akin to Nordnet's balance.
+•	Interactivity & Control: Empower users to explore data deeply. Charts and tables must be highly interactive, allowing for filtering, time-frame adjustments, and drill-downs.
+•	Actionability: Data should not just be presented; it should facilitate informed decision-making. Key performance indicators and alerts should be prominent.
+•	Consistency: Maintain a consistent look, feel, and interaction model across all sections and components of the application.
+•	Performance: The dashboard must load quickly and respond smoothly, even with complex data visualizations.
+
+3. Target Audience Profile
+Name: The "Detail-Oriented Dividend Investor"
+Characteristics:
+•	Highly analytical, loves numbers and financial metrics.
+•	Focuses primarily on dividends (current yield, historical yield, growth, payout ratio, ex-dividend dates).
+•	Values historical data and performance trends.
+•	Comfortable navigating data-dense interfaces if well-organized.
+•	Seeks clarity, precision, and the ability to "dig deep" into specific company financials.
+•	Prefers data presented in both raw numerical format (tables) and digestible visual formats (charts).
+•	Needs tools for tracking, analysis, and decision support.
+4. Overall Layout & Grid System
+The layout will be inspired by the clean, structured approach of Nordnet and Google Finance, prioritizing a clear hierarchy of information.
+General Structure:
+•	Fixed Header: 
+o	Application Logo/Name (Left)
+o	Search Bar (Central/Right)
+o	User Profile/Settings (Right)
+o	Logout Button (Right)
+•	Left Sidebar (Optional/Collapsible): For primary navigation between major sections (e.g., Dashboard Summary, Portfolio Details, Company Lookup, News, Settings). This allows for quick access without cluttering the main content area.
+•	Main Content Area: Dynamic area displaying the selected dashboard view, company details, or search results. This will be divided into logical sections using a flexible grid system (e.g., 12-column grid for responsiveness).
+•	Footer: Minimal, perhaps copyright information or version number.
+Key Layout Considerations:
+•	Responsive Design: While a desktop-first approach is implied for detailed analysis, the layout should gracefully adapt to smaller screens (tablets) for basic viewing.
+•	Information Grouping: Related data points will be grouped visually using cards, panels, or distinct sections with clear headings.
+•	White Space: Strategic use of white space to prevent visual clutter and improve readability, especially around data-dense tables and charts.
+5. Color Palette & Typography
+The palette and typography will aim for a professional, trustworthy, and visually clean aesthetic.
+Color Palette:
+•	Primary Accent Color: A professional blue or teal (e.g., #007bff or #2196F3 for a Google Finance feel, or a slightly darker Nordnet-like blue #00375E) to highlight interactive elements, calls to action, and key metrics.
+•	Secondary Accent Color: A complementary color (e.g., a subtle green for positive performance/growth, a subtle red for negative, or a neutral grey/orange for alerts). 
+o	Positive: Green (e.g., #28a745)
+o	Negative: Red (e.g., #dc3545)
+•	Neutral Palette (Backgrounds & Text): 
+o	Backgrounds: Light grey or off-white (e.g., #f8f9fa or #ffffff) for main content areas to provide a clean canvas.
+o	Borders/Dividers: Subtle light grey (e.g., #e9ecef).
+o	Text: Dark grey/black for primary text (e.g., #212529), lighter grey for secondary text (e.g., #6c757d).
+•	Chart Colors: A well-defined set of distinct, accessible colors for data series in charts, ensuring readability and differentiation. Avoid overly bright or clashing colors. 
+o	Example Series Colors: Use a professional, muted palette from tools like ColorBrewer (sequential/diverging schemes) or a carefully selected custom set.
+Typography:
+•	Font Family: A clean, highly readable sans-serif font family. Examples: 
+o	Google Fonts: Open Sans, Lato, Roboto (similar to Google Finance).
+o	System Fonts: Arial, Helvetica (for broad compatibility).
+•	Font Sizes: 
+o	Headings (H1, H2, H3): Clear hierarchy, progressively smaller. H1 for main page title, H2 for major section titles, H3 for sub-sections.
+o	Body Text: Comfortable reading size (e.g., 14-16px).
+o	Data Labels/Table Text: Slightly smaller but still highly legible (e.g., 12-14px).
+o	Numbers: Potentially a slightly bolder weight or specific monospaced font for financial figures to improve legibility and alignment in tables.
+•	Line Height & Letter Spacing: Optimize for readability, especially in data-dense tables.
+
+6. Dashboard Components & Data Visualization Guidelines
+This section details the specific components and visualization types.
+
+6.1. Login Screen
+•	Simplicity: Clean, minimal design.
+•	Fields: Username/Email, Password.
+•	Actions: Login button, "Forgot Password?" link, (Optional: "Register" link if self-registration is allowed).
+•	Branding: Prominent display of application logo/name.
+•	Security Message: A subtle message reassuring users about data security.
+
+6.2. Search Box
+•	Placement: Prominently in the header, always accessible.
+•	Functionality: 
+o	Auto-suggest: As the user types, suggest relevant companies (ticker symbol, company name) from a broad universe (not just portfolio holdings).
+o	Search Scope: Primarily for company lookup, leading to the "Company Lookup & Detailed Report" page. Potentially extend to search news or specific reports.
+•	Visuals: Clean input field with a search icon.
+
+6.3. Main Dashboard View
+This will be the landing page after login, providing an overview of the portfolio.
+•	Key Portfolio Metrics (Top Row/Cards): 
+o	Total Portfolio Value
+o	Daily/Weekly/Monthly Change (Absolute and Percentage)
+o	Total Dividends Collected YTD/All Time
+o	Current Average Portfolio Yield
+o	Expected Dividends Next Month
+•	Portfolio Allocation (Pie Charts): 
+o	Sector Allocation: Clear segments for each sector, with percentage labels. Interactivity: Hover to see exact percentage and value. Click to filter portfolio by sector.
+o	Industry Allocation: Similar to sector, perhaps a secondary pie chart or a drill-down from sector.
+o	Geographical Allocation (Geo-chart): A world map or relevant regional map highlighting countries where companies are based, with color intensity or size indicating allocation weight. Interactivity: Hover for exact percentage/value.
+•	Performance Chart (Line Chart): 
+o	Data: Portfolio value over time, potentially benchmarked against an index (e.g., S&P 500).
+o	Interactivity: 
+•	Timeframe Selector: Buttons/dropdown for 1D, 5D, 1M, 3M, 6M, YTD, 1Y, 5Y, Max.
+•	Zoom/Pan: Allow users to select specific periods within the chart.
+•	Tooltip: Display exact value and date on hover.
+•	Recent Dividend Payments (Table): 
+o	A concise table showing the most recent 5-10 dividend payments received.
+o	Columns: Date, Company, Ticker, Shares, Dividend per Share, Total Amount.
+•	Upcoming Ex-Dividend Dates (Table): 
+o	A table showing upcoming ex-dividend dates for portfolio holdings.
+o	Columns: Company, Ticker, Ex-Dividend Date, Pay Date, Estimated Dividend per Share, Shares Held.
+
+6.4. Portfolio Details / Holdings View
+A dedicated section for a detailed list of all holdings.
+•	Holdings Table: 
+o	Columns (Configurable/Sortable): Ticker, Company Name, Shares, Average Cost, Current Price, Current Value, Daily Change (Abs/%), Total Gain/Loss (Abs/%), Current Yield, Payout Ratio, Dividend Growth (3Y/5Y Avg), Next Ex-Div Date, Next Pay Date, Expected Dividend.
+o	Interactivity: Sortable columns, search/filter within the table. Click on a row to navigate to the individual company analysis page (now redirecting to the expanded "Company Lookup & Detailed Report" page).
+•	Dividend Income History (Bar Chart & Table): 
+o	Bar Chart: Dividends collected per month/quarter/year. Interactivity: Hover for exact amount.
+o	Table Below Chart: Detailed breakdown of dividends received, perhaps grouped by year/month, showing Company, Date, Amount.
+•	Top Dividend Payers (Table): 
+o	Table showing companies that have paid the most dividends historically (total amount). Columns: Company, Ticker, Total Dividends Received.
+•	Highest Single Dividend Payments (Table): 
+o	Table showing the largest individual dividend payments received. Columns: Date, Company, Amount.
+
+6.5. Company Lookup & Detailed Report
+This is a comprehensive, dedicated page accessible via the global search bar or by clicking on a company in the portfolio holdings.
+•	Header: Company Name, Ticker, Current Price, Daily Change (Abs/%).
+•	Short Company Description: A concise paragraph providing an overview of the company's business.
+•	Company Facts (Key Data Points): 
+o	Layout: Presented as a series of well-organized, distinct cards or a summary table.
+o	Content: Sector, Industry, Market Cap, Enterprise Value, Shares Outstanding, Exchange, Country of Origin, IPO Date, Employees.
+•	My Score/Rank: 
+o	Placement: Prominently displayed, perhaps as a numerical score or a visual rating (e.g., 1-5 stars, or a custom visual indicator).
+o	Description: A small tooltip or brief text explaining what the score represents (e.g., "Calculated based on dividend growth, payout ratio, and historical volatility"). This is your custom metric.
+•	Price Chart (Powered by TradingView API): 
+o	Integration: Seamless embedding of a TradingView chart widget.
+o	Functionality: Leverage TradingView's built-in interactivity (timeframes, indicators, drawing tools, zoom/pan).
+o	Data: Display historical price data.
+•	Financial Statements (Tabular View - Historical): 
+o	Tabs/Navigation: Provide clear tabs or a dropdown to switch between: 
+•	Result Statement (Income Statement): Key line items like Revenue, Cost of Revenue, Gross Profit, Operating Expenses, Net Income, EPS. Display data for at least the last 5-10 years/quarters.
+•	Balance Statement: Assets (Current, Non-Current), Liabilities (Current, Non-Current), Equity. Display data for at least the last 5-10 years/quarters.
+•	Cash Flow Statement: Operating Cash Flow, Investing Cash Flow, Financing Cash Flow, Net Change in Cash. Display data for at least the last 5-10 years/quarters.
+o	Readability: Ensure large, clear tables with alternating row colors for readability. Column headers should clearly indicate fiscal periods.
+o	Interactivity: Potentially allow users to toggle between annual and quarterly data (if available).
+•	Dividend History (Table & Bar Chart): 
+o	Table: Year, Annual Dividend per Share, Dividend Growth (YoY), Ex-Div Dates, Pay Dates. (More comprehensive than in portfolio view).
+o	Bar Chart: Annual Dividend per Share over time.
+•	Financial Ratios (Table): 
+o	Key ratios: P/E, P/B, Debt-to-Equity, Current Ratio, Quick Ratio, ROE, ROA, Operating Margin, Net Profit Margin, etc. (historical 5-10 years).
+•	Dividend Growth Analysis (Line Chart): 
+o	Line chart showing 1-year, 3-year, 5-year average dividend growth rate.
+•	Company News Feed (Filtered): 
+o	News specific to this company, pulled from the main news feed.
+
+6.6. News Feed
+A dedicated section for all relevant news.
+•	Layout: A feed of news articles, likely with headlines, source, date, and a brief snippet.
+•	Filtering: 
+o	Primary Filter (Prominent): Dividend Announcements (highest priority).
+o	Secondary Filters: Company-specific, Industry News, Macro/Economic News.
+o	Search/Filter by Ticker: Allow users to search for news related to specific companies.
+•	Interactivity: Click on a news item to open the full article in a new tab (linking to external source).
+
+6.7. Export to Excel Functionality
+•	Placement: Clear "Export to Excel" button in relevant sections (e.g., Portfolio Details, Company Lookup & Detailed Report, possibly the Main Dashboard).
+•	Scope: 
+o	Portfolio Details: Export all holding data (current allocation, all columns in the holdings table).
+o	Company Lookup & Detailed Report: Export all detailed financial data (statements, ratios), dividend history, and company facts for that specific company.
+o	Dashboard Summary: Export current allocation (sector/industry/geographical), dividend payments this month, expected dividends next month.
+•	Format: Export as a .xlsx file, with data well-formatted into columns and rows, potentially with relevant headers and separate sheets for different data sets (e.g., "Income Statement", "Balance Sheet").
+
+7. Interactive Elements & User Experience (UX)
+•	Tooltips: Provide explanatory text on hover for charts, complex metrics, and icons.
+
+7.1 ACTION ICONS
+ACTION	HTML CODE	EXAMPLE
+Add	<i class="fas fa-plus-circle"></i>	
+Edit	<i class="fas fa-pencil-alt"></i>	
+Delete	<i class="fas fa-trash-alt"></i>	
+Save	<i class="fas fa-save"></i>	
+Cancel	<i class="fas fa-times"></i>	
+
+7.2 SELECTION BOXES
+ACTION	HTML CODE	EXAMPLE
+Radio button	<i class="far fa-circle"></i> <!-- Unchecked -->
+<i class="fas fa-circle-dot"></i> <!-- Checked -->
+<i class="fas fa-dot-circle"></i> <!-- Checked (alternative) -->	
+Checkbox	<i class="far fa-square"></i> <!-- Unchecked -->
+<i class="fas fa-check-square"></i> <!-- Checked -->
+<i class="fas fa-square-minus"></i> <!-- Indeterminate -->	
+
+•	Loading States: Clear loading indicators for data fetching to inform the user.
+•	Error Messages: User-friendly error messages if data fails to load or an operation fails.
+•	Filters & Sorts: Visually intuitive dropdowns, buttons, and column headers for filtering and sorting.
+•	Navigation: Clear and consistent navigation menus (sidebar/top bar).
+•	Data Input (if any): For adding/editing portfolio holdings, ensure clear forms with validation.
+8. Technical Considerations (Briefly)
+While this is a design document, the following technical aspects are noted as they influence design.
+•	Backend: PHP
+•	Database: MySQL (phpMyAdmin for management)
+•	Web Server: Apache (via XAMPP)
+•	Data APIs: Integration with various APIs for real-time stock data, historical financials (Income, Balance, Cash Flow Statements), company facts, and news. Design should account for potential API rate limits or data availability issues.
+•	Frontend Technologies: Standard web technologies (HTML, CSS, JavaScript).
+•	Charting Library: Choose a robust JavaScript charting library that supports high interactivity (e.g., Chart.js, D3.js, Highcharts, Echarts). This is crucial for the "time frame change and other ways interact with the chart/data" requirement.
+•	TradingView Widget: Direct embedding of the TradingView chart widget will handle its specific UI and interactivity.
+•	Responsiveness: Use CSS frameworks or custom CSS media queries for adaptive layouts.
+9. Iteration & Feedback
+This document is a living guide. As development progresses, feedback from users and technical insights may necessitate adjustments. Regular reviews and iterative improvements are encouraged to ensure the final product meets user needs and performance expectations.
+
+NOTE1: All tables starting with achieve* can be excluded in any analyse.
+NOTE2: Always use the design document GitHub\psw\psw4.0\documentation\design_document.txt
+NOTE3: When adding a new feature, always update the session file with date and time with short description of the update GitHub\psw\psw4.0\developing\develop_log.txt

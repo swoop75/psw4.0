@@ -1,0 +1,152 @@
+Software Requirements Specification (SRS)
+Title: Dividend Portfolio Web Application
+Version: 1.0
+Author: Allan Andersen
+Date: 2025-07-19
+
+1. Introduction
+Purpose
+This document describes the functional and non-functional requirements for a web application that manages and displays data related to a personal dividend investing portfolio. It will provide a dashboard interface, enable CRUD operations, display tables and charts, and offer secure, authenticated access.
+Intended Audience
+* Primary: Project owner (self-managed portfolio)
+* Secondary: Friends who follow the dividend journey (read-only users)
+Scope
+The application will:
+* Connect to a MySQL database to read and modify portfolio data.
+* Allow CRUD operations on selected tables.
+* Display performance metrics using charts, tables, and dashboards.
+* Handle multiple users with different access levels.
+* Integrate with APIs for company data and dividend announcements.
+* Allow export to CSV/PDF and manual push of weekly summary emails.
+Technologies
+* Backend: PHP (Symfony preferred), or Python (Django/Flask)
+* Frontend: JavaScript (no specific library required)
+* Database: MySQL
+* Hosting: On-premises Windows Server
+Definitions and Acronyms
+* CRUD: Create, Read, Update, Delete
+* API: Application Programming Interface
+* ETF: Exchange-Traded Fund
+* BDC: Business Development Company
+* REIT: Real Estate Investment Trust
+* mREIT: Mortgage Real Estate Investment Trust
+
+2. Overall Description
+Product Perspective
+Standalone web app connecting directly to a private MySQL database.
+Product Functions
+* Manual entry of transactions (buy, sell, dividends).
+* Data visualizations for yield, income, performance.
+* View-only access for friends.
+* Admin user controls all accounts and visibility.
+* Audit trail of important changes.
+User Classes
+* Administrator (full access)
+* Viewer (read-only, limited page access)
+Operating Environment
+* Browser-based client
+* On-premises Windows server hosting MySQL and web server
+Assumptions and Dependencies
+* No external hosting or WSL setups
+* Company data fetched via APIs (Börsdata, FMP, etc.)
+* Notifications limited to in-app or manual email push
+
+3. Functional Requirements
+3.1 Portfolio Management
+* CRUD support for transaction, company, dividend, FX tables
+* Filters and column visibility managed by Admin
+3.2 Dividend Tracking
+* Forecast based on stored schedule, no external fetching of ex-dates
+* API integration for dividend changes
+3.3 Transactions & FX Handling
+* Manual entry one-by-one
+* Track per broker/account
+* Store FX rates based on transaction date
+3.4 User Roles & Access
+* Admin: create users, control access to pages, manage portfolios
+* Viewers: limited, read-only access with session-based filters. User can change their own password and email address.
+3.5 Visualization
+* Pie charts, tables, timelines
+* Yield on cost, portfolio yield, annual income, YoY dividend comparison
+* Show sector/country allocation
+3.6 Notifications
+* Triggers: dividend cut/increase/flat
+* Notification: in-app only, audit log enabled
+3.7 News Feed
+* API-pulled news (dividend, company announcements)
+* Manual blog/news entries (optional)
+3.8 ETF Benchmarking
+* Store daily ETF prices
+* Compare portfolio performance against 5-6 benchmarks
+3.9 Audit Logging
+* Log all edits (e.g., dividend changes, account transfers)
+* Create events logged with user and timestamp
+3.10 Data Export
+* Export: predefined CSV and PDF formats
+* No external import required
+
+4. Non-Functional Requirements
+Performance
+* Optimized for portfolios with 500+ holdings
+Security
+* MySQL-based user authentication
+* Role-based access control
+Usability
+* Web interface, keyboard-friendly manual entry
+* Mobile responsive design (future phase)
+Availability
+* Local server hosting under full user control
+Maintainability
+* Admin interface for configuration updates
+Portability
+* Runs on Windows Server with no WSL dependencies
+
+5. User Interface Requirements
+Tables
+* Transaction, Holdings, Dividend Overview, News
+* Hide/show columns per Admin config
+Filters
+* Sector, Country, Broker, Date Ranges
+* Session-based filtering only
+Dashboards
+* Top Holdings, Income Projections, Yield Charts
+Admin Console
+* User creation, permissions, logs
+Manual Upload Tools
+* CSV export, manual email summary builder
+
+6. External Interfaces
+API Integrations
+* Company metadata (Börsdata, FMP)
+* Dividend announcements
+* News feeds
+SMTP
+* Manual email summary send-out
+Database
+* Direct connection to MySQL (local server)
+
+7. System Architecture
+Overview
+* MVC or Python backend + JS frontend
+* Browser UI connects to backend via API
+* Backend interfaces with MySQL DB
+* Local API integrations via background workers
+Storage
+* MySQL for all portfolio data, users, logs, configs
+Security
+* Login via username/password (no 2FA for now)
+* Audit trails for critical actions
+
+8. Appendix
+User Roles Table
+* Admin: Full control
+* Viewer: Page-level restricted, read-only
+Notification Events
+* Dividend cut/increase/flat on own holdings
+Audit Log Events
+* Dividend change, account change, transaction edit
+Benchmark Comparison
+* Portfolio vs stored ETF performance over time
+
+End of Document
+
