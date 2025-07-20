@@ -59,7 +59,7 @@ class UserManagementController {
                 return false;
             }
             
-            $sql = "UPDATE users SET " . implode(', ', $updateFields) . ", updated_at = NOW() WHERE id = :user_id";
+            $sql = "UPDATE users SET " . implode(', ', $updateFields) . ", updated_at = NOW() WHERE user_id = :user_id";
             $stmt = $this->foundationDb->prepare($sql);
             
             foreach ($params as $key => $value) {

@@ -24,7 +24,7 @@ class DatabaseSetup {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 UNIQUE KEY unique_user_preference (user_id, preference_key),
-                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
             )";
             $db->exec($sql);
             
@@ -36,7 +36,7 @@ class DatabaseSetup {
                 last_activity TIMESTAMP NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
             )";
             $db->exec($sql);
             
@@ -50,7 +50,7 @@ class DatabaseSetup {
                 user_agent TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 INDEX idx_user_activity (user_id, created_at),
-                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
             )";
             $db->exec($sql);
             
@@ -67,11 +67,7 @@ class DatabaseSetup {
                 // Column probably already exists
             }
             
-            try {
-                $db->exec("ALTER TABLE users ADD COLUMN is_active TINYINT(1) DEFAULT 1 AFTER last_login");
-            } catch (Exception $e) {
-                // Column probably already exists
-            }
+            // Note: users table already has 'active' column, no need to add 'is_active'
             
             return true;
             
@@ -89,7 +85,7 @@ class DatabaseSetup {
             $db = Database::getConnection('foundation');
             
             $sql = "INSERT IGNORE INTO user_stats (user_id, login_count, last_activity) 
-                    SELECT id, 0, NOW() FROM users";
+                    SELECT user_id, 0, NOW() FROM users";
             $db->exec($sql);
             
             return true;
@@ -108,7 +104,7 @@ class DatabaseSetup {
             $db = Database::getConnection('foundation');
             
             // Get all user IDs
-            $stmt = $db->query("SELECT id FROM users");
+            $stmt = $db->query("SELECT user_id FROM users");
             $userIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
             
             $defaults = [
