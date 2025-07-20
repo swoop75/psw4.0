@@ -1,5 +1,5 @@
 <?php
-// c:/Users/laoan/Documents/GitHub/psw/psw4.0/templates/pages/index.php
+// c:/Users/laoan/Documents/GitHub/psw/psw4.0//public/templates/pages/index.php
 
 require_once APPROOT . '/templates/includes/header.php';
 ?>

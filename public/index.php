@@ -10,4 +10,4 @@ require_once '../app/core/Router.php';
 
 // Instantiate the router
 $router = new Router();
-
+?>
