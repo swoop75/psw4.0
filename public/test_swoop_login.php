@@ -3,11 +3,11 @@
  * Test swoop user authentication
  */
 
-require_once __DIR__ . '/config/config.php';
-require_once __DIR__ . '/config/constants.php';
-require_once __DIR__ . '/config/database.php';
-require_once __DIR__ . '/src/models/User.php';
-require_once __DIR__ . '/src/utils/Security.php';
+require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../config/constants.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../src/models/User.php';
+require_once __DIR__ . '/../src/utils/Security.php';
 
 echo "=== Testing Swoop User Authentication ===\n";
 
