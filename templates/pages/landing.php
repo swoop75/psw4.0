@@ -22,6 +22,13 @@
             -webkit-font-smoothing: antialiased;
         }
         
+        <?php if (!Auth::isLoggedIn()): ?>
+        /* Hide base layout header for non-logged-in users on landing page */
+        .header {
+            display: none !important;
+        }
+        <?php endif; ?>
+        
         /* Top Header with Login */
         .top-header {
             position: fixed;
