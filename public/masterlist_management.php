@@ -122,7 +122,11 @@ try {
     $statistics = [];
 }
 
-$user = Auth::getUser();
+$user = [
+    'username' => Auth::getUsername(),
+    'user_id' => Auth::getUserId(),
+    'role_name' => $_SESSION['role_name'] ?? 'User'
+];
 $csrfToken = Security::generateCSRFToken();
 ?>
 <!DOCTYPE html>
