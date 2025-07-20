@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengemaskinen Sverige + Worldwide</title>
+    
+    <!-- Beautiful Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Direct CSS -->
+    <link rel="stylesheet" href="assets/css/improved-main.css">
+    
+    <style>
+        /* Enhanced styles for beautiful presentation */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        
+        .test-notice {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 200, 150, 0.9);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        /* Override any potential conflicts */
+        .hero-section {
+            background: transparent !important;
+        }
+        
+        /* Add subtle animation */
+        .feature-row {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideIn 0.6s ease forwards;
+        }
+        
+        .feature-row:nth-child(1) { animation-delay: 0.1s; }
+        .feature-row:nth-child(2) { animation-delay: 0.2s; }
+        .feature-row:nth-child(3) { animation-delay: 0.3s; }
+        .feature-row:nth-child(4) { animation-delay: 0.4s; }
+        .feature-row:nth-child(5) { animation-delay: 0.5s; }
+        .feature-row:nth-child(6) { animation-delay: 0.6s; }
+        
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .hero-title {
+            opacity: 0;
+            animation: fadeInUp 1s ease 0.3s forwards;
+        }
+        
+        .logo-circle {
+            opacity: 0;
+            transform: scale(0.8);
+            animation: scaleIn 0.8s ease 0.1s forwards;
+        }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes scaleIn {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        /* Enhanced glow effect */
+        .logo-circle::after {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            right: -20px;
+            bottom: -20px;
+            background: radial-gradient(circle, rgba(0, 200, 150, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: -1;
+            animation: pulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="test-notice">
+        <i class="fas fa-palette"></i> Beautiful Landing Preview
+    </div>
+
+    <div class="hero-section">
+        <!-- Beautiful Animated Logo -->
+        <div class="hero-logo">
+            <div class="logo-circle">
+                <i class="fas fa-chart-line"></i>
+            </div>
+        </div>
+        
+        <!-- Stunning Typography -->
+        <h1 class="hero-title">
+            <span class="title-main">Pengemaskinen</span>
+            <span class="title-location">Sverige + Worldwide</span>
+        </h1>
+        
+        <!-- Beautiful Feature List with Icons -->
+        <div class="features-container">
+            <div class="feature-row">
+                <div class="feature-icon-circle">
+                    <i class="fas fa-chart-pie"></i>
+                </div>
+                <div class="feature-text">
+                    <h3>Portfolio Tracking & Analytics</h3>
+                    <p>Complete overview of your dividend investments with detailed performance metrics and real-time tracking</p>
+                </div>
+            </div>
+            
+            <div class="feature-row">
+                <div class="feature-icon-circle">
+                    <i class="fas fa-coins"></i>
+                </div>
+                <div class="feature-text">
+                    <h3>Dividend Income Management</h3>
+                    <p>Track payments, forecast income, and analyze yield patterns across all your holdings with precision</p>
+                </div>
+            </div>
+            
+            <div class="feature-row">
+                <div class="feature-icon-circle">
+                    <i class="fas fa-globe-americas"></i>
+                </div>
+                <div class="feature-text">
+                    <h3>Global Market Coverage</h3>
+                    <p>Monitor Swedish and international dividend stocks from multiple exchanges worldwide</p>
+                </div>
+            </div>
+            
+            <div class="feature-row">
+                <div class="feature-icon-circle">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div class="feature-text">
+                    <h3>Company Research Hub</h3>
+                    <p>In-depth analysis, financial data, and custom scoring metrics for informed investment decisions</p>
+                </div>
+            </div>
+            
+            <div class="feature-row">
+                <div class="feature-icon-circle">
+                    <i class="fas fa-shield-check"></i>
+                </div>
+                <div class="feature-text">
+                    <h3>Professional & Secure</h3>
+                    <p>Enterprise-grade security with role-based access control and comprehensive audit trails</p>
+                </div>
+            </div>
+            
+            <div class="feature-row">
+                <div class="feature-icon-circle">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <div class="feature-text">
+                    <h3>Advanced Reporting</h3>
+                    <p>Generate detailed reports and export data for tax reporting, analysis, and documentation</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Login Prompt -->
+        <div class="login-prompt">
+            <div class="login-card">
+                <h2>
+                    <i class="fas fa-sign-in-alt"></i>
+                    Access Your Portfolio
+                </h2>
+                <p>Login to view your personalized dividend portfolio dashboard with detailed analytics and insights.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add some interactive magic
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effect to feature icons
+            const featureIcons = document.querySelectorAll('.feature-icon-circle');
+            featureIcons.forEach(icon => {
+                icon.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.1) rotate(5deg)';
+                });
+                
+                icon.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1) rotate(0deg)';
+                });
+            });
+            
+            // Add parallax effect to logo
+            const logo = document.querySelector('.logo-circle');
+            document.addEventListener('mousemove', function(e) {
+                const x = (e.clientX / window.innerWidth) * 100;
+                const y = (e.clientY / window.innerHeight) * 100;
+                
+                logo.style.transform = `translate(${(x-50)*0.1}px, ${(y-50)*0.1}px)`;
+            });
+            
+            console.log('🎨 Beautiful landing page loaded successfully!');
+        });
+    </script>
+</body>
+</html>

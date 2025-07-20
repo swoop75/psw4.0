@@ -2,101 +2,100 @@
 /**
  * File: templates/pages/landing.php
  * Path: C:\Users\laoan\Documents\GitHub\psw\psw4.0\templates\pages\landing.php
- * Description: Landing page template for PSW 4.0
+ * Description: Beautiful landing page for PSW 4.0
  */
 ?>
 
-<div class="landing-content">
-    <div class="landing-logo">
-        <img src="<?php echo ASSETS_URL; ?>/img/psw-logo.svg" alt="PSW Logo" onerror="this.style.display='none'" style="height: 120px; width: 120px;">
-        <h1 class="landing-title"><?php echo APP_FULL_NAME; ?></h1>
-        <p class="landing-subtitle">Professional Dividend Portfolio Management & Analysis</p>
+<div class="hero-section">
+    <!-- Logo -->
+    <div class="hero-logo">
+        <div class="logo-circle">
+            <i class="fas fa-chart-line"></i>
+        </div>
     </div>
-
-    <div class="features-list">
-        <div class="feature-item">
-            <div class="feature-icon">
-                <i class="fas fa-chart-line"></i>
-            </div>
-            <div class="feature-content">
-                <h3 class="feature-title">Comprehensive Portfolio Tracking</h3>
-                <p class="feature-description">
-                    Monitor your dividend portfolio across multiple brokers and accounts with real-time performance tracking and detailed analytics.
-                </p>
-            </div>
-        </div>
-
-        <div class="feature-item">
-            <div class="feature-icon">
-                <i class="fas fa-coins"></i>
-            </div>
-            <div class="feature-content">
-                <h3 class="feature-title">Dividend Income Analysis</h3>
-                <p class="feature-description">
-                    Track dividend payments, forecast future income, and analyze yield patterns with comprehensive historical data and projections.
-                </p>
-            </div>
-        </div>
-
-        <div class="feature-item">
-            <div class="feature-icon">
+    
+    <!-- Main Headline -->
+    <h1 class="hero-title">
+        <span class="title-main">Pengemaskinen</span>
+        <span class="title-location">Sverige + Worldwide</span>
+    </h1>
+    
+    <!-- Feature List with Beautiful Icons -->
+    <div class="features-container">
+        <div class="feature-row">
+            <div class="feature-icon-circle">
                 <i class="fas fa-chart-pie"></i>
             </div>
-            <div class="feature-content">
-                <h3 class="feature-title">Portfolio Allocation Insights</h3>
-                <p class="feature-description">
-                    Visualize your portfolio allocation by sector, geography, and asset class with interactive charts and detailed breakdowns.
-                </p>
+            <div class="feature-text">
+                <h3>Portfolio Tracking & Analytics</h3>
+                <p>Complete overview of your dividend investments with detailed performance metrics</p>
             </div>
         </div>
-
-        <div class="feature-item">
-            <div class="feature-icon">
+        
+        <div class="feature-row">
+            <div class="feature-icon-circle">
+                <i class="fas fa-coins"></i>
+            </div>
+            <div class="feature-text">
+                <h3>Dividend Income Management</h3>
+                <p>Track payments, forecast income, and analyze yield patterns across all holdings</p>
+            </div>
+        </div>
+        
+        <div class="feature-row">
+            <div class="feature-icon-circle">
+                <i class="fas fa-globe-americas"></i>
+            </div>
+            <div class="feature-text">
+                <h3>Global Market Coverage</h3>
+                <p>Monitor Swedish and international dividend stocks from multiple exchanges</p>
+            </div>
+        </div>
+        
+        <div class="feature-row">
+            <div class="feature-icon-circle">
                 <i class="fas fa-building"></i>
             </div>
-            <div class="feature-content">
-                <h3 class="feature-title">Company Research & Analysis</h3>
-                <p class="feature-description">
-                    Access detailed company information, financial statements, dividend history, and custom scoring metrics for informed decisions.
-                </p>
+            <div class="feature-text">
+                <h3>Company Research Hub</h3>
+                <p>In-depth analysis, financial data, and custom scoring for informed decisions</p>
             </div>
         </div>
-
-        <div class="feature-item">
-            <div class="feature-icon">
-                <i class="fas fa-file-export"></i>
+        
+        <div class="feature-row">
+            <div class="feature-icon-circle">
+                <i class="fas fa-shield-check"></i>
             </div>
-            <div class="feature-content">
-                <h3 class="feature-title">Professional Reporting</h3>
-                <p class="feature-description">
-                    Generate detailed reports and export data to Excel for further analysis, tax reporting, and portfolio documentation.
-                </p>
+            <div class="feature-text">
+                <h3>Professional & Secure</h3>
+                <p>Enterprise-grade security with role-based access and comprehensive audit trails</p>
             </div>
         </div>
-
-        <div class="feature-item">
-            <div class="feature-icon">
-                <i class="fas fa-shield-alt"></i>
+        
+        <div class="feature-row">
+            <div class="feature-icon-circle">
+                <i class="fas fa-chart-bar"></i>
             </div>
-            <div class="feature-content">
-                <h3 class="feature-title">Secure & Professional</h3>
-                <p class="feature-description">
-                    Built with enterprise-grade security, role-based access control, and comprehensive audit logging for professional use.
-                </p>
+            <div class="feature-text">
+                <h3>Advanced Reporting</h3>
+                <p>Generate detailed reports and export data for tax reporting and analysis</p>
             </div>
         </div>
     </div>
-
+    
     <?php if (!Auth::isLoggedIn()): ?>
-        <div class="cta-section">
-            <p class="text-muted">
-                <i class="fas fa-info-circle"></i>
-                Login to access your dividend portfolio dashboard and detailed analytics.
-            </p>
+        <div class="login-prompt">
+            <div class="login-card">
+                <h2>
+                    <i class="fas fa-sign-in-alt"></i>
+                    Access Your Portfolio
+                </h2>
+                <p>Login to view your personalized dividend portfolio dashboard and detailed analytics.</p>
+            </div>
         </div>
     <?php else: ?>
-        <div class="cta-section">
-            <a href="<?php echo BASE_URL; ?>/dashboard.php" class="btn btn-primary btn-lg">
+        <div class="dashboard-cta">
+            <a href="<?php echo BASE_URL; ?>/dashboard.php" class="hero-button">
                 <i class="fas fa-tachometer-alt"></i>
                 Go to Dashboard
             </a>
