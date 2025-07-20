@@ -38,10 +38,10 @@
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(0, 200, 150, 0.1);
-            padding: 1rem 2rem;
+            padding: 1.25rem 2rem;
             z-index: 1000;
             box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
-            min-height: 80px;
+            min-height: 90px;
         }
         
         .header-container {
