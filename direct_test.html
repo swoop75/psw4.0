@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direct CSS Test - PSW 4.0</title>
+    
+    <!-- Direct CSS loading without PHP config -->
+    <link rel="stylesheet" href="assets/css/improved-main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<header class="header">
+    <div class="header-container">
+        <a href="#" class="logo">
+            <span class="logo-text">PSW 4.0</span>
+        </a>
+        
+        <div class="login-container">
+            <div class="user-menu">
+                <button class="login-toggle" onclick="toggleUserMenu()">
+                    <i class="fas fa-user"></i>
+                    Test User
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="login-dropdown" id="userMenu">
+                    <div class="user-info">
+                        <p><strong>Test User</strong></p>
+                        <p class="text-muted">Administrator</p>
+                    </div>
+                    <hr style="margin: 12px 0; border: none; border-top: 1px solid #e9ecef;">
+                    <a href="#" class="dropdown-link">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                    <a href="#" class="dropdown-link">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<nav class="main-nav">
+    <div class="nav-container">
+        <div class="nav-item">
+            <a href="#" class="nav-link">
+                <i class="fas fa-tachometer-alt"></i>
+                Dashboard
+            </a>
+        </div>
+        
+        <div class="nav-item">
+            <a href="javascript:void(0)" class="nav-link nav-dropdown-only">
+                <i class="fas fa-briefcase"></i>
+                Portfolio
+                <i class="fas fa-chevron-down nav-arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="#" class="submenu-link">
+                    Company List
+                    <span class="admin-badge">ADMIN</span>
+                </a>
+                <a href="#" class="submenu-link">
+                    Company Page
+                    <span class="admin-badge">ADMIN</span>
+                </a>
+            </div>
+        </div>
+        
+        <div class="nav-item">
+            <a href="#" class="nav-link">
+                <i class="fas fa-coins"></i>
+                Dividend Estimate
+            </a>
+        </div>
+        
+        <div class="nav-item">
+            <a href="javascript:void(0)" class="nav-link nav-dropdown-only">
+                <i class="fas fa-shopping-cart"></i>
+                Buying
+                <i class="fas fa-chevron-down nav-arrow"></i>
+            </a>
+            <div class="submenu">
+                <a href="#" class="submenu-link">
+                    Buy List
+                    <span class="admin-badge">ADMIN</span>
+                </a>
+                <a href="#" class="submenu-link">
+                    New Companies
+                    <span class="admin-badge">ADMIN</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<main class="main-container">
+    <div class="landing-content">
+        <div class="landing-logo">
+            <div style="width: 120px; height: 120px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); border-radius: var(--radius-2xl); margin: 0 auto var(--space-6); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-lg);">
+                <i class="fas fa-chart-line" style="font-size: var(--text-4xl); color: white;"></i>
+            </div>
+            <h1 class="landing-title">PSW 4.0 Direct Test</h1>
+            <p class="landing-subtitle">Testing Improved Design System</p>
+        </div>
+
+        <!-- Alerts -->
+        <div style="margin: var(--space-8) 0;">
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                Success: If you can see this styled alert, the CSS is working!
+            </div>
+            <div class="alert alert-error">
+                <i class="fas fa-exclamation-triangle"></i>
+                Error: This shows what error messages look like.
+            </div>
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                Info: The design system includes modern alerts and notifications.
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <div style="text-align: center; margin: var(--space-8) 0;">
+            <button class="btn btn-primary">
+                <i class="fas fa-star"></i>
+                Primary Button
+            </button>
+            <button class="btn btn-primary btn-lg" style="margin-left: var(--space-4);">
+                <i class="fas fa-rocket"></i>
+                Large Button
+            </button>
+        </div>
+
+        <!-- Feature Cards -->
+        <div class="features-list">
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-palette"></i>
+                </div>
+                <div class="feature-content">
+                    <h3 class="feature-title">Modern Design</h3>
+                    <p class="feature-description">
+                        Professional styling with Avanza green and Google blue color scheme.
+                    </p>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <div class="feature-content">
+                    <h3 class="feature-title">Responsive Layout</h3>
+                    <p class="feature-description">
+                        Works perfectly on desktop, tablet, and mobile devices.
+                    </p>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-magic"></i>
+                </div>
+                <div class="feature-content">
+                    <h3 class="feature-title">Smooth Animations</h3>
+                    <p class="feature-description">
+                        Hover over cards and navigation items to see smooth transitions.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Check -->
+        <div style="background: var(--primary-light); border: 1px solid var(--primary-color); border-radius: var(--radius-xl); padding: var(--space-8); margin: var(--space-8) 0; text-align: center;">
+            <h2 style="color: var(--primary-dark); margin-bottom: var(--space-4);">
+                <i class="fas fa-check-circle"></i>
+                Design System Status
+            </h2>
+            <p style="color: var(--text-secondary); font-size: var(--text-lg);">
+                If you can see this styled content with proper colors, shadows, and spacing,
+                then the improved design system is working correctly!
+            </p>
+            
+            <div style="margin-top: var(--space-6);">
+                <strong style="color: var(--primary-color);">✓ CSS Variables</strong> |
+                <strong style="color: var(--primary-color);">✓ Modern Typography</strong> |
+                <strong style="color: var(--primary-color);">✓ Professional Components</strong> |
+                <strong style="color: var(--primary-color);">✓ Responsive Design</strong>
+            </div>
+        </div>
+
+        <div class="cta-section">
+            <p class="text-muted">
+                <i class="fas fa-info-circle"></i>
+                This is a direct HTML test without PHP configuration dependencies.
+            </p>
+        </div>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="footer-content">
+        <p>&copy; 2024 PSW 4.0 | Design System Test</p>
+    </div>
+</footer>
+
+<script src="assets/js/improved-main.js"></script>
+
+<script>
+// Add some interactive behavior for testing
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('PSW 4.0 Direct Test Loaded');
+    
+    // Test if CSS variables are working
+    const testElement = document.querySelector('.landing-title');
+    if (testElement) {
+        const computedStyle = window.getComputedStyle(testElement);
+        console.log('Landing title color:', computedStyle.color);
+    }
+    
+    // Add click feedback to buttons
+    const buttons = document.querySelectorAll('.btn');
+    buttons.forEach(button => {
+        button.addEventListener('click', function() {
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = '';
+            }, 150);
+        });
+    });
+});
+
+function toggleUserMenu() {
+    const dropdown = document.querySelector('.login-dropdown');
+    if (dropdown) {
+        dropdown.classList.toggle('show');
+    }
+}
+</script>
+
+</body>
+</html>
