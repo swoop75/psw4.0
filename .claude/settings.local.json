@@ -6,7 +6,8 @@
       "Bash(sed:*)",
       "Bash(tail:*)",
       "Bash(rm:*)",
-      "Bash(php:*)"
+      "Bash(php:*)",
+      "Bash(find:*)"
     ],
     "deny": []
   }
