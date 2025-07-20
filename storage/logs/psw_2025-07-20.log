@@ -1,0 +1,2 @@
+{"timestamp":"2025-07-20 13:35:53","level":"ERROR","user_id":"anonymous","ip":"100.91.97.82","message":"Authentication error: SQLSTATE[HY093]: Invalid parameter number"}
+{"timestamp":"2025-07-20 13:35:53","level":"WARNING","user_id":"anonymous","ip":"100.91.97.82","message":"Failed login attempt","context":{"username":"swoop","ip":"100.91.97.82","reason":"Authentication failed"}}
