@@ -194,9 +194,9 @@ class User {
      */
     public function findById($userId) {
         try {
-            $sql = "SELECT u.user_id, u.username, u.email, u.role_id, r.role_name, u.weekly_report, u.created_at 
+            $sql = "SELECT u.user_id, u.username, u.email, u.role_id, r.role_name, u.weekly_report, u.created_at, u.password_hash, u.active
                     FROM users u 
-                    JOIN roles r ON u.role_id = r.role_id 
+                    LEFT JOIN roles r ON u.role_id = r.role_id 
                     WHERE u.user_id = :user_id";
             
             $stmt = $this->db->prepare($sql);
