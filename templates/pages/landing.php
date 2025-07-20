@@ -41,6 +41,7 @@
             padding: 1rem 2rem;
             z-index: 1000;
             box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+            min-height: 80px;
         }
         
         .header-container {
