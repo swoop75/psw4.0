@@ -95,15 +95,17 @@ class UserManagementController {
             
             return [
                 'user' => [
-                    'id' => $user['id'],
+                    'id' => $user['user_id'],
+                    'user_id' => $user['user_id'],
                     'username' => $user['username'],
                     'email' => $user['email'],
-                    'full_name' => $user['full_name'],
+                    'full_name' => $user['full_name'] ?? '',
                     'role_id' => $user['role_id'],
-                    'role_name' => $user['role_id'] == 1 ? 'Administrator' : 'User',
+                    'role_name' => $user['role_name'] ?? ($user['role_id'] == 1 ? 'Administrator' : 'User'),
                     'created_at' => $user['created_at'],
-                    'last_login' => $user['last_login'],
-                    'is_active' => $user['is_active']
+                    'last_login' => $user['last_login'] ?? null,
+                    'is_active' => $user['active'] ?? 1,
+                    'password_hash' => $user['password_hash'] ?? ''
                 ],
                 'profile_stats' => $profileData['stats'],
                 'preferences' => $profileData['preferences'],
@@ -189,9 +191,13 @@ class UserManagementController {
             $newPassword = $data['new_password'] ?? '';
             $confirmPassword = $data['confirm_password'] ?? '';
             
-            // Validate current password
-            $user = $this->getUserById($userId);
-            if (!$user || !Security::verifyPassword($currentPassword, $user['password_hash'])) {
+            // Get current password hash from database
+            $stmt = $this->foundationDb->prepare("SELECT password_hash FROM users WHERE user_id = :user_id");
+            $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+            $stmt->execute();
+            $userRecord = $stmt->fetch();
+            
+            if (!$userRecord || !Security::verifyPassword($currentPassword, $userRecord['password_hash'])) {
                 throw new Exception('Current password is incorrect');
             }
             
