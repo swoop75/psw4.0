@@ -10,7 +10,7 @@ class Router {
         $url = $this->getUrl();
 
         // Look for controller in controllers folder
-        if(isset($url[0]) && file_exists('../app/controllers/' . ucwords($url[0]) . '.php')){
+        if(isset($url[0]) && file_exists('../controllers/' . ucwords($url[0]) . '.php')){
             // If exists, set as controller
             $this->currentController = ucwords($url[0]);
             // Unset 0 Index
@@ -19,9 +19,9 @@ class Router {
 
         // Require the controller
         // First, load the base controller which all other controllers will extend
-        require_once '../app/core/Controller.php';
+        require_once 'Controller.php';
         // Then, load the specific controller for the page
-        require_once '../app/controllers/'. $this->currentController . '.php';
+        require_once '../controllers/'. $this->currentController . '.php';
 
         // Instantiate controller class
         $this->currentController = new $this->currentController;

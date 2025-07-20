@@ -1,13 +1,15 @@
 <?php
-// c:/Users/laoan/Documents/GitHub/psw/psw4.0//public/templates/pages/index.php
+// c:/Users/laoan/Documents/GitHub/psw/psw4.0/public/templates/pages/index.php
 
-require_once APPROOT . '/templates/includes/header.php';
+// Correct path to header, since templates folder is inside public
+require_once APPROOT . '/public/templates/includes/header.php';
 ?>
 
 <div class="landing-page">
     <div class="hero-section">
-        <h1>Welcome to Pengamaskinen Sverige + Worldwide</h1>
-        <p class="subtitle">Your personal dashboard for dividend stock portfolio analysis.</p>
+        <!-- Use the variables passed from the controller -->
+        <h1><?php echo $title; ?></h1>
+        <p class="subtitle"><?php echo $description; ?></p>
         
         <ul class="feature-list">
             <li><i class="fas fa-chart-line"></i> Track your portfolio's performance with interactive charts and detailed metrics.</li>
@@ -21,6 +23,6 @@ require_once APPROOT . '/templates/includes/header.php';
 </div>
 
 <?php
-require_once APPROOT . '/templates/includes/footer.php';
+// Correct path to footer
+require_once APPROOT . '/public/templates/includes/footer.php';
 ?>
-
