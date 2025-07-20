@@ -392,3 +392,4 @@
 {"timestamp":"2025-07-20 22:13:39","level":"ERROR","user_id":1,"ip":"100.91.97.82","message":"Country allocation error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ld.dividend_total_sek' in 'field list'"}
 {"timestamp":"2025-07-20 22:13:39","level":"ERROR","user_id":1,"ip":"100.91.97.82","message":"Currency allocation error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ld.dividend_total_sek' in 'field list'"}
 {"timestamp":"2025-07-20 22:13:39","level":"INFO","user_id":1,"ip":"100.91.97.82","message":"User action: dashboard_viewed","context":{"action":"dashboard_viewed","details":"User accessed dashboard","user_id":1}}
+{"timestamp":"2025-07-20 22:15:09","level":"INFO","user_id":1,"ip":"100.91.97.82","message":"User session destroyed","context":{"user_id":1,"username":"swoop"}}
