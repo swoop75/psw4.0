@@ -121,12 +121,19 @@
         .hero-section {
             max-width: 1000px;
             margin: 0 auto;
-            padding: 8rem 2rem 4rem;
+            padding: 4rem 2rem;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
+        
+        /* Extra padding only for non-logged-in users with custom header */
+        <?php if (!Auth::isLoggedIn()): ?>
+        .hero-section {
+            padding: 8rem 2rem 4rem;
+        }
+        <?php endif; ?>
         
         /* Logo + Title Layout */
         .hero-header {
@@ -456,7 +463,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-<!-- Top Header with Login -->
+<?php if (!Auth::isLoggedIn()): ?>
+<!-- Top Header with Login (only for non-logged-in users) -->
 <header class="top-header">
     <div class="header-container">
         <a href="#" class="logo-header">
@@ -469,20 +477,14 @@
         <div class="nav-links">
             <a href="#" class="nav-link">About</a>
             <a href="<?php echo BASE_URL; ?>/public/psw_philosophy.html" class="nav-link">Philosophy</a>
-            <?php if (!Auth::isLoggedIn()): ?>
-                <a href="<?php echo BASE_URL; ?>/login.php" class="login-button">
-                    <i class="fas fa-sign-in-alt"></i>
-                    Login
-                </a>
-            <?php else: ?>
-                <a href="<?php echo BASE_URL; ?>/dashboard.php" class="login-button">
-                    <i class="fas fa-tachometer-alt"></i>
-                    Dashboard
-                </a>
-            <?php endif; ?>
+            <a href="<?php echo BASE_URL; ?>/login.php" class="login-button">
+                <i class="fas fa-sign-in-alt"></i>
+                Login
+            </a>
         </div>
     </div>
 </header>
+<?php endif; ?>
 
 <div class="hero-section">
     <!-- Logo + Title Side by Side -->
