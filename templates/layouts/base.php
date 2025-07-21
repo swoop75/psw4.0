@@ -41,8 +41,6 @@
             <div class="nav-links">
                 <?php if (!Auth::isLoggedIn()): ?>
                     <!-- Non-logged-in navigation -->
-                    <a href="<?php echo BASE_URL; ?>/" class="nav-link">Home</a>
-                    <a href="#" class="nav-link">About</a>
                     <a href="<?php echo BASE_URL; ?>/philosophy.php" class="nav-link">Philosophy</a>
                     <button class="login-toggle" onclick="toggleLogin()">
                         <i class="fas fa-sign-in-alt"></i>
