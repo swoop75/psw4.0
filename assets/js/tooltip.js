@@ -111,42 +111,21 @@ function createTooltipContent(element) {
 }
 
 /**
- * Show tooltip with fixed positioning
+ * Show tooltip with simple positioning
  */
 function showTooltip(event) {
     const tooltip = this.querySelector('.company-tooltip');
     if (!tooltip) return;
     
-    // Get parent element coordinates
-    const parentRect = this.getBoundingClientRect();
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
-    
-    // Position tooltip to the right of the element
-    let left = parentRect.right + 10;
-    let top = parentRect.top;
-    
-    // Adjust if tooltip would go off screen
-    if (left + 400 > windowWidth) {
-        left = parentRect.left - 410; // Show on left instead
-    }
-    
-    if (top + 200 > windowHeight) {
-        top = windowHeight - 210; // Keep on screen
-    }
-    
-    if (top < 10) {
-        top = 10; // Don't go above screen
-    }
-    
-    // Set fixed position
-    tooltip.style.left = left + 'px';
-    tooltip.style.top = top + 'px';
-    tooltip.style.transform = 'none';
+    // Simple positioning to the right
+    tooltip.style.left = '100%';
+    tooltip.style.top = '0';
+    tooltip.style.marginLeft = '10px';
     
     // Show tooltip
     tooltip.style.opacity = '1';
     tooltip.style.visibility = 'visible';
+    tooltip.style.transform = 'translateY(0) scale(1)';
 }
 
 /**

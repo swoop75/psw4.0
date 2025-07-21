@@ -39,16 +39,15 @@
 
 /* Tooltip content - Override all parent effects */
 .company-tooltip {
-    position: fixed !important;
+    position: absolute !important;
     z-index: 999999 !important;
-    background: #4a5568 !important;
-    border: 2px solid #2d3748 !important;
-    border-radius: 8px !important;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8) !important;
+    background: #000000 !important;
+    border: 5px solid #ffffff !important;
+    border-radius: 0 !important;
+    box-shadow: 0 0 0 50px #000000 !important;
     padding: 20px !important;
-    width: auto !important;
-    min-width: 400px !important;
-    max-width: 500px !important;
+    width: 400px !important;
+    height: 150px !important;
     font-size: 14px !important;
     line-height: 1.5 !important;
     color: #ffffff !important;
@@ -63,6 +62,7 @@
     filter: none !important;
     mix-blend-mode: normal !important;
     isolation: isolate !important;
+    contain: layout style paint !important;
 }
 
 /* Default positioning (right side) */
