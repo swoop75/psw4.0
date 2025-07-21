@@ -122,47 +122,32 @@ try {
     $statistics = [];
 }
 
+// Initialize variables for template
+$pageTitle = 'Masterlist Management - PSW 4.0';
+$pageDescription = 'Manage company masterlist data';
+$additionalCSS = [BASE_URL . '/assets/css/masterlist-management.css?v=' . time()];
+$additionalJS = [BASE_URL . '/assets/js/masterlist-management.js?v=' . time()];
+
 $user = [
     'username' => Auth::getUsername(),
     'user_id' => Auth::getUserId(),
     'role_name' => $_SESSION['role_name'] ?? 'User'
 ];
 $csrfToken = Security::generateCSRFToken();
+
+// Prepare content for masterlist page
+ob_start();
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Masterlist Management - PSW 4.0</title>
-    
-    <!-- Beautiful Typography -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/masterlist-management.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
     <div class="container">
-        <!-- Header -->
-        <header class="page-header">
+        <!-- Page Header -->
+        <div class="page-header">
             <div class="header-content">
                 <div class="header-left">
                     <h1><i class="fas fa-building"></i> Masterlist Management</h1>
                     <p>Manage company masterlist data</p>
                 </div>
-                <div class="header-right">
-                    <span class="user-info">
-                        <i class="fas fa-user"></i> <?= htmlspecialchars($user['username']) ?>
-                    </span>
-                    <a href="<?= BASE_URL ?>/public/index.php" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left"></i> Back to Dashboard
-                    </a>
-                </div>
             </div>
-        </header>
+        </div>
 
         <?php if ($errorMessage): ?>
             <div class="alert alert-error">
@@ -463,5 +448,11 @@ $csrfToken = Security::generateCSRFToken();
     </div>
 
     <script src="<?= BASE_URL ?>/assets/js/masterlist-management.js"></script>
-</body>
-</html>
+    </div>
+
+<?php
+$content = ob_get_clean();
+
+// Include base layout
+include __DIR__ . '/templates/layouts/base.php';
+?>

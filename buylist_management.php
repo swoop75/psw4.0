@@ -9,7 +9,7 @@ session_start();
 require_once __DIR__ . '/config/config.php';
 require_once __DIR__ . '/config/constants.php';
 require_once __DIR__ . '/src/middleware/Auth.php';
-require_once __DIR__ . '/src/controllers/BuylistController.php';
+require_once __DIR__ . '/src/controllers/PortfolioBuylistController.php';
 require_once __DIR__ . '/src/controllers/MasterlistController.php';
 require_once __DIR__ . '/src/utils/Security.php';
 
@@ -18,7 +18,7 @@ if (!Auth::isLoggedIn()) {
     exit;
 }
 
-$controller = new BuylistController();
+$controller = new PortfolioBuylistController();
 $masterlistController = new MasterlistController();
 $errorMessage = '';
 $successMessage = '';
@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WI
                 break;
                 
             case 'add_to_masterlist':
-                $buylistId = $_POST['buylist_id'] ?? '';
+                $buylistId = $_POST['buy_list_id'] ?? '';
                 $masterlistData = [
                     'market' => $_POST['market'] ?? null,
                     'share_type_id' => $_POST['share_type_id'] ?? 1
@@ -51,20 +51,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WI
                 break;
                 
             case 'update':
-                $buylistId = $_POST['buylist_id'] ?? '';
-                unset($_POST['action'], $_POST['csrf_token'], $_POST['buylist_id']);
+                $buylistId = $_POST['buy_list_id'] ?? '';
+                unset($_POST['action'], $_POST['csrf_token'], $_POST['buy_list_id']);
                 $result = $controller->updateBuylistEntry($buylistId, $_POST);
                 echo json_encode(['success' => $result, 'message' => $result ? 'Entry updated successfully' : 'Failed to update entry']);
                 break;
                 
             case 'delete':
-                $buylistId = $_POST['buylist_id'] ?? '';
+                $buylistId = $_POST['buy_list_id'] ?? '';
                 $result = $controller->deleteBuylistEntry($buylistId);
                 echo json_encode(['success' => $result, 'message' => $result ? 'Entry removed from buylist' : 'Failed to remove entry']);
                 break;
                 
             case 'get_entry':
-                $buylistId = $_POST['buylist_id'] ?? '';
+                $buylistId = $_POST['buy_list_id'] ?? '';
                 $entry = $controller->getBuylistEntry($buylistId);
                 echo json_encode(['success' => (bool)$entry, 'entry' => $entry]);
                 break;
@@ -93,13 +93,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WI
 // Get filter parameters
 $filters = [
     'search' => $_GET['search'] ?? '',
-    'status_id' => $_GET['status_id'] ?? '',
-    'priority_level' => $_GET['priority_level'] ?? '',
-    'risk_level' => $_GET['risk_level'] ?? '',
-    'sector' => $_GET['sector'] ?? '',
-    'market_cap_category' => $_GET['market_cap_category'] ?? '',
-    'price_min' => $_GET['price_min'] ?? '',
-    'price_max' => $_GET['price_max'] ?? ''
+    'buylist_status_id' => $_GET['status_id'] ?? '',
+    'country_name' => $_GET['country'] ?? '',
+    'yield_min' => $_GET['yield_min'] ?? '',
+    'yield_max' => $_GET['yield_max'] ?? ''
 ];
 
 $page = max(1, (int)($_GET['page'] ?? 1));
@@ -107,8 +104,8 @@ $limit = max(10, min(100, (int)($_GET['limit'] ?? 25)));
 
 // Get data
 try {
-    $buylistData = $controller->getUserBuylist(array_filter($filters), $page, $limit);
-    $statuses = $controller->getBuylistStatuses();
+    $buylistData = $controller->getBuylist(array_filter($filters), $page, $limit);
+    $statuses = []; // Portfolio buylist doesn't have status system yet
     $filterOptions = $controller->getFilterOptions();
     $statistics = $controller->getBuylistStatistics();
 } catch (Exception $e) {
@@ -177,26 +174,26 @@ ob_start();
                     <i class="fas fa-bullseye"></i>
                 </div>
                 <div class="stat-content">
-                    <div class="stat-number"><?= number_format($statistics['target_value'], 0) ?> SEK</div>
-                    <div class="stat-label">Target Value</div>
+                    <div class="stat-number"><?= $statistics['unique_countries'] ?></div>
+                    <div class="stat-label">Countries</div>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon price">
-                    <i class="fas fa-chart-line"></i>
+                    <i class="fas fa-percentage"></i>
                 </div>
                 <div class="stat-content">
-                    <div class="stat-number"><?= number_format($statistics['avg_target_price'], 0) ?> SEK</div>
-                    <div class="stat-label">Avg Target Price</div>
+                    <div class="stat-number"><?= number_format($statistics['avg_yield'], 2) ?>%</div>
+                    <div class="stat-label">Avg Yield</div>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon entries">
-                    <i class="fas fa-coins"></i>
+                    <i class="fas fa-chart-bar"></i>
                 </div>
                 <div class="stat-content">
-                    <div class="stat-number"><?= $statistics['entries_with_price'] ?></div>
-                    <div class="stat-label">With Price Targets</div>
+                    <div class="stat-number"><?= number_format($statistics['max_yield'], 2) ?>%</div>
+                    <div class="stat-label">Max Yield</div>
                 </div>
             </div>
         </div>
@@ -221,18 +218,18 @@ ob_start();
                     </div>
                     <select id="statusFilter" onchange="applyFilters()">
                         <option value="">All Statuses</option>
-                        <?php foreach ($statuses as $status): ?>
-                            <option value="<?= $status['status_id'] ?>" <?= $filters['status_id'] == $status['status_id'] ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($status['status_name']) ?>
-                            </option>
-                        <?php endforeach; ?>
+                        <option value="1" <?= $filters['buylist_status_id'] == '1' ? 'selected' : '' ?>>Watching</option>
+                        <option value="2" <?= $filters['buylist_status_id'] == '2' ? 'selected' : '' ?>>Researching</option>
+                        <option value="3" <?= $filters['buylist_status_id'] == '3' ? 'selected' : '' ?>>Ready to Buy</option>
+                        <option value="4" <?= $filters['buylist_status_id'] == '4' ? 'selected' : '' ?>>Passed</option>
                     </select>
-                    <select id="priorityFilter" onchange="applyFilters()">
-                        <option value="">All Priorities</option>
-                        <option value="4" <?= $filters['priority_level'] == '4' ? 'selected' : '' ?>>Critical</option>
-                        <option value="3" <?= $filters['priority_level'] == '3' ? 'selected' : '' ?>>High</option>
-                        <option value="2" <?= $filters['priority_level'] == '2' ? 'selected' : '' ?>>Medium</option>
-                        <option value="1" <?= $filters['priority_level'] == '1' ? 'selected' : '' ?>>Low</option>
+                    <select id="countryFilter" onchange="applyFilters()">
+                        <option value="">All Countries</option>
+                        <option value="SE" <?= $filters['country_name'] == 'SE' ? 'selected' : '' ?>>Sweden</option>
+                        <option value="US" <?= $filters['country_name'] == 'US' ? 'selected' : '' ?>>United States</option>
+                        <option value="FI" <?= $filters['country_name'] == 'FI' ? 'selected' : '' ?>>Finland</option>
+                        <option value="NO" <?= $filters['country_name'] == 'NO' ? 'selected' : '' ?>>Norway</option>
+                        <option value="DK" <?= $filters['country_name'] == 'DK' ? 'selected' : '' ?>>Denmark</option>
                     </select>
                 </div>
             </div>
@@ -244,11 +241,11 @@ ob_start();
                         <tr>
                             <th>Company</th>
                             <th>Status</th>
-                            <th>Priority</th>
-                            <th>Target Price</th>
-                            <th>Quantity</th>
-                            <th>Target Value</th>
-                            <th>Updated</th>
+                            <th>Yield (%)</th>
+                            <th>Country</th>
+                            <th>Comments</th>
+                            <th>Inspiration</th>
+                            <th>ISIN</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -259,9 +256,9 @@ ob_start();
                                     <td>
                                         <div class="company-info">
                                             <div class="company-name">
-                                                <strong><?= htmlspecialchars($entry['company_name']) ?></strong>
+                                                <strong><?= htmlspecialchars($entry['company']) ?></strong>
                                                 <span class="ticker"><?= htmlspecialchars($entry['ticker']) ?></span>
-                                                <?php if ($entry['added_to_masterlist']): ?>
+                                                <?php if (false): ?>
                                                     <span class="masterlist-badge">
                                                         <i class="fas fa-check"></i> In Masterlist
                                                     </span>
@@ -271,47 +268,44 @@ ob_start();
                                                 <?php if ($entry['isin']): ?>
                                                     <span class="isin"><?= htmlspecialchars($entry['isin']) ?></span>
                                                 <?php endif; ?>
-                                                <span class="country"><?= htmlspecialchars($entry['country'] ?: 'N/A') ?></span>
-                                                <?php if ($entry['exchange']): ?>
+                                                <span class="country"><?= htmlspecialchars($entry['country_name'] ?: 'N/A') ?></span>
+                                                <?php if (false): ?>
                                                     <span class="exchange"><?= htmlspecialchars($entry['exchange']) ?></span>
                                                 <?php endif; ?>
                                             </div>
                                         </div>
                                     </td>
                                     <td>
-                                        <span class="status-badge" style="background-color: <?= htmlspecialchars($entry['status_color']) ?>">
-                                            <?= htmlspecialchars($entry['status_name']) ?>
+                                        <span class="status-badge">
+                                            <?= $entry['buylist_status_id'] ? 'Status ' . $entry['buylist_status_id'] : 'No Status' ?>
                                         </span>
                                     </td>
-                                    <td>
-                                        <span class="priority-badge priority-<?= $entry['priority_level'] ?>">
-                                            <?= ['', 'Low', 'Medium', 'High', 'Critical'][$entry['priority_level']] ?? 'Unknown' ?>
-                                        </span>
+                                    <td class="yield">
+                                        <?= $entry['yield'] ? number_format($entry['yield'], 2) . '%' : '-' ?>
                                     </td>
-                                    <td class="price">
-                                        <?= $entry['target_price'] ? number_format($entry['target_price'], 2) . ' SEK' : '-' ?>
+                                    <td class="country">
+                                        <?= htmlspecialchars($entry['country_name'] ?: '-') ?>
                                     </td>
-                                    <td class="quantity">
-                                        <?= $entry['target_quantity'] ? number_format($entry['target_quantity']) : '-' ?>
+                                    <td class="comments">
+                                        <?= htmlspecialchars(substr($entry['comments'] ?: '', 0, 50)) ?><?= strlen($entry['comments'] ?: '') > 50 ? '...' : '' ?>
                                     </td>
-                                    <td class="value">
-                                        <?= ($entry['target_price'] && $entry['target_quantity']) ? 
-                                            number_format($entry['target_price'] * $entry['target_quantity'], 0) . ' SEK' : '-' ?>
+                                    <td class="inspiration">
+                                        <?= htmlspecialchars(substr($entry['inspiration'] ?: '', 0, 30)) ?><?= strlen($entry['inspiration'] ?: '') > 30 ? '...' : '' ?>
                                     </td>
-                                    <td class="date">
-                                        <?= date('M j, Y', strtotime($entry['updated_at'])) ?>
+                                    <td class="isin mono">
+                                        <?= htmlspecialchars($entry['isin'] ?: '-') ?>
                                     </td>
                                     <td>
                                         <div class="action-buttons">
-                                            <?php if (!$entry['added_to_masterlist']): ?>
-                                                <button class="btn-icon btn-success" onclick="addToMasterlist(<?= $entry['buylist_id'] ?>, '<?= htmlspecialchars($entry['company_name']) ?>')" title="Add to Masterlist">
+                                            <?php if (true): ?>
+                                                <button class="btn-icon btn-success" onclick="addToMasterlist(<?= $entry['buy_list_id'] ?>, '<?= htmlspecialchars($entry['company']) ?>')" title="Add to Masterlist">
                                                     <i class="fas fa-plus-circle"></i>
                                                 </button>
                                             <?php endif; ?>
-                                            <button class="btn-icon" onclick="editEntry(<?= $entry['buylist_id'] ?>)" title="Edit">
+                                            <button class="btn-icon" onclick="editEntry(<?= $entry['buy_list_id'] ?>)" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            <button class="btn-icon btn-danger" onclick="deleteEntry(<?= $entry['buylist_id'] ?>, '<?= htmlspecialchars($entry['company_name']) ?>')" title="Remove">
+                                            <button class="btn-icon btn-danger" onclick="deleteEntry(<?= $entry['buy_list_id'] ?>, '<?= htmlspecialchars($entry['company']) ?>')" title="Remove">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </div>
@@ -320,7 +314,7 @@ ob_start();
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="8" class="text-center">
+                                <td colspan="7" class="text-center">
                                     <div class="empty-state">
                                         <i class="fas fa-star"></i>
                                         <p>Your buylist is empty</p>
@@ -372,21 +366,15 @@ ob_start();
             </div>
             <form id="entryForm">
                 <input type="hidden" id="modalAction" name="action" value="add">
-                <input type="hidden" id="buylistId" name="buylist_id" value="">
+                <input type="hidden" id="buylistId" name="buy_list_id" value="">
                 <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
                 
-                <div class="form-tabs">
-                    <button type="button" class="tab-button active" onclick="showTab('basic')">Basic Info</button>
-                    <button type="button" class="tab-button" onclick="showTab('analysis')">Analysis</button>
-                    <button type="button" class="tab-button" onclick="showTab('strategy')">Strategy</button>
-                </div>
                 
-                <!-- Basic Info Tab -->
-                <div id="basicTab" class="tab-content active">
+                <div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="company_name">Company Name *</label>
-                            <input type="text" id="company_name" name="company_name" required maxlength="200" placeholder="e.g., Tesla Inc">
+                            <label for="company">Company Name *</label>
+                            <input type="text" id="company" name="company" required maxlength="200" placeholder="e.g., Tesla Inc">
                         </div>
                         <div class="form-group">
                             <label for="ticker">Ticker *</label>
@@ -396,8 +384,8 @@ ob_start();
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="country">Country</label>
-                            <select id="country" name="country">
+                            <label for="country_name">Country</label>
+                            <select id="country_name" name="country_name">
                                 <option value="">Select Country</option>
                                 <option value="SE">Sweden</option>
                                 <option value="US">United States</option>
@@ -410,22 +398,15 @@ ob_start();
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="currency">Currency</label>
-                            <select id="currency" name="currency">
-                                <option value="SEK">SEK</option>
-                                <option value="USD">USD</option>
-                                <option value="EUR">EUR</option>
-                                <option value="NOK">NOK</option>
-                                <option value="DKK">DKK</option>
-                                <option value="GBP">GBP</option>
-                            </select>
+                            <label for="yield">Yield (%)</label>
+                            <input type="number" id="yield" name="yield" step="0.01" min="0" max="100" placeholder="0.00">
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="exchange">Exchange</label>
-                            <input type="text" id="exchange" name="exchange" maxlength="50" placeholder="e.g., NASDAQ, NYSE, OMX">
+                            <label for="inspiration">Inspiration</label>
+                            <input type="text" id="inspiration" name="inspiration" maxlength="255" placeholder="What inspired this pick?">
                         </div>
                         <div class="form-group">
                             <label for="isin">ISIN (Optional)</label>
@@ -434,133 +415,47 @@ ob_start();
                     </div>
                     
                     <div class="form-group">
-                        <label for="business_description">Business Description</label>
-                        <textarea id="business_description" name="business_description" rows="2" placeholder="Brief description of what the company does..."></textarea>
+                        <label for="comments">Comments</label>
+                        <textarea id="comments" name="comments" rows="3" placeholder="Add your notes about this investment..."></textarea>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="status_id">Status *</label>
-                            <select id="status_id" name="status_id" required>
-                                <?php foreach ($statuses as $status): ?>
-                                    <option value="<?= $status['status_id'] ?>" data-color="<?= $status['status_color'] ?>">
-                                        <?= htmlspecialchars($status['status_name']) ?>
-                                    </option>
-                                <?php endforeach; ?>
+                            <label for="buylist_status_id">Status</label>
+                            <select id="buylist_status_id" name="buylist_status_id">
+                                <option value="">Select Status</option>
+                                <option value="1">Watching</option>
+                                <option value="2">Researching</option>
+                                <option value="3">Ready to Buy</option>
+                                <option value="4">Passed</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="priority_level">Priority</label>
-                            <select id="priority_level" name="priority_level">
-                                <option value="1">Low</option>
-                                <option value="2">Medium</option>
-                                <option value="3" selected>High</option>
-                                <option value="4">Critical</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="target_price">Target Price (SEK)</label>
-                            <input type="number" id="target_price" name="target_price" step="0.01" min="0" placeholder="0.00">
-                        </div>
-                        <div class="form-group">
-                            <label for="target_quantity">Target Quantity</label>
-                            <input type="number" id="target_quantity" name="target_quantity" min="1" placeholder="0">
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="notes">Notes</label>
-                        <textarea id="notes" name="notes" rows="3" placeholder="Add your notes about this investment..."></textarea>
-                    </div>
-                </div>
-                
-                <!-- Analysis Tab -->
-                <div id="analysisTab" class="tab-content">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="expected_dividend_yield">Expected Dividend Yield (%)</label>
-                            <input type="number" id="expected_dividend_yield" name="expected_dividend_yield" step="0.01" min="0" max="100" placeholder="0.00">
-                        </div>
-                        <div class="form-group">
-                            <label for="pe_ratio">P/E Ratio</label>
-                            <input type="number" id="pe_ratio" name="pe_ratio" step="0.01" min="0" placeholder="0.00">
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="price_to_book">Price-to-Book</label>
-                            <input type="number" id="price_to_book" name="price_to_book" step="0.01" min="0" placeholder="0.00">
-                        </div>
-                        <div class="form-group">
-                            <label for="debt_to_equity">Debt-to-Equity</label>
-                            <input type="number" id="debt_to_equity" name="debt_to_equity" step="0.01" min="0" placeholder="0.00">
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="roe">ROE (%)</label>
-                            <input type="number" id="roe" name="roe" step="0.01" min="0" max="100" placeholder="0.00">
-                        </div>
-                        <div class="form-group">
-                            <label for="risk_level">Risk Level</label>
-                            <select id="risk_level" name="risk_level">
-                                <option value="1">Low Risk</option>
-                                <option value="2">Medium Risk</option>
-                                <option value="3" selected>High Risk</option>
+                            <label for="strategy_group_id">Strategy Group</label>
+                            <select id="strategy_group_id" name="strategy_group_id">
+                                <option value="">Select Strategy</option>
+                                <option value="1">Dividend Growth</option>
+                                <option value="2">Value Investing</option>
+                                <option value="3">Growth</option>
+                                <option value="4">Speculative</option>
                             </select>
                         </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="research_notes">Research Notes</label>
-                        <textarea id="research_notes" name="research_notes" rows="4" placeholder="Detailed research findings and analysis..."></textarea>
-                    </div>
-                </div>
-                
-                <!-- Strategy Tab -->
-                <div id="strategyTab" class="tab-content">
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="stop_loss_price">Stop Loss (SEK)</label>
-                            <input type="number" id="stop_loss_price" name="stop_loss_price" step="0.01" min="0" placeholder="0.00">
+                            <label for="broker_id">Broker</label>
+                            <select id="broker_id" name="broker_id">
+                                <option value="">Select Broker</option>
+                                <option value="1">Avanza</option>
+                                <option value="2">Nordnet</option>
+                                <option value="3">ICA Banken</option>
+                                <option value="4">Other</option>
+                            </select>
                         </div>
                         <div class="form-group">
-                            <label for="take_profit_price">Take Profit (SEK)</label>
-                            <input type="number" id="take_profit_price" name="take_profit_price" step="0.01" min="0" placeholder="0.00">
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="target_allocation_percent">Target Allocation (%)</label>
-                        <input type="number" id="target_allocation_percent" name="target_allocation_percent" step="0.01" min="0" max="100" placeholder="0.00">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="entry_strategy">Entry Strategy</label>
-                        <textarea id="entry_strategy" name="entry_strategy" rows="3" placeholder="When and how to enter this position..."></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="exit_strategy">Exit Strategy</label>
-                        <textarea id="exit_strategy" name="exit_strategy" rows="3" placeholder="When and how to exit this position..."></textarea>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="next_review_date">Next Review Date</label>
-                            <input type="date" id="next_review_date" name="next_review_date">
-                        </div>
-                        <div class="form-group">
-                            <label for="price_alert_enabled">Price Alerts</label>
-                            <div class="checkbox-group">
-                                <input type="checkbox" id="price_alert_enabled" name="price_alert_enabled" value="1" checked>
-                                <label for="price_alert_enabled">Enable price alerts</label>
-                            </div>
+                            <label for="new_group_id">Group ID</label>
+                            <input type="number" id="new_group_id" name="new_group_id" min="0" placeholder="Group ID">
                         </div>
                     </div>
                 </div>
@@ -584,7 +479,7 @@ ob_start();
             </div>
             <form id="masterlistForm">
                 <input type="hidden" name="action" value="add_to_masterlist">
-                <input type="hidden" id="masterlistBuylistId" name="buylist_id" value="">
+                <input type="hidden" id="masterlistBuylistId" name="buy_list_id" value="">
                 <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
                 
                 <div class="modal-body">
