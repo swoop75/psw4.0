@@ -43,11 +43,11 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 999999;
+    z-index: 1000000;
     background: #ffffff;
-    border: 2px solid #e2e8f0;
+    border: 3px solid #2d3748;
     border-radius: 16px;
-    box-shadow: 0 32px 64px rgba(0, 0, 0, 0.3), 0 8px 16px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 32px 64px rgb(0, 0, 0), 0 8px 16px rgb(0, 0, 0);
     padding: 32px;
     width: 520px;
     max-height: 85vh;
@@ -58,7 +58,7 @@
     opacity: 0;
     visibility: hidden;
     transform: translate(-50%, -50%) scale(0.95);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s ease;
     pointer-events: none;
     box-sizing: border-box;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -72,11 +72,11 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgb(15, 23, 42);
-    z-index: 999998;
+    background: rgb(0, 0, 0);
+    z-index: 999999;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     pointer-events: none;
 }
 
@@ -119,6 +119,7 @@
     visibility: visible;
     transform: translate(-50%, -50%) scale(1);
     pointer-events: auto;
+    z-index: 1000001;
 }
 
 /* Tooltip arrows - Right side (default) */
