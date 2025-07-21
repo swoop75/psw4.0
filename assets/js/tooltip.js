@@ -156,7 +156,7 @@ function showTooltip(event) {
     tooltip.style.visibility = 'visible';
     tooltip.style.transform = 'translate(-50%, -50%) scale(1)';
     tooltip.style.pointerEvents = 'auto';
-    tooltip.style.zIndex = '1000000';
+    tooltip.style.zIndex = '1000001';
     
     // Add click-to-close functionality
     tooltip.addEventListener('click', function(e) {
