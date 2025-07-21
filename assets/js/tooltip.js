@@ -111,66 +111,42 @@ function createTooltipContent(element) {
 }
 
 /**
- * Show tooltip with smart positioning
+ * Show tooltip with fixed positioning
  */
 function showTooltip(event) {
     const tooltip = this.querySelector('.company-tooltip');
     if (!tooltip) return;
     
-    // Show tooltip first to get dimensions
+    // Get parent element coordinates
+    const parentRect = this.getBoundingClientRect();
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    
+    // Position tooltip to the right of the element
+    let left = parentRect.right + 10;
+    let top = parentRect.top;
+    
+    // Adjust if tooltip would go off screen
+    if (left + 400 > windowWidth) {
+        left = parentRect.left - 410; // Show on left instead
+    }
+    
+    if (top + 200 > windowHeight) {
+        top = windowHeight - 210; // Keep on screen
+    }
+    
+    if (top < 10) {
+        top = 10; // Don't go above screen
+    }
+    
+    // Set fixed position
+    tooltip.style.left = left + 'px';
+    tooltip.style.top = top + 'px';
+    tooltip.style.transform = 'none';
+    
+    // Show tooltip
     tooltip.style.opacity = '1';
     tooltip.style.visibility = 'visible';
-    
-    // Smart positioning based on screen location
-    setTimeout(() => {
-        const tooltipRect = tooltip.getBoundingClientRect();
-        const parentRect = this.getBoundingClientRect();
-        const windowWidth = window.innerWidth;
-        const windowHeight = window.innerHeight;
-        
-        // Reset all position classes
-        tooltip.classList.remove('adjust-position', 'position-above', 'position-below', 'position-left', 'position-right');
-        
-        // Determine horizontal positioning
-        const spaceRight = windowWidth - parentRect.right;
-        const spaceLeft = parentRect.left;
-        
-        if (spaceRight < tooltipRect.width + 20 && spaceLeft > tooltipRect.width + 20) {
-            // Not enough space on right, move to left
-            tooltip.classList.add('position-left');
-        } else {
-            // Default right positioning
-            tooltip.classList.add('position-right');
-        }
-        
-        // Determine vertical positioning
-        const spaceBelow = windowHeight - parentRect.bottom;
-        const spaceAbove = parentRect.top;
-        
-        if (spaceBelow < tooltipRect.height + 20 && spaceAbove > tooltipRect.height + 20) {
-            // Not enough space below, move above
-            tooltip.classList.add('position-above');
-        } else {
-            // Default below positioning
-            tooltip.classList.add('position-below');
-        }
-        
-        // Fine-tune vertical position to keep tooltip on screen
-        const currentTop = tooltipRect.top;
-        const currentBottom = tooltipRect.bottom;
-        
-        if (currentBottom > windowHeight - 20) {
-            // Tooltip goes below screen, adjust upward
-            const adjustment = currentBottom - (windowHeight - 20);
-            tooltip.style.top = `-${adjustment}px`;
-        } else if (currentTop < 20) {
-            // Tooltip goes above screen, adjust downward
-            const adjustment = 20 - currentTop;
-            tooltip.style.top = `${adjustment}px`;
-        } else {
-            tooltip.style.top = '0';
-        }
-    }, 10);
 }
 
 /**
