@@ -79,7 +79,7 @@ class PortfolioBuylistController {
             $offset = ($page - 1) * $limit;
             $totalPages = ceil($totalRecords / $limit);
             
-            // Get buylist entries with reference data
+            // Get buylist entries with reference data (cross-database joins)
             $sql = "SELECT b.buy_list_id,
                            b.company,
                            b.ticker,
@@ -98,8 +98,8 @@ class PortfolioBuylistController {
                            bs.status as status_name,
                            b.buylistcol
                     FROM buylist b 
-                    LEFT JOIN portfolio_strategy_groups psg ON b.strategy_group_id = psg.strategy_group_id
-                    LEFT JOIN brokers br ON b.broker_id = br.broker_id
+                    LEFT JOIN psw_foundation.portfolio_strategy_groups psg ON b.strategy_group_id = psg.strategy_group_id
+                    LEFT JOIN psw_foundation.brokers br ON b.broker_id = br.broker_id
                     LEFT JOIN buylist_status bs ON b.buylist_status_id = bs.id
                     $whereClause 
                     ORDER BY b.buy_list_id DESC 
@@ -320,13 +320,21 @@ class PortfolioBuylistController {
     }
     
     /**
-     * Get single buylist entry
+     * Get single buylist entry with reference data
      * @param int $buylistId Entry ID
      * @return array|false Entry data or false if not found
      */
     public function getBuylistEntry($buylistId) {
         try {
-            $sql = "SELECT * FROM buylist WHERE buy_list_id = :buy_list_id";
+            $sql = "SELECT b.*,
+                           psg.strategy_name,
+                           br.broker_name,
+                           bs.status as status_name
+                    FROM buylist b 
+                    LEFT JOIN psw_foundation.portfolio_strategy_groups psg ON b.strategy_group_id = psg.strategy_group_id
+                    LEFT JOIN psw_foundation.brokers br ON b.broker_id = br.broker_id
+                    LEFT JOIN buylist_status bs ON b.buylist_status_id = bs.id
+                    WHERE b.buy_list_id = :buy_list_id";
             $stmt = $this->portfolioDb->prepare($sql);
             $stmt->bindValue(':buy_list_id', $buylistId, PDO::PARAM_INT);
             $stmt->execute();
@@ -393,14 +401,14 @@ class PortfolioBuylistController {
             $stmt->execute();
             $countries = $stmt->fetchAll(PDO::FETCH_COLUMN);
             
-            // Get strategy groups
-            $strategiesSql = "SELECT strategy_group_id, strategy_name FROM portfolio_strategy_groups ORDER BY strategy_name";
+            // Get strategy groups (cross-database query)
+            $strategiesSql = "SELECT strategy_group_id, strategy_name FROM psw_foundation.portfolio_strategy_groups ORDER BY strategy_name";
             $stmt = $this->portfolioDb->prepare($strategiesSql);
             $stmt->execute();
             $strategies = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
-            // Get brokers
-            $brokersSql = "SELECT broker_id, broker_name FROM brokers ORDER BY broker_name";
+            // Get brokers (cross-database query)
+            $brokersSql = "SELECT broker_id, broker_name FROM psw_foundation.brokers ORDER BY broker_name";
             $stmt = $this->portfolioDb->prepare($brokersSql);
             $stmt->execute();
             $brokers = $stmt->fetchAll(PDO::FETCH_ASSOC);
