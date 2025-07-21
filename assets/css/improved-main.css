@@ -314,6 +314,7 @@ a:hover {
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(0, 200, 150, 0.3);
     text-decoration: none;
+    position: relative;
 }
 
 .unified-header .login-toggle:hover {
@@ -324,6 +325,30 @@ a:hover {
 
 .unified-header .user-menu {
     position: relative;
+}
+
+/* Login dropdown positioning for unified header */
+.unified-header .login-dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    background: white;
+    border: 1px solid rgba(0, 200, 150, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    width: 280px;
+    padding: 1.5rem;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px) scale(0.95);
+    transition: all 0.3s ease;
+    z-index: 1001;
+}
+
+.unified-header .login-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
 }
 
 /* Adjust main container for fixed header */
