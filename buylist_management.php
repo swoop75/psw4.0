@@ -271,6 +271,7 @@ ob_start();
                                              data-ticker="<?= htmlspecialchars($entry['ticker']) ?>"
                                              data-isin="<?= htmlspecialchars($entry['isin'] ?: 'N/A') ?>"
                                              data-strategy-group="<?= htmlspecialchars($entry['strategy_name'] ?: 'No Strategy') ?>"
+                                             data-strategy-id="<?= $entry['strategy_group_id'] ?: 'N/A' ?>"
                                              data-new-group="<?= $entry['new_group_id'] ?: 'No Group' ?>"
                                              data-broker="<?= htmlspecialchars($entry['broker_name'] ?: 'No Broker') ?>"
                                              data-yield="<?= $entry['yield'] ? number_format($entry['yield'], 2) . '%' : 'N/A' ?>"

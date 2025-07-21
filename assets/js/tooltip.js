@@ -34,8 +34,14 @@ function createTooltipContent(element) {
     const ticker = element.dataset.ticker || 'N/A';
     const isin = element.dataset.isin || 'N/A';
     const strategyGroup = element.dataset.strategyGroup || 'No Strategy';
+    const strategyId = element.dataset.strategyId || 'N/A';
     const newGroup = element.dataset.newGroup || 'No Group';
     const broker = element.dataset.broker || 'No Broker';
+    
+    // Format strategy display with group number
+    const strategyDisplay = (strategyGroup !== 'No Strategy' && strategyId !== 'N/A' && strategyId !== '') 
+        ? `Group ${strategyId}: ${strategyGroup}`
+        : strategyGroup === 'No Strategy' ? 'No Strategy Assigned' : strategyGroup;
     const yield_ = element.dataset.yield || 'N/A';
     const country = element.dataset.country || 'N/A';
     const status = element.dataset.status || 'No Status';
@@ -74,7 +80,7 @@ function createTooltipContent(element) {
             <div class="tooltip-section-title">Organization</div>
             <div class="tooltip-row">
                 <span class="tooltip-label">Strategy:</span>
-                <span class="tooltip-value tooltip-strategy">${escapeHtml(strategyGroup)}</span>
+                <span class="tooltip-value tooltip-strategy">${escapeHtml(strategyDisplay)}</span>
             </div>
             <div class="tooltip-row">
                 <span class="tooltip-label">New Group:</span>
