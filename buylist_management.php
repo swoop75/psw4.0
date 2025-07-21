@@ -309,7 +309,7 @@ ob_start();
                         Showing <?= count($buylistData['entries']) ?> of <?= $buylistData['pagination']['total_records'] ?> entries
                     </div>
                     <div class="pagination-controls">
-                        <?php if ($buylistData['pagination']['has_prev']): ?>
+                        <?php if ($buylistData['pagination']['has_previous']): ?>
                             <a href="?<?= http_build_query(array_merge($_GET, ['page' => $buylistData['pagination']['current_page'] - 1])) ?>" class="btn btn-sm">
                                 <i class="fas fa-chevron-left"></i> Previous
                             </a>

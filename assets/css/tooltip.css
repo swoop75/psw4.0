@@ -41,17 +41,17 @@
 .company-tooltip {
     position: absolute;
     z-index: 999999;
-    background: #f0f4f8;
-    border: 2px solid #4a5568;
+    background: #1a202c !important;
+    border: 3px solid #000000;
     border-radius: 8px;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8), 0 10px 30px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.9), 0 10px 30px rgba(0, 0, 0, 0.7);
     padding: 18px;
     width: auto;
     min-width: 400px;
     max-width: 500px;
     font-size: 14px;
     line-height: 1.5;
-    color: #2d3748;
+    color: #ffffff !important;
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px) scale(0.95);
@@ -230,7 +230,7 @@
 .tooltip-section {
     margin-bottom: 12px;
     padding: 10px;
-    background: #e2e8f0;
+    background: #2d3748 !important;
     border-radius: 6px;
     border-left: 3px solid #667eea;
 }
@@ -266,20 +266,20 @@
 
 .tooltip-label {
     font-weight: 600;
-    color: #1f2937;
+    color: #e2e8f0 !important;
     min-width: 90px;
     font-size: 13px;
-    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.7);
+    text-shadow: none;
 }
 
 .tooltip-value {
-    color: #111827;
+    color: #ffffff !important;
     text-align: right;
     flex: 1;
     margin-left: 16px;
     font-weight: 500;
     font-size: 13px;
-    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.7);
+    text-shadow: none;
 }
 
 .tooltip-value.mono {
@@ -323,13 +323,13 @@
 
 /* Comments and inspiration section */
 .tooltip-text-content {
-    background: #cbd5e0;
+    background: #4a5568 !important;
     padding: 8px;
     border-radius: 4px;
     border-left: 3px solid #667eea;
     margin-top: 6px;
     font-style: italic;
-    color: #2d3748;
+    color: #e2e8f0 !important;
     line-height: 1.4;
     font-size: 13px;
     word-wrap: break-word;
