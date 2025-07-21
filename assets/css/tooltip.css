@@ -37,32 +37,27 @@
     text-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
 }
 
-/* Tooltip content - Override all parent effects */
+/* Tooltip content - Use white background since it works */
 .company-tooltip {
     position: absolute !important;
     z-index: 999999 !important;
-    background: #000000 !important;
-    border: 5px solid #ffffff !important;
-    border-radius: 0 !important;
-    box-shadow: 0 0 0 50px #000000 !important;
+    background: #ffffff !important;
+    border: 3px solid #2d3748 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
     padding: 20px !important;
-    width: 400px !important;
-    height: 150px !important;
+    width: auto !important;
+    min-width: 400px !important;
+    max-width: 500px !important;
     font-size: 14px !important;
     line-height: 1.5 !important;
-    color: #ffffff !important;
+    color: #1f2937 !important;
     opacity: 0 !important;
     visibility: hidden !important;
     transform: translateY(-10px) scale(0.95) !important;
     transition: all 0.3s ease !important;
     pointer-events: none !important;
     box-sizing: border-box !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    filter: none !important;
-    mix-blend-mode: normal !important;
-    isolation: isolate !important;
-    contain: layout style paint !important;
 }
 
 /* Default positioning (right side) */
