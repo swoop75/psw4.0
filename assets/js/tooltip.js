@@ -17,42 +17,19 @@ function initializeTooltips() {
         const tooltip = createTooltipContent(element);
         element.appendChild(tooltip);
         
-        // Add event listeners with stable show/hide logic
-        let hideTimeout;
-        let isTooltipVisible = false;
-        
+        // Simple and reliable event listeners
         element.addEventListener('mouseenter', function(e) {
-            clearTimeout(hideTimeout);
-            if (!isTooltipVisible) {
-                showTooltip.call(this, e);
-                isTooltipVisible = true;
-                
-                // Add global click listener to close modal
-                const closeModal = (event) => {
-                    const modal = document.querySelector('.tooltip-modal-container');
-                    if (modal && !modal.contains(event.target)) {
-                        hideTooltip.call(this, e);
-                        isTooltipVisible = false;
-                        document.removeEventListener('click', closeModal);
-                    }
-                };
-                setTimeout(() => document.addEventListener('click', closeModal), 100);
-            }
+            showTooltip.call(this, e);
         });
         
-        // Only hide on actual mouse leave from the element area
         element.addEventListener('mouseleave', function(e) {
-            // Check if mouse is really leaving the element bounds
-            const rect = element.getBoundingClientRect();
-            const x = e.clientX;
-            const y = e.clientY;
-            
-            if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) {
-                hideTimeout = setTimeout(() => {
+            // Small delay to allow moving to modal
+            setTimeout(() => {
+                const modal = document.querySelector('.tooltip-modal-container');
+                if (modal && !modal.matches(':hover')) {
                     hideTooltip.call(this, e);
-                    isTooltipVisible = false;
-                }, 300);
-            }
+                }
+            }, 200);
         });
     });
 }
@@ -184,22 +161,16 @@ function showTooltip(event) {
         document.body.appendChild(modalContainer);
     }
     
-    // Move tooltip to modal container and show it
+    // Clear any existing content and add tooltip
+    modalContainer.innerHTML = '';
     modalContainer.appendChild(tooltip.cloneNode(true));
     const modalTooltip = modalContainer.querySelector('.company-tooltip');
     
-    // Add mouse leave detection to modal container
+    // Simple mouse leave detection
     modalContainer.addEventListener('mouseleave', function(e) {
-        // Hide tooltip when mouse leaves the modal area
-        window.tooltipHideTimeout = setTimeout(() => {
+        setTimeout(() => {
             hideTooltip();
         }, 100);
-    });
-    
-    // Keep tooltip open when hovering over the modal content
-    modalTooltip.addEventListener('mouseenter', function(e) {
-        // Cancel any pending hide
-        clearTimeout(window.tooltipHideTimeout);
     });
     
     modalTooltip.style.cssText = `
