@@ -157,7 +157,7 @@ a:hover {
     color: var(--primary-dark);
 }
 
-/* Modern Header Styles */
+/* Modern Header Styles (Legacy - to be removed) */
 .header {
     background-color: var(--bg-primary);
     border-bottom: 1px solid var(--border-light);
@@ -171,6 +171,164 @@ a:hover {
 
 .header.scrolled {
     box-shadow: var(--shadow-md);
+}
+
+/* Unified Header Styles */
+.unified-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(0, 200, 150, 0.1);
+    padding: 1rem 2rem;
+    z-index: 1000;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+    min-height: 80px;
+}
+
+.unified-header .header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: auto;
+    padding: 0;
+}
+
+.unified-header .logo-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-decoration: none;
+}
+
+.unified-header .logo-mini {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #00C896 0%, #1A73E8 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 200, 150, 0.3);
+}
+
+.unified-header .logo-mini i {
+    font-size: 24px;
+    color: white;
+}
+
+.unified-header .logo-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #00C896 0%, #1A73E8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.unified-header .nav-links {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.unified-header .nav-link {
+    color: #6B7280;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
+}
+
+.unified-header .nav-link:hover {
+    color: #00C896;
+}
+
+.unified-header .nav-item {
+    position: relative;
+}
+
+.unified-header .nav-dropdown-only {
+    cursor: pointer;
+}
+
+.unified-header .nav-arrow {
+    margin-left: 0.5rem;
+    font-size: 0.75rem;
+    transition: transform 0.3s ease;
+}
+
+.unified-header .submenu {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    background: white;
+    border: 1px solid rgba(0, 200, 150, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    min-width: 200px;
+    padding: 0.5rem 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1001;
+}
+
+.unified-header .nav-item:hover .submenu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.unified-header .submenu-link {
+    display: block;
+    padding: 0.75rem 1rem;
+    color: #374151;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.unified-header .submenu-link:hover {
+    background: rgba(0, 200, 150, 0.05);
+    color: #00C896;
+}
+
+.unified-header .login-toggle {
+    background: linear-gradient(135deg, #00C896 0%, #1A73E8 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 200, 150, 0.3);
+    text-decoration: none;
+}
+
+.unified-header .login-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 200, 150, 0.4);
+    color: white;
+}
+
+.unified-header .user-menu {
+    position: relative;
+}
+
+/* Adjust main container for fixed header */
+.main-container {
+    padding-top: 100px;
 }
 
 .header-container {
