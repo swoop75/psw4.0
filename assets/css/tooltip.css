@@ -40,14 +40,14 @@
 /* Tooltip content */
 .company-tooltip {
     position: absolute;
-    z-index: 10000;
-    background: #f8fafc !important;
-    border: 2px solid #667eea;
+    z-index: 99999;
+    background: #ffffff !important;
+    border: 3px solid #667eea;
     border-radius: 12px;
-    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2), 0 5px 20px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 8px 25px rgba(102, 126, 234, 0.4);
     padding: 20px;
-    width: 420px;
-    min-height: 200px;
+    width: 440px !important;
+    height: 320px !important;
     font-size: 14px;
     line-height: 1.6;
     color: #111827;
@@ -57,6 +57,7 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     pointer-events: none;
     box-sizing: border-box;
+    overflow: hidden;
 }
 
 /* Default positioning (right side) */
@@ -226,10 +227,10 @@
 
 /* Tooltip content sections */
 .tooltip-section {
-    margin-bottom: 16px;
-    padding: 12px;
-    background: #f1f5f9;
-    border-radius: 8px;
+    margin-bottom: 12px;
+    padding: 10px;
+    background: #f8fafc;
+    border-radius: 6px;
     border-left: 3px solid #667eea;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
@@ -322,18 +323,17 @@
 
 /* Comments and inspiration section */
 .tooltip-text-content {
-    background: #e0e7ff;
-    padding: 12px;
-    border-radius: 8px;
-    border-left: 4px solid #667eea;
-    margin-top: 8px;
+    background: #f1f5f9;
+    padding: 8px;
+    border-radius: 6px;
+    border-left: 3px solid #667eea;
+    margin-top: 6px;
     font-style: italic;
     color: #1f2937;
-    max-height: 80px;
-    min-height: 40px;
+    height: 60px;
     overflow-y: auto;
-    line-height: 1.5;
-    font-size: 13px;
+    line-height: 1.4;
+    font-size: 12px;
     word-wrap: break-word;
     hyphens: auto;
 }
@@ -366,8 +366,8 @@
 /* Responsive positioning for mobile */
 @media (max-width: 768px) {
     .company-tooltip {
-        width: 350px;
-        min-height: 180px;
+        width: 350px !important;
+        height: 280px !important;
     }
     
     /* Force left positioning on mobile to avoid going off-screen */
