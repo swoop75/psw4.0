@@ -74,52 +74,38 @@ PSW = {
         let closeTimer = null;
         let autofillInProgress = false;
 
-        // Toggle dropdown
+        // Toggle dropdown - only explicit open/close
         const toggleDropdown = (show) => {
             if (closeTimer) {
                 clearTimeout(closeTimer);
                 closeTimer = null;
             }
 
-            isOpen = show !== undefined ? show : !isOpen;
+            // If show is explicitly set, use it. Otherwise toggle.
+            if (show !== undefined) {
+                isOpen = show;
+            } else {
+                isOpen = !isOpen;
+            }
+            
             loginDropdown.classList.toggle('show', isOpen);
             
             // Update ARIA attributes for accessibility
             loginToggle.setAttribute('aria-expanded', isOpen);
             loginDropdown.setAttribute('aria-hidden', !isOpen);
+            
+            console.log('Login dropdown toggled:', isOpen ? 'OPEN' : 'CLOSED');
         };
 
-        // Click to toggle
+        // ONLY click to toggle - no hover behavior
         loginToggle.addEventListener('click', (e) => {
+            e.preventDefault();
             e.stopPropagation();
             toggleDropdown();
+            console.log('Login button clicked');
         });
 
-        // Hover to show (desktop only)
-        if (window.innerWidth > 768) {
-            loginToggle.addEventListener('mouseenter', () => {
-                if (closeTimer) {
-                    clearTimeout(closeTimer);
-                    closeTimer = null;
-                }
-                toggleDropdown(true);
-            });
-
-            [loginToggle, loginDropdown].forEach(element => {
-                element.addEventListener('mouseleave', () => {
-                    closeTimer = setTimeout(() => {
-                        toggleDropdown(false);
-                    }, 300);
-                });
-
-                element.addEventListener('mouseenter', () => {
-                    if (closeTimer) {
-                        clearTimeout(closeTimer);
-                        closeTimer = null;
-                    }
-                });
-            });
-        }
+        // Disable ALL hover behavior to prevent conflicts
 
         // Enhanced password manager detection
         const isPasswordManagerElement = (element) => {
@@ -165,21 +151,11 @@ PSW = {
             return false;
         };
 
-        // Completely disable outside click closing - only allow manual close
+        // COMPLETELY disable all click-based closing
         document.addEventListener('click', (e) => {
-            // Only close if clicking the toggle button itself (to toggle off)
-            if (loginToggle.contains(e.target) && isOpen) {
-                toggleDropdown(false);
-                return;
-            }
-            
-            // Allow clicks inside our dropdown
-            if (loginDropdown.contains(e.target)) {
-                return;
-            }
-            
-            // For all other outside clicks - do nothing (don't close)
-            // This completely prevents accidental closing from LastPass interactions
+            // NEVER close the dropdown automatically
+            // Only allow manual closing via specific buttons or escape key
+            return;
         });
 
         // Close on escape key
@@ -190,9 +166,26 @@ PSW = {
             }
         });
 
-        // Since we disabled outside click closing, we can simplify this
-        // Just ensure the dropdown stays open for password managers
-        console.log('Login dropdown initialized - outside click closing disabled for LastPass compatibility');
+        // Add explicit close button handler
+        const closeBtn = loginDropdown.querySelector('.close-btn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleDropdown(false);
+                console.log('Close button clicked');
+            });
+        }
+
+        // Make sure form submission doesn't close dropdown prematurely
+        const loginForm = loginDropdown.querySelector('.login-form');
+        if (loginForm) {
+            loginForm.addEventListener('submit', (e) => {
+                console.log('Form submitted - dropdown will remain open until page redirects');
+            });
+        }
+
+        console.log('Login dropdown initialized - ALL automatic closing disabled for LastPass compatibility');
 
         // Handle dropdown links
         const dropdownLinks = loginDropdown.querySelectorAll('.dropdown-link');
@@ -614,12 +607,15 @@ window.formatNumber = PSW.utils.formatNumber;
 
 // Global functions for dropdown (backward compatibility)
 function toggleUserMenu() {
-    const dropdown = document.querySelector('.login-dropdown');
+    const dropdown = document.querySelector('.login-dropdown, #loginDropdown');
     if (dropdown) {
+        const isCurrentlyOpen = dropdown.classList.contains('show');
         dropdown.classList.toggle('show');
+        console.log('Global toggleUserMenu called:', !isCurrentlyOpen ? 'OPENING' : 'CLOSING');
     }
 }
 
 function toggleLogin() {
+    console.log('Global toggleLogin called');
     toggleUserMenu();
 }
