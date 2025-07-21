@@ -412,7 +412,7 @@ class UserManagementController {
     private function getDividendPaymentsCount() {
         try {
             $portfolioDb = Database::getConnection('portfolio');
-            $sql = "SELECT COUNT(*) as count FROM log_dividends WHERE dividend_total_sek > 0";
+            $sql = "SELECT COUNT(*) as count FROM log_dividends WHERE dividend_amount_sek > 0";
             $stmt = $portfolioDb->prepare($sql);
             $stmt->execute();
             
@@ -431,7 +431,7 @@ class UserManagementController {
     private function getTotalDividendAmount() {
         try {
             $portfolioDb = Database::getConnection('portfolio');
-            $sql = "SELECT SUM(dividend_total_sek) as total FROM log_dividends WHERE dividend_total_sek > 0";
+            $sql = "SELECT SUM(dividend_amount_sek) as total FROM log_dividends WHERE dividend_amount_sek > 0";
             $stmt = $portfolioDb->prepare($sql);
             $stmt->execute();
             
