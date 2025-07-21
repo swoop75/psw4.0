@@ -47,10 +47,11 @@
     border: 2px solid #2d3748;
     border-radius: 8px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
-    padding: 18px;
+    padding: 22px;
+    margin: -4px;
     width: auto;
-    min-width: 400px;
-    max-width: 500px;
+    min-width: 420px;
+    max-width: 520px;
     font-size: 14px;
     line-height: 1.5;
     color: #ffffff;
@@ -198,12 +199,10 @@
 /* Tooltip header */
 .tooltip-header {
     border-bottom: 2px solid rgba(102, 126, 234, 0.2);
-    padding-bottom: 12px;
-    margin-bottom: 16px;
-    background: linear-gradient(135deg, #f0f4ff 0%, #e8f2ff 100%);
-    padding: 12px;
+    padding: 14px;
+    margin: -10px -10px 16px -10px;
+    background: #5a6578;
     border-radius: 8px;
-    margin: -8px -8px 16px -8px;
 }
 
 .tooltip-company-name {
@@ -230,8 +229,8 @@
 /* Tooltip content sections */
 .tooltip-section {
     margin-bottom: 12px;
-    padding: 10px;
-    background: #4a5568;
+    padding: 12px;
+    background: #5a6578;
     border-radius: 6px;
     border-left: 3px solid #667eea;
 }
