@@ -352,32 +352,9 @@ select:focus {
     transform: rotate(180deg);
 }
 
-.dropdown-content {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    z-index: 1000;
-    max-height: 250px;
-    overflow-y: auto;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-8px);
-    transition: all 0.2s ease;
-    min-width: 220px;
-    margin-top: 2px;
-    display: none;
-}
+/* Removed - using more specific .checkbox-dropdown .dropdown-content instead */
 
-.dropdown-content.show {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
+/* Removed - using more specific .checkbox-dropdown .dropdown-content.show instead */
 
 /* Dropdown option styles moved to conditional section below */
 
@@ -416,27 +393,34 @@ select:focus {
     margin-right: 8px;
 }
 
-/* Hide all checkboxes in the dropdown by default */
-.checkbox-dropdown input[type="checkbox"] {
+/* FORCE HIDE all checkbox dropdowns content by default */
+.checkbox-dropdown .dropdown-content {
     display: none !important;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    max-height: 250px;
+    overflow-y: auto;
+    min-width: 220px;
+    margin-top: 2px;
 }
 
-/* Show checkboxes only in dropdown content when dropdown is open */
-.checkbox-dropdown .dropdown-content.show input[type="checkbox"] {
-    display: inline-block !important;
-    width: 16px;
-    height: 16px;
-    margin: 0;
-    accent-color: #f093fb;
-    cursor: pointer;
+/* FORCE SHOW dropdown content when explicitly shown */
+.checkbox-dropdown .dropdown-content.show {
+    display: block !important;
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
 }
 
-/* Ensure dropdown options are hidden by default */
+/* Dropdown options styling */
 .checkbox-dropdown .dropdown-option {
-    display: none;
-}
-
-.checkbox-dropdown .dropdown-content.show .dropdown-option {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -446,28 +430,30 @@ select:focus {
     transition: background-color 0.2s ease;
 }
 
-.checkbox-dropdown .dropdown-content.show .dropdown-option:hover {
+.checkbox-dropdown .dropdown-option:hover {
     background-color: #f8fafc;
 }
 
-.checkbox-dropdown .dropdown-content.show .dropdown-option:last-child {
+.checkbox-dropdown .dropdown-option:last-child {
     border-bottom: none;
 }
 
-.checkbox-dropdown .dropdown-content.show .dropdown-option label {
+.checkbox-dropdown .dropdown-option input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: #f093fb;
+    cursor: pointer;
+}
+
+.checkbox-dropdown .dropdown-option label {
     flex: 1;
     cursor: pointer;
     font-size: 14px;
     color: #2d3748;
 }
 
-/* Show dropdown content when open */
-.dropdown-content.show {
-    display: block;
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
+/* All dropdown styles now handled by .checkbox-dropdown specific rules */
 
 /* Table Styles */
 .table-container {
