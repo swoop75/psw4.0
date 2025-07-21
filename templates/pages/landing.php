@@ -22,126 +22,21 @@
             -webkit-font-smoothing: antialiased;
         }
         
-        <?php if (!Auth::isLoggedIn()): ?>
-        /* Hide base layout header for non-logged-in users on landing page */
+        /* Hide legacy header for all users */
         .header {
             display: none !important;
         }
-        <?php endif; ?>
         
-        /* Top Header with Login */
-        .top-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(0, 200, 150, 0.1);
-            padding: 1rem 2rem;
-            z-index: 1000;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
-            min-height: 80px;
-        }
-        
-        .header-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .logo-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            text-decoration: none;
-        }
-        
-        .logo-mini {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #00C896 0%, #1A73E8 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 15px rgba(0, 200, 150, 0.3);
-        }
-        
-        .logo-mini i {
-            font-size: 24px;
-            color: white;
-        }
-        
-        .logo-text {
-            font-size: 1.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #00C896 0%, #1A73E8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .login-button {
-            background: linear-gradient(135deg, #00C896 0%, #1A73E8 100%);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 200, 150, 0.3);
-            text-decoration: none;
-        }
-        
-        .login-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 200, 150, 0.4);
-            color: white;
-        }
-        
-        /* Navigation Links */
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            align-items: center;
-        }
-        
-        .nav-link {
-            color: #6B7280;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.95rem;
-            transition: color 0.3s ease;
-        }
-        
-        .nav-link:hover {
-            color: #00C896;
-        }
         
         .hero-section {
             max-width: 1000px;
             margin: 0 auto;
-            padding: 4rem 2rem;
+            padding: 8rem 2rem 4rem;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
-        
-        /* Extra padding only for non-logged-in users with custom header */
-        <?php if (!Auth::isLoggedIn()): ?>
-        .hero-section {
-            padding: 8rem 2rem 4rem;
-        }
-        <?php endif; ?>
         
         /* Logo + Title Layout */
         .hero-header {
@@ -471,29 +366,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-<?php if (!Auth::isLoggedIn()): ?>
-<!-- Top Header with Login (only for non-logged-in users) -->
-<header class="top-header">
-    <div class="header-container">
-        <a href="#" class="logo-header">
-            <div class="logo-mini">
-                <i class="fas fa-chart-line"></i>
-            </div>
-            <span class="logo-text">PSW 4.0</span>
-        </a>
-        
-        <div class="nav-links">
-            <a href="/" class="nav-link">Home</a>
-            <a href="#" class="nav-link">About</a>
-            <a href="<?php echo BASE_URL; ?>/public/psw_philosophy.html" class="nav-link">Philosophy</a>
-            <a href="<?php echo BASE_URL; ?>/login.php" class="login-button">
-                <i class="fas fa-sign-in-alt"></i>
-                Login
-            </a>
-        </div>
-    </div>
-</header>
-<?php endif; ?>
 
 <div class="hero-section">
     <!-- Logo + Title Side by Side -->

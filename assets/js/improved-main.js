@@ -66,7 +66,7 @@ PSW = {
     // Dropdown menu functionality
     initDropdowns: function() {
         const loginToggle = document.querySelector('.login-toggle');
-        const loginDropdown = document.querySelector('.login-dropdown');
+        const loginDropdown = document.querySelector('.login-dropdown, #loginDropdown');
         
         if (!loginToggle || !loginDropdown) return;
 
@@ -202,7 +202,7 @@ PSW = {
 
     // Navigation menu functionality
     initNavigation: function() {
-        const navItems = document.querySelectorAll('.nav-item');
+        const navItems = document.querySelectorAll('.nav-item, .unified-header .nav-item');
         
         navItems.forEach(navItem => {
             const navLink = navItem.querySelector('.nav-link');
