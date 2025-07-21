@@ -17,25 +17,42 @@ function initializeTooltips() {
         const tooltip = createTooltipContent(element);
         element.appendChild(tooltip);
         
-        // Add event listeners with debouncing to prevent flickering
+        // Add event listeners with stable show/hide logic
         let hideTimeout;
         let isTooltipVisible = false;
         
         element.addEventListener('mouseenter', function(e) {
             clearTimeout(hideTimeout);
             if (!isTooltipVisible) {
-                setTimeout(() => {
-                    showTooltip.call(this, e);
-                    isTooltipVisible = true;
-                }, 50); // Small delay to prevent rapid triggering
+                showTooltip.call(this, e);
+                isTooltipVisible = true;
+                
+                // Add global click listener to close modal
+                const closeModal = (event) => {
+                    const modal = document.querySelector('.tooltip-modal-container');
+                    if (modal && !modal.contains(event.target)) {
+                        hideTooltip.call(this, e);
+                        isTooltipVisible = false;
+                        document.removeEventListener('click', closeModal);
+                    }
+                };
+                setTimeout(() => document.addEventListener('click', closeModal), 100);
             }
         });
         
+        // Only hide on actual mouse leave from the element area
         element.addEventListener('mouseleave', function(e) {
-            hideTimeout = setTimeout(() => {
-                hideTooltip.call(this, e);
-                isTooltipVisible = false;
-            }, 150); // Longer delay to prevent flickering
+            // Check if mouse is really leaving the element bounds
+            const rect = element.getBoundingClientRect();
+            const x = e.clientX;
+            const y = e.clientY;
+            
+            if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) {
+                hideTimeout = setTimeout(() => {
+                    hideTooltip.call(this, e);
+                    isTooltipVisible = false;
+                }, 300);
+            }
         });
     });
 }
