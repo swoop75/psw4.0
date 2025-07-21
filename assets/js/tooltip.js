@@ -151,15 +151,26 @@ function showTooltip(event) {
         document.body.appendChild(backdrop);
     }
     
-    // Show modal tooltip (CSS handles centering)
-    tooltip.style.opacity = '1';
-    tooltip.style.visibility = 'visible';
-    tooltip.style.transform = 'translate(-50%, -50%) scale(1)';
-    tooltip.style.pointerEvents = 'auto';
-    tooltip.style.zIndex = '1000001';
-    tooltip.style.position = 'fixed';
-    tooltip.style.top = '50%';
-    tooltip.style.left = '50%';
+    // Show modal tooltip with forced visibility
+    tooltip.style.cssText = `
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) scale(1) !important;
+        z-index: 1000001 !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+        background: red !important;
+        border: 5px solid yellow !important;
+        border-radius: 16px !important;
+        padding: 32px !important;
+        width: 520px !important;
+        max-height: 85vh !important;
+        color: white !important;
+        font-size: 16px !important;
+        display: block !important;
+    `;
     
     // Debug logging
     console.log('Tooltip shown:', tooltip);
