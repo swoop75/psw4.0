@@ -92,9 +92,9 @@
 
 /* Show tooltip on hover */
 .company-info[data-tooltip="true"]:hover .company-tooltip {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0) scale(1);
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0) scale(1) !important;
 }
 
 /* Tooltip arrows - Right side (default) */
