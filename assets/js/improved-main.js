@@ -121,31 +121,64 @@ PSW = {
             });
         }
 
-        // Close on outside click (with LastPass/password manager support)
-        document.addEventListener('click', (e) => {
-            // Don't close if clicking on LastPass or other password manager elements
-            const isPasswordManagerElement = e.target.closest('[data-lastpass-root]') || 
-                                           e.target.closest('#lastpass-vault') ||
-                                           e.target.closest('.lp-element') ||
-                                           e.target.closest('[data-1password]') ||
-                                           e.target.closest('[data-bitwarden]') ||
-                                           e.target.classList.contains('lastpass-element') ||
-                                           e.target.id?.includes('lastpass') ||
-                                           e.target.id?.includes('1password') ||
-                                           e.target.id?.includes('bitwarden');
+        // Enhanced password manager detection
+        const isPasswordManagerElement = (element) => {
+            if (!element) return false;
             
+            // Check element and all parents
+            let current = element;
+            while (current && current !== document.body) {
+                // LastPass selectors
+                if (current.hasAttribute?.('data-lastpass-root') ||
+                    current.id?.includes('lastpass') ||
+                    current.className?.includes('lastpass') ||
+                    current.closest?.('#lastpass-vault') ||
+                    current.closest?.('[data-lastpass-root]') ||
+                    current.closest?.('.lp-element')) {
+                    return true;
+                }
+                
+                // 1Password selectors
+                if (current.hasAttribute?.('data-1password') ||
+                    current.id?.includes('1password') ||
+                    current.className?.includes('1password')) {
+                    return true;
+                }
+                
+                // Bitwarden selectors
+                if (current.hasAttribute?.('data-bitwarden') ||
+                    current.id?.includes('bitwarden') ||
+                    current.className?.includes('bitwarden')) {
+                    return true;
+                }
+                
+                // Generic password manager indicators
+                if (current.className?.includes('password-manager') ||
+                    current.className?.includes('extension-') ||
+                    current.hasAttribute?.('data-password-manager')) {
+                    return true;
+                }
+                
+                current = current.parentElement;
+            }
+            
+            return false;
+        };
+
+        // Close on outside click (with enhanced LastPass/password manager support)
+        document.addEventListener('click', (e) => {
             // Don't close if it's a password manager element, inside our dropdown, or autofill is in progress
-            if (!isPasswordManagerElement && 
+            if (!isPasswordManagerElement(e.target) && 
                 !autofillInProgress &&
                 !loginToggle.contains(e.target) && 
                 !loginDropdown.contains(e.target)) {
                 
-                // Add small delay to allow autofill to complete
+                // Add longer delay to allow autofill to complete
                 setTimeout(() => {
                     if (!autofillInProgress) {
                         toggleDropdown(false);
                     }
-                }, 150);
+                }, 300);
             }
         });
 
@@ -157,26 +190,34 @@ PSW = {
             }
         });
 
-        // Prevent modal closing during autofill
+        // Enhanced autofill detection to prevent modal closing
         const usernameInput = loginDropdown.querySelector('#username, input[name="username"]');
         const passwordInput = loginDropdown.querySelector('#password, input[name="password"]');
         
         [usernameInput, passwordInput].forEach(input => {
             if (input) {
-                // Detect autofill start
+                // Detect autofill start - longer duration
                 input.addEventListener('focus', () => {
                     autofillInProgress = true;
                     setTimeout(() => {
                         autofillInProgress = false;
-                    }, 2000); // Give 2 seconds for autofill to complete
+                    }, 3000); // Give 3 seconds for autofill to complete
                 });
                 
-                // Also detect when value changes (autofill)
+                // Detect when value changes (autofill) - longer duration
                 input.addEventListener('input', () => {
                     autofillInProgress = true;
                     setTimeout(() => {
                         autofillInProgress = false;
-                    }, 1000);
+                    }, 2000); // 2 seconds after input change
+                });
+                
+                // Detect mousedown on input (password manager click)
+                input.addEventListener('mousedown', () => {
+                    autofillInProgress = true;
+                    setTimeout(() => {
+                        autofillInProgress = false;
+                    }, 2000);
                 });
                 
                 // Detect autofill via animation (WebKit browsers)
@@ -185,9 +226,34 @@ PSW = {
                         autofillInProgress = true;
                         setTimeout(() => {
                             autofillInProgress = false;
-                        }, 1500);
+                        }, 2000);
                     }
                 });
+                
+                // Monitor for value changes with a watcher
+                let lastValue = input.value;
+                const checkValue = () => {
+                    if (input.value !== lastValue) {
+                        autofillInProgress = true;
+                        lastValue = input.value;
+                        setTimeout(() => {
+                            autofillInProgress = false;
+                        }, 1500);
+                    }
+                };
+                
+                // Check every 100ms when dropdown is open
+                const valueWatcher = setInterval(checkValue, 100);
+                
+                // Clear watcher when dropdown closes
+                const observer = new MutationObserver(() => {
+                    if (!loginDropdown.classList.contains('show')) {
+                        clearInterval(valueWatcher);
+                        observer.disconnect();
+                    }
+                });
+                
+                observer.observe(loginDropdown, { attributes: true, attributeFilter: ['class'] });
             }
         });
 
