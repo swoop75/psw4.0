@@ -42,10 +42,39 @@
                 <?php if (!Auth::isLoggedIn()): ?>
                     <!-- Non-logged-in navigation -->
                     <a href="<?php echo BASE_URL; ?>/philosophy.php" class="nav-link">Philosophy</a>
-                    <button class="login-toggle" onclick="toggleLogin()">
-                        <i class="fas fa-sign-in-alt"></i>
-                        Login
-                    </button>
+                    <div class="login-container">
+                        <button class="login-toggle" onclick="toggleLogin()">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Login
+                        </button>
+                        <!-- Login dropdown for non-logged-in users -->
+                        <div class="login-dropdown" id="loginDropdown">
+                            <?php if (isset($_SESSION['login_error'])): ?>
+                                <div class="alert alert-error">
+                                    <?php echo $_SESSION['login_error']; unset($_SESSION['login_error']); ?>
+                                </div>
+                            <?php endif; ?>
+                            
+                            <form method="POST" action="<?php echo BASE_URL; ?>/login.php" class="login-form">
+                                <input type="hidden" name="csrf_token" value="<?php echo Security::generateCSRFToken(); ?>">
+                                
+                                <div class="form-group">
+                                    <label for="username">Username or Email</label>
+                                    <input type="text" id="username" name="username" required autocomplete="username">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="password">Password</label>
+                                    <input type="password" id="password" name="password" required autocomplete="current-password">
+                                </div>
+                                
+                                <button type="submit" class="btn-login">
+                                    <i class="fas fa-sign-in-alt"></i>
+                                    Sign In
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 <?php else: ?>
                     <!-- Logged-in navigation -->
                     <div class="nav-item">
@@ -94,36 +123,6 @@
                 <?php endif; ?>
             </div>
         </div>
-        
-        <?php if (!Auth::isLoggedIn()): ?>
-        <!-- Login dropdown for non-logged-in users -->
-        <div class="login-dropdown" id="loginDropdown">
-            <?php if (isset($_SESSION['login_error'])): ?>
-                <div class="alert alert-error">
-                    <?php echo $_SESSION['login_error']; unset($_SESSION['login_error']); ?>
-                </div>
-            <?php endif; ?>
-            
-            <form method="POST" action="<?php echo BASE_URL; ?>/login.php" class="login-form">
-                <input type="hidden" name="csrf_token" value="<?php echo Security::generateCSRFToken(); ?>">
-                
-                <div class="form-group">
-                    <label for="username">Username or Email</label>
-                    <input type="text" id="username" name="username" required autocomplete="username">
-                </div>
-                
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required autocomplete="current-password">
-                </div>
-                
-                <button type="submit" class="btn-login">
-                    <i class="fas fa-sign-in-alt"></i>
-                    Sign In
-                </button>
-            </form>
-        </div>
-        <?php endif; ?>
     </header>
 
 
