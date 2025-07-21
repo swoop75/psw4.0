@@ -393,33 +393,20 @@ select:focus {
     margin-right: 8px;
 }
 
-/* ULTIMATE NUCLEAR OPTION: Hide ALL form elements everywhere except search */
-input:not(#searchInput) {
+/* Hide checkboxes and labels outside dropdown containers */
+input[type="checkbox"]:not(.checkbox-dropdown input[type="checkbox"]) {
     display: none !important;
 }
 
-label {
+label:not(.checkbox-dropdown label) {
     display: none !important;
 }
 
-select {
+select:not(.form-group select):not(#countryFilter):not(#statusFilter):not(#strategyFilter):not(#brokerFilter) {
     display: none !important;
 }
 
-/* Also hide anything that looks like a checkbox */
-[type="checkbox"] {
-    display: none !important;
-}
-
-/* Hide any elements with checkbox in the class name */
-*[class*="checkbox"] {
-    border: 3px solid red !important;
-    background: yellow !important;
-}
-
-*[class*="checkbox"] input {
-    display: none !important;
-}
+/* Hide any elements with checkbox in the class name - REMOVED PROBLEMATIC STYLING */
 
 /* FORCE HIDE all checkbox dropdowns content by default */
 .checkbox-dropdown .dropdown-content {
