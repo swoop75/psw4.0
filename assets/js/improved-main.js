@@ -165,20 +165,34 @@ PSW = {
             return false;
         };
 
-        // Close on outside click (with enhanced LastPass/password manager support)
+        // Much more aggressive approach - delay all outside clicks when dropdown is open
         document.addEventListener('click', (e) => {
-            // Don't close if it's a password manager element, inside our dropdown, or autofill is in progress
-            if (!isPasswordManagerElement(e.target) && 
-                !autofillInProgress &&
-                !loginToggle.contains(e.target) && 
-                !loginDropdown.contains(e.target)) {
+            // Always allow clicks inside our dropdown or toggle
+            if (loginToggle.contains(e.target) || loginDropdown.contains(e.target)) {
+                return;
+            }
+            
+            // For any outside click when dropdown is open, use a much longer delay
+            if (isOpen) {
+                // Set autofill in progress to prevent immediate closing
+                autofillInProgress = true;
                 
-                // Add longer delay to allow autofill to complete
+                // Much longer delay - 2 seconds
                 setTimeout(() => {
-                    if (!autofillInProgress) {
+                    // Double-check that user isn't still interacting with password manager
+                    if (!document.querySelector('input:focus') && 
+                        !document.querySelector('[data-lastpass-root]') &&
+                        !document.querySelector('#lastpass-vault')) {
+                        autofillInProgress = false;
                         toggleDropdown(false);
+                    } else {
+                        // If there's still activity, wait another 2 seconds
+                        setTimeout(() => {
+                            autofillInProgress = false;
+                            toggleDropdown(false);
+                        }, 2000);
                     }
-                }, 300);
+                }, 2000);
             }
         });
 
@@ -190,72 +204,65 @@ PSW = {
             }
         });
 
-        // Enhanced autofill detection to prevent modal closing
+        // Extremely aggressive autofill protection - keep dropdown open during ANY input activity
         const usernameInput = loginDropdown.querySelector('#username, input[name="username"]');
         const passwordInput = loginDropdown.querySelector('#password, input[name="password"]');
         
+        // Global activity monitor
+        let lastActivity = 0;
+        const updateActivity = () => {
+            lastActivity = Date.now();
+            autofillInProgress = true;
+        };
+        
+        // Monitor ALL possible events that could indicate password manager activity
+        const events = ['focus', 'blur', 'input', 'change', 'mousedown', 'mouseup', 'click', 'keydown'];
+        
         [usernameInput, passwordInput].forEach(input => {
             if (input) {
-                // Detect autofill start - longer duration
-                input.addEventListener('focus', () => {
-                    autofillInProgress = true;
-                    setTimeout(() => {
-                        autofillInProgress = false;
-                    }, 3000); // Give 3 seconds for autofill to complete
+                events.forEach(eventType => {
+                    input.addEventListener(eventType, updateActivity);
                 });
                 
-                // Detect when value changes (autofill) - longer duration
-                input.addEventListener('input', () => {
-                    autofillInProgress = true;
-                    setTimeout(() => {
-                        autofillInProgress = false;
-                    }, 2000); // 2 seconds after input change
-                });
-                
-                // Detect mousedown on input (password manager click)
-                input.addEventListener('mousedown', () => {
-                    autofillInProgress = true;
-                    setTimeout(() => {
-                        autofillInProgress = false;
-                    }, 2000);
-                });
-                
-                // Detect autofill via animation (WebKit browsers)
-                input.addEventListener('animationstart', (e) => {
-                    if (e.animationName === 'autofill') {
-                        autofillInProgress = true;
-                        setTimeout(() => {
-                            autofillInProgress = false;
-                        }, 2000);
+                // Special handling for password managers that modify values directly
+                Object.defineProperty(input, 'value', {
+                    get: function() {
+                        return this._value || '';
+                    },
+                    set: function(val) {
+                        this._value = val;
+                        updateActivity(); // Any value change triggers protection
+                        if (this.setAttribute) {
+                            this.setAttribute('value', val);
+                        }
                     }
                 });
-                
-                // Monitor for value changes with a watcher
-                let lastValue = input.value;
-                const checkValue = () => {
-                    if (input.value !== lastValue) {
-                        autofillInProgress = true;
-                        lastValue = input.value;
-                        setTimeout(() => {
-                            autofillInProgress = false;
-                        }, 1500);
-                    }
-                };
-                
-                // Check every 100ms when dropdown is open
-                const valueWatcher = setInterval(checkValue, 100);
-                
-                // Clear watcher when dropdown closes
-                const observer = new MutationObserver(() => {
-                    if (!loginDropdown.classList.contains('show')) {
-                        clearInterval(valueWatcher);
-                        observer.disconnect();
-                    }
-                });
-                
-                observer.observe(loginDropdown, { attributes: true, attributeFilter: ['class'] });
             }
         });
+        
+        // Continuous monitoring - if there's been recent activity, keep dropdown open
+        const activityMonitor = setInterval(() => {
+            if (isOpen) {
+                const timeSinceActivity = Date.now() - lastActivity;
+                if (timeSinceActivity < 3000) { // 3 seconds of protection after any activity
+                    autofillInProgress = true;
+                } else {
+                    autofillInProgress = false;
+                }
+            }
+        }, 100);
+        
+        // Cleanup monitor when dropdown closes
+        const cleanup = () => {
+            if (!loginDropdown.classList.contains('show')) {
+                clearInterval(activityMonitor);
+                autofillInProgress = false;
+            }
+        };
+        
+        // Watch for dropdown state changes
+        const observer = new MutationObserver(cleanup);
+        observer.observe(loginDropdown, { attributes: true, attributeFilter: ['class'] });
 
         // Handle dropdown links
         const dropdownLinks = loginDropdown.querySelectorAll('.dropdown-link');
