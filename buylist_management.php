@@ -161,47 +161,7 @@ ob_start();
             </div>
         <?php endif; ?>
 
-        <!-- Statistics Cards -->
-        <?php if (!empty($statistics)): ?>
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-list"></i>
-                </div>
-                <div class="stat-content">
-                    <div class="stat-number"><?= $statistics['total_entries'] ?></div>
-                    <div class="stat-label">Total Entries</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon target">
-                    <i class="fas fa-bullseye"></i>
-                </div>
-                <div class="stat-content">
-                    <div class="stat-number"><?= $statistics['unique_countries'] ?></div>
-                    <div class="stat-label">Countries</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon price">
-                    <i class="fas fa-percentage"></i>
-                </div>
-                <div class="stat-content">
-                    <div class="stat-number"><?= number_format($statistics['avg_yield'], 2) ?>%</div>
-                    <div class="stat-label">Avg Yield</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon entries">
-                    <i class="fas fa-chart-bar"></i>
-                </div>
-                <div class="stat-content">
-                    <div class="stat-number"><?= number_format($statistics['max_yield'], 2) ?>%</div>
-                    <div class="stat-label">Max Yield</div>
-                </div>
-            </div>
-        </div>
-        <?php endif; ?>
+        <!-- Statistics removed for cleaner interface -->
 
         <!-- Main Content -->
         <div class="content-wrapper">
