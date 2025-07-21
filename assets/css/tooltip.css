@@ -73,7 +73,8 @@
     right: 0;
     bottom: 0;
     background: rgb(15, 23, 42);
-    z-index: 999998;
+    z-index: -1;
+    opacity: 1;
 }
 
 /* Default positioning (right side) */
