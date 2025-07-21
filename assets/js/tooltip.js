@@ -30,6 +30,24 @@ function createTooltipContent(element) {
     const tooltip = document.createElement('div');
     tooltip.className = 'company-tooltip';
     
+    // Create backdrop element
+    const backdrop = document.createElement('div');
+    backdrop.className = 'tooltip-backdrop';
+    backdrop.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgb(0, 0, 0);
+        z-index: 999999;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        pointer-events: none;
+    `;
+    tooltip.appendChild(backdrop);
+    
     const company = element.dataset.company || 'N/A';
     const ticker = element.dataset.ticker || 'N/A';
     const isin = element.dataset.isin || 'N/A';
@@ -122,11 +140,20 @@ function showTooltip(event) {
     const tooltip = this.querySelector('.company-tooltip');
     if (!tooltip) return;
     
+    // Show backdrop first
+    const backdrop = tooltip.querySelector('.tooltip-backdrop');
+    if (backdrop) {
+        backdrop.style.opacity = '1';
+        backdrop.style.visibility = 'visible';
+        backdrop.style.pointerEvents = 'auto';
+    }
+    
     // Show modal tooltip (CSS handles centering)
     tooltip.style.opacity = '1';
     tooltip.style.visibility = 'visible';
     tooltip.style.transform = 'translate(-50%, -50%) scale(1)';
     tooltip.style.pointerEvents = 'auto';
+    tooltip.style.zIndex = '1000000';
     
     // Add click-to-close functionality
     tooltip.addEventListener('click', function(e) {
@@ -142,6 +169,14 @@ function showTooltip(event) {
 function hideTooltip(event) {
     const tooltip = this.querySelector('.company-tooltip');
     if (!tooltip) return;
+    
+    // Hide backdrop first
+    const backdrop = tooltip.querySelector('.tooltip-backdrop');
+    if (backdrop) {
+        backdrop.style.opacity = '0';
+        backdrop.style.visibility = 'hidden';
+        backdrop.style.pointerEvents = 'none';
+    }
     
     tooltip.style.opacity = '0';
     tooltip.style.visibility = 'hidden';
