@@ -92,9 +92,6 @@ function debounceSearch() {
  */
 function applyFilters() {
     const searchInput = document.getElementById('searchInput');
-    const countryFilter = document.getElementById('countryFilter');
-    const strategyFilter = document.getElementById('strategyFilter');
-    const brokerFilter = document.getElementById('brokerFilter');
     
     const params = new URLSearchParams();
     
@@ -102,22 +99,25 @@ function applyFilters() {
         params.set('search', searchInput.value.trim());
     }
     
-    // Handle checkbox dropdown filters
+    // Handle all checkbox dropdown filters
     const statusValues = getDropdownValues('status');
     if (statusValues.length > 0) {
         params.set('status_id', statusValues.join(','));
     }
     
-    if (countryFilter && countryFilter.value) {
-        params.set('country', countryFilter.value);
+    const countryValues = getDropdownValues('country');
+    if (countryValues.length > 0) {
+        params.set('country', countryValues.join(','));
     }
     
-    if (strategyFilter && strategyFilter.value) {
-        params.set('strategy_group_id', strategyFilter.value);
+    const strategyValues = getDropdownValues('strategy');
+    if (strategyValues.length > 0) {
+        params.set('strategy_group_id', strategyValues.join(','));
     }
     
-    if (brokerFilter && brokerFilter.value) {
-        params.set('broker_id', brokerFilter.value);
+    const brokerValues = getDropdownValues('broker');
+    if (brokerValues.length > 0) {
+        params.set('broker_id', brokerValues.join(','));
     }
     
     // Reset to page 1 when filtering
