@@ -27,6 +27,7 @@
     /* Background Colors */
     --bg-primary: #f8fafc;
     --bg-secondary: #e2e8f0;
+    --bg-tertiary: #f1f5f9;
     --bg-white: rgba(255, 255, 255, 0.9);
     --bg-white-solid: rgba(255, 255, 255, 1);
     
@@ -286,7 +287,7 @@ body {
     align-items: center;
     padding: var(--space-6) var(--space-8);
     border-bottom: 1px solid var(--border-light);
-    background: var(--bg-tertiary);
+    background: #f8fafc;
     flex-wrap: wrap;
     gap: var(--space-4);
 }
@@ -384,7 +385,7 @@ body {
 }
 
 .btn-icon:hover {
-    background: var(--bg-tertiary);
+    background: #f1f5f9;
     color: var(--text-primary);
     transform: scale(1.1);
 }
@@ -480,12 +481,12 @@ select:hover {
 }
 
 .data-table th {
-    background: var(--bg-tertiary);
+    background: #f8fafc;
     padding: var(--space-5) var(--space-4);
     text-align: left;
     font-weight: var(--font-semibold);
-    color: var(--text-primary);
-    border-bottom: 2px solid var(--border-light);
+    color: #374151;
+    border-bottom: 2px solid #e5e7eb;
     white-space: nowrap;
     font-size: var(--text-xs);
     text-transform: uppercase;
@@ -504,7 +505,7 @@ select:hover {
 }
 
 .data-table tbody tr:hover {
-    background: var(--bg-tertiary);
+    background: #f8fafc;
     transform: scale(1.01);
 }
 
@@ -549,9 +550,10 @@ select:hover {
 
 .isin {
     font-family: var(--font-mono);
-    background: var(--bg-tertiary);
+    background: #f1f5f9;
     padding: var(--space-1);
     border-radius: var(--radius-sm);
+    color: #6b7280;
 }
 
 .country, .exchange {
@@ -687,7 +689,7 @@ select:hover {
     align-items: center;
     padding: var(--space-8) var(--space-8) var(--space-6);
     border-bottom: 1px solid var(--border-light);
-    background: var(--bg-tertiary);
+    background: #f8fafc;
     border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
 }
 
@@ -757,7 +759,7 @@ form {
 
 .tab-button:hover {
     color: var(--text-primary);
-    background: var(--bg-tertiary);
+    background: #f8fafc;
 }
 
 .tab-content {
@@ -861,7 +863,7 @@ form {
     align-items: center;
     padding: var(--space-6) var(--space-8);
     border-top: 1px solid var(--border-light);
-    background: var(--bg-tertiary);
+    background: #f8fafc;
     border-radius: 0 0 var(--radius-2xl) var(--radius-2xl);
 }
 
