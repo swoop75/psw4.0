@@ -55,29 +55,15 @@ function createTooltipContent(element) {
         </div>
         
         <div class="tooltip-section">
-            <div class="tooltip-section-title">Investment Details</div>
+            <div class="tooltip-section-title">Organization</div>
             <div class="tooltip-row">
                 <span class="tooltip-label">ISIN:</span>
                 <span class="tooltip-value mono">${escapeHtml(isin)}</span>
             </div>
             <div class="tooltip-row">
-                <span class="tooltip-label">Yield:</span>
-                <span class="tooltip-value tooltip-yield">${escapeHtml(yield_)}</span>
-            </div>
-            <div class="tooltip-row">
                 <span class="tooltip-label">Country:</span>
                 <span class="tooltip-value">${escapeHtml(country)}</span>
             </div>
-            <div class="tooltip-row">
-                <span class="tooltip-label">Status:</span>
-                <span class="tooltip-value">
-                    <span class="tooltip-status">${escapeHtml(status)}</span>
-                </span>
-            </div>
-        </div>
-        
-        <div class="tooltip-section">
-            <div class="tooltip-section-title">Organization</div>
             <div class="tooltip-row">
                 <span class="tooltip-label">Strategy:</span>
                 <span class="tooltip-value tooltip-strategy">${escapeHtml(strategyDisplay)}</span>
@@ -89,6 +75,20 @@ function createTooltipContent(element) {
             <div class="tooltip-row">
                 <span class="tooltip-label">Broker:</span>
                 <span class="tooltip-value tooltip-broker">${escapeHtml(broker)}</span>
+            </div>
+        </div>
+        
+        <div class="tooltip-section">
+            <div class="tooltip-section-title">Investment Details</div>
+            <div class="tooltip-row">
+                <span class="tooltip-label">Yield:</span>
+                <span class="tooltip-value tooltip-yield">${escapeHtml(yield_)}</span>
+            </div>
+            <div class="tooltip-row">
+                <span class="tooltip-label">Status:</span>
+                <span class="tooltip-value">
+                    <span class="tooltip-status">${escapeHtml(status)}</span>
+                </span>
             </div>
         </div>
         
@@ -111,7 +111,7 @@ function createTooltipContent(element) {
 }
 
 /**
- * Show tooltip with positioning adjustment
+ * Show tooltip with smart positioning
  */
 function showTooltip(event) {
     const tooltip = this.querySelector('.company-tooltip');
@@ -121,15 +121,54 @@ function showTooltip(event) {
     tooltip.style.opacity = '1';
     tooltip.style.visibility = 'visible';
     
-    // Check if tooltip goes off-screen and adjust position
+    // Smart positioning based on screen location
     setTimeout(() => {
-        const rect = tooltip.getBoundingClientRect();
+        const tooltipRect = tooltip.getBoundingClientRect();
+        const parentRect = this.getBoundingClientRect();
         const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
         
-        if (rect.right > windowWidth - 20) {
-            tooltip.classList.add('adjust-position');
+        // Reset all position classes
+        tooltip.classList.remove('adjust-position', 'position-above', 'position-below', 'position-left', 'position-right');
+        
+        // Determine horizontal positioning
+        const spaceRight = windowWidth - parentRect.right;
+        const spaceLeft = parentRect.left;
+        
+        if (spaceRight < tooltipRect.width + 20 && spaceLeft > tooltipRect.width + 20) {
+            // Not enough space on right, move to left
+            tooltip.classList.add('position-left');
         } else {
-            tooltip.classList.remove('adjust-position');
+            // Default right positioning
+            tooltip.classList.add('position-right');
+        }
+        
+        // Determine vertical positioning
+        const spaceBelow = windowHeight - parentRect.bottom;
+        const spaceAbove = parentRect.top;
+        
+        if (spaceBelow < tooltipRect.height + 20 && spaceAbove > tooltipRect.height + 20) {
+            // Not enough space below, move above
+            tooltip.classList.add('position-above');
+        } else {
+            // Default below positioning
+            tooltip.classList.add('position-below');
+        }
+        
+        // Fine-tune vertical position to keep tooltip on screen
+        const currentTop = tooltipRect.top;
+        const currentBottom = tooltipRect.bottom;
+        
+        if (currentBottom > windowHeight - 20) {
+            // Tooltip goes below screen, adjust upward
+            const adjustment = currentBottom - (windowHeight - 20);
+            tooltip.style.top = `-${adjustment}px`;
+        } else if (currentTop < 20) {
+            // Tooltip goes above screen, adjust downward
+            const adjustment = 20 - currentTop;
+            tooltip.style.top = `${adjustment}px`;
+        } else {
+            tooltip.style.top = '0';
         }
     }, 10);
 }
@@ -143,7 +182,8 @@ function hideTooltip(event) {
     
     tooltip.style.opacity = '0';
     tooltip.style.visibility = 'hidden';
-    tooltip.classList.remove('adjust-position');
+    tooltip.style.top = '';
+    tooltip.classList.remove('adjust-position', 'position-above', 'position-below', 'position-left', 'position-right');
 }
 
 /**
