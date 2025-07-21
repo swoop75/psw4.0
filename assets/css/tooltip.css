@@ -37,14 +37,22 @@
     text-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
 }
 
-/* Tooltip content */
+/* Tooltip content - Nuclear approach with multiple solid layers */
 .company-tooltip {
     position: absolute;
     z-index: 999999;
-    background: #4a5568;
-    border: 2px solid #2d3748;
+    background: 
+        #4a5568,
+        #4a5568,
+        #4a5568,
+        linear-gradient(to right, #4a5568 0%, #4a5568 100%),
+        linear-gradient(to bottom, #4a5568 0%, #4a5568 100%);
+    border: 5px solid #4a5568;
     border-radius: 8px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+    box-shadow: 
+        0 0 0 10px #4a5568,
+        0 0 0 20px #4a5568,
+        0 20px 40px rgba(0, 0, 0, 0.8);
     padding: 20px;
     width: auto;
     min-width: 400px;
@@ -58,6 +66,34 @@
     transition: all 0.3s ease;
     pointer-events: none;
     box-sizing: border-box;
+    outline: 10px solid #4a5568;
+    outline-offset: -5px;
+}
+
+/* Additional blocking layer */
+.company-tooltip::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    right: -20px;
+    bottom: -20px;
+    background: #4a5568;
+    border-radius: 15px;
+    z-index: -2;
+}
+
+/* Another blocking layer */
+.company-tooltip::after {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    background: #4a5568;
+    border-radius: 12px;
+    z-index: -1;
 }
 
 /* Default positioning (right side) */
