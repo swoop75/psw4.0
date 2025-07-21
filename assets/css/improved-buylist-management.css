@@ -1130,7 +1130,7 @@ label:not(.checkbox-dropdown label):not(.form-group label) {
     border: 2px solid var(--border-light);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-xl);
-    z-index: 1000;
+    z-index: 9999;
     max-height: 250px;
     overflow-y: auto;
     min-width: 220px;
