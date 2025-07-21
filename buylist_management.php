@@ -95,6 +95,8 @@ $filters = [
     'search' => $_GET['search'] ?? '',
     'buylist_status_id' => $_GET['status_id'] ?? '',
     'country_name' => $_GET['country'] ?? '',
+    'strategy_group_id' => $_GET['strategy_group_id'] ?? '',
+    'broker_id' => $_GET['broker_id'] ?? '',
     'yield_min' => $_GET['yield_min'] ?? '',
     'yield_max' => $_GET['yield_max'] ?? ''
 ];
@@ -105,13 +107,11 @@ $limit = max(10, min(100, (int)($_GET['limit'] ?? 25)));
 // Get data
 try {
     $buylistData = $controller->getBuylist(array_filter($filters), $page, $limit);
-    $statuses = []; // Portfolio buylist doesn't have status system yet
     $filterOptions = $controller->getFilterOptions();
     $statistics = $controller->getBuylistStatistics();
 } catch (Exception $e) {
     $errorMessage = 'Error loading data: ' . $e->getMessage();
     $buylistData = ['entries' => [], 'pagination' => []];
-    $statuses = [];
     $filterOptions = [];
     $statistics = [];
 }
@@ -218,18 +218,27 @@ ob_start();
                     </div>
                     <select id="statusFilter" onchange="applyFilters()">
                         <option value="">All Statuses</option>
-                        <option value="1" <?= $filters['buylist_status_id'] == '1' ? 'selected' : '' ?>>Watching</option>
-                        <option value="2" <?= $filters['buylist_status_id'] == '2' ? 'selected' : '' ?>>Researching</option>
-                        <option value="3" <?= $filters['buylist_status_id'] == '3' ? 'selected' : '' ?>>Ready to Buy</option>
-                        <option value="4" <?= $filters['buylist_status_id'] == '4' ? 'selected' : '' ?>>Passed</option>
+                        <?php foreach ($filterOptions['statuses'] ?? [] as $status): ?>
+                            <option value="<?= $status['id'] ?>" <?= $filters['buylist_status_id'] == $status['id'] ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($status['status']) ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                     <select id="countryFilter" onchange="applyFilters()">
                         <option value="">All Countries</option>
-                        <option value="SE" <?= $filters['country_name'] == 'SE' ? 'selected' : '' ?>>Sweden</option>
-                        <option value="US" <?= $filters['country_name'] == 'US' ? 'selected' : '' ?>>United States</option>
-                        <option value="FI" <?= $filters['country_name'] == 'FI' ? 'selected' : '' ?>>Finland</option>
-                        <option value="NO" <?= $filters['country_name'] == 'NO' ? 'selected' : '' ?>>Norway</option>
-                        <option value="DK" <?= $filters['country_name'] == 'DK' ? 'selected' : '' ?>>Denmark</option>
+                        <?php foreach ($filterOptions['countries'] ?? [] as $country): ?>
+                            <option value="<?= htmlspecialchars($country) ?>" <?= $filters['country_name'] === $country ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($country) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <select id="strategyFilter" onchange="applyFilters()">
+                        <option value="">All Strategies</option>
+                        <?php foreach ($filterOptions['strategies'] ?? [] as $strategy): ?>
+                            <option value="<?= $strategy['strategy_group_id'] ?>" <?= $filters['strategy_group_id'] == $strategy['strategy_group_id'] ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($strategy['strategy_name']) ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
             </div>
@@ -241,11 +250,11 @@ ob_start();
                         <tr>
                             <th>Company</th>
                             <th>Status</th>
+                            <th>Strategy Group</th>
+                            <th>New Group</th>
+                            <th>Broker</th>
                             <th>Yield (%)</th>
                             <th>Country</th>
-                            <th>Comments</th>
-                            <th>Inspiration</th>
-                            <th>ISIN</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -258,27 +267,32 @@ ob_start();
                                             <div class="company-name">
                                                 <strong><?= htmlspecialchars($entry['company']) ?></strong>
                                                 <span class="ticker"><?= htmlspecialchars($entry['ticker']) ?></span>
-                                                <?php if (false): ?>
-                                                    <span class="masterlist-badge">
-                                                        <i class="fas fa-check"></i> In Masterlist
-                                                    </span>
-                                                <?php endif; ?>
                                             </div>
                                             <div class="company-details">
                                                 <?php if ($entry['isin']): ?>
                                                     <span class="isin"><?= htmlspecialchars($entry['isin']) ?></span>
                                                 <?php endif; ?>
-                                                <span class="country"><?= htmlspecialchars($entry['country_name'] ?: 'N/A') ?></span>
-                                                <?php if (false): ?>
-                                                    <span class="exchange"><?= htmlspecialchars($entry['exchange']) ?></span>
+                                                <?php if ($entry['comments']): ?>
+                                                    <div class="comments-preview" title="<?= htmlspecialchars($entry['comments']) ?>">
+                                                        <?= htmlspecialchars(substr($entry['comments'], 0, 80)) ?><?= strlen($entry['comments']) > 80 ? '...' : '' ?>
+                                                    </div>
                                                 <?php endif; ?>
                                             </div>
                                         </div>
                                     </td>
                                     <td>
                                         <span class="status-badge">
-                                            <?= $entry['buylist_status_id'] ? 'Status ' . $entry['buylist_status_id'] : 'No Status' ?>
+                                            <?= htmlspecialchars($entry['status_name'] ?: 'No Status') ?>
                                         </span>
+                                    </td>
+                                    <td class="strategy">
+                                        <?= htmlspecialchars($entry['strategy_name'] ?: '-') ?>
+                                    </td>
+                                    <td class="new-group">
+                                        <?= $entry['new_group_id'] ?: '-' ?>
+                                    </td>
+                                    <td class="broker">
+                                        <?= htmlspecialchars($entry['broker_name'] ?: '-') ?>
                                     </td>
                                     <td class="yield">
                                         <?= $entry['yield'] ? number_format($entry['yield'], 2) . '%' : '-' ?>
@@ -286,22 +300,11 @@ ob_start();
                                     <td class="country">
                                         <?= htmlspecialchars($entry['country_name'] ?: '-') ?>
                                     </td>
-                                    <td class="comments">
-                                        <?= htmlspecialchars(substr($entry['comments'] ?: '', 0, 50)) ?><?= strlen($entry['comments'] ?: '') > 50 ? '...' : '' ?>
-                                    </td>
-                                    <td class="inspiration">
-                                        <?= htmlspecialchars(substr($entry['inspiration'] ?: '', 0, 30)) ?><?= strlen($entry['inspiration'] ?: '') > 30 ? '...' : '' ?>
-                                    </td>
-                                    <td class="isin mono">
-                                        <?= htmlspecialchars($entry['isin'] ?: '-') ?>
-                                    </td>
                                     <td>
                                         <div class="action-buttons">
-                                            <?php if (true): ?>
                                                 <button class="btn-icon btn-success" onclick="addToMasterlist(<?= $entry['buy_list_id'] ?>, '<?= htmlspecialchars($entry['company']) ?>')" title="Add to Masterlist">
                                                     <i class="fas fa-plus-circle"></i>
                                                 </button>
-                                            <?php endif; ?>
                                             <button class="btn-icon" onclick="editEntry(<?= $entry['buy_list_id'] ?>)" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </button>
@@ -314,7 +317,7 @@ ob_start();
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="7" class="text-center">
+                                <td colspan="8" class="text-center">
                                     <div class="empty-state">
                                         <i class="fas fa-star"></i>
                                         <p>Your buylist is empty</p>
@@ -424,20 +427,22 @@ ob_start();
                             <label for="buylist_status_id">Status</label>
                             <select id="buylist_status_id" name="buylist_status_id">
                                 <option value="">Select Status</option>
-                                <option value="1">Watching</option>
-                                <option value="2">Researching</option>
-                                <option value="3">Ready to Buy</option>
-                                <option value="4">Passed</option>
+                                <?php foreach ($filterOptions['statuses'] ?? [] as $status): ?>
+                                    <option value="<?= $status['id'] ?>">
+                                        <?= htmlspecialchars($status['status']) ?>
+                                    </option>
+                                <?php endforeach; ?>
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="strategy_group_id">Strategy Group</label>
                             <select id="strategy_group_id" name="strategy_group_id">
                                 <option value="">Select Strategy</option>
-                                <option value="1">Dividend Growth</option>
-                                <option value="2">Value Investing</option>
-                                <option value="3">Growth</option>
-                                <option value="4">Speculative</option>
+                                <?php foreach ($filterOptions['strategies'] ?? [] as $strategy): ?>
+                                    <option value="<?= $strategy['strategy_group_id'] ?>">
+                                        <?= htmlspecialchars($strategy['strategy_name']) ?>
+                                    </option>
+                                <?php endforeach; ?>
                             </select>
                         </div>
                     </div>
@@ -447,10 +452,11 @@ ob_start();
                             <label for="broker_id">Broker</label>
                             <select id="broker_id" name="broker_id">
                                 <option value="">Select Broker</option>
-                                <option value="1">Avanza</option>
-                                <option value="2">Nordnet</option>
-                                <option value="3">ICA Banken</option>
-                                <option value="4">Other</option>
+                                <?php foreach ($filterOptions['brokers'] ?? [] as $broker): ?>
+                                    <option value="<?= $broker['broker_id'] ?>">
+                                        <?= htmlspecialchars($broker['broker_name']) ?>
+                                    </option>
+                                <?php endforeach; ?>
                             </select>
                         </div>
                         <div class="form-group">

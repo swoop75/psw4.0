@@ -44,6 +44,16 @@ class PortfolioBuylistController {
                 $params[':status_id'] = $filters['buylist_status_id'];
             }
             
+            if (!empty($filters['strategy_group_id'])) {
+                $whereConditions[] = "b.strategy_group_id = :strategy_group_id";
+                $params[':strategy_group_id'] = $filters['strategy_group_id'];
+            }
+            
+            if (!empty($filters['broker_id'])) {
+                $whereConditions[] = "b.broker_id = :broker_id";
+                $params[':broker_id'] = $filters['broker_id'];
+            }
+            
             if (isset($filters['yield_min'])) {
                 $whereConditions[] = "b.yield >= :yield_min";
                 $params[':yield_min'] = $filters['yield_min'];
@@ -69,7 +79,7 @@ class PortfolioBuylistController {
             $offset = ($page - 1) * $limit;
             $totalPages = ceil($totalRecords / $limit);
             
-            // Get buylist entries
+            // Get buylist entries with reference data
             $sql = "SELECT b.buy_list_id,
                            b.company,
                            b.ticker,
@@ -78,13 +88,19 @@ class PortfolioBuylistController {
                            b.country_id,
                            b.yield,
                            b.strategy_group_id,
+                           psg.strategy_name,
                            b.new_group_id,
                            b.broker_id,
+                           br.broker_name,
                            b.inspiration,
                            b.comments,
                            b.buylist_status_id,
+                           bs.status as status_name,
                            b.buylistcol
                     FROM buylist b 
+                    LEFT JOIN portfolio_strategy_groups psg ON b.strategy_group_id = psg.strategy_group_id
+                    LEFT JOIN brokers br ON b.broker_id = br.broker_id
+                    LEFT JOIN buylist_status bs ON b.buylist_status_id = bs.id
                     $whereClause 
                     ORDER BY b.buy_list_id DESC 
                     LIMIT :limit OFFSET :offset";
@@ -111,11 +127,14 @@ class PortfolioBuylistController {
                     'country_id' => $entry['country_id'],
                     'yield' => (float) ($entry['yield'] ?? 0),
                     'strategy_group_id' => $entry['strategy_group_id'],
+                    'strategy_name' => $entry['strategy_name'],
                     'new_group_id' => $entry['new_group_id'],
                     'broker_id' => $entry['broker_id'],
+                    'broker_name' => $entry['broker_name'],
                     'inspiration' => $entry['inspiration'],
                     'comments' => $entry['comments'],
                     'buylist_status_id' => $entry['buylist_status_id'],
+                    'status_name' => $entry['status_name'],
                     'buylistcol' => $entry['buylistcol']
                 ];
             }
@@ -374,8 +393,29 @@ class PortfolioBuylistController {
             $stmt->execute();
             $countries = $stmt->fetchAll(PDO::FETCH_COLUMN);
             
+            // Get strategy groups
+            $strategiesSql = "SELECT strategy_group_id, strategy_name FROM portfolio_strategy_groups ORDER BY strategy_name";
+            $stmt = $this->portfolioDb->prepare($strategiesSql);
+            $stmt->execute();
+            $strategies = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            // Get brokers
+            $brokersSql = "SELECT broker_id, broker_name FROM brokers ORDER BY broker_name";
+            $stmt = $this->portfolioDb->prepare($brokersSql);
+            $stmt->execute();
+            $brokers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            // Get buylist statuses
+            $statusesSql = "SELECT id, status FROM buylist_status ORDER BY id";
+            $stmt = $this->portfolioDb->prepare($statusesSql);
+            $stmt->execute();
+            $statuses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
             return [
                 'countries' => $countries,
+                'strategies' => $strategies,
+                'brokers' => $brokers,
+                'statuses' => $statuses,
                 'yield_ranges' => [
                     ['min' => 0, 'max' => 2, 'label' => '0-2%'],
                     ['min' => 2, 'max' => 4, 'label' => '2-4%'],
@@ -389,6 +429,9 @@ class PortfolioBuylistController {
             Logger::error('Get filter options error: ' . $e->getMessage());
             return [
                 'countries' => [],
+                'strategies' => [],
+                'brokers' => [],
+                'statuses' => [],
                 'yield_ranges' => []
             ];
         }
