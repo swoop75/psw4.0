@@ -94,6 +94,7 @@ function applyFilters() {
     const statusFilter = document.getElementById('statusFilter');
     const countryFilter = document.getElementById('countryFilter');
     const strategyFilter = document.getElementById('strategyFilter');
+    const brokerFilter = document.getElementById('brokerFilter');
     
     const params = new URLSearchParams();
     
@@ -111,6 +112,10 @@ function applyFilters() {
     
     if (strategyFilter && strategyFilter.value) {
         params.set('strategy_group_id', strategyFilter.value);
+    }
+    
+    if (brokerFilter && brokerFilter.value) {
+        params.set('broker_id', brokerFilter.value);
     }
     
     // Reset to page 1 when filtering

@@ -55,7 +55,7 @@ function createTooltipContent(element) {
     // Format strategy display with group number
     const strategyDisplay = (strategyGroup !== 'No Strategy' && strategyId !== 'N/A' && strategyId !== '') 
         ? `Group ${strategyId}: ${strategyGroup}`
-        : strategyGroup === 'No Strategy' ? 'No Strategy Assigned' : strategyGroup;
+        : strategyGroup === 'No Strategy' ? 'No Strategy Group Assigned' : strategyGroup;
     const yield_ = element.dataset.yield || 'N/A';
     const country = element.dataset.country || 'N/A';
     const status = element.dataset.status || 'No Status';
@@ -84,7 +84,7 @@ function createTooltipContent(element) {
                 <span class="tooltip-value">${escapeHtml(country)}</span>
             </div>
             <div class="tooltip-row">
-                <span class="tooltip-label">Strategy:</span>
+                <span class="tooltip-label">Strategy Group:</span>
                 <span class="tooltip-value tooltip-strategy">${escapeHtml(strategyDisplay)}</span>
             </div>
             <div class="tooltip-row">

@@ -200,10 +200,18 @@ ob_start();
                         <?php endforeach; ?>
                     </select>
                     <select id="strategyFilter" onchange="applyFilters()">
-                        <option value="">All Strategies</option>
+                        <option value="">All Strategy Groups</option>
                         <?php foreach ($filterOptions['strategies'] ?? [] as $strategy): ?>
                             <option value="<?= $strategy['strategy_group_id'] ?>" <?= $filters['strategy_group_id'] == $strategy['strategy_group_id'] ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($strategy['strategy_name']) ?>
+                                Group <?= $strategy['strategy_group_id'] ?>: <?= htmlspecialchars($strategy['strategy_name']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <select id="brokerFilter" onchange="applyFilters()">
+                        <option value="">All Brokers</option>
+                        <?php foreach ($filterOptions['brokers'] ?? [] as $broker): ?>
+                            <option value="<?= $broker['broker_id'] ?>" <?= $filters['broker_id'] == $broker['broker_id'] ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($broker['broker_name']) ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
