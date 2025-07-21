@@ -119,7 +119,10 @@ try {
 // Initialize variables for template
 $pageTitle = 'Buylist Management - PSW 4.0';
 $pageDescription = 'Manage your watchlist and buy targets';
-$additionalCSS = [BASE_URL . '/assets/css/improved-buylist-management.css?v=' . time()];
+$additionalCSS = [
+    BASE_URL . '/assets/css/improved-buylist-management.css?v=' . time(),
+    BASE_URL . '/assets/css/tooltip.css?v=' . time()
+];
 $additionalJS = [BASE_URL . '/assets/js/buylist-management.js?v=' . time()];
 
 $user = [
@@ -139,6 +142,7 @@ ob_start();
                 <div class="header-left">
                     <h1><i class="fas fa-star"></i> Buylist Management</h1>
                     <p>Manage your watchlist and buy targets</p>
+                    <p class="header-hint"><i class="fas fa-info-circle"></i> Hover over company names for detailed information</p>
                 </div>
             </div>
         </div>
@@ -251,7 +255,6 @@ ob_start();
                             <th>Company</th>
                             <th>Status</th>
                             <th>Strategy Group</th>
-                            <th>New Group</th>
                             <th>Broker</th>
                             <th>Yield (%)</th>
                             <th>Country</th>
@@ -263,17 +266,32 @@ ob_start();
                             <?php foreach ($buylistData['entries'] as $entry): ?>
                                 <tr>
                                     <td>
-                                        <div class="company-info">
+                                        <div class="company-info" 
+                                             data-tooltip="true"
+                                             data-company="<?= htmlspecialchars($entry['company']) ?>"
+                                             data-ticker="<?= htmlspecialchars($entry['ticker']) ?>"
+                                             data-isin="<?= htmlspecialchars($entry['isin'] ?: 'N/A') ?>"
+                                             data-strategy-group="<?= htmlspecialchars($entry['strategy_name'] ?: 'N/A') ?>"
+                                             data-strategy-id="<?= $entry['strategy_group_id'] ?: 'N/A' ?>"
+                                             data-new-group="<?= $entry['new_group_id'] ?: 'N/A' ?>"
+                                             data-broker="<?= htmlspecialchars($entry['broker_name'] ?: 'N/A') ?>"
+                                             data-broker-id="<?= $entry['broker_id'] ?: 'N/A' ?>"
+                                             data-yield="<?= $entry['yield'] ? number_format($entry['yield'], 2) . '%' : 'N/A' ?>"
+                                             data-country="<?= htmlspecialchars($entry['country_name'] ?: 'N/A') ?>"
+                                             data-status="<?= htmlspecialchars($entry['status_name'] ?: 'No Status') ?>"
+                                             data-comments="<?= htmlspecialchars($entry['comments'] ?: 'No comments') ?>"
+                                             data-inspiration="<?= htmlspecialchars($entry['inspiration'] ?: 'No inspiration noted') ?>">
                                             <div class="company-name">
                                                 <strong><?= htmlspecialchars($entry['company']) ?></strong>
                                                 <span class="ticker"><?= htmlspecialchars($entry['ticker']) ?></span>
+                                                <i class="fas fa-info-circle tooltip-icon" title="Hover for details"></i>
                                             </div>
                                             <div class="company-details">
                                                 <?php if ($entry['isin']): ?>
                                                     <span class="isin"><?= htmlspecialchars($entry['isin']) ?></span>
                                                 <?php endif; ?>
                                                 <?php if ($entry['comments']): ?>
-                                                    <div class="comments-preview" title="<?= htmlspecialchars($entry['comments']) ?>">
+                                                    <div class="comments-preview">
                                                         <?= htmlspecialchars(substr($entry['comments'], 0, 80)) ?><?= strlen($entry['comments']) > 80 ? '...' : '' ?>
                                                     </div>
                                                 <?php endif; ?>
@@ -287,9 +305,6 @@ ob_start();
                                     </td>
                                     <td class="strategy">
                                         <?= htmlspecialchars($entry['strategy_name'] ?: '-') ?>
-                                    </td>
-                                    <td class="new-group">
-                                        <?= $entry['new_group_id'] ?: '-' ?>
                                     </td>
                                     <td class="broker">
                                         <?= htmlspecialchars($entry['broker_name'] ?: '-') ?>
@@ -317,7 +332,7 @@ ob_start();
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="8" class="text-center">
+                                <td colspan="7" class="text-center">
                                     <div class="empty-state">
                                         <i class="fas fa-star"></i>
                                         <p>Your buylist is empty</p>
@@ -548,6 +563,7 @@ ob_start();
     </div>
 
     <script src="<?= BASE_URL ?>/assets/js/buylist-management.js"></script>
+    <script src="<?= BASE_URL ?>/assets/js/tooltip.js"></script>
     </div>
 
 <?php
