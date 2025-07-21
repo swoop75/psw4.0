@@ -393,6 +393,19 @@ select:focus {
     margin-right: 8px;
 }
 
+/* NUCLEAR OPTION: Hide ALL form elements in toolbar except search */
+.toolbar-right input:not(#searchInput) {
+    display: none !important;
+}
+
+.toolbar-right label {
+    display: none !important;
+}
+
+.toolbar-right select {
+    display: none !important;
+}
+
 /* FORCE HIDE all checkbox dropdowns content by default */
 .checkbox-dropdown .dropdown-content {
     display: none !important;
@@ -417,6 +430,15 @@ select:focus {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
+}
+
+/* Override global rules when dropdown is open */
+.checkbox-dropdown .dropdown-content.show input[type="checkbox"] {
+    display: inline-block !important;
+}
+
+.checkbox-dropdown .dropdown-content.show label {
+    display: block !important;
 }
 
 /* Dropdown options styling */
