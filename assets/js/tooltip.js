@@ -142,7 +142,7 @@ function showTooltip(event) {
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgb(0, 0, 0);
+            background: rgba(0, 0, 0, 0.8);
             z-index: 999999;
             opacity: 1;
             visibility: visible;
@@ -157,6 +157,18 @@ function showTooltip(event) {
     tooltip.style.transform = 'translate(-50%, -50%) scale(1)';
     tooltip.style.pointerEvents = 'auto';
     tooltip.style.zIndex = '1000001';
+    tooltip.style.position = 'fixed';
+    tooltip.style.top = '50%';
+    tooltip.style.left = '50%';
+    
+    // Debug logging
+    console.log('Tooltip shown:', tooltip);
+    console.log('Tooltip styles:', {
+        opacity: tooltip.style.opacity,
+        visibility: tooltip.style.visibility,
+        zIndex: tooltip.style.zIndex,
+        transform: tooltip.style.transform
+    });
     
     // Add click-to-close functionality
     tooltip.addEventListener('click', function(e) {
