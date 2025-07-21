@@ -393,16 +393,31 @@ select:focus {
     margin-right: 8px;
 }
 
-/* NUCLEAR OPTION: Hide ALL form elements in toolbar except search */
-.toolbar-right input:not(#searchInput) {
+/* ULTIMATE NUCLEAR OPTION: Hide ALL form elements everywhere except search */
+input:not(#searchInput) {
     display: none !important;
 }
 
-.toolbar-right label {
+label {
     display: none !important;
 }
 
-.toolbar-right select {
+select {
+    display: none !important;
+}
+
+/* Also hide anything that looks like a checkbox */
+[type="checkbox"] {
+    display: none !important;
+}
+
+/* Hide any elements with checkbox in the class name */
+*[class*="checkbox"] {
+    border: 3px solid red !important;
+    background: yellow !important;
+}
+
+*[class*="checkbox"] input {
     display: none !important;
 }
 
