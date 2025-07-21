@@ -19,6 +19,21 @@
 .company-info[data-tooltip="true"] {
     position: relative;
     cursor: help;
+    display: block;
+    width: 100%;
+    pointer-events: auto;
+}
+
+/* Ensure all child elements don't block hover */
+.company-info[data-tooltip="true"] * {
+    pointer-events: none;
+}
+
+/* Re-enable pointer events for interactive elements */
+.company-info[data-tooltip="true"] .tooltip-close,
+.company-info[data-tooltip="true"] button,
+.company-info[data-tooltip="true"] a {
+    pointer-events: auto;
 }
 
 .tooltip-icon {

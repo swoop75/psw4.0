@@ -142,7 +142,7 @@ function showTooltip(event) {
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgb(0, 0, 0);
             z-index: 999999;
             opacity: 1;
             visibility: visible;
@@ -151,7 +151,7 @@ function showTooltip(event) {
         document.body.appendChild(backdrop);
     }
     
-    // Show modal tooltip with forced visibility
+    // Show modal tooltip with proper styling
     tooltip.style.cssText = `
         position: fixed !important;
         top: 50% !important;
@@ -161,14 +161,18 @@ function showTooltip(event) {
         opacity: 1 !important;
         visibility: visible !important;
         pointer-events: auto !important;
-        background: red !important;
-        border: 5px solid yellow !important;
+        background: #ffffff !important;
+        border: 3px solid #2d3748 !important;
         border-radius: 16px !important;
         padding: 32px !important;
         width: 520px !important;
         max-height: 85vh !important;
-        color: white !important;
-        font-size: 16px !important;
+        color: #1f2937 !important;
+        font-size: 14px !important;
+        line-height: 1.6 !important;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+        box-shadow: 0 32px 64px rgba(0, 0, 0, 0.3), 0 8px 16px rgba(0, 0, 0, 0.2) !important;
+        overflow-y: auto !important;
         display: block !important;
     `;
     
