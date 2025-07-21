@@ -202,30 +202,51 @@ ob_start();
                             <?php endforeach; ?>
                         </div>
                     </div>
-                    <select id="countryFilter" onchange="applyFilters()">
-                        <option value="">All Countries</option>
-                        <?php foreach ($filterOptions['countries'] ?? [] as $country): ?>
-                            <option value="<?= htmlspecialchars($country) ?>" <?= $filters['country_name'] === $country ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($country) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <select id="strategyFilter" onchange="applyFilters()">
-                        <option value="">All Strategy Groups</option>
-                        <?php foreach ($filterOptions['strategies'] ?? [] as $strategy): ?>
-                            <option value="<?= $strategy['strategy_group_id'] ?>" <?= $filters['strategy_group_id'] == $strategy['strategy_group_id'] ? 'selected' : '' ?>>
-                                Group <?= $strategy['strategy_group_id'] ?>: <?= htmlspecialchars($strategy['strategy_name']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <select id="brokerFilter" onchange="applyFilters()">
-                        <option value="">All Brokers</option>
-                        <?php foreach ($filterOptions['brokers'] ?? [] as $broker): ?>
-                            <option value="<?= $broker['broker_id'] ?>" <?= $filters['broker_id'] == $broker['broker_id'] ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($broker['broker_name']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+                    <div class="checkbox-dropdown" data-filter="country">
+                        <button type="button" class="dropdown-button" id="countryFilter">
+                            <span class="dropdown-text">All Countries</span>
+                            <i class="fas fa-chevron-down arrow"></i>
+                        </button>
+                        <div class="dropdown-content">
+                            <?php foreach ($filterOptions['countries'] ?? [] as $country): ?>
+                                <div class="dropdown-option">
+                                    <input type="checkbox" id="country_<?= htmlspecialchars($country) ?>" value="<?= htmlspecialchars($country) ?>" 
+                                           <?= $filters['country_name'] === $country ? 'checked' : '' ?>>
+                                    <label for="country_<?= htmlspecialchars($country) ?>"><?= htmlspecialchars($country) ?></label>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <div class="checkbox-dropdown" data-filter="strategy">
+                        <button type="button" class="dropdown-button" id="strategyFilter">
+                            <span class="dropdown-text">All Strategy Groups</span>
+                            <i class="fas fa-chevron-down arrow"></i>
+                        </button>
+                        <div class="dropdown-content">
+                            <?php foreach ($filterOptions['strategies'] ?? [] as $strategy): ?>
+                                <div class="dropdown-option">
+                                    <input type="checkbox" id="strategy_<?= $strategy['strategy_group_id'] ?>" value="<?= $strategy['strategy_group_id'] ?>" 
+                                           <?= $filters['strategy_group_id'] == $strategy['strategy_group_id'] ? 'checked' : '' ?>>
+                                    <label for="strategy_<?= $strategy['strategy_group_id'] ?>">Group <?= $strategy['strategy_group_id'] ?>: <?= htmlspecialchars($strategy['strategy_name']) ?></label>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <div class="checkbox-dropdown" data-filter="broker">
+                        <button type="button" class="dropdown-button" id="brokerFilter">
+                            <span class="dropdown-text">All Brokers</span>
+                            <i class="fas fa-chevron-down arrow"></i>
+                        </button>
+                        <div class="dropdown-content">
+                            <?php foreach ($filterOptions['brokers'] ?? [] as $broker): ?>
+                                <div class="dropdown-option">
+                                    <input type="checkbox" id="broker_<?= $broker['broker_id'] ?>" value="<?= $broker['broker_id'] ?>" 
+                                           <?= $filters['broker_id'] == $broker['broker_id'] ? 'checked' : '' ?>>
+                                    <label for="broker_<?= $broker['broker_id'] ?>"><?= htmlspecialchars($broker['broker_name']) ?></label>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
                 </div>
             </div>
 
