@@ -40,24 +40,28 @@
 /* Tooltip content */
 .company-tooltip {
     position: absolute;
-    z-index: 99999;
+    z-index: 99999 !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
     background: #ffffff !important;
-    border: 3px solid #667eea;
+    border: 3px solid #667eea !important;
     border-radius: 12px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 8px 25px rgba(102, 126, 234, 0.4);
-    padding: 20px;
-    width: 440px !important;
-    height: 320px !important;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), 0 12px 35px rgba(0, 0, 0, 0.4), inset 0 0 0 1000px #ffffff !important;
+    padding: 22px;
+    min-width: 420px;
+    max-width: 480px;
+    min-height: 250px;
+    max-height: 400px;
     font-size: 14px;
     line-height: 1.6;
-    color: #111827;
+    color: #111827 !important;
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px) scale(0.95);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     pointer-events: none;
     box-sizing: border-box;
-    overflow: hidden;
+    overflow-y: auto;
 }
 
 /* Default positioning (right side) */
@@ -227,10 +231,10 @@
 
 /* Tooltip content sections */
 .tooltip-section {
-    margin-bottom: 12px;
-    padding: 10px;
-    background: #f8fafc;
-    border-radius: 6px;
+    margin-bottom: 14px;
+    padding: 12px;
+    background: #f8fafc !important;
+    border-radius: 8px;
     border-left: 3px solid #667eea;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
@@ -323,17 +327,18 @@
 
 /* Comments and inspiration section */
 .tooltip-text-content {
-    background: #f1f5f9;
-    padding: 8px;
-    border-radius: 6px;
+    background: #f1f5f9 !important;
+    padding: 10px;
+    border-radius: 8px;
     border-left: 3px solid #667eea;
-    margin-top: 6px;
+    margin-top: 8px;
     font-style: italic;
-    color: #1f2937;
-    height: 60px;
+    color: #1f2937 !important;
+    min-height: 30px;
+    max-height: 80px;
     overflow-y: auto;
-    line-height: 1.4;
-    font-size: 12px;
+    line-height: 1.5;
+    font-size: 13px;
     word-wrap: break-word;
     hyphens: auto;
 }
@@ -366,8 +371,10 @@
 /* Responsive positioning for mobile */
 @media (max-width: 768px) {
     .company-tooltip {
-        width: 350px !important;
-        height: 280px !important;
+        min-width: 320px;
+        max-width: 380px;
+        min-height: 220px;
+        max-height: 350px;
     }
     
     /* Force left positioning on mobile to avoid going off-screen */
