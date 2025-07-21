@@ -17,31 +17,25 @@ function initializeTooltips() {
         const tooltip = createTooltipContent(element);
         element.appendChild(tooltip);
         
-        // Add event listeners with timeout to prevent flickering
+        // Add event listeners with debouncing to prevent flickering
         let hideTimeout;
+        let isTooltipVisible = false;
         
         element.addEventListener('mouseenter', function(e) {
             clearTimeout(hideTimeout);
-            showTooltip.call(this, e);
+            if (!isTooltipVisible) {
+                setTimeout(() => {
+                    showTooltip.call(this, e);
+                    isTooltipVisible = true;
+                }, 50); // Small delay to prevent rapid triggering
+            }
         });
         
         element.addEventListener('mouseleave', function(e) {
             hideTimeout = setTimeout(() => {
                 hideTooltip.call(this, e);
-            }, 100);
-        });
-        
-        // Keep tooltip open when hovering over the tooltip itself
-        element.addEventListener('mouseenter', function(e) {
-            const tooltip = this.querySelector('.company-tooltip');
-            if (tooltip) {
-                tooltip.addEventListener('mouseenter', () => clearTimeout(hideTimeout));
-                tooltip.addEventListener('mouseleave', () => {
-                    hideTimeout = setTimeout(() => {
-                        hideTooltip.call(element, e);
-                    }, 100);
-                });
-            }
+                isTooltipVisible = false;
+            }, 150); // Longer delay to prevent flickering
         });
     });
 }
