@@ -33,11 +33,9 @@ function createTooltipContent(element) {
     const company = element.dataset.company || 'N/A';
     const ticker = element.dataset.ticker || 'N/A';
     const isin = element.dataset.isin || 'N/A';
-    const strategyGroup = element.dataset.strategyGroup || 'N/A';
-    const strategyId = element.dataset.strategyId || 'N/A';
-    const newGroup = element.dataset.newGroup || 'N/A';
-    const broker = element.dataset.broker || 'N/A';
-    const brokerId = element.dataset.brokerId || 'N/A';
+    const strategyGroup = element.dataset.strategyGroup || 'No Strategy';
+    const newGroup = element.dataset.newGroup || 'No Group';
+    const broker = element.dataset.broker || 'No Broker';
     const yield_ = element.dataset.yield || 'N/A';
     const country = element.dataset.country || 'N/A';
     const status = element.dataset.status || 'No Status';
@@ -76,23 +74,15 @@ function createTooltipContent(element) {
             <div class="tooltip-section-title">Organization</div>
             <div class="tooltip-row">
                 <span class="tooltip-label">Strategy:</span>
-                <span class="tooltip-value">${escapeHtml(strategyGroup)}</span>
-            </div>
-            <div class="tooltip-row">
-                <span class="tooltip-label">Strategy ID:</span>
-                <span class="tooltip-value mono">${escapeHtml(strategyId)}</span>
+                <span class="tooltip-value tooltip-strategy">${escapeHtml(strategyGroup)}</span>
             </div>
             <div class="tooltip-row">
                 <span class="tooltip-label">New Group:</span>
-                <span class="tooltip-value mono">${escapeHtml(newGroup)}</span>
+                <span class="tooltip-value tooltip-group mono">${escapeHtml(newGroup)}</span>
             </div>
             <div class="tooltip-row">
                 <span class="tooltip-label">Broker:</span>
-                <span class="tooltip-value">${escapeHtml(broker)}</span>
-            </div>
-            <div class="tooltip-row">
-                <span class="tooltip-label">Broker ID:</span>
-                <span class="tooltip-value mono">${escapeHtml(brokerId)}</span>
+                <span class="tooltip-value tooltip-broker">${escapeHtml(broker)}</span>
             </div>
         </div>
         

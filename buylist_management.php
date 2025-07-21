@@ -254,7 +254,6 @@ ob_start();
                         <tr>
                             <th>Company</th>
                             <th>Status</th>
-                            <th>Strategy Group</th>
                             <th>Broker</th>
                             <th>Yield (%)</th>
                             <th>Country</th>
@@ -271,11 +270,9 @@ ob_start();
                                              data-company="<?= htmlspecialchars($entry['company']) ?>"
                                              data-ticker="<?= htmlspecialchars($entry['ticker']) ?>"
                                              data-isin="<?= htmlspecialchars($entry['isin'] ?: 'N/A') ?>"
-                                             data-strategy-group="<?= htmlspecialchars($entry['strategy_name'] ?: 'N/A') ?>"
-                                             data-strategy-id="<?= $entry['strategy_group_id'] ?: 'N/A' ?>"
-                                             data-new-group="<?= $entry['new_group_id'] ?: 'N/A' ?>"
-                                             data-broker="<?= htmlspecialchars($entry['broker_name'] ?: 'N/A') ?>"
-                                             data-broker-id="<?= $entry['broker_id'] ?: 'N/A' ?>"
+                                             data-strategy-group="<?= htmlspecialchars($entry['strategy_name'] ?: 'No Strategy') ?>"
+                                             data-new-group="<?= $entry['new_group_id'] ?: 'No Group' ?>"
+                                             data-broker="<?= htmlspecialchars($entry['broker_name'] ?: 'No Broker') ?>"
                                              data-yield="<?= $entry['yield'] ? number_format($entry['yield'], 2) . '%' : 'N/A' ?>"
                                              data-country="<?= htmlspecialchars($entry['country_name'] ?: 'N/A') ?>"
                                              data-status="<?= htmlspecialchars($entry['status_name'] ?: 'No Status') ?>"
@@ -303,9 +300,6 @@ ob_start();
                                             <?= htmlspecialchars($entry['status_name'] ?: 'No Status') ?>
                                         </span>
                                     </td>
-                                    <td class="strategy">
-                                        <?= htmlspecialchars($entry['strategy_name'] ?: '-') ?>
-                                    </td>
                                     <td class="broker">
                                         <?= htmlspecialchars($entry['broker_name'] ?: '-') ?>
                                     </td>
@@ -332,7 +326,7 @@ ob_start();
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="7" class="text-center">
+                                <td colspan="6" class="text-center">
                                     <div class="empty-state">
                                         <i class="fas fa-star"></i>
                                         <p>Your buylist is empty</p>

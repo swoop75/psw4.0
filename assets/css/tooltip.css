@@ -165,6 +165,25 @@
     font-weight: 600;
 }
 
+/* Highlight important organizational values */
+.tooltip-strategy,
+.tooltip-broker {
+    background: #f0f8ff !important;
+    color: #1565c0 !important;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* Group ID highlighting */
+.tooltip-group {
+    background: #fff3e0 !important;
+    color: #e65100 !important;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
 /* Comments and inspiration section */
 .tooltip-text-content {
     background: #f9f9f9;
@@ -192,8 +211,8 @@
 
 /* Yield highlighting */
 .tooltip-yield {
-    background: #e8f5e8;
-    color: #2e7d32;
+    background: #e8f5e8 !important;
+    color: #2e7d32 !important;
     font-weight: 600;
     padding: 2px 6px;
     border-radius: 4px;
