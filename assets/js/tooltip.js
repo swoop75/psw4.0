@@ -188,6 +188,20 @@ function showTooltip(event) {
     modalContainer.appendChild(tooltip.cloneNode(true));
     const modalTooltip = modalContainer.querySelector('.company-tooltip');
     
+    // Add mouse leave detection to modal container
+    modalContainer.addEventListener('mouseleave', function(e) {
+        // Hide tooltip when mouse leaves the modal area
+        window.tooltipHideTimeout = setTimeout(() => {
+            hideTooltip();
+        }, 100);
+    });
+    
+    // Keep tooltip open when hovering over the modal content
+    modalTooltip.addEventListener('mouseenter', function(e) {
+        // Cancel any pending hide
+        clearTimeout(window.tooltipHideTimeout);
+    });
+    
     modalTooltip.style.cssText = `
         position: relative !important;
         top: auto !important;
