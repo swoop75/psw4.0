@@ -635,6 +635,47 @@
                     }
                 },
                 {
+                    "name": "broker_type",
+                    "schema": [
+                        {
+                            "Field": "id",
+                            "Type": "int",
+                            "Null": "NO",
+                            "Key": "PRI",
+                            "Default": null,
+                            "Extra": "auto_increment"
+                        },
+                        {
+                            "Field": "broker_type",
+                            "Type": "enum('bank','broker','multiple')",
+                            "Null": "NO",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        }
+                    ],
+                    "sample_data": {
+                        "columns": [
+                            "id",
+                            "broker_type"
+                        ],
+                        "rows": [
+                            [
+                                1,
+                                "multiple"
+                            ],
+                            [
+                                2,
+                                "bank"
+                            ],
+                            [
+                                3,
+                                "broker"
+                            ]
+                        ]
+                    }
+                },
+                {
                     "name": "brokers",
                     "schema": [
                         {
@@ -654,6 +695,14 @@
                             "Extra": ""
                         },
                         {
+                            "Field": "broker_type_id",
+                            "Type": "int",
+                            "Null": "YES",
+                            "Key": "MUL",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
                             "Field": "broker_description",
                             "Type": "text",
                             "Null": "YES",
@@ -666,38 +715,1249 @@
                         "columns": [
                             "broker_id",
                             "broker_name",
+                            "broker_type_id",
                             "broker_description"
                         ],
                         "rows": [
                             [
                                 1,
                                 "Montrose",
+                                3,
                                 null
                             ],
                             [
                                 2,
                                 "Avanza",
+                                1,
                                 null
                             ],
                             [
                                 3,
                                 "Nordnet",
+                                1,
                                 null
                             ],
                             [
                                 4,
                                 "Nordea",
+                                1,
                                 null
                             ],
                             [
                                 5,
                                 "SAVR",
+                                3,
                                 null
                             ],
                             [
                                 6,
                                 "SBAB",
+                                2,
                                 ""
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "name": "buylist",
+                    "schema": [
+                        {
+                            "Field": "buylist_id",
+                            "Type": "int",
+                            "Null": "NO",
+                            "Key": "PRI",
+                            "Default": null,
+                            "Extra": "auto_increment"
+                        },
+                        {
+                            "Field": "isin",
+                            "Type": "char(12)",
+                            "Null": "YES",
+                            "Key": "MUL",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "company_name",
+                            "Type": "varchar(200)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "ticker",
+                            "Type": "varchar(20)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "country",
+                            "Type": "char(2)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "currency",
+                            "Type": "char(3)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": "SEK",
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "exchange",
+                            "Type": "varchar(50)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "company_website",
+                            "Type": "varchar(255)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "business_description",
+                            "Type": "text",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "user_id",
+                            "Type": "int",
+                            "Null": "NO",
+                            "Key": "MUL",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "status_id",
+                            "Type": "int",
+                            "Null": "NO",
+                            "Key": "MUL",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "target_price",
+                            "Type": "decimal(10,2)",
+                            "Null": "YES",
+                            "Key": "MUL",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "target_quantity",
+                            "Type": "int",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "priority_level",
+                            "Type": "tinyint",
+                            "Null": "YES",
+                            "Key": "MUL",
+                            "Default": "3",
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "notes",
+                            "Type": "text",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "research_notes",
+                            "Type": "text",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "expected_dividend_yield",
+                            "Type": "decimal(5,2)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "pe_ratio",
+                            "Type": "decimal(8,2)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "price_to_book",
+                            "Type": "decimal(8,2)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "debt_to_equity",
+                            "Type": "decimal(8,2)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "roe",
+                            "Type": "decimal(5,2)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "analyst_rating",
+                            "Type": "varchar(20)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "risk_level",
+                            "Type": "tinyint",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": "3",
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "sector",
+                            "Type": "varchar(100)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "market_cap_category",
+                            "Type": "enum('Small','Mid','Large','Mega')",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": "Mid",
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "target_allocation_percent",
+                            "Type": "decimal(5,2)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "stop_loss_price",
+                            "Type": "decimal(10,2)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "take_profit_price",
+                            "Type": "decimal(10,2)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "entry_strategy",
+                            "Type": "text",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "exit_strategy",
+                            "Type": "text",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "last_analysis_date",
+                            "Type": "date",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "next_review_date",
+                            "Type": "date",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "price_alert_enabled",
+                            "Type": "tinyint(1)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": "1",
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "price_alert_target",
+                            "Type": "decimal(10,2)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "created_at",
+                            "Type": "timestamp",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": "CURRENT_TIMESTAMP",
+                            "Extra": "DEFAULT_GENERATED"
+                        },
+                        {
+                            "Field": "updated_at",
+                            "Type": "timestamp",
+                            "Null": "YES",
+                            "Key": "MUL",
+                            "Default": "CURRENT_TIMESTAMP",
+                            "Extra": "DEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+                        },
+                        {
+                            "Field": "created_by",
+                            "Type": "int",
+                            "Null": "YES",
+                            "Key": "MUL",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "updated_by",
+                            "Type": "int",
+                            "Null": "YES",
+                            "Key": "MUL",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "added_to_masterlist",
+                            "Type": "tinyint(1)",
+                            "Null": "NO",
+                            "Key": "",
+                            "Default": "0",
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "added_to_masterlist_date",
+                            "Type": "timestamp",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        }
+                    ],
+                    "sample_data": {
+                        "columns": [
+                            "buylist_id",
+                            "isin",
+                            "company_name",
+                            "ticker",
+                            "country",
+                            "currency",
+                            "exchange",
+                            "company_website",
+                            "business_description",
+                            "user_id",
+                            "status_id",
+                            "target_price",
+                            "target_quantity",
+                            "priority_level",
+                            "notes",
+                            "research_notes",
+                            "expected_dividend_yield",
+                            "pe_ratio",
+                            "price_to_book",
+                            "debt_to_equity",
+                            "roe",
+                            "analyst_rating",
+                            "risk_level",
+                            "sector",
+                            "market_cap_category",
+                            "target_allocation_percent",
+                            "stop_loss_price",
+                            "take_profit_price",
+                            "entry_strategy",
+                            "exit_strategy",
+                            "last_analysis_date",
+                            "next_review_date",
+                            "price_alert_enabled",
+                            "price_alert_target",
+                            "created_at",
+                            "updated_at",
+                            "created_by",
+                            "updated_by",
+                            "added_to_masterlist",
+                            "added_to_masterlist_date"
+                        ],
+                        "rows": [
+                            [
+                                1,
+                                "FI4000552500",
+                                "Sampo Oyj A",
+                                "Sampo",
+                                "SE",
+                                "SEK",
+                                null,
+                                null,
+                                null,
+                                1,
+                                1,
+                                "421.00",
+                                91,
+                                3,
+                                "Sample buylist entry for testing - Target: 421 SEK",
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                3,
+                                null,
+                                "Mid",
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                1,
+                                null,
+                                "2025-07-20T14:55:39",
+                                "2025-07-20T15:15:00",
+                                1,
+                                1,
+                                0,
+                                null
+                            ],
+                            [
+                                2,
+                                "SE0000106270",
+                                "Hennes & Mauritz",
+                                "HM B",
+                                "SE",
+                                "SEK",
+                                null,
+                                null,
+                                null,
+                                1,
+                                2,
+                                "261.00",
+                                68,
+                                3,
+                                "Sample buylist entry for testing - Target: 261 SEK",
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                3,
+                                null,
+                                "Mid",
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                1,
+                                null,
+                                "2025-07-20T14:55:39",
+                                "2025-07-20T15:15:00",
+                                1,
+                                1,
+                                0,
+                                null
+                            ],
+                            [
+                                3,
+                                "SE0000111940",
+                                "Ratos B",
+                                "RATO B",
+                                "SE",
+                                "SEK",
+                                null,
+                                null,
+                                null,
+                                1,
+                                3,
+                                "429.00",
+                                70,
+                                2,
+                                "Sample buylist entry for testing - Target: 429 SEK",
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                3,
+                                null,
+                                "Mid",
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                1,
+                                null,
+                                "2025-07-20T14:55:39",
+                                "2025-07-20T15:15:00",
+                                1,
+                                1,
+                                0,
+                                null
+                            ],
+                            [
+                                4,
+                                "SE0000113250",
+                                "Skanska",
+                                "SKA B",
+                                "SE",
+                                "SEK",
+                                null,
+                                null,
+                                null,
+                                1,
+                                4,
+                                "149.00",
+                                42,
+                                1,
+                                "Sample buylist entry for testing - Target: 149 SEK",
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                3,
+                                null,
+                                "Mid",
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                1,
+                                null,
+                                "2025-07-20T14:55:39",
+                                "2025-07-20T15:15:00",
+                                1,
+                                1,
+                                0,
+                                null
+                            ],
+                            [
+                                5,
+                                "SE0000242455",
+                                "Swedbank",
+                                "SWED A",
+                                "SE",
+                                "SEK",
+                                null,
+                                null,
+                                null,
+                                1,
+                                1,
+                                "369.00",
+                                93,
+                                2,
+                                "Sample buylist entry for testing - Target: 369 SEK",
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                3,
+                                null,
+                                "Mid",
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                1,
+                                null,
+                                "2025-07-20T14:55:39",
+                                "2025-07-20T15:15:00",
+                                1,
+                                1,
+                                0,
+                                null
+                            ],
+                            [
+                                6,
+                                null,
+                                "Tesla Inc",
+                                "TSLA",
+                                "US",
+                                "USD",
+                                "NASDAQ",
+                                null,
+                                "Electric vehicles and clean energy",
+                                1,
+                                1,
+                                "250.00",
+                                10,
+                                3,
+                                "Sample buylist entry - considering for investment",
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                3,
+                                null,
+                                "Mid",
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                1,
+                                null,
+                                "2025-07-20T15:15:00",
+                                "2025-07-20T15:15:00",
+                                1,
+                                1,
+                                0,
+                                null
+                            ],
+                            [
+                                7,
+                                null,
+                                "ASML Holding",
+                                "ASML",
+                                "NL",
+                                "EUR",
+                                "Euronext",
+                                null,
+                                "Semiconductor equipment manufacturer",
+                                1,
+                                2,
+                                "650.00",
+                                5,
+                                2,
+                                "Sample buylist entry - considering for investment",
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                3,
+                                null,
+                                "Mid",
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                1,
+                                null,
+                                "2025-07-20T15:15:00",
+                                "2025-07-20T15:15:00",
+                                1,
+                                1,
+                                0,
+                                null
+                            ],
+                            [
+                                8,
+                                null,
+                                "Spotify Technology",
+                                "SPOT",
+                                "SE",
+                                "USD",
+                                "NYSE",
+                                null,
+                                "Music streaming platform",
+                                1,
+                                3,
+                                "150.00",
+                                20,
+                                3,
+                                "Sample buylist entry - considering for investment",
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                3,
+                                null,
+                                "Mid",
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                1,
+                                null,
+                                "2025-07-20T15:15:00",
+                                "2025-07-20T15:15:00",
+                                1,
+                                1,
+                                0,
+                                null
+                            ],
+                            [
+                                9,
+                                null,
+                                "Klarna Bank",
+                                "KLARNA",
+                                "SE",
+                                "SEK",
+                                "Private",
+                                null,
+                                "Buy now pay later fintech",
+                                1,
+                                4,
+                                "100.00",
+                                50,
+                                4,
+                                "Sample buylist entry - considering for investment",
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                3,
+                                null,
+                                "Mid",
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                1,
+                                null,
+                                "2025-07-20T15:15:00",
+                                "2025-07-20T16:09:46",
+                                1,
+                                1,
+                                1,
+                                "2025-07-20T16:09:46"
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "name": "buylist_alerts",
+                    "schema": [
+                        {
+                            "Field": "alert_id",
+                            "Type": "int",
+                            "Null": "NO",
+                            "Key": "PRI",
+                            "Default": null,
+                            "Extra": "auto_increment"
+                        },
+                        {
+                            "Field": "buylist_id",
+                            "Type": "int",
+                            "Null": "NO",
+                            "Key": "MUL",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "alert_type",
+                            "Type": "enum('price_target','price_drop','price_rise','dividend_announcement','earnings')",
+                            "Null": "YES",
+                            "Key": "MUL",
+                            "Default": "price_target",
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "alert_condition",
+                            "Type": "varchar(50)",
+                            "Null": "NO",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "alert_value",
+                            "Type": "decimal(10,2)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "is_active",
+                            "Type": "tinyint(1)",
+                            "Null": "YES",
+                            "Key": "MUL",
+                            "Default": "1",
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "is_triggered",
+                            "Type": "tinyint(1)",
+                            "Null": "YES",
+                            "Key": "MUL",
+                            "Default": "0",
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "triggered_at",
+                            "Type": "timestamp",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "trigger_price",
+                            "Type": "decimal(10,2)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "notification_sent",
+                            "Type": "tinyint(1)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": "0",
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "created_at",
+                            "Type": "timestamp",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": "CURRENT_TIMESTAMP",
+                            "Extra": "DEFAULT_GENERATED"
+                        },
+                        {
+                            "Field": "updated_at",
+                            "Type": "timestamp",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": "CURRENT_TIMESTAMP",
+                            "Extra": "DEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+                        }
+                    ],
+                    "sample_data": {
+                        "columns": [
+                            "alert_id",
+                            "buylist_id",
+                            "alert_type",
+                            "alert_condition",
+                            "alert_value",
+                            "is_active",
+                            "is_triggered",
+                            "triggered_at",
+                            "trigger_price",
+                            "notification_sent",
+                            "created_at",
+                            "updated_at"
+                        ],
+                        "rows": []
+                    }
+                },
+                {
+                    "name": "buylist_history",
+                    "schema": [
+                        {
+                            "Field": "history_id",
+                            "Type": "int",
+                            "Null": "NO",
+                            "Key": "PRI",
+                            "Default": null,
+                            "Extra": "auto_increment"
+                        },
+                        {
+                            "Field": "buylist_id",
+                            "Type": "int",
+                            "Null": "NO",
+                            "Key": "MUL",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "field_name",
+                            "Type": "varchar(50)",
+                            "Null": "NO",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "old_value",
+                            "Type": "text",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "new_value",
+                            "Type": "text",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "change_reason",
+                            "Type": "varchar(255)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "changed_at",
+                            "Type": "timestamp",
+                            "Null": "YES",
+                            "Key": "MUL",
+                            "Default": "CURRENT_TIMESTAMP",
+                            "Extra": "DEFAULT_GENERATED"
+                        },
+                        {
+                            "Field": "changed_by",
+                            "Type": "int",
+                            "Null": "YES",
+                            "Key": "MUL",
+                            "Default": null,
+                            "Extra": ""
+                        }
+                    ],
+                    "sample_data": {
+                        "columns": [
+                            "history_id",
+                            "buylist_id",
+                            "field_name",
+                            "old_value",
+                            "new_value",
+                            "change_reason",
+                            "changed_at",
+                            "changed_by"
+                        ],
+                        "rows": []
+                    }
+                },
+                {
+                    "name": "buylist_masterlist_log",
+                    "schema": [
+                        {
+                            "Field": "log_id",
+                            "Type": "int",
+                            "Null": "NO",
+                            "Key": "PRI",
+                            "Default": null,
+                            "Extra": "auto_increment"
+                        },
+                        {
+                            "Field": "buylist_id",
+                            "Type": "int",
+                            "Null": "NO",
+                            "Key": "MUL",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "masterlist_isin",
+                            "Type": "char(12)",
+                            "Null": "NO",
+                            "Key": "MUL",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "action_type",
+                            "Type": "enum('added_to_masterlist','already_exists')",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": "added_to_masterlist",
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "action_date",
+                            "Type": "timestamp",
+                            "Null": "YES",
+                            "Key": "MUL",
+                            "Default": "CURRENT_TIMESTAMP",
+                            "Extra": "DEFAULT_GENERATED"
+                        },
+                        {
+                            "Field": "action_by",
+                            "Type": "int",
+                            "Null": "YES",
+                            "Key": "MUL",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "notes",
+                            "Type": "text",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        }
+                    ],
+                    "sample_data": {
+                        "columns": [
+                            "log_id",
+                            "buylist_id",
+                            "masterlist_isin",
+                            "action_type",
+                            "action_date",
+                            "action_by",
+                            "notes"
+                        ],
+                        "rows": [
+                            [
+                                1,
+                                9,
+                                "SE8667088130",
+                                "already_exists",
+                                "2025-07-20T16:08:09",
+                                1,
+                                null
+                            ],
+                            [
+                                2,
+                                9,
+                                "SE8667088130",
+                                "already_exists",
+                                "2025-07-20T16:09:46",
+                                1,
+                                null
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "name": "buylist_status",
+                    "schema": [
+                        {
+                            "Field": "status_id",
+                            "Type": "int",
+                            "Null": "NO",
+                            "Key": "PRI",
+                            "Default": null,
+                            "Extra": "auto_increment"
+                        },
+                        {
+                            "Field": "status_name",
+                            "Type": "varchar(50)",
+                            "Null": "NO",
+                            "Key": "UNI",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "status_description",
+                            "Type": "text",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "status_color",
+                            "Type": "varchar(7)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": "#007bff",
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "is_active",
+                            "Type": "tinyint(1)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": "1",
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "sort_order",
+                            "Type": "int",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": "0",
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "created_at",
+                            "Type": "timestamp",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": "CURRENT_TIMESTAMP",
+                            "Extra": "DEFAULT_GENERATED"
+                        },
+                        {
+                            "Field": "updated_at",
+                            "Type": "timestamp",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": "CURRENT_TIMESTAMP",
+                            "Extra": "DEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+                        }
+                    ],
+                    "sample_data": {
+                        "columns": [
+                            "status_id",
+                            "status_name",
+                            "status_description",
+                            "status_color",
+                            "is_active",
+                            "sort_order",
+                            "created_at",
+                            "updated_at"
+                        ],
+                        "rows": [
+                            [
+                                1,
+                                "Research",
+                                "Company under research and analysis",
+                                "#6c757d",
+                                1,
+                                1,
+                                "2025-07-20T14:55:37",
+                                "2025-07-20T14:55:37"
+                            ],
+                            [
+                                2,
+                                "Watchlist",
+                                "Company on watchlist, waiting for entry opportunity",
+                                "#17a2b8",
+                                1,
+                                2,
+                                "2025-07-20T14:55:37",
+                                "2025-07-20T14:55:37"
+                            ],
+                            [
+                                3,
+                                "Buy Target",
+                                "Ready to buy at target price",
+                                "#28a745",
+                                1,
+                                3,
+                                "2025-07-20T14:55:37",
+                                "2025-07-20T14:55:37"
+                            ],
+                            [
+                                4,
+                                "Partial Fill",
+                                "Partially filled order",
+                                "#fd7e14",
+                                1,
+                                4,
+                                "2025-07-20T14:55:37",
+                                "2025-07-20T14:55:37"
+                            ],
+                            [
+                                5,
+                                "Filled",
+                                "Order completed successfully",
+                                "#20c997",
+                                1,
+                                5,
+                                "2025-07-20T14:55:37",
+                                "2025-07-20T14:55:37"
+                            ],
+                            [
+                                6,
+                                "Rejected",
+                                "Order rejected or cancelled",
+                                "#dc3545",
+                                1,
+                                6,
+                                "2025-07-20T14:55:37",
+                                "2025-07-20T14:55:37"
+                            ],
+                            [
+                                7,
+                                "Sold",
+                                "Position sold, no longer active",
+                                "#6f42c1",
+                                1,
+                                7,
+                                "2025-07-20T14:55:37",
+                                "2025-07-20T14:55:37"
+                            ],
+                            [
+                                8,
+                                "Hold",
+                                "Currently holding, monitoring",
+                                "#0d6efd",
+                                1,
+                                8,
+                                "2025-07-20T14:55:37",
+                                "2025-07-20T14:55:37"
                             ]
                         ]
                     }
@@ -2229,6 +3489,305 @@
                     }
                 },
                 {
+                    "name": "user_activity_log",
+                    "schema": [
+                        {
+                            "Field": "id",
+                            "Type": "int",
+                            "Null": "NO",
+                            "Key": "PRI",
+                            "Default": null,
+                            "Extra": "auto_increment"
+                        },
+                        {
+                            "Field": "user_id",
+                            "Type": "int",
+                            "Null": "NO",
+                            "Key": "MUL",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "action_type",
+                            "Type": "varchar(50)",
+                            "Null": "NO",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "description",
+                            "Type": "text",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "ip_address",
+                            "Type": "varchar(45)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "user_agent",
+                            "Type": "text",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "created_at",
+                            "Type": "timestamp",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": "CURRENT_TIMESTAMP",
+                            "Extra": "DEFAULT_GENERATED"
+                        }
+                    ],
+                    "sample_data": {
+                        "columns": [
+                            "id",
+                            "user_id",
+                            "action_type",
+                            "description",
+                            "ip_address",
+                            "user_agent",
+                            "created_at"
+                        ],
+                        "rows": []
+                    }
+                },
+                {
+                    "name": "user_preferences",
+                    "schema": [
+                        {
+                            "Field": "id",
+                            "Type": "int",
+                            "Null": "NO",
+                            "Key": "PRI",
+                            "Default": null,
+                            "Extra": "auto_increment"
+                        },
+                        {
+                            "Field": "user_id",
+                            "Type": "int",
+                            "Null": "NO",
+                            "Key": "MUL",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "preference_key",
+                            "Type": "varchar(50)",
+                            "Null": "NO",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "preference_value",
+                            "Type": "text",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "created_at",
+                            "Type": "timestamp",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": "CURRENT_TIMESTAMP",
+                            "Extra": "DEFAULT_GENERATED"
+                        },
+                        {
+                            "Field": "updated_at",
+                            "Type": "timestamp",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": "CURRENT_TIMESTAMP",
+                            "Extra": "DEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+                        }
+                    ],
+                    "sample_data": {
+                        "columns": [
+                            "id",
+                            "user_id",
+                            "preference_key",
+                            "preference_value",
+                            "created_at",
+                            "updated_at"
+                        ],
+                        "rows": [
+                            [
+                                1,
+                                1,
+                                "theme",
+                                "light",
+                                "2025-07-20T13:29:01",
+                                "2025-07-20T13:29:01"
+                            ],
+                            [
+                                2,
+                                1,
+                                "language",
+                                "en",
+                                "2025-07-20T13:29:01",
+                                "2025-07-20T13:29:01"
+                            ],
+                            [
+                                3,
+                                1,
+                                "currency_display",
+                                "SEK",
+                                "2025-07-20T13:29:01",
+                                "2025-07-20T13:29:01"
+                            ],
+                            [
+                                4,
+                                1,
+                                "date_format",
+                                "Y-m-d",
+                                "2025-07-20T13:29:02",
+                                "2025-07-20T13:29:02"
+                            ],
+                            [
+                                5,
+                                1,
+                                "decimal_places",
+                                "2",
+                                "2025-07-20T13:29:02",
+                                "2025-07-20T13:29:02"
+                            ],
+                            [
+                                6,
+                                1,
+                                "notifications_email",
+                                "1",
+                                "2025-07-20T13:29:02",
+                                "2025-07-20T13:29:02"
+                            ],
+                            [
+                                7,
+                                1,
+                                "dashboard_refresh",
+                                "300",
+                                "2025-07-20T13:29:02",
+                                "2025-07-20T13:29:02"
+                            ],
+                            [
+                                8,
+                                1,
+                                "table_page_size",
+                                "50",
+                                "2025-07-20T13:29:02",
+                                "2025-07-20T13:29:02"
+                            ],
+                            [
+                                9,
+                                2,
+                                "theme",
+                                "light",
+                                "2025-07-20T13:29:02",
+                                "2025-07-20T13:29:02"
+                            ],
+                            [
+                                10,
+                                2,
+                                "language",
+                                "en",
+                                "2025-07-20T13:29:02",
+                                "2025-07-20T13:29:02"
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "name": "user_stats",
+                    "schema": [
+                        {
+                            "Field": "id",
+                            "Type": "int",
+                            "Null": "NO",
+                            "Key": "PRI",
+                            "Default": null,
+                            "Extra": "auto_increment"
+                        },
+                        {
+                            "Field": "user_id",
+                            "Type": "int",
+                            "Null": "NO",
+                            "Key": "UNI",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "login_count",
+                            "Type": "int",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": "0",
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "last_activity",
+                            "Type": "timestamp",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "created_at",
+                            "Type": "timestamp",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": "CURRENT_TIMESTAMP",
+                            "Extra": "DEFAULT_GENERATED"
+                        },
+                        {
+                            "Field": "updated_at",
+                            "Type": "timestamp",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": "CURRENT_TIMESTAMP",
+                            "Extra": "DEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+                        }
+                    ],
+                    "sample_data": {
+                        "columns": [
+                            "id",
+                            "user_id",
+                            "login_count",
+                            "last_activity",
+                            "created_at",
+                            "updated_at"
+                        ],
+                        "rows": [
+                            [
+                                1,
+                                1,
+                                0,
+                                "2025-07-20T13:29:35",
+                                "2025-07-20T13:29:35",
+                                "2025-07-20T13:29:35"
+                            ],
+                            [
+                                2,
+                                2,
+                                0,
+                                "2025-07-20T13:29:35",
+                                "2025-07-20T13:29:35",
+                                "2025-07-20T13:29:35"
+                            ]
+                        ]
+                    }
+                },
+                {
                     "name": "users",
                     "schema": [
                         {
@@ -2252,6 +3811,22 @@
                             "Type": "varchar(255)",
                             "Null": "NO",
                             "Key": "UNI",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "full_name",
+                            "Type": "varchar(100)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "last_login",
+                            "Type": "timestamp",
+                            "Null": "YES",
+                            "Key": "",
                             "Default": null,
                             "Extra": ""
                         },
@@ -2309,6 +3884,8 @@
                             "user_id",
                             "username",
                             "email",
+                            "full_name",
+                            "last_login",
                             "weekly_report",
                             "password_hash",
                             "role_id",
@@ -2321,17 +3898,21 @@
                                 1,
                                 "swoop",
                                 "laoan.ada@outlook.com",
+                                null,
+                                null,
                                 1,
-                                "$2y$10$NPP2mWGacdAAv7xRhLSR6e/uN5eyXn6lGMg6V2LOv6eBDp.BsW0vy",
+                                "$2y$10$pZQ7UMiGZvPgTUMbwQXrreTJZqNU6mOvzIPJXEczUSx6atFfDf6EK",
                                 1,
                                 1,
                                 "2025-06-22T23:41:58",
-                                "2025-07-02T04:37:06"
+                                "2025-07-20T14:00:57"
                             ],
                             [
                                 2,
                                 "ruifang",
                                 "simple_wind@hotmail.com",
+                                null,
+                                null,
                                 0,
                                 "$2y$10$OovxQqLlBrRN0eyLDQK95.tsvbDuxmrJU2ARLLfT2orqWvgEwOx4C",
                                 2,
@@ -2612,6 +4193,360 @@
                             "reportType"
                         ],
                         "rows": []
+                    }
+                },
+                {
+                    "name": "combined_instruments",
+                    "schema": [
+                        {
+                            "Field": "insId",
+                            "Type": "int",
+                            "Null": "NO",
+                            "Key": "",
+                            "Default": "0",
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "ref_instrument_id",
+                            "Type": "int",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "name",
+                            "Type": "varchar(255)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "urlName",
+                            "Type": "varchar(255)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "ticker",
+                            "Type": "varchar(50)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "isin",
+                            "Type": "varchar(20)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "yahoo",
+                            "Type": "varchar(20)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "sector_id",
+                            "Type": "int",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "market_id",
+                            "Type": "int",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "branch_id",
+                            "Type": "int",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "country_id",
+                            "Type": "int",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "listingDate",
+                            "Type": "date",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "stockPriceCurrency",
+                            "Type": "varchar(3)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "reportCurrency",
+                            "Type": "varchar(3)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "industryID",
+                            "Type": "int",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "updated",
+                            "Type": "datetime",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "source_table",
+                            "Type": "varchar(6)",
+                            "Null": "NO",
+                            "Key": "",
+                            "Default": "",
+                            "Extra": ""
+                        }
+                    ],
+                    "sample_data": {
+                        "columns": [
+                            "insId",
+                            "ref_instrument_id",
+                            "name",
+                            "urlName",
+                            "ticker",
+                            "isin",
+                            "yahoo",
+                            "sector_id",
+                            "market_id",
+                            "branch_id",
+                            "country_id",
+                            "listingDate",
+                            "stockPriceCurrency",
+                            "reportCurrency",
+                            "industryID",
+                            "updated",
+                            "source_table"
+                        ],
+                        "rows": [
+                            [
+                                10054,
+                                null,
+                                "Fundamental Global Inc",
+                                "1347-property-insurance",
+                                "FGF",
+                                "US30259W1045",
+                                "FGF",
+                                1,
+                                33,
+                                74,
+                                5,
+                                "2014-04-01",
+                                "USD",
+                                "USD",
+                                null,
+                                null,
+                                "global"
+                            ],
+                            [
+                                10055,
+                                null,
+                                "180 Degree Capital Corp",
+                                "180-degree-capital",
+                                "TURN",
+                                "US68235B2088",
+                                "TURN",
+                                1,
+                                33,
+                                71,
+                                5,
+                                "1992-02-25",
+                                "USD",
+                                "USD",
+                                null,
+                                null,
+                                "global"
+                            ],
+                            [
+                                10056,
+                                null,
+                                "1-800-Flowers.com Inc",
+                                "1-800-flowers-com",
+                                "FLWS",
+                                "US68243Q1067",
+                                "FLWS",
+                                8,
+                                33,
+                                50,
+                                5,
+                                "1999-08-03",
+                                "USD",
+                                "USD",
+                                null,
+                                null,
+                                "global"
+                            ],
+                            [
+                                10058,
+                                null,
+                                "1st Source Corp",
+                                "1st-source",
+                                "SRCE",
+                                "US3369011032",
+                                "SRCE",
+                                1,
+                                33,
+                                69,
+                                5,
+                                "1983-08-12",
+                                "USD",
+                                "USD",
+                                null,
+                                null,
+                                "global"
+                            ],
+                            [
+                                10060,
+                                null,
+                                "A-Mark Precious Metals Inc",
+                                "a-mark-precious-metals",
+                                "AMRK",
+                                "US00181T1079",
+                                "AMRK",
+                                1,
+                                33,
+                                71,
+                                5,
+                                "2014-03-17",
+                                "USD",
+                                "USD",
+                                null,
+                                null,
+                                "global"
+                            ],
+                            [
+                                10062,
+                                null,
+                                "AAON Inc",
+                                "aaon",
+                                "AAON",
+                                "US0003602069",
+                                "AAON",
+                                5,
+                                33,
+                                31,
+                                5,
+                                "1990-12-01",
+                                "USD",
+                                "USD",
+                                null,
+                                null,
+                                "global"
+                            ],
+                            [
+                                10064,
+                                null,
+                                "Abeona Therapeutics Inc",
+                                "abeona-therapeutics",
+                                "ABEO",
+                                "US00289Y2063",
+                                "ABEO",
+                                4,
+                                33,
+                                78,
+                                5,
+                                "1980-09-19",
+                                "USD",
+                                "USD",
+                                null,
+                                null,
+                                "global"
+                            ],
+                            [
+                                10068,
+                                null,
+                                "AC Immune SA",
+                                "ac-immune",
+                                "ACIU",
+                                "CH0329023102",
+                                "ACIU",
+                                4,
+                                33,
+                                78,
+                                5,
+                                "2016-09-23",
+                                "USD",
+                                "CHF",
+                                null,
+                                null,
+                                "global"
+                            ],
+                            [
+                                10070,
+                                null,
+                                "Acacia Research Corp",
+                                "acacia-research",
+                                "ACTG",
+                                "US0038813079",
+                                "ACTG",
+                                5,
+                                33,
+                                24,
+                                5,
+                                "2002-12-16",
+                                "USD",
+                                "USD",
+                                null,
+                                null,
+                                "global"
+                            ],
+                            [
+                                10071,
+                                null,
+                                "Acadia Healthcare Co Inc",
+                                "acadia-healthcare",
+                                "ACHC",
+                                "US00404A1097",
+                                "ACHC",
+                                4,
+                                33,
+                                81,
+                                5,
+                                "2011-11-01",
+                                "USD",
+                                "USD",
+                                null,
+                                null,
+                                "global"
+                            ]
+                        ]
                     }
                 },
                 {
@@ -5163,6 +7098,14 @@
                             "Extra": ""
                         },
                         {
+                            "Field": "isin",
+                            "Type": "varchar(20)",
+                            "Null": "NO",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
                             "Field": "country_name",
                             "Type": "varchar(100)",
                             "Null": "YES",
@@ -5190,7 +7133,7 @@
                             "Field": "strategy_group_id",
                             "Type": "int",
                             "Null": "YES",
-                            "Key": "",
+                            "Key": "MUL",
                             "Default": null,
                             "Extra": ""
                         },
@@ -5206,7 +7149,7 @@
                             "Field": "broker_id",
                             "Type": "int",
                             "Null": "YES",
-                            "Key": "",
+                            "Key": "MUL",
                             "Default": null,
                             "Extra": ""
                         },
@@ -5248,6 +7191,7 @@
                             "buy_list_id",
                             "company",
                             "ticker",
+                            "isin",
                             "country_name",
                             "country_id",
                             "yield",
@@ -5264,6 +7208,7 @@
                                 26,
                                 "Sixth Street Specialty Lending",
                                 "TSLX",
+                                "",
                                 "USA",
                                 null,
                                 "9.02",
@@ -5279,6 +7224,7 @@
                                 27,
                                 "TC Energy Corp",
                                 "TSE:TRP",
+                                "",
                                 "Canada",
                                 2,
                                 "5.97",
@@ -5294,6 +7240,7 @@
                                 28,
                                 "Capital Southwest Corp",
                                 "NASDAQ:C",
+                                "",
                                 "USA",
                                 null,
                                 "10.91",
@@ -5309,6 +7256,7 @@
                                 29,
                                 "Oaktree Specialty Lending Corp",
                                 "NYSE:OCS",
+                                "",
                                 "USA",
                                 null,
                                 "9.39",
@@ -5324,6 +7272,7 @@
                                 30,
                                 "VF Corp",
                                 "NYSE:VFC",
+                                "",
                                 "USA",
                                 null,
                                 "7.13",
@@ -5339,6 +7288,7 @@
                                 31,
                                 "Canadian Natural Resources Ltd",
                                 "CNQ:TSX",
+                                "",
                                 "Canada",
                                 2,
                                 "4.20",
@@ -5354,6 +7304,7 @@
                                 32,
                                 "Algonquin Power & Utilities Corp",
                                 "TO:AQN",
+                                "",
                                 "Canada",
                                 2,
                                 "7.14",
@@ -5369,6 +7320,7 @@
                                 33,
                                 "LyondellBasell Industries NV",
                                 "LYB:NYSE",
+                                "",
                                 "USA",
                                 null,
                                 "5.70",
@@ -5384,6 +7336,7 @@
                                 34,
                                 "Packaging Corp of America",
                                 "NYSE:PKG",
+                                "US6951561090",
                                 "USA",
                                 null,
                                 "3.90",
@@ -5399,6 +7352,7 @@
                                 35,
                                 "Cogeco Communications Inc",
                                 "TSE:CCA",
+                                "",
                                 "Canada",
                                 2,
                                 "3.86",
