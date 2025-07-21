@@ -41,9 +41,6 @@
 .company-tooltip {
     position: absolute;
     z-index: 999999;
-    background-color: #4a5568 !important;
-    background-image: none !important;
-    background: #4a5568 !important;
     border: 2px solid #2d3748;
     border-radius: 8px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
@@ -60,6 +57,32 @@
     transition: all 0.3s ease;
     pointer-events: none;
     box-sizing: border-box;
+}
+
+/* Absolute backdrop to block background text */
+.company-tooltip::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    background: #4a5568;
+    border-radius: 10px;
+    z-index: -1;
+}
+
+/* Additional backdrop layer */
+.company-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #4a5568;
+    border-radius: 8px;
+    z-index: -1;
 }
 
 /* Default positioning (right side) */
