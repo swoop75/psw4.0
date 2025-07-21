@@ -148,18 +148,15 @@ function showTooltip(event) {
     const tooltip = this.querySelector('.company-tooltip');
     if (!tooltip) return;
     
-    // Create and show backdrop
-    if (tooltip.dataset.hasBackdrop === 'true') {
-        // Remove any existing backdrop
-        const existingBackdrop = document.querySelector('.tooltip-backdrop');
-        if (existingBackdrop) {
-            existingBackdrop.remove();
-        }
-        
-        // Create new backdrop
-        const backdrop = document.createElement('div');
-        backdrop.className = 'tooltip-backdrop';
-        backdrop.style.cssText = `
+    // Hide the entire page body content
+    document.body.style.overflow = 'hidden';
+    
+    // Create and show modal container
+    let modalContainer = document.querySelector('.tooltip-modal-container');
+    if (!modalContainer) {
+        modalContainer = document.createElement('div');
+        modalContainer.className = 'tooltip-modal-container';
+        modalContainer.style.cssText = `
             position: fixed;
             top: 0;
             left: 0;
@@ -167,20 +164,25 @@ function showTooltip(event) {
             bottom: 0;
             background: rgb(0, 0, 0);
             z-index: 999999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             opacity: 1;
             visibility: visible;
-            pointer-events: none;
         `;
-        document.body.appendChild(backdrop);
+        document.body.appendChild(modalContainer);
     }
     
-    // Show modal tooltip with proper styling
-    tooltip.style.cssText = `
-        position: fixed !important;
-        top: 50% !important;
-        left: 50% !important;
-        transform: translate(-50%, -50%) scale(1) !important;
-        z-index: 1000001 !important;
+    // Move tooltip to modal container and show it
+    modalContainer.appendChild(tooltip.cloneNode(true));
+    const modalTooltip = modalContainer.querySelector('.company-tooltip');
+    
+    modalTooltip.style.cssText = `
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        transform: none !important;
+        z-index: auto !important;
         opacity: 1 !important;
         visibility: visible !important;
         pointer-events: auto !important;
@@ -197,6 +199,7 @@ function showTooltip(event) {
         box-shadow: 0 32px 64px rgba(0, 0, 0, 0.3), 0 8px 16px rgba(0, 0, 0, 0.2) !important;
         overflow-y: auto !important;
         display: block !important;
+        margin: 0 !important;
     `;
     
     // Debug logging
@@ -220,19 +223,14 @@ function showTooltip(event) {
  * Hide modal tooltip
  */
 function hideTooltip(event) {
-    const tooltip = this.querySelector('.company-tooltip');
-    if (!tooltip) return;
-    
-    // Remove backdrop
-    const backdrop = document.querySelector('.tooltip-backdrop');
-    if (backdrop) {
-        backdrop.remove();
+    // Remove modal container completely
+    const modalContainer = document.querySelector('.tooltip-modal-container');
+    if (modalContainer) {
+        modalContainer.remove();
     }
     
-    tooltip.style.opacity = '0';
-    tooltip.style.visibility = 'hidden';
-    tooltip.style.transform = 'translate(-50%, -50%) scale(0.9)';
-    tooltip.style.pointerEvents = 'none';
+    // Restore body overflow
+    document.body.style.overflow = '';
 }
 
 /**
