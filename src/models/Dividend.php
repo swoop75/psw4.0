@@ -28,17 +28,17 @@ class Dividend {
         try {
             // Query log_dividends table - get company info separately to avoid cross-database issues
             $sql = "SELECT 
-                        ld.ex_date as date,
+                        ld.payment_date as date,
                         ld.pay_date,
                         ld.isin,
-                        ld.shares_on_pay_date as shares,
-                        ld.dividend_per_share_original_currency as dividend_per_share,
-                        ld.dividend_total_original_currency as total_amount,
-                        ld.dividend_total_sek as sek_amount,
-                        ld.withholding_tax_percent,
-                        ld.withholding_tax_sek
+                        ld.shares_held as shares,
+                        ld.dividend_amount_local / ld.shares_held as dividend_per_share,
+                        ld.dividend_amount_local as total_amount,
+                        ld.dividend_amount_sek as sek_amount,
+                        ld.tax_rate_percent as withholding_tax_percent,
+                        ld.tax_amount_sek as withholding_tax_sek
                     FROM log_dividends ld
-                    WHERE ld.dividend_total_sek > 0";
+                    WHERE ld.dividend_amount_sek > 0";
             
             // Add user filtering if not admin (when user system is implemented)
             if (!$isAdmin && $userId) {
@@ -46,7 +46,7 @@ class Dividend {
                 // $sql .= " AND ld.user_id = :user_id";
             }
             
-            $sql .= " ORDER BY ld.ex_date DESC, ld.pay_date DESC LIMIT :limit";
+            $sql .= " ORDER BY ld.payment_date DESC, ld.pay_date DESC LIMIT :limit";
             
             $stmt = $this->portfolioDb->prepare($sql);
             $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
@@ -108,7 +108,7 @@ class Dividend {
             // Mock data for upcoming ex-dividend dates
             return [
                 [
-                    'ex_date' => '2025-07-25',
+                    'payment_date' => '2025-07-25',
                     'pay_date' => '2025-08-15',
                     'company' => 'Apple Inc.',
                     'symbol' => 'AAPL',
@@ -118,7 +118,7 @@ class Dividend {
                     'currency' => 'USD'
                 ],
                 [
-                    'ex_date' => '2025-07-28',
+                    'payment_date' => '2025-07-28',
                     'pay_date' => '2025-08-20',
                     'company' => 'Procter & Gamble',
                     'symbol' => 'PG',
@@ -128,7 +128,7 @@ class Dividend {
                     'currency' => 'USD'
                 ],
                 [
-                    'ex_date' => '2025-08-02',
+                    'payment_date' => '2025-08-02',
                     'pay_date' => '2025-08-25',
                     'company' => 'Hennes & Mauritz AB',
                     'symbol' => 'HM-B.ST',
@@ -138,7 +138,7 @@ class Dividend {
                     'currency' => 'SEK'
                 ],
                 [
-                    'ex_date' => '2025-08-05',
+                    'payment_date' => '2025-08-05',
                     'pay_date' => '2025-08-30',
                     'company' => 'PepsiCo Inc.',
                     'symbol' => 'PEP',
@@ -235,26 +235,26 @@ class Dividend {
             // YTD statistics
             $ytdSql = "SELECT 
                         COUNT(*) as ytd_count,
-                        SUM(dividend_total_sek) as ytd_total
+                        SUM(dividend_amount_sek) as ytd_total
                     FROM log_dividends 
-                    WHERE YEAR(ex_date) = :current_year 
-                    AND dividend_total_sek > 0";
+                    WHERE YEAR(payment_date) = :current_year 
+                    AND dividend_amount_sek > 0";
             
             // All-time statistics  
             $allTimeSql = "SELECT 
                             COUNT(*) as all_time_count,
-                            SUM(dividend_total_sek) as all_time_total
+                            SUM(dividend_amount_sek) as all_time_total
                         FROM log_dividends 
-                        WHERE dividend_total_sek > 0";
+                        WHERE dividend_amount_sek > 0";
             
             // Monthly statistics for current year
             $monthlySql = "SELECT 
-                            MONTH(ex_date) as month,
-                            SUM(dividend_total_sek) as monthly_total
+                            MONTH(payment_date) as month,
+                            SUM(dividend_amount_sek) as monthly_total
                         FROM log_dividends 
-                        WHERE YEAR(ex_date) = :current_year 
-                        AND dividend_total_sek > 0
-                        GROUP BY MONTH(ex_date)
+                        WHERE YEAR(payment_date) = :current_year 
+                        AND dividend_amount_sek > 0
+                        GROUP BY MONTH(payment_date)
                         ORDER BY monthly_total DESC";
             
             // TODO: Add user filtering when portfolio system is implemented

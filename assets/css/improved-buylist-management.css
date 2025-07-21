@@ -2,7 +2,13 @@
  * File: assets/css/improved-buylist-management.css
  * Path: C:\Users\laoan\Documents\GitHub\psw\psw4.0\assets\css\improved-buylist-management.css
  * Description: Enhanced Buylist Management styles for PSW 4.0 - BEAUTIFUL DESIGN v2025-07-20
+ * Updated: Compatible with unified navigation system
  */
+
+/* Compatibility with unified navigation */
+.container {
+    margin-top: 0; /* Remove any extra margin since main-container already has padding-top */
+}
 
 /* CSS Custom Properties - Beautiful Design System */
 :root {

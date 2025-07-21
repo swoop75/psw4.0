@@ -226,10 +226,10 @@ class Company {
                     INNER JOIN (
                         SELECT 
                             isin,
-                            MAX(ex_date) as latest_dividend_date,
-                            dividend_total_sek as latest_dividend_amount
+                            MAX(payment_date) as latest_dividend_date,
+                            dividend_amount_sek as latest_dividend_amount
                         FROM log_dividends
-                        WHERE ex_date >= :cutoff_date
+                        WHERE payment_date >= :cutoff_date
                         GROUP BY isin
                     ) ld ON m.isin = ld.isin
                     ORDER BY ld.latest_dividend_date DESC

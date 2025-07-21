@@ -90,12 +90,12 @@ class DividendLogsController {
      * @return array Query components
      */
     private function buildDividendQuery($filters, $userId, $isAdmin) {
-        $where = ["ld.dividend_total_sek > 0"];
+        $where = ["ld.dividend_amount_sek > 0"];
         $params = [];
         
         // Year filter
         if (!empty($filters['year']) && is_numeric($filters['year'])) {
-            $where[] = "YEAR(ld.ex_date) = :year";
+            $where[] = "YEAR(ld.payment_date) = :year";
             $params[':year'] = (int) $filters['year'];
         }
         
@@ -109,29 +109,29 @@ class DividendLogsController {
         
         // Currency filter
         if (!empty($filters['currency'])) {
-            $where[] = "ld.original_currency = :currency";
+            $where[] = "ld.currency_local = :currency";
             $params[':currency'] = $filters['currency'];
         }
         
         // Amount range filters
         if (!empty($filters['amount_min']) && is_numeric($filters['amount_min'])) {
-            $where[] = "ld.dividend_total_sek >= :amount_min";
+            $where[] = "ld.dividend_amount_sek >= :amount_min";
             $params[':amount_min'] = (float) $filters['amount_min'];
         }
         
         if (!empty($filters['amount_max']) && is_numeric($filters['amount_max'])) {
-            $where[] = "ld.dividend_total_sek <= :amount_max";
+            $where[] = "ld.dividend_amount_sek <= :amount_max";
             $params[':amount_max'] = (float) $filters['amount_max'];
         }
         
         // Date range filters
         if (!empty($filters['date_from'])) {
-            $where[] = "ld.ex_date >= :date_from";
+            $where[] = "ld.payment_date >= :date_from";
             $params[':date_from'] = $filters['date_from'];
         }
         
         if (!empty($filters['date_to'])) {
-            $where[] = "ld.ex_date <= :date_to";
+            $where[] = "ld.payment_date <= :date_to";
             $params[':date_to'] = $filters['date_to'];
         }
         
@@ -143,17 +143,17 @@ class DividendLogsController {
         }
         
         // Build ORDER BY clause
-        $validSortColumns = ['ex_date', 'pay_date', 'company_name', 'dividend_total_sek', 'original_currency'];
-        $sortColumn = in_array($filters['sort'] ?? '', $validSortColumns) ? $filters['sort'] : 'ex_date';
+        $validSortColumns = ['payment_date', 'pay_date', 'company_name', 'dividend_amount_sek', 'currency_local'];
+        $sortColumn = in_array($filters['sort'] ?? '', $validSortColumns) ? $filters['sort'] : 'payment_date';
         $sortOrder = (($filters['order'] ?? '') === 'ASC') ? 'ASC' : 'DESC';
         
         $orderBy = match($sortColumn) {
-            'company_name' => "m.company_name {$sortOrder}, ld.ex_date DESC",
-            'ex_date' => "ld.ex_date {$sortOrder}, ld.pay_date DESC",
-            'pay_date' => "ld.pay_date {$sortOrder}, ld.ex_date DESC",
-            'dividend_total_sek' => "ld.dividend_total_sek {$sortOrder}, ld.ex_date DESC",
-            'original_currency' => "ld.original_currency {$sortOrder}, ld.ex_date DESC",
-            default => "ld.ex_date {$sortOrder}, ld.pay_date DESC"
+            'company_name' => "m.company_name {$sortOrder}, ld.payment_date DESC",
+            'payment_date' => "ld.payment_date {$sortOrder}, ld.pay_date DESC",
+            'pay_date' => "ld.pay_date {$sortOrder}, ld.payment_date DESC",
+            'dividend_amount_sek' => "ld.dividend_amount_sek {$sortOrder}, ld.payment_date DESC",
+            'currency_local' => "ld.currency_local {$sortOrder}, ld.payment_date DESC",
+            default => "ld.payment_date {$sortOrder}, ld.pay_date DESC"
         };
         
         return [
@@ -203,16 +203,16 @@ class DividendLogsController {
     private function getPaginatedResults($whereClause, $params, $orderBy, $offset, $limit) {
         try {
             $sql = "SELECT 
-                        ld.ex_date,
+                        ld.payment_date,
                         ld.pay_date,
                         ld.isin,
-                        ld.shares_on_pay_date as shares,
-                        ld.dividend_per_share_original_currency,
-                        ld.dividend_total_original_currency,
-                        ld.original_currency,
-                        ld.dividend_total_sek,
-                        ld.withholding_tax_percent,
-                        ld.withholding_tax_sek,
+                        ld.shares_held as shares,
+                        ld.dividend_amount_local / ld.shares_held as dividend_per_share_original_currency,
+                        ld.dividend_amount_local as dividend_total_original_currency,
+                        ld.currency_local as original_currency,
+                        ld.dividend_amount_sek,
+                        ld.tax_rate_percent as withholding_tax_percent,
+                        ld.tax_amount_sek as withholding_tax_sek,
                         ld.net_dividend_sek,
                         ld.fx_rate_to_sek,
                         m.company_name,
@@ -244,7 +244,7 @@ class DividendLogsController {
             $dividends = [];
             foreach ($results as $result) {
                 $dividends[] = [
-                    'ex_date' => $result['ex_date'],
+                    'payment_date' => $result['payment_date'],
                     'pay_date' => $result['pay_date'],
                     'isin' => $result['isin'],
                     'company_name' => $result['company_name'] ?? 'Unknown Company',
@@ -255,7 +255,7 @@ class DividendLogsController {
                     'dividend_per_share' => (float) $result['dividend_per_share_original_currency'],
                     'dividend_total_original' => (float) $result['dividend_total_original_currency'],
                     'original_currency' => $result['original_currency'],
-                    'dividend_total_sek' => (float) $result['dividend_total_sek'],
+                    'dividend_amount_sek' => (float) $result['dividend_amount_sek'],
                     'withholding_tax_percent' => (float) $result['withholding_tax_percent'],
                     'withholding_tax_sek' => (float) $result['withholding_tax_sek'],
                     'net_dividend_sek' => (float) $result['net_dividend_sek'],
@@ -280,19 +280,19 @@ class DividendLogsController {
     private function getFilterOptions($userId, $isAdmin) {
         try {
             // Get available years
-            $yearsSql = "SELECT DISTINCT YEAR(ex_date) as year 
+            $yearsSql = "SELECT DISTINCT YEAR(payment_date) as year 
                         FROM log_dividends 
-                        WHERE dividend_total_sek > 0 
+                        WHERE dividend_amount_sek > 0 
                         ORDER BY year DESC";
             $yearsStmt = $this->portfolioDb->prepare($yearsSql);
             $yearsStmt->execute();
             $years = $yearsStmt->fetchAll(PDO::FETCH_COLUMN);
             
             // Get available currencies
-            $currenciesSql = "SELECT DISTINCT original_currency 
+            $currenciesSql = "SELECT DISTINCT currency_local as original_currency 
                              FROM log_dividends 
-                             WHERE dividend_total_sek > 0 AND original_currency IS NOT NULL
-                             ORDER BY original_currency";
+                             WHERE dividend_amount_sek > 0 AND currency_local IS NOT NULL
+                             ORDER BY currency_local";
             $currenciesStmt = $this->portfolioDb->prepare($currenciesSql);
             $currenciesStmt->execute();
             $currencies = $currenciesStmt->fetchAll(PDO::FETCH_COLUMN);
@@ -301,7 +301,7 @@ class DividendLogsController {
             $companiesSql = "SELECT DISTINCT m.company_name, m.ticker_symbol
                             FROM log_dividends ld
                             LEFT JOIN masterlist m ON ld.isin = m.isin
-                            WHERE ld.dividend_total_sek > 0 AND m.company_name IS NOT NULL
+                            WHERE ld.dividend_amount_sek > 0 AND m.company_name IS NOT NULL
                             ORDER BY m.company_name
                             LIMIT 50";
             $companiesStmt = $this->portfolioDb->prepare($companiesSql);
@@ -335,14 +335,14 @@ class DividendLogsController {
             $sql = "SELECT 
                         COUNT(*) as total_payments,
                         COUNT(DISTINCT ld.isin) as unique_companies,
-                        SUM(ld.dividend_total_sek) as total_amount_sek,
-                        AVG(ld.dividend_total_sek) as avg_amount_sek,
-                        MIN(ld.dividend_total_sek) as min_amount_sek,
-                        MAX(ld.dividend_total_sek) as max_amount_sek,
-                        SUM(ld.withholding_tax_sek) as total_tax_sek,
-                        COUNT(DISTINCT ld.original_currency) as currencies_count,
-                        MIN(ld.ex_date) as earliest_date,
-                        MAX(ld.ex_date) as latest_date
+                        SUM(ld.dividend_amount_sek) as total_amount_sek,
+                        AVG(ld.dividend_amount_sek) as avg_amount_sek,
+                        MIN(ld.dividend_amount_sek) as min_amount_sek,
+                        MAX(ld.dividend_amount_sek) as max_amount_sek,
+                        SUM(ld.tax_amount_sek) as total_tax_sek,
+                        COUNT(DISTINCT ld.currency_local) as currencies_count,
+                        MIN(ld.payment_date) as earliest_date,
+                        MAX(ld.payment_date) as latest_date
                     FROM log_dividends ld
                     LEFT JOIN masterlist m ON ld.isin = m.isin
                     WHERE {$whereClause}";
@@ -410,7 +410,7 @@ class DividendLogsController {
             
             foreach ($dividends as $dividend) {
                 $csv .= sprintf("%s,%s,%s,%s,%s,%s,%d,%.4f,%.2f,%s,%.2f,%.2f,%.2f,%.6f\n",
-                    $dividend['ex_date'],
+                    $dividend['payment_date'],
                     $dividend['pay_date'],
                     '"' . str_replace('"', '""', $dividend['company_name']) . '"',
                     $dividend['ticker_symbol'],
@@ -420,7 +420,7 @@ class DividendLogsController {
                     $dividend['dividend_per_share'],
                     $dividend['dividend_total_original'],
                     $dividend['original_currency'],
-                    $dividend['dividend_total_sek'],
+                    $dividend['dividend_amount_sek'],
                     $dividend['withholding_tax_sek'],
                     $dividend['net_dividend_sek'],
                     $dividend['fx_rate_to_sek']

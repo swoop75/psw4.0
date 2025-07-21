@@ -34,7 +34,7 @@ class Portfolio {
             // Get company count from dividend data
             $companyCountSql = "SELECT COUNT(DISTINCT isin) as unique_companies
                                FROM log_dividends 
-                               WHERE dividend_total_sek > 0";
+                               WHERE dividend_amount_sek > 0";
             
             $stmt = $this->portfolioDb->prepare($companyCountSql);
             $stmt->execute();
@@ -147,11 +147,11 @@ class Portfolio {
             $sql = "SELECT 
                         'Sweden' as name,
                         COUNT(DISTINCT ld.isin) as company_count,
-                        SUM(ld.dividend_total_sek) as total_dividends,
-                        AVG(ld.dividend_total_sek) as avg_dividend
+                        SUM(ld.dividend_amount_sek) as total_dividends,
+                        AVG(ld.dividend_amount_sek) as avg_dividend
                     FROM log_dividends ld
-                    WHERE ld.dividend_total_sek > 0
-                    AND YEAR(ld.ex_date) = YEAR(CURDATE())";
+                    WHERE ld.dividend_amount_sek > 0
+                    AND YEAR(ld.payment_date) = YEAR(CURDATE())";
             
             // TODO: Add user filtering when implemented
             
@@ -203,11 +203,11 @@ class Portfolio {
             $sql = "SELECT 
                         'SEK' as currency,
                         COUNT(DISTINCT ld.isin) as company_count,
-                        SUM(ld.dividend_total_sek) as total_dividends_sek,
-                        SUM(ld.dividend_total_sek) as total_dividends_original
+                        SUM(ld.dividend_amount_sek) as total_dividends_sek,
+                        SUM(ld.dividend_amount_sek) as total_dividends_original
                     FROM log_dividends ld
-                    WHERE ld.dividend_total_sek > 0
-                    AND YEAR(ld.ex_date) = YEAR(CURDATE())";
+                    WHERE ld.dividend_amount_sek > 0
+                    AND YEAR(ld.payment_date) = YEAR(CURDATE())";
             
             // TODO: Add user filtering when implemented
             

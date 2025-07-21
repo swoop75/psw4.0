@@ -16,7 +16,9 @@
       "Bash(ls:*)",
       "Bash(copy \"C:\\Users\\laoan\\Documents\\GitHub\\psw\\psw4.0\\test_simple.html\" \"D:\"\")",
       "Bash(cp:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(curl:*)",
+      "Bash(mysql:*)"
     ],
     "deny": []
   }
