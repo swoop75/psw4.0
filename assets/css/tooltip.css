@@ -25,9 +25,9 @@
     font-size: 12px;
     color: #667eea;
     margin-left: 8px;
-    opacity: 0.7;
+    opacity: 1;
     transition: all 0.3s ease;
-    text-shadow: 0 1px 2px rgba(102, 126, 234, 0.2);
+    text-shadow: none;
 }
 
 .company-info:hover .tooltip-icon {
@@ -103,7 +103,7 @@
     height: 0;
     border-style: solid;
     border-width: 6px 6px 6px 0;
-    border-color: transparent rgba(102, 126, 234, 0.2) transparent transparent;
+    border-color: transparent #667eea transparent transparent;
 }
 
 .company-tooltip.position-right::after {
@@ -128,7 +128,7 @@
     height: 0;
     border-style: solid;
     border-width: 6px 0 6px 6px;
-    border-color: transparent transparent transparent rgba(102, 126, 234, 0.2);
+    border-color: transparent transparent transparent #667eea;
 }
 
 .company-tooltip.position-left::after {
@@ -153,7 +153,7 @@
     height: 0;
     border-style: solid;
     border-width: 6px 6px 0 6px;
-    border-color: rgba(102, 126, 234, 0.2) transparent transparent transparent;
+    border-color: #667eea transparent transparent transparent;
 }
 
 .company-tooltip.position-above::after {
@@ -178,7 +178,7 @@
     height: 0;
     border-style: solid;
     border-width: 0 6px 6px 6px;
-    border-color: transparent transparent rgba(102, 126, 234, 0.2) transparent;
+    border-color: transparent transparent #667eea transparent;
 }
 
 .company-tooltip.position-below::after {
@@ -195,7 +195,7 @@
 
 /* Tooltip header */
 .tooltip-header {
-    border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+    border-bottom: 2px solid #667eea;
     padding: 12px;
     margin-bottom: 16px;
     background: #4a5568;
@@ -208,7 +208,7 @@
     color: #111827;
     margin-bottom: 6px;
     letter-spacing: -0.02em;
-    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
+    text-shadow: none;
 }
 
 .tooltip-ticker {
@@ -243,7 +243,7 @@
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.8px;
-    border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+    border-bottom: 1px solid #667eea;
     padding-bottom: 4px;
 }
 
@@ -253,7 +253,7 @@
     align-items: center;
     margin-bottom: 8px;
     padding: 6px 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid #e5e7eb;
 }
 
 .tooltip-row:last-child {
@@ -292,12 +292,12 @@
 /* Highlight important organizational values */
 .tooltip-strategy,
 .tooltip-broker {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%) !important;
+    background: #e0e7ff !important;
     color: #667eea !important;
     font-weight: 600;
     padding: 4px 8px;
     border-radius: 6px;
-    border: 1px solid rgba(102, 126, 234, 0.2);
+    border: 1px solid #667eea;
 }
 
 /* Strategy group number styling */
@@ -308,12 +308,12 @@
 
 /* Group ID highlighting */
 .tooltip-group {
-    background: linear-gradient(135deg, rgba(251, 146, 60, 0.1) 0%, rgba(251, 113, 133, 0.1) 100%) !important;
+    background: #fed7aa !important;
     color: #ea580c !important;
     font-weight: 600;
     padding: 4px 8px;
     border-radius: 6px;
-    border: 1px solid rgba(251, 146, 60, 0.2);
+    border: 1px solid #f97316;
 }
 
 /* Comments and inspiration section */
@@ -341,17 +341,17 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 2px 4px #667eea;
 }
 
 /* Yield highlighting */
 .tooltip-yield {
-    background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(21, 128, 61, 0.1) 100%) !important;
+    background: #dcfce7 !important;
     color: #059669 !important;
     font-weight: 700;
     padding: 4px 8px;
     border-radius: 6px;
-    border: 1px solid rgba(34, 197, 94, 0.2);
+    border: 1px solid #22c55e;
     font-size: 14px;
 }
 
