@@ -92,14 +92,7 @@
     margin-top: 10px;
 }
 
-/* Show modal tooltip on hover */
-.company-info[data-tooltip="true"]:hover .company-tooltip {
-    opacity: 1;
-    visibility: visible;
-    transform: translate(-50%, -50%) scale(1);
-    pointer-events: auto;
-    z-index: 1000001;
-}
+/* Tooltip visibility is now handled by JavaScript */
 
 /* Tooltip arrows - Right side (default) */
 .company-tooltip.position-right::before {

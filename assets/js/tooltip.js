@@ -30,23 +30,8 @@ function createTooltipContent(element) {
     const tooltip = document.createElement('div');
     tooltip.className = 'company-tooltip';
     
-    // Create backdrop element
-    const backdrop = document.createElement('div');
-    backdrop.className = 'tooltip-backdrop';
-    backdrop.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgb(0, 0, 0);
-        z-index: 999999;
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.3s ease;
-        pointer-events: none;
-    `;
-    tooltip.appendChild(backdrop);
+    // Store reference to create backdrop later
+    tooltip.dataset.hasBackdrop = 'true';
     
     const company = element.dataset.company || 'N/A';
     const ticker = element.dataset.ticker || 'N/A';
@@ -140,12 +125,30 @@ function showTooltip(event) {
     const tooltip = this.querySelector('.company-tooltip');
     if (!tooltip) return;
     
-    // Show backdrop first
-    const backdrop = tooltip.querySelector('.tooltip-backdrop');
-    if (backdrop) {
-        backdrop.style.opacity = '1';
-        backdrop.style.visibility = 'visible';
-        backdrop.style.pointerEvents = 'auto';
+    // Create and show backdrop
+    if (tooltip.dataset.hasBackdrop === 'true') {
+        // Remove any existing backdrop
+        const existingBackdrop = document.querySelector('.tooltip-backdrop');
+        if (existingBackdrop) {
+            existingBackdrop.remove();
+        }
+        
+        // Create new backdrop
+        const backdrop = document.createElement('div');
+        backdrop.className = 'tooltip-backdrop';
+        backdrop.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgb(0, 0, 0);
+            z-index: 999999;
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        `;
+        document.body.appendChild(backdrop);
     }
     
     // Show modal tooltip (CSS handles centering)
@@ -170,12 +173,10 @@ function hideTooltip(event) {
     const tooltip = this.querySelector('.company-tooltip');
     if (!tooltip) return;
     
-    // Hide backdrop first
-    const backdrop = tooltip.querySelector('.tooltip-backdrop');
+    // Remove backdrop
+    const backdrop = document.querySelector('.tooltip-backdrop');
     if (backdrop) {
-        backdrop.style.opacity = '0';
-        backdrop.style.visibility = 'hidden';
-        backdrop.style.pointerEvents = 'none';
+        backdrop.remove();
     }
     
     tooltip.style.opacity = '0';
