@@ -39,25 +39,27 @@
 
 /* Tooltip content */
 .company-tooltip {
-    position: fixed !important;
-    z-index: 999999 !important;
+    position: absolute;
+    z-index: 999999;
     background-color: #4a5568 !important;
     background-image: none !important;
     background: #4a5568 !important;
-    border: 2px solid #2d3748 !important;
-    border-radius: 8px !important;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8) !important;
-    padding: 18px !important;
-    width: auto !important;
-    min-width: 400px !important;
-    max-width: 500px !important;
-    font-size: 14px !important;
-    line-height: 1.5 !important;
-    color: #ffffff !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-    box-sizing: border-box !important;
+    border: 2px solid #2d3748;
+    border-radius: 8px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+    padding: 18px;
+    width: auto;
+    min-width: 400px;
+    max-width: 500px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #ffffff;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px) scale(0.95);
+    transition: all 0.3s ease;
+    pointer-events: none;
+    box-sizing: border-box;
 }
 
 /* Default positioning (right side) */
@@ -88,9 +90,9 @@
 
 /* Show tooltip on hover */
 .company-info[data-tooltip="true"]:hover .company-tooltip {
-    opacity: 1 !important;
-    visibility: visible !important;
-    transform: translateY(0) scale(1) !important;
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
 }
 
 /* Tooltip arrows - Right side (default) */
