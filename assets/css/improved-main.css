@@ -299,6 +299,10 @@ a:hover {
     color: #00C896;
 }
 
+.unified-header .login-container {
+    position: relative;
+}
+
 .unified-header .login-toggle {
     background: linear-gradient(135deg, #00C896 0%, #1A73E8 100%);
     color: white;
@@ -314,7 +318,6 @@ a:hover {
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(0, 200, 150, 0.3);
     text-decoration: none;
-    position: relative;
 }
 
 .unified-header .login-toggle:hover {
@@ -349,6 +352,72 @@ a:hover {
     opacity: 1;
     visibility: visible;
     transform: translateY(0) scale(1);
+}
+
+/* Form styling for unified header */
+.unified-header .form-group {
+    margin-bottom: 1rem;
+}
+
+.unified-header .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #374151;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.unified-header .form-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #D1D5DB;
+    border-radius: 8px;
+    background-color: white;
+    color: #111827;
+    font-size: 0.875rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.unified-header .form-group input:focus {
+    outline: none;
+    border-color: #00C896;
+    box-shadow: 0 0 0 3px rgba(0, 200, 150, 0.1);
+}
+
+.unified-header .btn-login {
+    width: 100%;
+    background: linear-gradient(135deg, #00C896 0%, #1A73E8 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+.unified-header .btn-login:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 200, 150, 0.3);
+}
+
+.unified-header .alert {
+    padding: 0.75rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+}
+
+.unified-header .alert-error {
+    background-color: #FEF2F2;
+    border: 1px solid #FECACA;
+    color: #DC2626;
 }
 
 /* Adjust main container for fixed header */
