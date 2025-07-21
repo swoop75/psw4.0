@@ -11,6 +11,7 @@ let searchTimeout;
 document.addEventListener('DOMContentLoaded', function() {
     initializeEventListeners();
     initializeSearch();
+    initializeCheckboxDropdowns();
 });
 
 /**
@@ -91,7 +92,6 @@ function debounceSearch() {
  */
 function applyFilters() {
     const searchInput = document.getElementById('searchInput');
-    const statusFilter = document.getElementById('statusFilter');
     const countryFilter = document.getElementById('countryFilter');
     const strategyFilter = document.getElementById('strategyFilter');
     const brokerFilter = document.getElementById('brokerFilter');
@@ -102,8 +102,10 @@ function applyFilters() {
         params.set('search', searchInput.value.trim());
     }
     
-    if (statusFilter && statusFilter.value) {
-        params.set('status_id', statusFilter.value);
+    // Handle checkbox dropdown filters
+    const statusValues = getDropdownValues('status');
+    if (statusValues.length > 0) {
+        params.set('status_id', statusValues.join(','));
     }
     
     if (countryFilter && countryFilter.value) {
@@ -518,4 +520,111 @@ function formatDate(dateString) {
     
     const date = new Date(dateString);
     return date.toLocaleDateString('sv-SE');
+}
+
+/**
+ * Initialize checkbox dropdown functionality
+ */
+function initializeCheckboxDropdowns() {
+    const dropdowns = document.querySelectorAll('.checkbox-dropdown');
+    
+    dropdowns.forEach(dropdown => {
+        const button = dropdown.querySelector('.dropdown-button');
+        const content = dropdown.querySelector('.dropdown-content');
+        const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]');
+        const textElement = button.querySelector('.dropdown-text');
+        const arrow = button.querySelector('.arrow');
+        
+        // Toggle dropdown on button click
+        button.addEventListener('click', function(e) {
+            e.stopPropagation();
+            
+            // Close other dropdowns
+            dropdowns.forEach(otherDropdown => {
+                if (otherDropdown !== dropdown) {
+                    otherDropdown.querySelector('.dropdown-button').classList.remove('open');
+                    otherDropdown.querySelector('.dropdown-content').classList.remove('show');
+                }
+            });
+            
+            // Toggle current dropdown
+            button.classList.toggle('open');
+            content.classList.toggle('show');
+        });
+        
+        // Handle checkbox changes
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateDropdownText(dropdown);
+                applyFilters();
+            });
+        });
+        
+        // Prevent dropdown from closing when clicking inside content
+        content.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+        
+        // Initialize text
+        updateDropdownText(dropdown);
+    });
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function() {
+        dropdowns.forEach(dropdown => {
+            dropdown.querySelector('.dropdown-button').classList.remove('open');
+            dropdown.querySelector('.dropdown-content').classList.remove('show');
+        });
+    });
+}
+
+/**
+ * Update dropdown button text based on selected checkboxes
+ */
+function updateDropdownText(dropdown) {
+    const button = dropdown.querySelector('.dropdown-button');
+    const textElement = button.querySelector('.dropdown-text');
+    const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]:checked');
+    const filterType = dropdown.dataset.filter;
+    
+    if (checkboxes.length === 0) {
+        switch(filterType) {
+            case 'status':
+                textElement.innerHTML = 'All Statuses';
+                textElement.className = 'dropdown-text dropdown-placeholder';
+                break;
+            case 'country':
+                textElement.innerHTML = 'All Countries';
+                textElement.className = 'dropdown-text dropdown-placeholder';
+                break;
+            case 'strategy':
+                textElement.innerHTML = 'All Strategy Groups';
+                textElement.className = 'dropdown-text dropdown-placeholder';
+                break;
+            case 'broker':
+                textElement.innerHTML = 'All Brokers';
+                textElement.className = 'dropdown-text dropdown-placeholder';
+                break;
+            default:
+                textElement.innerHTML = 'All Options';
+                textElement.className = 'dropdown-text dropdown-placeholder';
+        }
+    } else if (checkboxes.length === 1) {
+        textElement.textContent = checkboxes[0].nextElementSibling.textContent;
+        textElement.className = 'dropdown-text dropdown-selected';
+    } else {
+        textElement.innerHTML = `${checkboxes.length} selected <span class="selected-count">${checkboxes.length}</span>`;
+        textElement.className = 'dropdown-text dropdown-selected';
+    }
+}
+
+/**
+ * Get selected values from checkbox dropdown
+ */
+function getDropdownValues(filterType) {
+    const dropdown = document.querySelector(`[data-filter="${filterType}"]`);
+    if (!dropdown) return [];
+    
+    const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]:checked');
+    return Array.from(checkboxes).map(cb => cb.value);
 }

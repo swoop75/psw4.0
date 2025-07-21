@@ -183,14 +183,25 @@ ob_start();
                         <i class="fas fa-search"></i>
                         <input type="text" id="searchInput" placeholder="Search companies, notes..." value="<?= htmlspecialchars($filters['search']) ?>">
                     </div>
-                    <select id="statusFilter" onchange="applyFilters()">
-                        <option value="">All Statuses</option>
-                        <?php foreach ($filterOptions['statuses'] ?? [] as $status): ?>
-                            <option value="<?= $status['id'] ?>" <?= $filters['buylist_status_id'] == $status['id'] ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($status['status']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+                    <div class="checkbox-dropdown" data-filter="status">
+                        <button type="button" class="dropdown-button" id="statusFilter">
+                            <span class="dropdown-text">All Statuses</span>
+                            <i class="fas fa-chevron-down arrow"></i>
+                        </button>
+                        <div class="dropdown-content">
+                            <?php foreach ($filterOptions['statuses'] ?? [] as $status): 
+                                $statusName = strtolower($status['status']);
+                                $isDefaultUnchecked = in_array($statusName, ['no', 'bought', 'blocked']);
+                                $isChecked = $filters['buylist_status_id'] == $status['id'] && !$isDefaultUnchecked;
+                            ?>
+                                <div class="dropdown-option">
+                                    <input type="checkbox" id="status_<?= $status['id'] ?>" value="<?= $status['id'] ?>" 
+                                           <?= $isChecked ? 'checked' : '' ?>>
+                                    <label for="status_<?= $status['id'] ?>"><?= htmlspecialchars($status['status']) ?></label>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
                     <select id="countryFilter" onchange="applyFilters()">
                         <option value="">All Countries</option>
                         <?php foreach ($filterOptions['countries'] ?? [] as $country): ?>

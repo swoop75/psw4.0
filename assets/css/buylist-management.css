@@ -308,6 +308,123 @@ select:focus {
     box-shadow: 0 0 0 3px rgba(240, 147, 251, 0.1);
 }
 
+/* Checkbox Dropdown Styles */
+.checkbox-dropdown {
+    position: relative;
+    display: inline-block;
+    min-width: 180px;
+}
+
+.dropdown-button {
+    width: 100%;
+    padding: 10px 32px 10px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+    background: white;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+.dropdown-button:hover {
+    border-color: #cbd5e0;
+}
+
+.dropdown-button:focus {
+    outline: none;
+    border-color: #f093fb;
+    box-shadow: 0 0 0 3px rgba(240, 147, 251, 0.1);
+}
+
+.dropdown-button .arrow {
+    transition: transform 0.2s ease;
+    color: #718096;
+}
+
+.dropdown-button.open .arrow {
+    transform: rotate(180deg);
+}
+
+.dropdown-content {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    max-height: 250px;
+    overflow-y: auto;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all 0.2s ease;
+}
+
+.dropdown-content.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-option {
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    border-bottom: 1px solid #f7fafc;
+    transition: background-color 0.2s ease;
+}
+
+.dropdown-option:hover {
+    background-color: #f8fafc;
+}
+
+.dropdown-option:last-child {
+    border-bottom: none;
+}
+
+.dropdown-option input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #f093fb;
+    cursor: pointer;
+}
+
+.dropdown-option label {
+    flex: 1;
+    cursor: pointer;
+    font-size: 14px;
+    color: #2d3748;
+}
+
+.selected-count {
+    background: #f093fb;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    min-width: 18px;
+    text-align: center;
+}
+
+.dropdown-placeholder {
+    color: #718096;
+}
+
+.dropdown-selected {
+    color: #2d3748;
+    font-weight: 500;
+}
+
 /* Table Styles */
 .table-container {
     overflow-x: auto;
