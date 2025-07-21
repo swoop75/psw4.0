@@ -165,35 +165,21 @@ PSW = {
             return false;
         };
 
-        // Much more aggressive approach - delay all outside clicks when dropdown is open
+        // Completely disable outside click closing - only allow manual close
         document.addEventListener('click', (e) => {
-            // Always allow clicks inside our dropdown or toggle
-            if (loginToggle.contains(e.target) || loginDropdown.contains(e.target)) {
+            // Only close if clicking the toggle button itself (to toggle off)
+            if (loginToggle.contains(e.target) && isOpen) {
+                toggleDropdown(false);
                 return;
             }
             
-            // For any outside click when dropdown is open, use a much longer delay
-            if (isOpen) {
-                // Set autofill in progress to prevent immediate closing
-                autofillInProgress = true;
-                
-                // Much longer delay - 2 seconds
-                setTimeout(() => {
-                    // Double-check that user isn't still interacting with password manager
-                    if (!document.querySelector('input:focus') && 
-                        !document.querySelector('[data-lastpass-root]') &&
-                        !document.querySelector('#lastpass-vault')) {
-                        autofillInProgress = false;
-                        toggleDropdown(false);
-                    } else {
-                        // If there's still activity, wait another 2 seconds
-                        setTimeout(() => {
-                            autofillInProgress = false;
-                            toggleDropdown(false);
-                        }, 2000);
-                    }
-                }, 2000);
+            // Allow clicks inside our dropdown
+            if (loginDropdown.contains(e.target)) {
+                return;
             }
+            
+            // For all other outside clicks - do nothing (don't close)
+            // This completely prevents accidental closing from LastPass interactions
         });
 
         // Close on escape key
@@ -204,65 +190,9 @@ PSW = {
             }
         });
 
-        // Extremely aggressive autofill protection - keep dropdown open during ANY input activity
-        const usernameInput = loginDropdown.querySelector('#username, input[name="username"]');
-        const passwordInput = loginDropdown.querySelector('#password, input[name="password"]');
-        
-        // Global activity monitor
-        let lastActivity = 0;
-        const updateActivity = () => {
-            lastActivity = Date.now();
-            autofillInProgress = true;
-        };
-        
-        // Monitor ALL possible events that could indicate password manager activity
-        const events = ['focus', 'blur', 'input', 'change', 'mousedown', 'mouseup', 'click', 'keydown'];
-        
-        [usernameInput, passwordInput].forEach(input => {
-            if (input) {
-                events.forEach(eventType => {
-                    input.addEventListener(eventType, updateActivity);
-                });
-                
-                // Special handling for password managers that modify values directly
-                Object.defineProperty(input, 'value', {
-                    get: function() {
-                        return this._value || '';
-                    },
-                    set: function(val) {
-                        this._value = val;
-                        updateActivity(); // Any value change triggers protection
-                        if (this.setAttribute) {
-                            this.setAttribute('value', val);
-                        }
-                    }
-                });
-            }
-        });
-        
-        // Continuous monitoring - if there's been recent activity, keep dropdown open
-        const activityMonitor = setInterval(() => {
-            if (isOpen) {
-                const timeSinceActivity = Date.now() - lastActivity;
-                if (timeSinceActivity < 3000) { // 3 seconds of protection after any activity
-                    autofillInProgress = true;
-                } else {
-                    autofillInProgress = false;
-                }
-            }
-        }, 100);
-        
-        // Cleanup monitor when dropdown closes
-        const cleanup = () => {
-            if (!loginDropdown.classList.contains('show')) {
-                clearInterval(activityMonitor);
-                autofillInProgress = false;
-            }
-        };
-        
-        // Watch for dropdown state changes
-        const observer = new MutationObserver(cleanup);
-        observer.observe(loginDropdown, { attributes: true, attributeFilter: ['class'] });
+        // Since we disabled outside click closing, we can simplify this
+        // Just ensure the dropdown stays open for password managers
+        console.log('Login dropdown initialized - outside click closing disabled for LastPass compatibility');
 
         // Handle dropdown links
         const dropdownLinks = loginDropdown.querySelectorAll('.dropdown-link');

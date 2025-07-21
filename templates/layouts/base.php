@@ -49,6 +49,13 @@
                         </button>
                         <!-- Login dropdown for non-logged-in users -->
                         <div class="login-dropdown" id="loginDropdown">
+                            <div class="login-header">
+                                <h3>Sign In</h3>
+                                <button type="button" class="close-btn" onclick="toggleLogin()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            
                             <?php if (isset($_SESSION['login_error'])): ?>
                                 <div class="alert alert-error">
                                     <?php echo $_SESSION['login_error']; unset($_SESSION['login_error']); ?>

@@ -354,6 +354,43 @@ a:hover {
     transform: translateY(0) scale(1);
 }
 
+/* Login header with close button */
+.unified-header .login-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #E5E7EB;
+}
+
+.unified-header .login-header h3 {
+    margin: 0;
+    color: #374151;
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+.unified-header .close-btn {
+    background: none;
+    border: none;
+    color: #6B7280;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+}
+
+.unified-header .close-btn:hover {
+    background: #F3F4F6;
+    color: #374151;
+}
+
 /* Form styling for unified header */
 .unified-header .form-group {
     margin-bottom: 1rem;
