@@ -50,8 +50,13 @@ function createTooltipContent(element) {
     
     tooltip.innerHTML = `
         <div class="tooltip-header">
-            <div class="tooltip-company-name">${escapeHtml(company)}</div>
-            <span class="tooltip-ticker">${escapeHtml(ticker)}</span>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <div class="tooltip-company-name">${escapeHtml(company)}</div>
+                    <span class="tooltip-ticker">${escapeHtml(ticker)}</span>
+                </div>
+                <button class="tooltip-close" onclick="this.parentElement.parentElement.parentElement.parentElement.style.display='none'" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #666; margin-left: 20px;">&times;</button>
+            </div>
         </div>
         
         <div class="tooltip-section">
@@ -111,25 +116,28 @@ function createTooltipContent(element) {
 }
 
 /**
- * Show tooltip with simple positioning
+ * Show modal tooltip
  */
 function showTooltip(event) {
     const tooltip = this.querySelector('.company-tooltip');
     if (!tooltip) return;
     
-    // Simple positioning to the right
-    tooltip.style.left = '100%';
-    tooltip.style.top = '0';
-    tooltip.style.marginLeft = '10px';
-    
-    // Show tooltip
+    // Show modal tooltip (CSS handles centering)
     tooltip.style.opacity = '1';
     tooltip.style.visibility = 'visible';
-    tooltip.style.transform = 'translateY(0) scale(1)';
+    tooltip.style.transform = 'translate(-50%, -50%) scale(1)';
+    tooltip.style.pointerEvents = 'auto';
+    
+    // Add click-to-close functionality
+    tooltip.addEventListener('click', function(e) {
+        if (e.target === tooltip) {
+            hideTooltip.call(tooltip.parentElement);
+        }
+    });
 }
 
 /**
- * Hide tooltip
+ * Hide modal tooltip
  */
 function hideTooltip(event) {
     const tooltip = this.querySelector('.company-tooltip');
@@ -137,8 +145,8 @@ function hideTooltip(event) {
     
     tooltip.style.opacity = '0';
     tooltip.style.visibility = 'hidden';
-    tooltip.style.top = '';
-    tooltip.classList.remove('adjust-position', 'position-above', 'position-below', 'position-left', 'position-right');
+    tooltip.style.transform = 'translate(-50%, -50%) scale(0.9)';
+    tooltip.style.pointerEvents = 'none';
 }
 
 /**
