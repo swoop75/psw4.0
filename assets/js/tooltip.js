@@ -3,7 +3,6 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded, initializing tooltips...');
     initializeTooltips();
 });
 
@@ -12,10 +11,8 @@ document.addEventListener('DOMContentLoaded', function() {
  */
 function initializeTooltips() {
     const tooltipElements = document.querySelectorAll('[data-tooltip="true"]');
-    console.log('Found tooltip elements:', tooltipElements.length);
     
-    tooltipElements.forEach((element, index) => {
-        console.log(`Creating tooltip ${index + 1}...`);
+    tooltipElements.forEach(element => {
         // Create tooltip content
         const tooltip = createTooltipContent(element);
         element.appendChild(tooltip);
@@ -24,7 +21,6 @@ function initializeTooltips() {
         element.addEventListener('mouseenter', showTooltip);
         element.addEventListener('mouseleave', hideTooltip);
     });
-    console.log('All tooltips initialized');
 }
 
 /**

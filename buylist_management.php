@@ -123,7 +123,10 @@ $additionalCSS = [
     BASE_URL . '/assets/css/improved-buylist-management.css?v=' . time(),
     BASE_URL . '/assets/css/tooltip.css?v=' . time()
 ];
-$additionalJS = [BASE_URL . '/assets/js/buylist-management.js?v=' . time()];
+$additionalJS = [
+    BASE_URL . '/assets/js/buylist-management.js?v=' . time(),
+    BASE_URL . '/assets/js/tooltip.js?v=' . time()
+];
 
 $user = [
     'username' => Auth::getUsername(),
@@ -517,8 +520,6 @@ ob_start();
         </div>
     </div>
 
-    <script src="<?= BASE_URL ?>/assets/js/buylist-management.js"></script>
-    <script src="<?= BASE_URL ?>/assets/js/tooltip.js"></script>
     </div>
 
 <?php
