@@ -146,7 +146,7 @@ function showTooltip(event) {
             z-index: 999999;
             opacity: 1;
             visibility: visible;
-            pointer-events: auto;
+            pointer-events: none;
         `;
         document.body.appendChild(backdrop);
     }
