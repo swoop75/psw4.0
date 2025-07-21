@@ -92,7 +92,8 @@ function debounceSearch() {
 function applyFilters() {
     const searchInput = document.getElementById('searchInput');
     const statusFilter = document.getElementById('statusFilter');
-    const priorityFilter = document.getElementById('priorityFilter');
+    const countryFilter = document.getElementById('countryFilter');
+    const strategyFilter = document.getElementById('strategyFilter');
     
     const params = new URLSearchParams();
     
@@ -104,8 +105,12 @@ function applyFilters() {
         params.set('status_id', statusFilter.value);
     }
     
-    if (priorityFilter && priorityFilter.value) {
-        params.set('priority_level', priorityFilter.value);
+    if (countryFilter && countryFilter.value) {
+        params.set('country', countryFilter.value);
+    }
+    
+    if (strategyFilter && strategyFilter.value) {
+        params.set('strategy_group_id', strategyFilter.value);
     }
     
     // Reset to page 1 when filtering
@@ -140,16 +145,15 @@ function showAddModal() {
     modalAction.value = 'add';
     submitText.textContent = 'Add to Buylist';
     
-    // Reset tabs
-    showTab('basic');
+    // No tabs to reset in simplified form
     
     modal.style.display = 'block';
     
     // Focus first input
     setTimeout(() => {
-        const companyNameField = document.getElementById('company_name');
-        if (companyNameField) {
-            companyNameField.focus();
+        const companyField = document.getElementById('company');
+        if (companyField) {
+            companyField.focus();
         }
     }, 100);
 }
@@ -171,7 +175,7 @@ function editEntry(buylistId) {
     // Get entry data via AJAX
     const formData = new FormData();
     formData.append('action', 'get_entry');
-    formData.append('buylist_id', buylistId);
+    formData.append('buy_list_id', buylistId);
     formData.append('csrf_token', document.querySelector('input[name="csrf_token"]').value);
     
     showLoading('Loading entry data...');
@@ -326,7 +330,7 @@ function confirmDelete() {
     
     const formData = new FormData();
     formData.append('action', 'delete');
-    formData.append('buylist_id', deleteEntryId);
+    formData.append('buy_list_id', deleteEntryId);
     formData.append('csrf_token', document.querySelector('input[name="csrf_token"]').value);
     
     const deleteButton = document.querySelector('#deleteModal .btn-danger');
@@ -431,30 +435,7 @@ function handleMasterlistFormSubmit(event) {
     });
 }
 
-/**
- * Show tab content
- */
-function showTab(tabName) {
-    // Hide all tabs
-    const tabs = document.querySelectorAll('.tab-content');
-    tabs.forEach(tab => tab.classList.remove('active'));
-    
-    // Hide all tab buttons
-    const buttons = document.querySelectorAll('.tab-button');
-    buttons.forEach(button => button.classList.remove('active'));
-    
-    // Show selected tab
-    const selectedTab = document.getElementById(tabName + 'Tab');
-    if (selectedTab) {
-        selectedTab.classList.add('active');
-    }
-    
-    // Activate selected button
-    const selectedButton = document.querySelector(`[onclick="showTab('${tabName}')"]`);
-    if (selectedButton) {
-        selectedButton.classList.add('active');
-    }
-}
+// Tab functionality removed - using simplified single form
 
 /**
  * Show alert message
