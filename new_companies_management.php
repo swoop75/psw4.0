@@ -319,13 +319,13 @@ ob_start();
 
             <!-- Search Results Indicator -->
             <?php 
-            $hasSearch = !empty($filters['search']);
+            $hasSearch = !empty($_GET['search']);
             $activeFilters = array_filter([
-                !empty($filters['new_companies_status_id']) ? 'status' : null,
-                !empty($filters['country_name']) ? 'country' : null,
-                !empty($filters['strategy_group_id']) ? 'strategy' : null,
-                !empty($filters['broker_id']) ? 'broker' : null,
-                !empty($filters['yield_min']) || !empty($filters['yield_max']) ? 'yield' : null
+                !empty($_GET['status_id']) ? 'status' : null,
+                !empty($_GET['country']) ? 'country' : null,
+                !empty($_GET['strategy_group_id']) ? 'strategy' : null,
+                !empty($_GET['broker_id']) ? 'broker' : null,
+                !empty($_GET['yield_min']) || !empty($_GET['yield_max']) ? 'yield' : null
             ]);
             $activeFilterCount = count($activeFilters);
             $totalRecords = $newCompaniesData['pagination']['total_records'] ?? 0;
@@ -336,7 +336,7 @@ ob_start();
                         <?php if ($hasSearch): ?>
                             <span class="search-icon">🔍</span>
                             <span class="search-text">
-                                Search results for "<strong><?= htmlspecialchars($filters['search']) ?></strong>"
+                                Search results for "<strong><?= htmlspecialchars($_GET['search']) ?></strong>"
                             </span>
                         <?php else: ?>
                             <span class="filter-icon">📊</span>
