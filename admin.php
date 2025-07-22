@@ -9,7 +9,7 @@ session_start();
 require_once __DIR__ . '/config/config.php';
 require_once __DIR__ . '/config/constants.php';
 require_once __DIR__ . '/src/middleware/Auth.php';
-require_once __DIR__ . '/src/controllers/PortfolioBuylistController.php';
+require_once __DIR__ . '/src/controllers/NewCompaniesController.php';
 require_once __DIR__ . '/src/utils/Security.php';
 
 if (!Auth::isLoggedIn()) {
@@ -25,7 +25,7 @@ if (!isset($_SESSION['role_name']) || !in_array($_SESSION['role_name'], $adminRo
     exit;
 }
 
-$controller = new PortfolioBuylistController();
+$controller = new NewCompaniesController();
 $successMessage = '';
 $errorMessage = '';
 
@@ -290,7 +290,7 @@ ob_start();
                 </div>
                 
                 <div class="action-grid">
-                    <a href="<?= BASE_URL ?>/buylist_management.php" class="action-card">
+                    <a href="<?= BASE_URL ?>/new_companies_management.php" class="action-card">
                         <i class="fas fa-star"></i>
                         <span>New Companies Management</span>
                     </a>

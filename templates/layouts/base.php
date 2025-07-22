@@ -93,7 +93,7 @@
                         <div class="submenu">
                             <a href="<?php echo BASE_URL; ?>/dashboard.php" class="submenu-link">Dashboard</a>
                             <a href="<?php echo BASE_URL; ?>/masterlist_management.php" class="submenu-link">Masterlist Management</a>
-                            <a href="<?php echo BASE_URL; ?>/buylist_management.php" class="submenu-link">New Companies</a>
+                            <a href="<?php echo BASE_URL; ?>/new_companies_management.php" class="submenu-link">New Companies</a>
                             <a href="<?php echo BASE_URL; ?>/user_management.php" class="submenu-link">User Management</a>
                             <?php 
                             $adminRoles = ['Admin', 'admin', 'Administrator', 'administrator'];
