@@ -628,3 +628,50 @@ function getDropdownValues(filterType) {
     const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]:checked');
     return Array.from(checkboxes).map(cb => cb.value);
 }
+
+/**
+ * Clear all active filters
+ */
+function clearAllFilters() {
+    // Clear search input
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.value = '';
+    }
+    
+    // Uncheck all filter checkboxes
+    const allCheckboxes = document.querySelectorAll('.checkbox-dropdown input[type="checkbox"]');
+    allCheckboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    
+    // Update dropdown texts
+    const dropdowns = document.querySelectorAll('.checkbox-dropdown');
+    dropdowns.forEach(dropdown => {
+        updateDropdownText(dropdown);
+    });
+    
+    // Redirect to base URL without any parameters
+    window.location.href = window.location.pathname;
+}
+
+/**
+ * Search all items (remove filters but keep search)
+ */
+function searchAllItems() {
+    const searchInput = document.getElementById('searchInput');
+    const searchTerm = searchInput ? searchInput.value.trim() : '';
+    
+    if (!searchTerm) {
+        // If no search term, just clear filters
+        clearAllFilters();
+        return;
+    }
+    
+    // Redirect with only search parameter
+    const params = new URLSearchParams();
+    params.set('search', searchTerm);
+    params.set('page', '1');
+    
+    window.location.href = window.location.pathname + '?' + params.toString();
+}
