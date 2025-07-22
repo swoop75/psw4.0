@@ -193,7 +193,7 @@ ob_start();
             <!-- Toolbar -->
             <div class="toolbar">
                 <div class="toolbar-left">
-                    <button class="btn btn-primary" onclick="alert('Button clicked!'); showAddModal();">
+                    <button class="btn btn-primary" onclick="showAddModal()">
                         <i class="fas fa-plus"></i> Add New Company
                     </button>
                     <button class="btn btn-secondary" onclick="refreshData()">

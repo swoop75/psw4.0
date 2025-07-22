@@ -150,19 +150,29 @@ function refreshData() {
  */
 function showAddModal() {
     const modal = document.getElementById('entryModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalAction = document.getElementById('modalAction');
+    const submitText = document.getElementById('submitText');
+    const form = document.getElementById('entryForm');
     
-    if (!modal) {
-        alert('Modal element not found!');
-        return;
-    }
+    if (!modal) return;
     
-    alert('Modal found! Setting display to block...');
+    // Reset form
+    if (form) form.reset();
+    
+    // Set modal for create mode
+    if (modalTitle) modalTitle.textContent = 'Add New Company';
+    if (modalAction) modalAction.value = 'add';
+    if (submitText) submitText.textContent = 'Add New Company';
+    
+    // Show modal with both display and show class for opacity
     modal.style.display = 'block';
+    modal.classList.add('show');
     
-    // Check if it's actually visible
+    // Focus first input
     setTimeout(() => {
-        const computed = window.getComputedStyle(modal);
-        alert('Modal display: ' + computed.display + ', visibility: ' + computed.visibility + ', opacity: ' + computed.opacity);
+        const companyField = document.getElementById('company');
+        if (companyField) companyField.focus();
     }, 100);
 }
 
@@ -247,6 +257,7 @@ function populateEntryForm(entry) {
 function closeModal() {
     const modal = document.getElementById('entryModal');
     modal.style.display = 'none';
+    modal.classList.remove('show');
 }
 
 /**
