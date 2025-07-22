@@ -189,10 +189,12 @@ ob_start();
                             <i class="fas fa-chevron-down arrow"></i>
                         </button>
                         <div class="dropdown-content">
-                            <?php foreach ($filterOptions['statuses'] ?? [] as $status): 
+                            <?php 
+                            $selectedStatusIds = !empty($filters['buylist_status_id']) ? explode(',', $filters['buylist_status_id']) : [];
+                            foreach ($filterOptions['statuses'] ?? [] as $status): 
                                 $statusName = strtolower($status['status']);
                                 $isDefaultUnchecked = in_array($statusName, ['no', 'bought', 'blocked']);
-                                $isChecked = $filters['buylist_status_id'] == $status['id'] && !$isDefaultUnchecked;
+                                $isChecked = in_array($status['id'], $selectedStatusIds) && !$isDefaultUnchecked;
                             ?>
                                 <div class="dropdown-option">
                                     <input type="checkbox" id="status_<?= $status['id'] ?>" value="<?= $status['id'] ?>" 
@@ -208,10 +210,13 @@ ob_start();
                             <i class="fas fa-chevron-down arrow"></i>
                         </button>
                         <div class="dropdown-content">
-                            <?php foreach ($filterOptions['countries'] ?? [] as $country): ?>
+                            <?php 
+                            $selectedCountries = !empty($filters['country_name']) ? explode(',', $filters['country_name']) : [];
+                            foreach ($filterOptions['countries'] ?? [] as $country): 
+                            ?>
                                 <div class="dropdown-option">
                                     <input type="checkbox" id="country_<?= htmlspecialchars($country) ?>" value="<?= htmlspecialchars($country) ?>" 
-                                           <?= $filters['country_name'] === $country ? 'checked' : '' ?>>
+                                           <?= in_array($country, $selectedCountries) ? 'checked' : '' ?>>
                                     <label for="country_<?= htmlspecialchars($country) ?>"><?= htmlspecialchars($country) ?></label>
                                 </div>
                             <?php endforeach; ?>
@@ -223,10 +228,13 @@ ob_start();
                             <i class="fas fa-chevron-down arrow"></i>
                         </button>
                         <div class="dropdown-content">
-                            <?php foreach ($filterOptions['strategies'] ?? [] as $strategy): ?>
+                            <?php 
+                            $selectedStrategyIds = !empty($filters['strategy_group_id']) ? explode(',', $filters['strategy_group_id']) : [];
+                            foreach ($filterOptions['strategies'] ?? [] as $strategy): 
+                            ?>
                                 <div class="dropdown-option">
                                     <input type="checkbox" id="strategy_<?= $strategy['strategy_group_id'] ?>" value="<?= $strategy['strategy_group_id'] ?>" 
-                                           <?= $filters['strategy_group_id'] == $strategy['strategy_group_id'] ? 'checked' : '' ?>>
+                                           <?= in_array($strategy['strategy_group_id'], $selectedStrategyIds) ? 'checked' : '' ?>>
                                     <label for="strategy_<?= $strategy['strategy_group_id'] ?>">Group <?= $strategy['strategy_group_id'] ?>: <?= htmlspecialchars($strategy['strategy_name']) ?></label>
                                 </div>
                             <?php endforeach; ?>
@@ -238,10 +246,13 @@ ob_start();
                             <i class="fas fa-chevron-down arrow"></i>
                         </button>
                         <div class="dropdown-content">
-                            <?php foreach ($filterOptions['brokers'] ?? [] as $broker): ?>
+                            <?php 
+                            $selectedBrokerIds = !empty($filters['broker_id']) ? explode(',', $filters['broker_id']) : [];
+                            foreach ($filterOptions['brokers'] ?? [] as $broker): 
+                            ?>
                                 <div class="dropdown-option">
                                     <input type="checkbox" id="broker_<?= $broker['broker_id'] ?>" value="<?= $broker['broker_id'] ?>" 
-                                           <?= $filters['broker_id'] == $broker['broker_id'] ? 'checked' : '' ?>>
+                                           <?= in_array($broker['broker_id'], $selectedBrokerIds) ? 'checked' : '' ?>>
                                     <label for="broker_<?= $broker['broker_id'] ?>"><?= htmlspecialchars($broker['broker_name']) ?></label>
                                 </div>
                             <?php endforeach; ?>
