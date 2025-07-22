@@ -30,8 +30,11 @@ class NewCompaniesController {
             
             // Build WHERE conditions based on filters
             if (!empty($filters['search'])) {
-                $whereConditions[] = "(nc.company LIKE :search OR nc.ticker LIKE :search OR nc.isin LIKE :search)";
-                $params[':search'] = '%' . $filters['search'] . '%';
+                $searchTerm = '%' . $filters['search'] . '%';
+                $whereConditions[] = "(nc.company LIKE :search_company OR nc.ticker LIKE :search_ticker OR nc.isin LIKE :search_isin)";
+                $params[':search_company'] = $searchTerm;
+                $params[':search_ticker'] = $searchTerm;
+                $params[':search_isin'] = $searchTerm;
             }
             
             // Handle multi-value filters with comma-separated values and null support
