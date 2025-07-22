@@ -211,7 +211,7 @@ ob_start();
                             ?>
                                 <div class="dropdown-option">
                                     <input type="checkbox" id="status_null" value="null" <?= $isNullSelected ? 'checked' : '' ?>>
-                                    <label for="status_null">Not bought</label>
+                                    <label for="status_null">not bought</label>
                                 </div>
                             <?php
                             

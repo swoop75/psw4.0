@@ -23,7 +23,7 @@ class PortfolioBuylistController {
      * @param int $limit Items per page
      * @return array Buylist data with pagination
      */
-    public function getBuylist($filters = [], $page = 1, $limit = 50) {
+    public function getNewCompanies($filters = [], $page = 1, $limit = 50) {
         try {
             $whereConditions = ['1=1'];
             $params = [];
@@ -40,10 +40,10 @@ class PortfolioBuylistController {
                 $countryConditions = [];
                 foreach ($countryValues as $index => $value) {
                     if ($value === 'null') {
-                        $countryConditions[] = "b.country_name IS NULL";
+                        $countryConditions[] = "nc.country_name IS NULL";
                     } else {
                         $paramName = ":country_name_$index";
-                        $countryConditions[] = "b.country_name = $paramName";
+                        $countryConditions[] = "nc.country_name = $paramName";
                         $params[$paramName] = $value;
                     }
                 }
@@ -52,15 +52,15 @@ class PortfolioBuylistController {
                 }
             }
             
-            if (!empty($filters['buylist_status_id'])) {
-                $statusValues = explode(',', $filters['buylist_status_id']);
+            if (!empty($filters['new_companies_status_id'])) {
+                $statusValues = explode(',', $filters['new_companies_status_id']);
                 $statusConditions = [];
                 foreach ($statusValues as $index => $value) {
                     if ($value === 'null') {
-                        $statusConditions[] = "b.buylist_status_id IS NULL";
+                        $statusConditions[] = "nc.new_companies_status_id IS NULL";
                     } else {
                         $paramName = ":status_id_$index";
-                        $statusConditions[] = "b.buylist_status_id = $paramName";
+                        $statusConditions[] = "nc.new_companies_status_id = $paramName";
                         $params[$paramName] = $value;
                     }
                 }
@@ -74,10 +74,10 @@ class PortfolioBuylistController {
                 $strategyConditions = [];
                 foreach ($strategyValues as $index => $value) {
                     if ($value === 'null') {
-                        $strategyConditions[] = "b.strategy_group_id IS NULL";
+                        $strategyConditions[] = "nc.strategy_group_id IS NULL";
                     } else {
                         $paramName = ":strategy_group_id_$index";
-                        $strategyConditions[] = "b.strategy_group_id = $paramName";
+                        $strategyConditions[] = "nc.strategy_group_id = $paramName";
                         $params[$paramName] = $value;
                     }
                 }
@@ -91,10 +91,10 @@ class PortfolioBuylistController {
                 $brokerConditions = [];
                 foreach ($brokerValues as $index => $value) {
                     if ($value === 'null') {
-                        $brokerConditions[] = "b.broker_id IS NULL";
+                        $brokerConditions[] = "nc.broker_id IS NULL";
                     } else {
                         $paramName = ":broker_id_$index";
-                        $brokerConditions[] = "b.broker_id = $paramName";
+                        $brokerConditions[] = "nc.broker_id = $paramName";
                         $params[$paramName] = $value;
                     }
                 }
@@ -104,12 +104,12 @@ class PortfolioBuylistController {
             }
             
             if (isset($filters['yield_min'])) {
-                $whereConditions[] = "b.yield >= :yield_min";
+                $whereConditions[] = "nc.yield >= :yield_min";
                 $params[':yield_min'] = $filters['yield_min'];
             }
             
             if (isset($filters['yield_max'])) {
-                $whereConditions[] = "b.yield <= :yield_max";
+                $whereConditions[] = "nc.yield <= :yield_max";
                 $params[':yield_max'] = $filters['yield_max'];
             }
             

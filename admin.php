@@ -154,7 +154,7 @@ ob_start();
                                 <label class="checkbox-item">
                                     <input type="checkbox" name="status_defaults[]" value="null" 
                                            <?= in_array('null', $currentDefaults['status_defaults'] ?? ['null']) ? 'checked' : '' ?>>
-                                    <span>Not bought</span>
+                                    <span>not bought</span>
                                 </label>
                                 
                                 <?php foreach ($filterOptions['statuses'] ?? [] as $status): ?>
