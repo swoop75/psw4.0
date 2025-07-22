@@ -57,10 +57,10 @@ class PortfolioBuylistController {
                 $statusConditions = [];
                 foreach ($statusValues as $index => $value) {
                     if ($value === 'null') {
-                        $statusConditions[] = "nc.new_companies_status_id IS NULL";
+                        $statusConditions[] = "nc.buylist_status_id IS NULL";
                     } else {
                         $paramName = ":status_id_$index";
-                        $statusConditions[] = "nc.new_companies_status_id = $paramName";
+                        $statusConditions[] = "nc.buylist_status_id = $paramName";
                         $params[$paramName] = $value;
                     }
                 }
@@ -129,7 +129,7 @@ class PortfolioBuylistController {
             $totalPages = ceil($totalRecords / $limit);
             
             // Get new_companies entries with reference data (cross-database joins)
-            $sql = "SELECT nc.new_companies_id,
+            $sql = "SELECT nc.buy_list_id as new_companies_id,
                            nc.company,
                            nc.ticker,
                            nc.isin,
@@ -143,15 +143,15 @@ class PortfolioBuylistController {
                            br.broker_name,
                            nc.inspiration,
                            nc.comments,
-                           nc.new_companies_status_id,
-                           ncs.status as status_name,
-                           nc.new_companies_col
+                           nc.buylist_status_id as new_companies_status_id,
+                           bs.status as status_name,
+                           nc.buylistcol as new_companies_col
                     FROM new_companies nc 
                     LEFT JOIN psw_foundation.portfolio_strategy_groups psg ON nc.strategy_group_id = psg.strategy_group_id
                     LEFT JOIN psw_foundation.brokers br ON nc.broker_id = br.broker_id
-                    LEFT JOIN new_companies_status ncs ON nc.new_companies_status_id = ncs.id
+                    LEFT JOIN buylist_status bs ON nc.buylist_status_id = bs.id
                     $whereClause 
-                    ORDER BY nc.new_companies_id DESC 
+                    ORDER BY nc.buy_list_id DESC 
                     LIMIT :limit OFFSET :offset";
             
             $stmt = $this->portfolioDb->prepare($sql);
@@ -219,7 +219,7 @@ class PortfolioBuylistController {
             }
             
             // Check if this company is already in new_companies (by company name and ticker if available)
-            $checkSql = "SELECT new_companies_id FROM new_companies WHERE company = :company";
+            $checkSql = "SELECT buy_list_id FROM new_companies WHERE company = :company";
             $checkParams = [':company' => $data['company']];
             
             if (!empty($data['ticker'])) {
@@ -250,8 +250,8 @@ class PortfolioBuylistController {
                 'broker_id' => !empty($data['broker_id']) ? (int)$data['broker_id'] : null,
                 'inspiration' => !empty($data['inspiration']) ? Security::sanitizeInput($data['inspiration']) : null,
                 'comments' => !empty($data['comments']) ? Security::sanitizeInput($data['comments']) : null,
-                'new_companies_status_id' => !empty($data['new_companies_status_id']) ? (int)$data['new_companies_status_id'] : null,
-                'new_companies_col' => !empty($data['new_companies_col']) ? Security::sanitizeInput($data['new_companies_col']) : null
+                'buylist_status_id' => !empty($data['new_companies_status_id']) ? (int)$data['new_companies_status_id'] : null,
+                'buylistcol' => !empty($data['new_companies_col']) ? Security::sanitizeInput($data['new_companies_col']) : null
             ];
             
             // Build INSERT query
@@ -298,7 +298,7 @@ class PortfolioBuylistController {
             
             // Prepare update data
             $updateData = [];
-            $params = [':new_companies_id' => $companyId];
+            $params = [':buy_list_id' => $companyId];
             
             if (isset($data['company'])) {
                 $updateData[] = "company = :company";
@@ -326,15 +326,15 @@ class PortfolioBuylistController {
             }
             
             if (isset($data['new_companies_status_id'])) {
-                $updateData[] = "new_companies_status_id = :new_companies_status_id";
-                $params[':new_companies_status_id'] = (int)$data['new_companies_status_id'];
+                $updateData[] = "buylist_status_id = :buylist_status_id";
+                $params[':buylist_status_id'] = (int)$data['new_companies_status_id'];
             }
             
             if (empty($updateData)) {
                 return true; // Nothing to update
             }
             
-            $sql = "UPDATE new_companies SET " . implode(', ', $updateData) . " WHERE new_companies_id = :new_companies_id";
+            $sql = "UPDATE new_companies SET " . implode(', ', $updateData) . " WHERE buy_list_id = :buy_list_id";
             $stmt = $this->portfolioDb->prepare($sql);
             
             foreach ($params as $key => $value) {
@@ -356,9 +356,9 @@ class PortfolioBuylistController {
      */
     public function deleteNewCompanyEntry($companyId) {
         try {
-            $sql = "DELETE FROM new_companies WHERE new_companies_id = :new_companies_id";
+            $sql = "DELETE FROM new_companies WHERE buy_list_id = :buy_list_id";
             $stmt = $this->portfolioDb->prepare($sql);
-            $stmt->bindValue(':new_companies_id', $companyId, PDO::PARAM_INT);
+            $stmt->bindValue(':buy_list_id', $companyId, PDO::PARAM_INT);
             
             return $stmt->execute();
             
@@ -383,9 +383,9 @@ class PortfolioBuylistController {
                     LEFT JOIN psw_foundation.portfolio_strategy_groups psg ON nc.strategy_group_id = psg.strategy_group_id
                     LEFT JOIN psw_foundation.brokers br ON nc.broker_id = br.broker_id
                     LEFT JOIN new_companies_status ncs ON nc.new_companies_status_id = ncs.id
-                    WHERE nc.new_companies_id = :new_companies_id";
+                    WHERE nc.buy_list_id = :buy_list_id";
             $stmt = $this->portfolioDb->prepare($sql);
-            $stmt->bindValue(':new_companies_id', $companyId, PDO::PARAM_INT);
+            $stmt->bindValue(':buy_list_id', $companyId, PDO::PARAM_INT);
             $stmt->execute();
             
             return $stmt->fetch() ?: false;
@@ -463,7 +463,7 @@ class PortfolioBuylistController {
             $brokers = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
             // Get new companies statuses
-            $statusesSql = "SELECT id, status FROM new_companies_status ORDER BY id";
+            $statusesSql = "SELECT id, status FROM buylist_status ORDER BY id";
             $stmt = $this->portfolioDb->prepare($statusesSql);
             $stmt->execute();
             $statuses = $stmt->fetchAll(PDO::FETCH_ASSOC);
