@@ -103,13 +103,18 @@ $defaultCountries = $adminDefaults['country_defaults'] ?? [];
 $defaultStrategies = $adminDefaults['strategy_defaults'] ?? [];
 $defaultBrokers = $adminDefaults['broker_defaults'] ?? [];
 
-// Get filter parameters, using admin defaults when no explicit filter is set
+// Detect if this is "search all items" mode (search with no explicit filters)
+$isSearchAllMode = !empty($_GET['search']) && empty($_GET['status_id']) && empty($_GET['country']) && 
+                   empty($_GET['strategy_group_id']) && empty($_GET['broker_id']) && 
+                   empty($_GET['yield_min']) && empty($_GET['yield_max']);
+
+// Get filter parameters, using admin defaults when no explicit filter is set (unless in search all mode)
 $filters = [
     'search' => $_GET['search'] ?? '',
-    'new_companies_status_id' => $_GET['status_id'] ?? (!empty($defaultStatusIds) ? implode(',', $defaultStatusIds) : ''),
-    'country_name' => $_GET['country'] ?? (!empty($defaultCountries) ? implode(',', $defaultCountries) : ''),
-    'strategy_group_id' => $_GET['strategy_group_id'] ?? (!empty($defaultStrategies) ? implode(',', $defaultStrategies) : ''),
-    'broker_id' => $_GET['broker_id'] ?? (!empty($defaultBrokers) ? implode(',', $defaultBrokers) : ''),
+    'new_companies_status_id' => $_GET['status_id'] ?? ($isSearchAllMode ? '' : (!empty($defaultStatusIds) ? implode(',', $defaultStatusIds) : '')),
+    'country_name' => $_GET['country'] ?? ($isSearchAllMode ? '' : (!empty($defaultCountries) ? implode(',', $defaultCountries) : '')),
+    'strategy_group_id' => $_GET['strategy_group_id'] ?? ($isSearchAllMode ? '' : (!empty($defaultStrategies) ? implode(',', $defaultStrategies) : '')),
+    'broker_id' => $_GET['broker_id'] ?? ($isSearchAllMode ? '' : (!empty($defaultBrokers) ? implode(',', $defaultBrokers) : '')),
     'yield_min' => $_GET['yield_min'] ?? '',
     'yield_max' => $_GET['yield_max'] ?? ''
 ];
