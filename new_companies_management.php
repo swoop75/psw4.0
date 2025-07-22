@@ -1,7 +1,7 @@
 <?php
 /**
- * File: buylist_management.php
- * Description: Buylist management interface for PSW 4.0 - integrated with unified navigation
+ * File: new_companies_management.php
+ * Description: New Companies (watchlist) management interface for PSW 4.0 - integrated with unified navigation
  */
 
 session_start();
@@ -134,11 +134,11 @@ try {
 $pageTitle = 'New Companies Management - PSW 4.0';
 $pageDescription = 'Manage your watchlist and buy targets';
 $additionalCSS = [
-    BASE_URL . '/assets/css/improved-buylist-management.css?v=' . time(),
+    BASE_URL . '/assets/css/new-companies-management.css?v=' . time(),
     BASE_URL . '/assets/css/tooltip.css?v=' . time()
 ];
 $additionalJS = [
-    BASE_URL . '/assets/js/buylist-management.js?v=' . time(),
+    BASE_URL . '/assets/js/new-companies-management.js?v=' . time(),
     BASE_URL . '/assets/js/tooltip.js?v=' . time()
 ];
 

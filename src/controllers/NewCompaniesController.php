@@ -1,7 +1,7 @@
 <?php
 /**
- * File: src/controllers/PortfolioBuylistController.php
- * Description: Portfolio Buylist controller for PSW 4.0 - handles psw_portfolio.buylist table
+ * File: src/controllers/NewCompaniesController.php
+ * Description: New Companies (watchlist) controller for PSW 4.0 - handles psw_portfolio.new_companies table
  */
 
 require_once __DIR__ . '/../../config/database.php';
@@ -9,7 +9,7 @@ require_once __DIR__ . '/../middleware/Auth.php';
 require_once __DIR__ . '/../utils/Logger.php';
 require_once __DIR__ . '/../utils/Security.php';
 
-class PortfolioBuylistController {
+class NewCompaniesController {
     private $portfolioDb;
     
     public function __construct() {
@@ -17,11 +17,11 @@ class PortfolioBuylistController {
     }
     
     /**
-     * Get all buylist entries with optional filtering
+     * Get all new companies entries with optional filtering
      * @param array $filters Optional filters
      * @param int $page Page number
      * @param int $limit Items per page
-     * @return array Buylist data with pagination
+     * @return array New companies data with pagination
      */
     public function getNewCompanies($filters = [], $page = 1, $limit = 50) {
         try {
@@ -201,7 +201,7 @@ class PortfolioBuylistController {
             ];
             
         } catch (Exception $e) {
-            Logger::error('Portfolio buylist error: ' . $e->getMessage());
+            Logger::error('New companies error: ' . $e->getMessage());
             throw $e;
         }
     }
@@ -378,7 +378,7 @@ class PortfolioBuylistController {
             $sql = "SELECT nc.*,
                            psg.strategy_name,
                            br.broker_name,
-                           bs.status as status_name
+                           ncs.status as status_name
                     FROM new_companies nc 
                     LEFT JOIN psw_foundation.portfolio_strategy_groups psg ON nc.strategy_group_id = psg.strategy_group_id
                     LEFT JOIN psw_foundation.brokers br ON nc.broker_id = br.broker_id
