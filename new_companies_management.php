@@ -144,12 +144,10 @@ try {
 $pageTitle = 'New Companies Management - PSW 4.0';
 $pageDescription = 'Manage your watchlist and buy targets';
 $additionalCSS = [
-    BASE_URL . '/assets/css/new-companies-management.css?v=' . time(),
-    BASE_URL . '/assets/css/tooltip.css?v=' . time()
+    BASE_URL . '/assets/css/new-companies-management.css?v=' . time()
 ];
 $additionalJS = [
-    BASE_URL . '/assets/js/new-companies-management.js?v=' . time(),
-    BASE_URL . '/assets/js/tooltip.js?v=' . time()
+    BASE_URL . '/assets/js/new-companies-management.js?v=' . time()
 ];
 
 $user = [
