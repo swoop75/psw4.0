@@ -460,6 +460,9 @@ a:hover {
 /* Adjust main container for fixed header */
 .main-container {
     padding-top: 100px;
+    max-width: 95vw;
+    overflow-x: auto;
+    box-sizing: border-box;
 }
 
 .header-container {
@@ -1254,12 +1257,15 @@ a:hover {
     }
 }
 
-/* Main Container Styles */
+/* Main Container Styles - Desktop Optimized */
 .main-container {
-    max-width: 1200px;
+    max-width: 95vw; /* Use 95% of viewport width for better desktop utilization */
+    width: 100%;
     margin: 0 auto;
     padding: var(--space-6);
     min-height: calc(100vh - 200px);
+    box-sizing: border-box;
+    overflow-x: auto; /* Allow horizontal scroll only when needed */
 }
 
 /* Enhanced Landing Page */
