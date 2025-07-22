@@ -1377,25 +1377,30 @@ label:not(.checkbox-dropdown label):not(.form-group label) {
     transform: scale(1.1);
 }
 
-/* Right-Side Company Panel - Avanza Style */
+/* Right-Side Company Panel - Modern Transform Approach */
 .company-panel {
     position: fixed;
     top: 0;
-    right: -380px;
+    right: 0;
     width: 380px;
     height: 100vh;
     background: #ffffff;
     border-left: 1px solid var(--border-dark);
     box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
     z-index: 1000;
-    transition: right 0.3s ease;
+    
+    /* Modern transform animation - GPU accelerated */
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+    
     overflow-y: auto;
     display: flex;
     flex-direction: column;
 }
 
 .company-panel.open {
-    right: 0;
+    transform: translateX(0);
 }
 
 .company-panel-backdrop {
@@ -1623,7 +1628,12 @@ label:not(.checkbox-dropdown label):not(.form-group label) {
 @media (max-width: 768px) {
     .company-panel {
         width: 100vw;
-        right: -100vw;
+        /* Transform approach works the same on mobile */
+        transform: translateX(100%);
+    }
+    
+    .company-panel.open {
+        transform: translateX(0);
     }
     
     .company-panel-content {

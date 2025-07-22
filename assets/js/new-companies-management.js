@@ -173,7 +173,11 @@ function showAddModal() {
         if (submitText) submitText.textContent = 'Add New Company';
         
         // Show modal
+        console.log('Setting modal display to block');
         modal.style.display = 'block';
+        console.log('Modal computed style:', window.getComputedStyle(modal).display);
+        console.log('Modal z-index:', window.getComputedStyle(modal).zIndex);
+        console.log('Modal visibility:', window.getComputedStyle(modal).visibility);
         
         // Focus first input
         setTimeout(() => {
@@ -695,30 +699,37 @@ function searchAllItems() {
 // Toggle company details panel
 function toggleCompanyPanel(button) {
     try {
-        alert('toggleCompanyPanel called!');
+        // Try to find .company-info in the current element first (for the original "more" button)
+        let companyInfo = button.closest('.company-info');
+        
+        // If not found, look for .company-info in the same table row (for action buttons)
+        if (!companyInfo) {
+            const row = button.closest('tr');
+            if (row) {
+                companyInfo = row.querySelector('.company-info');
+            }
+        }
+        
         const panel = document.getElementById('companyPanel');
         const backdrop = document.getElementById('companyPanelBackdrop');
         
-        console.log('Panel elements:', {
-            panel: !!panel,
-            backdrop: !!backdrop
-        });
+        if (!panel || !backdrop) {
+            console.error('Panel elements not found');
+            return;
+        }
         
-        if (!panel) {
-            alert('Panel not found!');
+        if (!companyInfo) {
+            console.error('Company info not found');
             return;
         }
         
         if (panel.classList.contains('open')) {
-            panel.classList.remove('open');
-            if (backdrop) backdrop.classList.remove('active');
+            closeCompanyPanel();
         } else {
-            panel.classList.add('open');
-            if (backdrop) backdrop.classList.add('active');
+            openCompanyPanel(companyInfo);
         }
     } catch (error) {
-        alert('Error in toggleCompanyPanel: ' + error.message);
-        console.error('Error:', error);
+        console.error('Error in toggleCompanyPanel:', error);
     }
 }
 
