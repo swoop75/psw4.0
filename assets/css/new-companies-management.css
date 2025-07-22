@@ -753,7 +753,7 @@ select:hover {
     justify-content: flex-end;
 }
 
-/* Beautiful Modal Styles - Modern Design */
+/* Ultra-Beautiful High-Performance Modal */
 .modal {
     display: none;
     position: fixed;
@@ -762,10 +762,11 @@ select:hover {
     top: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.7) 100%);
-    backdrop-filter: blur(8px);
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.8) 100%);
+    backdrop-filter: blur(6px);
     opacity: 0;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: opacity 0.25s ease;
+    will-change: opacity;
 }
 
 .modal.show {
@@ -773,26 +774,48 @@ select:hover {
 }
 
 .modal-content {
-    background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
-    margin: 2% auto;
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 50%, #ffffff 100%);
+    margin: 1.5% auto;
     padding: 0;
-    border-radius: 20px;
-    width: 90%;
-    max-width: 800px;
-    max-height: 90vh;
+    border-radius: 24px;
+    width: 92%;
+    max-width: 900px;
+    max-height: 92vh;
     overflow: hidden;
     box-shadow: 
-        0 25px 50px rgba(0, 0, 0, 0.25),
-        0 0 0 1px rgba(255, 255, 255, 0.8),
-        inset 0 1px 0 rgba(255, 255, 255, 0.9);
-    transform: scale(0.9) translateY(20px);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        0 32px 64px rgba(0, 0, 0, 0.12),
+        0 16px 32px rgba(0, 0, 0, 0.08),
+        0 8px 16px rgba(0, 0, 0, 0.04),
+        0 0 0 1px rgba(255, 255, 255, 0.9),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+    transform: scale(0.95) translateY(30px);
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     position: relative;
     overflow-y: auto;
+    will-change: transform;
+    /* Add subtle glow */
+    filter: drop-shadow(0 0 20px rgba(0, 200, 150, 0.15));
 }
 
 .modal.show .modal-content {
     transform: scale(1) translateY(0);
+}
+
+/* Performance optimization: Use transform instead of box-shadow animations */
+.modal-content::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+        rgba(0, 200, 150, 0.05) 0%, 
+        rgba(26, 115, 232, 0.03) 50%, 
+        rgba(0, 200, 150, 0.05) 100%);
+    border-radius: 24px;
+    pointer-events: none;
+    z-index: 1;
 }
 
 .modal-header {
@@ -804,6 +827,11 @@ select:hover {
     color: white;
     position: relative;
     overflow: hidden;
+    z-index: 2;
+    /* Add subtle pattern */
+    background-image: 
+        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
 }
 
 .modal-header::before {
@@ -817,68 +845,119 @@ select:hover {
     pointer-events: none;
 }
 
+/* Add animated shimmer effect - performance optimized */
+.modal-header::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    animation: shimmer 3s ease-in-out infinite;
+    will-change: transform;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(200%); }
+}
+
 .modal-header h3 {
     font-size: var(--text-2xl);
     font-weight: var(--font-bold);
     color: white;
     margin: 0;
     position: relative;
-    z-index: 1;
+    z-index: 3;
     display: flex;
     align-items: center;
     gap: var(--space-3);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .modal-header h3::before {
-    content: '✨';
-    font-size: var(--text-lg);
-    opacity: 0.8;
+    content: '🚀';
+    font-size: var(--text-xl);
+    animation: float 2s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-3px); }
 }
 
 .modal-close {
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    font-size: var(--text-lg);
+    background: rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    font-size: var(--text-base);
     cursor: pointer;
     color: white;
-    padding: var(--space-2);
+    padding: 0;
     border-radius: 50%;
-    transition: all 0.2s ease;
-    width: 36px;
-    height: 36px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
-    z-index: 1;
+    z-index: 3;
     backdrop-filter: blur(10px);
+    will-change: transform;
 }
 
 .modal-close:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.35);
     transform: scale(1.1) rotate(90deg);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.modal-close:active {
+    transform: scale(0.95) rotate(90deg);
 }
 
 .modal-body {
     padding: var(--space-8);
 }
 
-/* Beautiful Form Styles */
+/* Ultra-Beautiful Form Styles */
 form {
     padding: var(--space-8);
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
+    background: 
+        linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.98) 100%),
+        radial-gradient(circle at 10% 20%, rgba(0, 200, 150, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 90% 80%, rgba(26, 115, 232, 0.02) 0%, transparent 50%);
     position: relative;
+    z-index: 2;
 }
 
 form::before {
     content: '';
     position: absolute;
     top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+    left: var(--space-4);
+    right: var(--space-4);
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--primary-color), var(--secondary-color), transparent);
+    border-radius: 1px;
+}
+
+/* Add subtle form sections */
+.form-row {
+    background: rgba(255, 255, 255, 0.5);
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-4);
+    border: 1px solid rgba(0, 200, 150, 0.05);
+    transition: all 0.2s ease;
+}
+
+.form-row:hover {
+    background: rgba(255, 255, 255, 0.7);
+    border-color: rgba(0, 200, 150, 0.1);
+    transform: translateY(-1px);
 }
 
 .form-tabs {
