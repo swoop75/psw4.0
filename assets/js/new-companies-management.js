@@ -670,63 +670,64 @@ function searchAllItems() {
 
 // Toggle company details panel
 function toggleCompanyPanel(button) {
-    alert('Function called! Button: ' + button.tagName);
-    console.log('toggleCompanyPanel called', button);
-    
-    // Try to find .company-info in the current element first (for the original "more" button)
-    let companyInfo = button.closest('.company-info');
-    console.log('companyInfo from closest:', companyInfo);
-    
-    // If not found, look for .company-info in the same table row (for action buttons)
-    if (!companyInfo) {
-        const row = button.closest('tr');
-        console.log('row found:', row);
-        companyInfo = row ? row.querySelector('.company-info') : null;
-        console.log('companyInfo from row:', companyInfo);
-    }
-    
+    // Simple test first
     const panel = document.getElementById('companyPanel');
-    const backdrop = document.getElementById('companyPanelBackdrop');
-    console.log('panel:', panel, 'backdrop:', backdrop);
-    
-    if (panel && panel.classList.contains('open')) {
-        alert('Closing panel');
-        closeCompanyPanel();
-    } else if (companyInfo && panel) {
-        alert('Opening panel with company: ' + companyInfo.dataset.company);
-        console.log('Opening panel with companyInfo:', companyInfo.dataset);
-        openCompanyPanel(companyInfo);
-    } else {
-        alert('Problem: companyInfo=' + !!companyInfo + ', panel=' + !!panel);
-        console.log('No companyInfo found!');
+    if (panel) {
+        panel.classList.add('open');
+        const backdrop = document.getElementById('companyPanelBackdrop');
+        if (backdrop) {
+            backdrop.classList.add('active');
+        }
     }
 }
 
 // Open company panel with data
 function openCompanyPanel(companyInfo) {
-    const panel = document.getElementById('companyPanel');
-    const backdrop = document.getElementById('companyPanelBackdrop');
-    const title = document.getElementById('companyPanelTitle');
-    const loading = panel.querySelector('.company-panel-loading');
-    const dataContent = panel.querySelector('.company-panel-data');
-    
-    // Show loading state
-    loading.style.display = 'flex';
-    dataContent.style.display = 'none';
-    
-    // Update panel title
-    title.textContent = companyInfo.dataset.company;
-    
-    // Open panel with animation
-    panel.classList.add('open');
-    backdrop.classList.add('active');
-    
-    // Simulate loading delay and populate data
-    setTimeout(() => {
-        populateCompanyPanel(companyInfo);
-        loading.style.display = 'none';
-        dataContent.style.display = 'flex';
-    }, 500);
+    try {
+        const panel = document.getElementById('companyPanel');
+        const backdrop = document.getElementById('companyPanelBackdrop');
+        const title = document.getElementById('companyPanelTitle');
+        
+        if (!panel || !backdrop || !title) {
+            console.error('Panel elements missing:', { panel: !!panel, backdrop: !!backdrop, title: !!title });
+            return;
+        }
+        
+        const loading = panel.querySelector('.company-panel-loading');
+        const dataContent = panel.querySelector('.company-panel-data');
+        
+        if (!loading || !dataContent) {
+            console.error('Panel content elements missing:', { loading: !!loading, dataContent: !!dataContent });
+            return;
+        }
+        
+        // Show loading state
+        loading.style.display = 'flex';
+        dataContent.style.display = 'none';
+        
+        // Update panel title
+        title.textContent = companyInfo.dataset.company || 'Company Details';
+        
+        // Open panel with animation
+        panel.classList.add('open');
+        backdrop.classList.add('active');
+        
+        // Simulate loading delay and populate data
+        setTimeout(() => {
+            try {
+                populateCompanyPanel(companyInfo);
+                loading.style.display = 'none';
+                dataContent.style.display = 'flex';
+            } catch (error) {
+                console.error('Error populating panel:', error);
+                loading.style.display = 'none';
+                dataContent.innerHTML = '<p>Error loading company details</p>';
+                dataContent.style.display = 'block';
+            }
+        }, 500);
+    } catch (error) {
+        console.error('Error in openCompanyPanel:', error);
+    }
 }
 
 // Close company panel
