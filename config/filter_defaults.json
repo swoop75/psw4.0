@@ -1,0 +1,14 @@
+{
+    "status_defaults": [
+        "null"
+    ],
+    "country_defaults": [],
+    "strategy_defaults": [],
+    "broker_defaults": [
+        "2",
+        "1",
+        "4",
+        "3",
+        "5"
+    ]
+}
