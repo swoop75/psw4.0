@@ -404,7 +404,7 @@ ob_start();
                                 <tr>
                                     <td>
                                         <div class="company-info" 
-                                             data-tooltip="true"
+                                             data-company-id="<?= $entry['new_companies_id'] ?>"
                                              data-company="<?= htmlspecialchars($entry['company']) ?>"
                                              data-ticker="<?= htmlspecialchars($entry['ticker']) ?>"
                                              data-isin="<?= htmlspecialchars($entry['isin'] ?: 'N/A') ?>"
@@ -418,9 +418,13 @@ ob_start();
                                              data-comments="<?= htmlspecialchars($entry['comments'] ?: 'No comments') ?>"
                                              data-inspiration="<?= htmlspecialchars($entry['inspiration'] ?: 'No inspiration noted') ?>">
                                             <div class="company-name">
-                                                <strong><?= htmlspecialchars($entry['company']) ?></strong>
+                                                <a href="#" class="company-name-link" onclick="openCompanyPage(<?= $entry['new_companies_id'] ?>); return false;">
+                                                    <strong><?= htmlspecialchars($entry['company']) ?></strong>
+                                                </a>
                                                 <span class="ticker"><?= htmlspecialchars($entry['ticker']) ?></span>
-                                                <i class="fas fa-info-circle tooltip-icon" title="Hover for details"></i>
+                                                <button class="company-details-btn" onclick="toggleCompanyPanel(this)" title="View details">
+                                                    <i class="fas fa-ellipsis-h"></i>
+                                                </button>
                                             </div>
                                             <div class="company-details">
                                                 <?php if ($entry['isin']): ?>
@@ -694,6 +698,28 @@ ob_start();
             </div>
         </div>
     </div>
+
+    <!-- Company Details Right Panel -->
+    <div id="companyPanel" class="company-panel">
+        <div class="company-panel-header">
+            <h3 id="companyPanelTitle">Company Details</h3>
+            <button class="panel-close-btn" onclick="closeCompanyPanel()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="company-panel-content">
+            <div class="company-panel-loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                Loading company details...
+            </div>
+            <div class="company-panel-data" style="display: none;">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel Backdrop -->
+    <div id="companyPanelBackdrop" class="company-panel-backdrop" onclick="closeCompanyPanel()"></div>
 
     </div>
 

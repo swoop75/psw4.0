@@ -663,3 +663,168 @@ function searchAllItems() {
     
     window.location.href = window.location.pathname + '?' + params.toString();
 }
+
+/**
+ * Company Panel Functions - Avanza Style
+ */
+
+// Toggle company details panel
+function toggleCompanyPanel(button) {
+    const companyInfo = button.closest('.company-info');
+    const panel = document.getElementById('companyPanel');
+    const backdrop = document.getElementById('companyPanelBackdrop');
+    
+    if (panel.classList.contains('open')) {
+        closeCompanyPanel();
+    } else {
+        openCompanyPanel(companyInfo);
+    }
+}
+
+// Open company panel with data
+function openCompanyPanel(companyInfo) {
+    const panel = document.getElementById('companyPanel');
+    const backdrop = document.getElementById('companyPanelBackdrop');
+    const title = document.getElementById('companyPanelTitle');
+    const loading = panel.querySelector('.company-panel-loading');
+    const dataContent = panel.querySelector('.company-panel-data');
+    
+    // Show loading state
+    loading.style.display = 'flex';
+    dataContent.style.display = 'none';
+    
+    // Update panel title
+    title.textContent = companyInfo.dataset.company;
+    
+    // Open panel with animation
+    panel.classList.add('open');
+    backdrop.classList.add('active');
+    
+    // Simulate loading delay and populate data
+    setTimeout(() => {
+        populateCompanyPanel(companyInfo);
+        loading.style.display = 'none';
+        dataContent.style.display = 'flex';
+    }, 500);
+}
+
+// Close company panel
+function closeCompanyPanel() {
+    const panel = document.getElementById('companyPanel');
+    const backdrop = document.getElementById('companyPanelBackdrop');
+    
+    panel.classList.remove('open');
+    backdrop.classList.remove('active');
+}
+
+// Populate panel with company data
+function populateCompanyPanel(companyInfo) {
+    const dataContent = document.querySelector('.company-panel-data');
+    const data = companyInfo.dataset;
+    
+    const html = `
+        <div class="company-hero">
+            <h2>${escapeHtml(data.company)}</h2>
+            <div class="ticker">${escapeHtml(data.ticker)}</div>
+        </div>
+        
+        <div class="panel-section">
+            <div class="panel-section-title">Investment Details</div>
+            <div class="panel-info-grid">
+                <div class="panel-info-row">
+                    <span class="panel-info-label">ISIN:</span>
+                    <span class="panel-info-value">${escapeHtml(data.isin)}</span>
+                </div>
+                <div class="panel-info-row">
+                    <span class="panel-info-label">Country:</span>
+                    <span class="panel-info-value">${escapeHtml(data.country)}</span>
+                </div>
+                <div class="panel-info-row">
+                    <span class="panel-info-label">Yield:</span>
+                    <span class="panel-info-value panel-badge">${escapeHtml(data.yield)}</span>
+                </div>
+                <div class="panel-info-row">
+                    <span class="panel-info-label">Status:</span>
+                    <span class="panel-info-value">${escapeHtml(data.status)}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel-section">
+            <div class="panel-section-title">Organization</div>
+            <div class="panel-info-grid">
+                <div class="panel-info-row">
+                    <span class="panel-info-label">Strategy Group:</span>
+                    <span class="panel-info-value">${escapeHtml(data.strategyGroup)}</span>
+                </div>
+                <div class="panel-info-row">
+                    <span class="panel-info-label">New Group:</span>
+                    <span class="panel-info-value">${escapeHtml(data.newGroup)}</span>
+                </div>
+                <div class="panel-info-row">
+                    <span class="panel-info-label">Broker:</span>
+                    <span class="panel-info-value">${escapeHtml(data.broker)}</span>
+                </div>
+            </div>
+        </div>
+        
+        ${data.comments !== 'No comments' ? `
+        <div class="panel-section">
+            <div class="panel-section-title">Comments</div>
+            <div class="panel-text-content">${escapeHtml(data.comments)}</div>
+        </div>
+        ` : ''}
+        
+        ${data.inspiration !== 'No inspiration noted' ? `
+        <div class="panel-section">
+            <div class="panel-section-title">Inspiration</div>
+            <div class="panel-text-content">${escapeHtml(data.inspiration)}</div>
+        </div>
+        ` : ''}
+        
+        <div class="panel-actions">
+            <button class="panel-action-btn" onclick="editEntry(${data.companyId})">
+                <i class="fas fa-edit"></i> Edit
+            </button>
+            <button class="panel-action-btn primary" onclick="openCompanyPage(${data.companyId})">
+                <i class="fas fa-external-link-alt"></i> View Company
+            </button>
+        </div>
+    `;
+    
+    dataContent.innerHTML = html;
+}
+
+// Open company page (placeholder)
+function openCompanyPage(companyId) {
+    // For now, show a placeholder message
+    alert('Company page feature coming soon!\\nCompany ID: ' + companyId);
+    // Future: window.location.href = '/company/' + companyId;
+}
+
+// Escape HTML to prevent XSS
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Close panel when clicking outside
+document.addEventListener('click', function(event) {
+    const panel = document.getElementById('companyPanel');
+    const backdrop = document.getElementById('companyPanelBackdrop');
+    
+    if (panel && panel.classList.contains('open') && 
+        !panel.contains(event.target) && 
+        !event.target.closest('.company-details-btn')) {
+        closeCompanyPanel();
+    }
+});
+
+// Close panel with escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeCompanyPanel();
+    }
+});
