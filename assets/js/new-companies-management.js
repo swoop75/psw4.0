@@ -4,6 +4,7 @@
 
 // Debug: Test if JS file is loading
 console.log('new-companies-management.js is loading...');
+window.testFunction = function() { alert('Test function works!'); };
 
 // Global variables
 let deleteEntryId = '';
