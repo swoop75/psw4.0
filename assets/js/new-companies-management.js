@@ -670,13 +670,21 @@ function searchAllItems() {
 
 // Toggle company details panel
 function toggleCompanyPanel(button) {
-    const companyInfo = button.closest('.company-info');
+    // Try to find .company-info in the current element first (for the original "more" button)
+    let companyInfo = button.closest('.company-info');
+    
+    // If not found, look for .company-info in the same table row (for action buttons)
+    if (!companyInfo) {
+        const row = button.closest('tr');
+        companyInfo = row ? row.querySelector('.company-info') : null;
+    }
+    
     const panel = document.getElementById('companyPanel');
     const backdrop = document.getElementById('companyPanelBackdrop');
     
     if (panel.classList.contains('open')) {
         closeCompanyPanel();
-    } else {
+    } else if (companyInfo) {
         openCompanyPanel(companyInfo);
     }
 }
