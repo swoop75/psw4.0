@@ -798,7 +798,7 @@ function populateCompanyPanel(companyInfo) {
 // Open company page (placeholder)
 function openCompanyPage(companyId) {
     // For now, show a placeholder message
-    alert('Company page feature coming soon!\\nCompany ID: ' + companyId);
+    alert('Company page feature coming soon!\nCompany ID: ' + companyId);
     // Future: window.location.href = '/company/' + companyId;
 }
 

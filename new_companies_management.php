@@ -454,9 +454,12 @@ ob_start();
                                     </td>
                                     <td>
                                         <div class="action-buttons">
-                                                <button class="btn-icon btn-success" onclick="addToMasterlist(<?= $entry['new_companies_id'] ?>, '<?= htmlspecialchars($entry['company']) ?>')" title="Add to Masterlist">
-                                                    <i class="fas fa-plus-circle"></i>
-                                                </button>
+                                            <button class="btn-icon" onclick="toggleCompanyPanel(this)" title="View Details">
+                                                <i class="fas fa-info-circle"></i>
+                                            </button>
+                                            <button class="btn-icon btn-success" onclick="addToMasterlist(<?= $entry['new_companies_id'] ?>, '<?= htmlspecialchars($entry['company']) ?>')" title="Add to Masterlist">
+                                                <i class="fas fa-plus-circle"></i>
+                                            </button>
                                             <button class="btn-icon" onclick="editEntry(<?= $entry['new_companies_id'] ?>)" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </button>
