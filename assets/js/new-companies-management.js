@@ -3,15 +3,6 @@
  */
 
 // JavaScript file for New Companies Management
-alert('JS file loaded!');
-
-// Test if functions exist after file loads
-setTimeout(function() {
-    console.log('Functions defined?', {
-        showAddModal: typeof showAddModal,
-        toggleCompanyPanel: typeof toggleCompanyPanel
-    });
-}, 1000);
 
 // Global variables
 let deleteEntryId = '';
