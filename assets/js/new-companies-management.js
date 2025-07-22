@@ -149,30 +149,20 @@ function refreshData() {
  * Show add entry modal
  */
 function showAddModal() {
-    alert('showAddModal function called!');
     const modal = document.getElementById('entryModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalAction = document.getElementById('modalAction');
-    const submitText = document.getElementById('submitText');
-    const form = document.getElementById('entryForm');
     
-    if (!modal) return;
+    if (!modal) {
+        alert('Modal element not found!');
+        return;
+    }
     
-    // Reset form
-    if (form) form.reset();
-    
-    // Set modal for create mode
-    if (modalTitle) modalTitle.textContent = 'Add New Company';
-    if (modalAction) modalAction.value = 'add';
-    if (submitText) submitText.textContent = 'Add New Company';
-    
-    // Show modal
+    alert('Modal found! Setting display to block...');
     modal.style.display = 'block';
     
-    // Focus first input
+    // Check if it's actually visible
     setTimeout(() => {
-        const companyField = document.getElementById('company');
-        if (companyField) companyField.focus();
+        const computed = window.getComputedStyle(modal);
+        alert('Modal display: ' + computed.display + ', visibility: ' + computed.visibility + ', opacity: ' + computed.opacity);
     }, 100);
 }
 
