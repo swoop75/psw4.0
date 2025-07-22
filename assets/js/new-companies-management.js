@@ -613,7 +613,7 @@ function updateDropdownText(dropdown) {
         textElement.textContent = checkboxes[0].nextElementSibling.textContent;
         textElement.className = 'dropdown-text dropdown-selected';
     } else {
-        textElement.innerHTML = `${checkboxes.length} selected <span class="selected-count">${checkboxes.length}</span>`;
+        textElement.innerHTML = `<span class="selected-count">${checkboxes.length}</span> selected`;
         textElement.className = 'dropdown-text dropdown-selected';
     }
 }
