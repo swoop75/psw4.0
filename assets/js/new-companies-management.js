@@ -3,6 +3,7 @@
  */
 
 // JavaScript file for New Companies Management
+alert('JS file loaded!');
 
 // Global variables
 let deleteEntryId = '';
