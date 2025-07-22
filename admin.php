@@ -81,7 +81,9 @@ $pageDescription = 'System administration and configuration';
 $additionalCSS = [
     BASE_URL . '/assets/css/admin.css?v=' . time()
 ];
-$additionalJS = [];
+$additionalJS = [
+    BASE_URL . '/assets/js/admin.js?v=' . time()
+];
 
 $user = [
     'username' => Auth::getUsername(),
@@ -143,7 +145,12 @@ ob_start();
                             <h3>Default Status Filters</h3>
                             <p class="form-help">Select which statuses should be shown by default:</p>
                             
-                            <div class="checkbox-list">
+                            <div class="select-all-controls">
+                                <button type="button" onclick="selectAllCheckboxes('status_defaults')" class="btn-select-all">Select All</button>
+                                <button type="button" onclick="deselectAllCheckboxes('status_defaults')" class="btn-select-all">Deselect All</button>
+                            </div>
+                            
+                            <div class="checkbox-list" data-group="status_defaults">
                                 <label class="checkbox-item">
                                     <input type="checkbox" name="status_defaults[]" value="null" 
                                            <?= in_array('null', $currentDefaults['status_defaults'] ?? ['null']) ? 'checked' : '' ?>>
@@ -165,7 +172,12 @@ ob_start();
                             <h3>Default Country Filters</h3>
                             <p class="form-help">Select which countries should be shown by default:</p>
                             
-                            <div class="checkbox-list">
+                            <div class="select-all-controls">
+                                <button type="button" onclick="selectAllCheckboxes('country_defaults')" class="btn-select-all">Select All</button>
+                                <button type="button" onclick="deselectAllCheckboxes('country_defaults')" class="btn-select-all">Deselect All</button>
+                            </div>
+                            
+                            <div class="checkbox-list" data-group="country_defaults">
                                 <label class="checkbox-item">
                                     <input type="checkbox" name="country_defaults[]" value="null"
                                            <?= in_array('null', $currentDefaults['country_defaults'] ?? []) ? 'checked' : '' ?>>
@@ -187,7 +199,12 @@ ob_start();
                             <h3>Default Strategy Group Filters</h3>
                             <p class="form-help">Select which strategy groups should be shown by default:</p>
                             
-                            <div class="checkbox-list">
+                            <div class="select-all-controls">
+                                <button type="button" onclick="selectAllCheckboxes('strategy_defaults')" class="btn-select-all">Select All</button>
+                                <button type="button" onclick="deselectAllCheckboxes('strategy_defaults')" class="btn-select-all">Deselect All</button>
+                            </div>
+                            
+                            <div class="checkbox-list" data-group="strategy_defaults">
                                 <label class="checkbox-item">
                                     <input type="checkbox" name="strategy_defaults[]" value="null"
                                            <?= in_array('null', $currentDefaults['strategy_defaults'] ?? []) ? 'checked' : '' ?>>
@@ -209,7 +226,12 @@ ob_start();
                             <h3>Default Broker Filters</h3>
                             <p class="form-help">Select which brokers should be shown by default:</p>
                             
-                            <div class="checkbox-list">
+                            <div class="select-all-controls">
+                                <button type="button" onclick="selectAllCheckboxes('broker_defaults')" class="btn-select-all">Select All</button>
+                                <button type="button" onclick="deselectAllCheckboxes('broker_defaults')" class="btn-select-all">Deselect All</button>
+                            </div>
+                            
+                            <div class="checkbox-list" data-group="broker_defaults">
                                 <label class="checkbox-item">
                                     <input type="checkbox" name="broker_defaults[]" value="null"
                                            <?= in_array('null', $currentDefaults['broker_defaults'] ?? []) ? 'checked' : '' ?>>

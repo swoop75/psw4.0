@@ -34,24 +34,73 @@ class PortfolioBuylistController {
                 $params[':search'] = '%' . $filters['search'] . '%';
             }
             
+            // Handle multi-value filters with comma-separated values and null support
             if (!empty($filters['country_name'])) {
-                $whereConditions[] = "b.country_name = :country_name";
-                $params[':country_name'] = $filters['country_name'];
+                $countryValues = explode(',', $filters['country_name']);
+                $countryConditions = [];
+                foreach ($countryValues as $index => $value) {
+                    if ($value === 'null') {
+                        $countryConditions[] = "b.country_name IS NULL";
+                    } else {
+                        $paramName = ":country_name_$index";
+                        $countryConditions[] = "b.country_name = $paramName";
+                        $params[$paramName] = $value;
+                    }
+                }
+                if (!empty($countryConditions)) {
+                    $whereConditions[] = "(" . implode(' OR ', $countryConditions) . ")";
+                }
             }
             
             if (!empty($filters['buylist_status_id'])) {
-                $whereConditions[] = "b.buylist_status_id = :status_id";
-                $params[':status_id'] = $filters['buylist_status_id'];
+                $statusValues = explode(',', $filters['buylist_status_id']);
+                $statusConditions = [];
+                foreach ($statusValues as $index => $value) {
+                    if ($value === 'null') {
+                        $statusConditions[] = "b.buylist_status_id IS NULL";
+                    } else {
+                        $paramName = ":status_id_$index";
+                        $statusConditions[] = "b.buylist_status_id = $paramName";
+                        $params[$paramName] = $value;
+                    }
+                }
+                if (!empty($statusConditions)) {
+                    $whereConditions[] = "(" . implode(' OR ', $statusConditions) . ")";
+                }
             }
             
             if (!empty($filters['strategy_group_id'])) {
-                $whereConditions[] = "b.strategy_group_id = :strategy_group_id";
-                $params[':strategy_group_id'] = $filters['strategy_group_id'];
+                $strategyValues = explode(',', $filters['strategy_group_id']);
+                $strategyConditions = [];
+                foreach ($strategyValues as $index => $value) {
+                    if ($value === 'null') {
+                        $strategyConditions[] = "b.strategy_group_id IS NULL";
+                    } else {
+                        $paramName = ":strategy_group_id_$index";
+                        $strategyConditions[] = "b.strategy_group_id = $paramName";
+                        $params[$paramName] = $value;
+                    }
+                }
+                if (!empty($strategyConditions)) {
+                    $whereConditions[] = "(" . implode(' OR ', $strategyConditions) . ")";
+                }
             }
             
             if (!empty($filters['broker_id'])) {
-                $whereConditions[] = "b.broker_id = :broker_id";
-                $params[':broker_id'] = $filters['broker_id'];
+                $brokerValues = explode(',', $filters['broker_id']);
+                $brokerConditions = [];
+                foreach ($brokerValues as $index => $value) {
+                    if ($value === 'null') {
+                        $brokerConditions[] = "b.broker_id IS NULL";
+                    } else {
+                        $paramName = ":broker_id_$index";
+                        $brokerConditions[] = "b.broker_id = $paramName";
+                        $params[$paramName] = $value;
+                    }
+                }
+                if (!empty($brokerConditions)) {
+                    $whereConditions[] = "(" . implode(' OR ', $brokerConditions) . ")";
+                }
             }
             
             if (isset($filters['yield_min'])) {
