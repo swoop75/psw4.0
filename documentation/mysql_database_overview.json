@@ -5867,356 +5867,6 @@
             "name": "psw_portfolio",
             "tables": [
                 {
-                    "name": "buylist",
-                    "schema": [
-                        {
-                            "Field": "buy_list_id",
-                            "Type": "int",
-                            "Null": "NO",
-                            "Key": "PRI",
-                            "Default": null,
-                            "Extra": "auto_increment"
-                        },
-                        {
-                            "Field": "company",
-                            "Type": "varchar(100)",
-                            "Null": "NO",
-                            "Key": "",
-                            "Default": null,
-                            "Extra": ""
-                        },
-                        {
-                            "Field": "ticker",
-                            "Type": "varchar(15)",
-                            "Null": "YES",
-                            "Key": "",
-                            "Default": null,
-                            "Extra": ""
-                        },
-                        {
-                            "Field": "isin",
-                            "Type": "varchar(20)",
-                            "Null": "NO",
-                            "Key": "",
-                            "Default": null,
-                            "Extra": ""
-                        },
-                        {
-                            "Field": "country_name",
-                            "Type": "varchar(100)",
-                            "Null": "YES",
-                            "Key": "",
-                            "Default": null,
-                            "Extra": ""
-                        },
-                        {
-                            "Field": "country_id",
-                            "Type": "int",
-                            "Null": "YES",
-                            "Key": "MUL",
-                            "Default": null,
-                            "Extra": ""
-                        },
-                        {
-                            "Field": "yield",
-                            "Type": "decimal(4,2)",
-                            "Null": "YES",
-                            "Key": "",
-                            "Default": null,
-                            "Extra": ""
-                        },
-                        {
-                            "Field": "strategy_group_id",
-                            "Type": "int",
-                            "Null": "YES",
-                            "Key": "MUL",
-                            "Default": null,
-                            "Extra": ""
-                        },
-                        {
-                            "Field": "new_group_id",
-                            "Type": "int",
-                            "Null": "YES",
-                            "Key": "",
-                            "Default": null,
-                            "Extra": ""
-                        },
-                        {
-                            "Field": "broker_id",
-                            "Type": "int",
-                            "Null": "YES",
-                            "Key": "MUL",
-                            "Default": null,
-                            "Extra": ""
-                        },
-                        {
-                            "Field": "inspiration",
-                            "Type": "varchar(50)",
-                            "Null": "YES",
-                            "Key": "",
-                            "Default": null,
-                            "Extra": ""
-                        },
-                        {
-                            "Field": "comments",
-                            "Type": "varchar(50)",
-                            "Null": "YES",
-                            "Key": "",
-                            "Default": null,
-                            "Extra": ""
-                        },
-                        {
-                            "Field": "buylist_status_id",
-                            "Type": "int",
-                            "Null": "YES",
-                            "Key": "MUL",
-                            "Default": null,
-                            "Extra": ""
-                        },
-                        {
-                            "Field": "buylistcol",
-                            "Type": "varchar(45)",
-                            "Null": "YES",
-                            "Key": "",
-                            "Default": null,
-                            "Extra": ""
-                        }
-                    ],
-                    "sample_data": {
-                        "columns": [
-                            "buy_list_id",
-                            "company",
-                            "ticker",
-                            "isin",
-                            "country_name",
-                            "country_id",
-                            "yield",
-                            "strategy_group_id",
-                            "new_group_id",
-                            "broker_id",
-                            "inspiration",
-                            "comments",
-                            "buylist_status_id",
-                            "buylistcol"
-                        ],
-                        "rows": [
-                            [
-                                26,
-                                "Sixth Street Specialty Lending",
-                                "TSLX",
-                                "",
-                                "USA",
-                                null,
-                                "9.02",
-                                1,
-                                null,
-                                2,
-                                null,
-                                null,
-                                1,
-                                null
-                            ],
-                            [
-                                27,
-                                "TC Energy Corp",
-                                "TSE:TRP",
-                                "",
-                                "Canada",
-                                2,
-                                "5.97",
-                                1,
-                                null,
-                                2,
-                                null,
-                                null,
-                                1,
-                                null
-                            ],
-                            [
-                                28,
-                                "Capital Southwest Corp",
-                                "NASDAQ:C",
-                                "",
-                                "USA",
-                                null,
-                                "10.91",
-                                1,
-                                null,
-                                2,
-                                null,
-                                null,
-                                1,
-                                null
-                            ],
-                            [
-                                29,
-                                "Oaktree Specialty Lending Corp",
-                                "NYSE:OCS",
-                                "",
-                                "USA",
-                                null,
-                                "9.39",
-                                1,
-                                null,
-                                2,
-                                null,
-                                null,
-                                1,
-                                null
-                            ],
-                            [
-                                30,
-                                "VF Corp",
-                                "NYSE:VFC",
-                                "",
-                                "USA",
-                                null,
-                                "7.13",
-                                1,
-                                null,
-                                1,
-                                "",
-                                "huge divide",
-                                3,
-                                null
-                            ],
-                            [
-                                31,
-                                "Canadian Natural Resources Ltd",
-                                "CNQ:TSX",
-                                "",
-                                "Canada",
-                                2,
-                                "4.20",
-                                1,
-                                null,
-                                3,
-                                null,
-                                null,
-                                1,
-                                null
-                            ],
-                            [
-                                32,
-                                "Algonquin Power & Utilities Corp",
-                                "TO:AQN",
-                                "",
-                                "Canada",
-                                2,
-                                "7.14",
-                                1,
-                                null,
-                                3,
-                                "",
-                                "huge divid",
-                                3,
-                                null
-                            ],
-                            [
-                                33,
-                                "LyondellBasell Industries NV",
-                                "LYB:NYSE",
-                                "",
-                                "USA",
-                                null,
-                                "5.70",
-                                1,
-                                null,
-                                2,
-                                null,
-                                null,
-                                1,
-                                null
-                            ],
-                            [
-                                34,
-                                "Packaging Corp of America",
-                                "NYSE:PKG",
-                                "US6951561090",
-                                "USA",
-                                null,
-                                "3.90",
-                                1,
-                                null,
-                                1,
-                                "",
-                                "yield",
-                                null,
-                                null
-                            ],
-                            [
-                                35,
-                                "Cogeco Communications Inc",
-                                "TSE:CCA",
-                                "",
-                                "Canada",
-                                2,
-                                "3.86",
-                                1,
-                                null,
-                                3,
-                                null,
-                                null,
-                                1,
-                                null
-                            ]
-                        ]
-                    }
-                },
-                {
-                    "name": "buylist_status",
-                    "schema": [
-                        {
-                            "Field": "id",
-                            "Type": "int",
-                            "Null": "NO",
-                            "Key": "PRI",
-                            "Default": null,
-                            "Extra": "auto_increment"
-                        },
-                        {
-                            "Field": "status",
-                            "Type": "varchar(20)",
-                            "Null": "NO",
-                            "Key": "UNI",
-                            "Default": null,
-                            "Extra": ""
-                        },
-                        {
-                            "Field": "comments",
-                            "Type": "varchar(255)",
-                            "Null": "YES",
-                            "Key": "",
-                            "Default": null,
-                            "Extra": ""
-                        }
-                    ],
-                    "sample_data": {
-                        "columns": [
-                            "id",
-                            "status",
-                            "comments"
-                        ],
-                        "rows": [
-                            [
-                                1,
-                                "bought",
-                                null
-                            ],
-                            [
-                                2,
-                                "blocked",
-                                null
-                            ],
-                            [
-                                3,
-                                "no",
-                                null
-                            ]
-                        ]
-                    }
-                },
-                {
                     "name": "log_dividends",
                     "schema": [
                         {
@@ -6467,6 +6117,356 @@
                             "updated_at"
                         ],
                         "rows": []
+                    }
+                },
+                {
+                    "name": "new_companies",
+                    "schema": [
+                        {
+                            "Field": "new_company_id",
+                            "Type": "int",
+                            "Null": "NO",
+                            "Key": "PRI",
+                            "Default": null,
+                            "Extra": "auto_increment"
+                        },
+                        {
+                            "Field": "company",
+                            "Type": "varchar(100)",
+                            "Null": "NO",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "ticker",
+                            "Type": "varchar(15)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "isin",
+                            "Type": "varchar(20)",
+                            "Null": "NO",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "country_name",
+                            "Type": "varchar(100)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "country_id",
+                            "Type": "int",
+                            "Null": "YES",
+                            "Key": "MUL",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "yield",
+                            "Type": "decimal(4,2)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "strategy_group_id",
+                            "Type": "int",
+                            "Null": "YES",
+                            "Key": "MUL",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "new_group_id",
+                            "Type": "int",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "broker_id",
+                            "Type": "int",
+                            "Null": "YES",
+                            "Key": "MUL",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "inspiration",
+                            "Type": "varchar(50)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "comments",
+                            "Type": "varchar(50)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "new_companies_status_id",
+                            "Type": "int",
+                            "Null": "YES",
+                            "Key": "MUL",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "new_companies_col",
+                            "Type": "varchar(45)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        }
+                    ],
+                    "sample_data": {
+                        "columns": [
+                            "new_company_id",
+                            "company",
+                            "ticker",
+                            "isin",
+                            "country_name",
+                            "country_id",
+                            "yield",
+                            "strategy_group_id",
+                            "new_group_id",
+                            "broker_id",
+                            "inspiration",
+                            "comments",
+                            "new_companies_status_id",
+                            "new_companies_col"
+                        ],
+                        "rows": [
+                            [
+                                26,
+                                "Sixth Street Specialty Lending",
+                                "TSLX",
+                                "",
+                                "USA",
+                                null,
+                                "9.02",
+                                1,
+                                null,
+                                2,
+                                null,
+                                null,
+                                1,
+                                null
+                            ],
+                            [
+                                27,
+                                "TC Energy Corp",
+                                "TSE:TRP",
+                                "",
+                                "Canada",
+                                2,
+                                "5.97",
+                                1,
+                                null,
+                                2,
+                                null,
+                                null,
+                                1,
+                                null
+                            ],
+                            [
+                                28,
+                                "Capital Southwest Corp",
+                                "NASDAQ:C",
+                                "",
+                                "USA",
+                                null,
+                                "10.91",
+                                1,
+                                null,
+                                2,
+                                null,
+                                null,
+                                1,
+                                null
+                            ],
+                            [
+                                29,
+                                "Oaktree Specialty Lending Corp",
+                                "NYSE:OCS",
+                                "",
+                                "USA",
+                                null,
+                                "9.39",
+                                1,
+                                null,
+                                2,
+                                null,
+                                null,
+                                1,
+                                null
+                            ],
+                            [
+                                30,
+                                "VF Corp",
+                                "NYSE:VFC",
+                                "",
+                                "USA",
+                                null,
+                                "7.13",
+                                1,
+                                null,
+                                1,
+                                "",
+                                "huge divide",
+                                3,
+                                null
+                            ],
+                            [
+                                31,
+                                "Canadian Natural Resources Ltd",
+                                "CNQ:TSX",
+                                "",
+                                "Canada",
+                                2,
+                                "4.20",
+                                1,
+                                null,
+                                3,
+                                null,
+                                null,
+                                1,
+                                null
+                            ],
+                            [
+                                32,
+                                "Algonquin Power & Utilities Corp",
+                                "TO:AQN",
+                                "",
+                                "Canada",
+                                2,
+                                "7.14",
+                                1,
+                                null,
+                                3,
+                                "",
+                                "huge divid",
+                                3,
+                                null
+                            ],
+                            [
+                                33,
+                                "LyondellBasell Industries NV",
+                                "LYB:NYSE",
+                                "",
+                                "USA",
+                                null,
+                                "5.70",
+                                1,
+                                null,
+                                2,
+                                null,
+                                null,
+                                1,
+                                null
+                            ],
+                            [
+                                34,
+                                "Packaging Corp of America",
+                                "NYSE:PKG",
+                                "US6951561090",
+                                "USA",
+                                null,
+                                "3.90",
+                                1,
+                                null,
+                                1,
+                                "",
+                                "yield",
+                                null,
+                                null
+                            ],
+                            [
+                                35,
+                                "Cogeco Communications Inc",
+                                "TSE:CCA",
+                                "",
+                                "Canada",
+                                2,
+                                "3.86",
+                                1,
+                                null,
+                                3,
+                                null,
+                                null,
+                                1,
+                                null
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "name": "new_companies_status",
+                    "schema": [
+                        {
+                            "Field": "id",
+                            "Type": "int",
+                            "Null": "NO",
+                            "Key": "PRI",
+                            "Default": null,
+                            "Extra": "auto_increment"
+                        },
+                        {
+                            "Field": "status",
+                            "Type": "varchar(20)",
+                            "Null": "NO",
+                            "Key": "UNI",
+                            "Default": null,
+                            "Extra": ""
+                        },
+                        {
+                            "Field": "comments",
+                            "Type": "varchar(255)",
+                            "Null": "YES",
+                            "Key": "",
+                            "Default": null,
+                            "Extra": ""
+                        }
+                    ],
+                    "sample_data": {
+                        "columns": [
+                            "id",
+                            "status",
+                            "comments"
+                        ],
+                        "rows": [
+                            [
+                                1,
+                                "bought",
+                                null
+                            ],
+                            [
+                                2,
+                                "blocked",
+                                null
+                            ],
+                            [
+                                3,
+                                "no",
+                                null
+                            ]
+                        ]
                     }
                 },
                 {
