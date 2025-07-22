@@ -25,7 +25,8 @@
     <?php endif; ?>
     
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="<?php echo ASSETS_URL; ?>/img/favicon.ico">
+    <link rel="icon" type="image/png" href="<?php echo BASE_URL; ?>/public/assets/img/psw-logo.png">
+    <link rel="shortcut icon" type="image/png" href="<?php echo BASE_URL; ?>/public/assets/img/psw-logo.png">
 </head>
 <body>
     <!-- Unified Top Navigation Bar -->
