@@ -115,8 +115,13 @@ class NewCompaniesController {
             
             $whereClause = 'WHERE ' . implode(' AND ', $whereConditions);
             
-            // Count total records
-            $countSql = "SELECT COUNT(*) as total FROM new_companies nc $whereClause";
+            // Count total records - include JOINs to match main query
+            $countSql = "SELECT COUNT(*) as total 
+                        FROM new_companies nc 
+                        LEFT JOIN psw_foundation.portfolio_strategy_groups psg ON nc.strategy_group_id = psg.strategy_group_id
+                        LEFT JOIN psw_foundation.brokers br ON nc.broker_id = br.broker_id
+                        LEFT JOIN new_companies_status ncs ON nc.new_companies_status_id = ncs.id
+                        $whereClause";
             $countStmt = $this->portfolioDb->prepare($countSql);
             foreach ($params as $key => $value) {
                 $countStmt->bindValue($key, $value);
