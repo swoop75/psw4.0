@@ -17,15 +17,10 @@ if (!Auth::isLoggedIn()) {
     exit;
 }
 
-// Debug: Check what role is actually set
-error_log('Debug - Current user role: ' . ($_SESSION['role_name'] ?? 'NOT SET'));
-error_log('Debug - All session data: ' . print_r($_SESSION, true));
-
-// Check if user has admin privileges (you can modify this logic as needed)
-// Allow multiple possible admin role names
+// Check if user has admin privileges
 $adminRoles = ['Admin', 'admin', 'Administrator', 'administrator'];
 if (!isset($_SESSION['role_name']) || !in_array($_SESSION['role_name'], $adminRoles)) {
-    $_SESSION['flash_error'] = 'Access denied. Admin privileges required. Current role: ' . ($_SESSION['role_name'] ?? 'none');
+    $_SESSION['flash_error'] = 'Access denied. Admin privileges required.';
     header('Location: ' . BASE_URL . '/dashboard.php');
     exit;
 }
