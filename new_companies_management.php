@@ -108,11 +108,6 @@ $isSearchAllMode = !empty($_GET['search']) && empty($_GET['status_id']) && empty
                    empty($_GET['strategy_group_id']) && empty($_GET['broker_id']) && 
                    empty($_GET['yield_min']) && empty($_GET['yield_max']);
 
-// Debug: Check if search all mode is detected and what filters are applied
-if (!empty($_GET['search'])) {
-    error_log("DEBUG: Search term: " . $_GET['search'] . ", Search all mode: " . ($isSearchAllMode ? 'YES' : 'NO'));
-    error_log("DEBUG: Filters passed to DB: " . json_encode($dbFilters));
-}
 
 // Get filter parameters, using admin defaults when no explicit filter is set (unless in search all mode)
 $filters = [
