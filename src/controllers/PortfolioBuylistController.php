@@ -57,10 +57,10 @@ class PortfolioBuylistController {
                 $statusConditions = [];
                 foreach ($statusValues as $index => $value) {
                     if ($value === 'null') {
-                        $statusConditions[] = "nc.buylist_status_id IS NULL";
+                        $statusConditions[] = "nc.status_id IS NULL";
                     } else {
                         $paramName = ":status_id_$index";
-                        $statusConditions[] = "nc.buylist_status_id = $paramName";
+                        $statusConditions[] = "nc.status_id = $paramName";
                         $params[$paramName] = $value;
                     }
                 }
@@ -143,13 +143,13 @@ class PortfolioBuylistController {
                            br.broker_name,
                            nc.inspiration,
                            nc.comments,
-                           nc.buylist_status_id as new_companies_status_id,
+                           nc.status_id as new_companies_status_id,
                            bs.status as status_name,
                            nc.buylistcol as new_companies_col
                     FROM new_companies nc 
                     LEFT JOIN psw_foundation.portfolio_strategy_groups psg ON nc.strategy_group_id = psg.strategy_group_id
                     LEFT JOIN psw_foundation.brokers br ON nc.broker_id = br.broker_id
-                    LEFT JOIN buylist_status bs ON nc.buylist_status_id = bs.id
+                    LEFT JOIN buylist_status bs ON nc.status_id = bs.status_id
                     $whereClause 
                     ORDER BY nc.buy_list_id DESC 
                     LIMIT :limit OFFSET :offset";
@@ -250,7 +250,7 @@ class PortfolioBuylistController {
                 'broker_id' => !empty($data['broker_id']) ? (int)$data['broker_id'] : null,
                 'inspiration' => !empty($data['inspiration']) ? Security::sanitizeInput($data['inspiration']) : null,
                 'comments' => !empty($data['comments']) ? Security::sanitizeInput($data['comments']) : null,
-                'buylist_status_id' => !empty($data['new_companies_status_id']) ? (int)$data['new_companies_status_id'] : null,
+                'status_id' => !empty($data['new_companies_status_id']) ? (int)$data['new_companies_status_id'] : null,
                 'buylistcol' => !empty($data['new_companies_col']) ? Security::sanitizeInput($data['new_companies_col']) : null
             ];
             
@@ -326,8 +326,8 @@ class PortfolioBuylistController {
             }
             
             if (isset($data['new_companies_status_id'])) {
-                $updateData[] = "buylist_status_id = :buylist_status_id";
-                $params[':buylist_status_id'] = (int)$data['new_companies_status_id'];
+                $updateData[] = "status_id = :status_id";
+                $params[':status_id'] = (int)$data['new_companies_status_id'];
             }
             
             if (empty($updateData)) {
@@ -378,11 +378,11 @@ class PortfolioBuylistController {
             $sql = "SELECT nc.*,
                            psg.strategy_name,
                            br.broker_name,
-                           ncs.status as status_name
+                           bs.status as status_name
                     FROM new_companies nc 
                     LEFT JOIN psw_foundation.portfolio_strategy_groups psg ON nc.strategy_group_id = psg.strategy_group_id
                     LEFT JOIN psw_foundation.brokers br ON nc.broker_id = br.broker_id
-                    LEFT JOIN new_companies_status ncs ON nc.new_companies_status_id = ncs.id
+                    LEFT JOIN buylist_status bs ON nc.status_id = bs.status_id
                     WHERE nc.buy_list_id = :buy_list_id";
             $stmt = $this->portfolioDb->prepare($sql);
             $stmt->bindValue(':buy_list_id', $companyId, PDO::PARAM_INT);
