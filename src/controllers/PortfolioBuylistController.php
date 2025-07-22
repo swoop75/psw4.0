@@ -30,7 +30,7 @@ class PortfolioBuylistController {
             
             // Build WHERE conditions based on filters
             if (!empty($filters['search'])) {
-                $whereConditions[] = "(b.company LIKE :search OR b.ticker LIKE :search OR b.isin LIKE :search)";
+                $whereConditions[] = "(nc.company LIKE :search OR nc.ticker LIKE :search OR nc.isin LIKE :search)";
                 $params[':search'] = '%' . $filters['search'] . '%';
             }
             
@@ -116,7 +116,7 @@ class PortfolioBuylistController {
             $whereClause = 'WHERE ' . implode(' AND ', $whereConditions);
             
             // Count total records
-            $countSql = "SELECT COUNT(*) as total FROM buylist b $whereClause";
+            $countSql = "SELECT COUNT(*) as total FROM new_companies nc $whereClause";
             $countStmt = $this->portfolioDb->prepare($countSql);
             foreach ($params as $key => $value) {
                 $countStmt->bindValue($key, $value);
@@ -128,30 +128,30 @@ class PortfolioBuylistController {
             $offset = ($page - 1) * $limit;
             $totalPages = ceil($totalRecords / $limit);
             
-            // Get buylist entries with reference data (cross-database joins)
-            $sql = "SELECT b.buy_list_id,
-                           b.company,
-                           b.ticker,
-                           b.isin,
-                           b.country_name,
-                           b.country_id,
-                           b.yield,
-                           b.strategy_group_id,
+            // Get new_companies entries with reference data (cross-database joins)
+            $sql = "SELECT nc.new_companies_id,
+                           nc.company,
+                           nc.ticker,
+                           nc.isin,
+                           nc.country_name,
+                           nc.country_id,
+                           nc.yield,
+                           nc.strategy_group_id,
                            psg.strategy_name,
-                           b.new_group_id,
-                           b.broker_id,
+                           nc.new_group_id,
+                           nc.broker_id,
                            br.broker_name,
-                           b.inspiration,
-                           b.comments,
-                           b.buylist_status_id,
-                           bs.status as status_name,
-                           b.buylistcol
-                    FROM buylist b 
-                    LEFT JOIN psw_foundation.portfolio_strategy_groups psg ON b.strategy_group_id = psg.strategy_group_id
-                    LEFT JOIN psw_foundation.brokers br ON b.broker_id = br.broker_id
-                    LEFT JOIN buylist_status bs ON b.buylist_status_id = bs.id
+                           nc.inspiration,
+                           nc.comments,
+                           nc.new_companies_status_id,
+                           ncs.status as status_name,
+                           nc.new_companies_col
+                    FROM new_companies nc 
+                    LEFT JOIN psw_foundation.portfolio_strategy_groups psg ON nc.strategy_group_id = psg.strategy_group_id
+                    LEFT JOIN psw_foundation.brokers br ON nc.broker_id = br.broker_id
+                    LEFT JOIN new_companies_status ncs ON nc.new_companies_status_id = ncs.id
                     $whereClause 
-                    ORDER BY b.buy_list_id DESC 
+                    ORDER BY nc.new_companies_id DESC 
                     LIMIT :limit OFFSET :offset";
             
             $stmt = $this->portfolioDb->prepare($sql);
@@ -168,7 +168,7 @@ class PortfolioBuylistController {
             $formattedEntries = [];
             foreach ($entries as $entry) {
                 $formattedEntries[] = [
-                    'buy_list_id' => $entry['buy_list_id'],
+                    'new_companies_id' => $entry['new_companies_id'],
                     'company' => $entry['company'],
                     'ticker' => $entry['ticker'],
                     'isin' => $entry['isin'],
@@ -182,9 +182,9 @@ class PortfolioBuylistController {
                     'broker_name' => $entry['broker_name'],
                     'inspiration' => $entry['inspiration'],
                     'comments' => $entry['comments'],
-                    'buylist_status_id' => $entry['buylist_status_id'],
+                    'new_companies_status_id' => $entry['new_companies_status_id'],
                     'status_name' => $entry['status_name'],
-                    'buylistcol' => $entry['buylistcol']
+                    'new_companies_col' => $entry['new_companies_col']
                 ];
             }
             
@@ -207,19 +207,19 @@ class PortfolioBuylistController {
     }
     
     /**
-     * Add new buylist entry
+     * Add new company entry
      * @param array $data Entry data
      * @return bool Success status
      */
-    public function addBuylistEntry($data) {
+    public function addNewCompanyEntry($data) {
         try {
             // Validate required fields
             if (empty($data['company'])) {
                 throw new Exception('Company name is required');
             }
             
-            // Check if this company is already in buylist (by company name and ticker if available)
-            $checkSql = "SELECT buy_list_id FROM buylist WHERE company = :company";
+            // Check if this company is already in new_companies (by company name and ticker if available)
+            $checkSql = "SELECT new_companies_id FROM new_companies WHERE company = :company";
             $checkParams = [':company' => $data['company']];
             
             if (!empty($data['ticker'])) {
@@ -234,7 +234,7 @@ class PortfolioBuylistController {
             $stmt->execute();
             
             if ($stmt->fetch()) {
-                throw new Exception('This company is already in the buylist');
+                throw new Exception('This company is already in the new companies list');
             }
             
             // Prepare data for insertion
@@ -250,15 +250,15 @@ class PortfolioBuylistController {
                 'broker_id' => !empty($data['broker_id']) ? (int)$data['broker_id'] : null,
                 'inspiration' => !empty($data['inspiration']) ? Security::sanitizeInput($data['inspiration']) : null,
                 'comments' => !empty($data['comments']) ? Security::sanitizeInput($data['comments']) : null,
-                'buylist_status_id' => !empty($data['buylist_status_id']) ? (int)$data['buylist_status_id'] : null,
-                'buylistcol' => !empty($data['buylistcol']) ? Security::sanitizeInput($data['buylistcol']) : null
+                'new_companies_status_id' => !empty($data['new_companies_status_id']) ? (int)$data['new_companies_status_id'] : null,
+                'new_companies_col' => !empty($data['new_companies_col']) ? Security::sanitizeInput($data['new_companies_col']) : null
             ];
             
             // Build INSERT query
             $fields = array_keys($insertData);
             $placeholders = ':' . implode(', :', $fields);
             
-            $sql = "INSERT INTO buylist (" . implode(', ', $fields) . ") VALUES ($placeholders)";
+            $sql = "INSERT INTO new_companies (" . implode(', ', $fields) . ") VALUES ($placeholders)";
             $stmt = $this->portfolioDb->prepare($sql);
             
             foreach ($insertData as $key => $value) {
@@ -268,7 +268,7 @@ class PortfolioBuylistController {
             $success = $stmt->execute();
             
             if ($success) {
-                Logger::info('Buylist entry added successfully', [
+                Logger::info('New company entry added successfully', [
                     'company' => $data['company'],
                     'isin' => $data['isin']
                 ]);
@@ -277,28 +277,28 @@ class PortfolioBuylistController {
             return $success;
             
         } catch (Exception $e) {
-            Logger::error('Add buylist entry error: ' . $e->getMessage());
+            Logger::error('Add new company entry error: ' . $e->getMessage());
             return false;
         }
     }
     
     /**
-     * Update buylist entry
-     * @param int $buylistId Entry ID
+     * Update new company entry
+     * @param int $companyId Entry ID
      * @param array $data Updated data
      * @return bool Success status
      */
-    public function updateBuylistEntry($buylistId, $data) {
+    public function updateNewCompanyEntry($companyId, $data) {
         try {
             // Get current entry
-            $currentEntry = $this->getBuylistEntry($buylistId);
+            $currentEntry = $this->getNewCompanyEntry($companyId);
             if (!$currentEntry) {
-                throw new Exception('Buylist entry not found');
+                throw new Exception('New company entry not found');
             }
             
             // Prepare update data
             $updateData = [];
-            $params = [':buy_list_id' => $buylistId];
+            $params = [':new_companies_id' => $companyId];
             
             if (isset($data['company'])) {
                 $updateData[] = "company = :company";
@@ -325,16 +325,16 @@ class PortfolioBuylistController {
                 $params[':comments'] = Security::sanitizeInput($data['comments']);
             }
             
-            if (isset($data['buylist_status_id'])) {
-                $updateData[] = "buylist_status_id = :buylist_status_id";
-                $params[':buylist_status_id'] = (int)$data['buylist_status_id'];
+            if (isset($data['new_companies_status_id'])) {
+                $updateData[] = "new_companies_status_id = :new_companies_status_id";
+                $params[':new_companies_status_id'] = (int)$data['new_companies_status_id'];
             }
             
             if (empty($updateData)) {
                 return true; // Nothing to update
             }
             
-            $sql = "UPDATE buylist SET " . implode(', ', $updateData) . " WHERE buy_list_id = :buy_list_id";
+            $sql = "UPDATE new_companies SET " . implode(', ', $updateData) . " WHERE new_companies_id = :new_companies_id";
             $stmt = $this->portfolioDb->prepare($sql);
             
             foreach ($params as $key => $value) {
@@ -344,63 +344,63 @@ class PortfolioBuylistController {
             return $stmt->execute();
             
         } catch (Exception $e) {
-            Logger::error('Update buylist entry error: ' . $e->getMessage());
+            Logger::error('Update new company entry error: ' . $e->getMessage());
             return false;
         }
     }
     
     /**
-     * Delete buylist entry
-     * @param int $buylistId Entry ID
+     * Delete new company entry
+     * @param int $companyId Entry ID
      * @return bool Success status
      */
-    public function deleteBuylistEntry($buylistId) {
+    public function deleteNewCompanyEntry($companyId) {
         try {
-            $sql = "DELETE FROM buylist WHERE buy_list_id = :buy_list_id";
+            $sql = "DELETE FROM new_companies WHERE new_companies_id = :new_companies_id";
             $stmt = $this->portfolioDb->prepare($sql);
-            $stmt->bindValue(':buy_list_id', $buylistId, PDO::PARAM_INT);
+            $stmt->bindValue(':new_companies_id', $companyId, PDO::PARAM_INT);
             
             return $stmt->execute();
             
         } catch (Exception $e) {
-            Logger::error('Delete buylist entry error: ' . $e->getMessage());
+            Logger::error('Delete new company entry error: ' . $e->getMessage());
             return false;
         }
     }
     
     /**
-     * Get single buylist entry with reference data
-     * @param int $buylistId Entry ID
+     * Get single new company entry with reference data
+     * @param int $companyId Entry ID
      * @return array|false Entry data or false if not found
      */
-    public function getBuylistEntry($buylistId) {
+    public function getNewCompanyEntry($companyId) {
         try {
-            $sql = "SELECT b.*,
+            $sql = "SELECT nc.*,
                            psg.strategy_name,
                            br.broker_name,
-                           bs.status as status_name
-                    FROM buylist b 
-                    LEFT JOIN psw_foundation.portfolio_strategy_groups psg ON b.strategy_group_id = psg.strategy_group_id
-                    LEFT JOIN psw_foundation.brokers br ON b.broker_id = br.broker_id
-                    LEFT JOIN buylist_status bs ON b.buylist_status_id = bs.id
-                    WHERE b.buy_list_id = :buy_list_id";
+                           ncs.status as status_name
+                    FROM new_companies nc 
+                    LEFT JOIN psw_foundation.portfolio_strategy_groups psg ON nc.strategy_group_id = psg.strategy_group_id
+                    LEFT JOIN psw_foundation.brokers br ON nc.broker_id = br.broker_id
+                    LEFT JOIN new_companies_status ncs ON nc.new_companies_status_id = ncs.id
+                    WHERE nc.new_companies_id = :new_companies_id";
             $stmt = $this->portfolioDb->prepare($sql);
-            $stmt->bindValue(':buy_list_id', $buylistId, PDO::PARAM_INT);
+            $stmt->bindValue(':new_companies_id', $companyId, PDO::PARAM_INT);
             $stmt->execute();
             
             return $stmt->fetch() ?: false;
             
         } catch (Exception $e) {
-            Logger::error('Get buylist entry error: ' . $e->getMessage());
+            Logger::error('Get new company entry error: ' . $e->getMessage());
             return false;
         }
     }
     
     /**
-     * Get buylist statistics
+     * Get new companies statistics
      * @return array Statistics
      */
-    public function getBuylistStatistics() {
+    public function getNewCompaniesStatistics() {
         try {
             $sql = "SELECT 
                         COUNT(*) as total_entries,
@@ -408,7 +408,7 @@ class PortfolioBuylistController {
                         AVG(yield) as avg_yield,
                         MAX(yield) as max_yield,
                         MIN(yield) as min_yield
-                    FROM buylist 
+                    FROM new_companies 
                     WHERE yield IS NOT NULL AND yield > 0";
             
             $stmt = $this->portfolioDb->prepare($sql);
@@ -424,7 +424,7 @@ class PortfolioBuylistController {
             ];
             
         } catch (Exception $e) {
-            Logger::error('Buylist statistics error: ' . $e->getMessage());
+            Logger::error('New companies statistics error: ' . $e->getMessage());
             return [
                 'total_entries' => 0,
                 'unique_countries' => 0,
@@ -443,7 +443,7 @@ class PortfolioBuylistController {
         try {
             // Get unique countries
             $countriesSql = "SELECT DISTINCT country_name 
-                            FROM buylist 
+                            FROM new_companies 
                             WHERE country_name IS NOT NULL AND country_name != ''
                             ORDER BY country_name";
             $stmt = $this->portfolioDb->prepare($countriesSql);
@@ -462,8 +462,8 @@ class PortfolioBuylistController {
             $stmt->execute();
             $brokers = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
-            // Get buylist statuses
-            $statusesSql = "SELECT id, status FROM buylist_status ORDER BY id";
+            // Get new companies statuses
+            $statusesSql = "SELECT id, status FROM new_companies_status ORDER BY id";
             $stmt = $this->portfolioDb->prepare($statusesSql);
             $stmt->execute();
             $statuses = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -495,24 +495,24 @@ class PortfolioBuylistController {
     }
     
     /**
-     * Add buylist entry to masterlist (placeholder for portfolio schema)
-     * @param int $buylistId Buylist entry ID
+     * Add new company entry to masterlist (placeholder for portfolio schema)
+     * @param int $companyId New company entry ID
      * @param array $masterlistData Additional masterlist data
      * @return bool Success status
      */
-    public function addToMasterlist($buylistId, $masterlistData = []) {
+    public function addToMasterlist($companyId, $masterlistData = []) {
         try {
-            // Get buylist entry
-            $buylistEntry = $this->getBuylistEntry($buylistId);
-            if (!$buylistEntry) {
-                throw new Exception('Buylist entry not found');
+            // Get new company entry
+            $companyEntry = $this->getNewCompanyEntry($companyId);
+            if (!$companyEntry) {
+                throw new Exception('New company entry not found');
             }
             
             // For now, just return true as a placeholder
             // This would need to be implemented with the actual masterlist integration
             Logger::info('Add to masterlist placeholder called', [
-                'buylist_id' => $buylistId,
-                'company' => $buylistEntry['company']
+                'company_id' => $companyId,
+                'company' => $companyEntry['company']
             ]);
             
             return true;
@@ -524,13 +524,13 @@ class PortfolioBuylistController {
     }
     
     /**
-     * Export buylist to CSV
+     * Export new companies to CSV
      * @param array $filters Optional filters
      * @return string CSV content
      */
     public function exportToCSV($filters = []) {
         try {
-            $data = $this->getBuylist($filters, 1, 10000); // Get all entries
+            $data = $this->getNewCompanies($filters, 1, 10000); // Get all entries
             
             $csv = "Company,Ticker,ISIN,Country,Yield,Comments,Inspiration\n";
             

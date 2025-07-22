@@ -36,36 +36,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WI
         
         switch ($action) {
             case 'add':
-                $result = $controller->addBuylistEntry($_POST);
-                echo json_encode(['success' => $result, 'message' => $result ? 'Entry added to buylist successfully' : 'Failed to add entry']);
+                $result = $controller->addNewCompanyEntry($_POST);
+                echo json_encode(['success' => $result, 'message' => $result ? 'Entry added to new companies successfully' : 'Failed to add entry']);
                 break;
                 
             case 'add_to_masterlist':
-                $buylistId = $_POST['buy_list_id'] ?? '';
+                $companyId = $_POST['new_companies_id'] ?? '';
                 $masterlistData = [
                     'market' => $_POST['market'] ?? null,
                     'share_type_id' => $_POST['share_type_id'] ?? 1
                 ];
-                $result = $controller->addToMasterlist($buylistId, $masterlistData);
+                $result = $controller->addToMasterlist($companyId, $masterlistData);
                 echo json_encode(['success' => $result, 'message' => $result ? 'Company added to masterlist successfully' : 'Failed to add to masterlist']);
                 break;
                 
             case 'update':
-                $buylistId = $_POST['buy_list_id'] ?? '';
-                unset($_POST['action'], $_POST['csrf_token'], $_POST['buy_list_id']);
-                $result = $controller->updateBuylistEntry($buylistId, $_POST);
+                $companyId = $_POST['new_companies_id'] ?? '';
+                unset($_POST['action'], $_POST['csrf_token'], $_POST['new_companies_id']);
+                $result = $controller->updateNewCompanyEntry($companyId, $_POST);
                 echo json_encode(['success' => $result, 'message' => $result ? 'Entry updated successfully' : 'Failed to update entry']);
                 break;
                 
             case 'delete':
-                $buylistId = $_POST['buy_list_id'] ?? '';
-                $result = $controller->deleteBuylistEntry($buylistId);
-                echo json_encode(['success' => $result, 'message' => $result ? 'Entry removed from buylist' : 'Failed to remove entry']);
+                $companyId = $_POST['new_companies_id'] ?? '';
+                $result = $controller->deleteNewCompanyEntry($companyId);
+                echo json_encode(['success' => $result, 'message' => $result ? 'Entry removed from new companies' : 'Failed to remove entry']);
                 break;
                 
             case 'get_entry':
-                $buylistId = $_POST['buy_list_id'] ?? '';
-                $entry = $controller->getBuylistEntry($buylistId);
+                $companyId = $_POST['new_companies_id'] ?? '';
+                $entry = $controller->getNewCompanyEntry($companyId);
                 echo json_encode(['success' => (bool)$entry, 'entry' => $entry]);
                 break;
                 
@@ -106,7 +106,7 @@ $defaultBrokers = $adminDefaults['broker_defaults'] ?? [];
 // Get filter parameters, using admin defaults when no explicit filter is set
 $filters = [
     'search' => $_GET['search'] ?? '',
-    'buylist_status_id' => $_GET['status_id'] ?? (!empty($defaultStatusIds) ? implode(',', $defaultStatusIds) : ''),
+    'new_companies_status_id' => $_GET['status_id'] ?? (!empty($defaultStatusIds) ? implode(',', $defaultStatusIds) : ''),
     'country_name' => $_GET['country'] ?? (!empty($defaultCountries) ? implode(',', $defaultCountries) : ''),
     'strategy_group_id' => $_GET['strategy_group_id'] ?? (!empty($defaultStrategies) ? implode(',', $defaultStrategies) : ''),
     'broker_id' => $_GET['broker_id'] ?? (!empty($defaultBrokers) ? implode(',', $defaultBrokers) : ''),
@@ -120,18 +120,18 @@ $limit = max(10, min(100, (int)($_GET['limit'] ?? 25)));
 
 // Get data
 try {
-    $buylistData = $controller->getBuylist(array_filter($filters), $page, $limit);
+    $newCompaniesData = $controller->getNewCompanies(array_filter($filters), $page, $limit);
     $filterOptions = $controller->getFilterOptions();
-    $statistics = $controller->getBuylistStatistics();
+    $statistics = $controller->getNewCompaniesStatistics();
 } catch (Exception $e) {
     $errorMessage = 'Error loading data: ' . $e->getMessage();
-    $buylistData = ['entries' => [], 'pagination' => []];
+    $newCompaniesData = ['entries' => [], 'pagination' => []];
     $filterOptions = [];
     $statistics = [];
 }
 
 // Initialize variables for template
-$pageTitle = 'Buylist Management - PSW 4.0';
+$pageTitle = 'New Companies Management - PSW 4.0';
 $pageDescription = 'Manage your watchlist and buy targets';
 $additionalCSS = [
     BASE_URL . '/assets/css/improved-buylist-management.css?v=' . time(),
@@ -157,7 +157,7 @@ ob_start();
         <div class="page-header">
             <div class="header-content">
                 <div class="header-left">
-                    <h1><i class="fas fa-star"></i> Buylist Management</h1>
+                    <h1><i class="fas fa-star"></i> New Companies Management</h1>
                     <p>Manage your watchlist and buy targets</p>
                     <p class="header-hint"><i class="fas fa-info-circle"></i> Hover over company names for detailed information</p>
                 </div>
@@ -186,7 +186,7 @@ ob_start();
             <div class="toolbar">
                 <div class="toolbar-left">
                     <button class="btn btn-primary" onclick="showAddModal()">
-                        <i class="fas fa-plus"></i> Add to Buylist
+                        <i class="fas fa-plus"></i> Add New Company
                     </button>
                     <button class="btn btn-secondary" onclick="refreshData()">
                         <i class="fas fa-sync-alt"></i> Refresh
@@ -204,7 +204,7 @@ ob_start();
                         </button>
                         <div class="dropdown-content">
                             <?php 
-                            $selectedStatusIds = !empty($filters['buylist_status_id']) ? explode(',', $filters['buylist_status_id']) : [];
+                            $selectedStatusIds = !empty($filters['new_companies_status_id']) ? explode(',', $filters['new_companies_status_id']) : [];
                             
                             // Add null option first - check if it's in selected values or admin defaults
                             $isNullSelected = in_array('null', $selectedStatusIds);
@@ -327,8 +327,8 @@ ob_start();
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if (!empty($buylistData['entries'])): ?>
-                            <?php foreach ($buylistData['entries'] as $entry): ?>
+                        <?php if (!empty($newCompaniesData['entries'])): ?>
+                            <?php foreach ($newCompaniesData['entries'] as $entry): ?>
                                 <tr>
                                     <td>
                                         <div class="company-info" 
@@ -378,13 +378,13 @@ ob_start();
                                     </td>
                                     <td>
                                         <div class="action-buttons">
-                                                <button class="btn-icon btn-success" onclick="addToMasterlist(<?= $entry['buy_list_id'] ?>, '<?= htmlspecialchars($entry['company']) ?>')" title="Add to Masterlist">
+                                                <button class="btn-icon btn-success" onclick="addToMasterlist(<?= $entry['new_companies_id'] ?>, '<?= htmlspecialchars($entry['company']) ?>')" title="Add to Masterlist">
                                                     <i class="fas fa-plus-circle"></i>
                                                 </button>
-                                            <button class="btn-icon" onclick="editEntry(<?= $entry['buy_list_id'] ?>)" title="Edit">
+                                            <button class="btn-icon" onclick="editEntry(<?= $entry['new_companies_id'] ?>)" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            <button class="btn-icon btn-danger" onclick="deleteEntry(<?= $entry['buy_list_id'] ?>, '<?= htmlspecialchars($entry['company']) ?>')" title="Remove">
+                                            <button class="btn-icon btn-danger" onclick="deleteEntry(<?= $entry['new_companies_id'] ?>, '<?= htmlspecialchars($entry['company']) ?>')" title="Remove">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </div>
@@ -396,7 +396,7 @@ ob_start();
                                 <td colspan="6" class="text-center">
                                     <div class="empty-state">
                                         <i class="fas fa-star"></i>
-                                        <p>Your buylist is empty</p>
+                                        <p>Your new companies list is empty</p>
                                         <button class="btn btn-primary" onclick="showAddModal()">
                                             <i class="fas fa-plus"></i> Add First Entry
                                         </button>
@@ -409,24 +409,24 @@ ob_start();
             </div>
 
             <!-- Pagination -->
-            <?php if (!empty($buylistData['pagination'])): ?>
+            <?php if (!empty($newCompaniesData['pagination'])): ?>
                 <div class="pagination">
                     <div class="pagination-info">
-                        Showing <?= count($buylistData['entries']) ?> of <?= $buylistData['pagination']['total_records'] ?> entries
+                        Showing <?= count($newCompaniesData['entries']) ?> of <?= $newCompaniesData['pagination']['total_records'] ?> entries
                     </div>
                     <div class="pagination-controls">
-                        <?php if ($buylistData['pagination']['has_previous']): ?>
-                            <a href="?<?= http_build_query(array_merge($_GET, ['page' => $buylistData['pagination']['current_page'] - 1])) ?>" class="btn btn-sm">
+                        <?php if ($newCompaniesData['pagination']['has_previous']): ?>
+                            <a href="?<?= http_build_query(array_merge($_GET, ['page' => $newCompaniesData['pagination']['current_page'] - 1])) ?>" class="btn btn-sm">
                                 <i class="fas fa-chevron-left"></i> Previous
                             </a>
                         <?php endif; ?>
                         
                         <span class="page-info">
-                            Page <?= $buylistData['pagination']['current_page'] ?> of <?= $buylistData['pagination']['total_pages'] ?>
+                            Page <?= $newCompaniesData['pagination']['current_page'] ?> of <?= $newCompaniesData['pagination']['total_pages'] ?>
                         </span>
                         
-                        <?php if ($buylistData['pagination']['has_next']): ?>
-                            <a href="?<?= http_build_query(array_merge($_GET, ['page' => $buylistData['pagination']['current_page'] + 1])) ?>" class="btn btn-sm">
+                        <?php if ($newCompaniesData['pagination']['has_next']): ?>
+                            <a href="?<?= http_build_query(array_merge($_GET, ['page' => $newCompaniesData['pagination']['current_page'] + 1])) ?>" class="btn btn-sm">
                                 Next <i class="fas fa-chevron-right"></i>
                             </a>
                         <?php endif; ?>
@@ -440,12 +440,12 @@ ob_start();
     <div id="entryModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="modalTitle">Add to Buylist</h3>
+                <h3 id="modalTitle">Add New Company</h3>
                 <button class="modal-close" onclick="closeModal()">&times;</button>
             </div>
             <form id="entryForm">
                 <input type="hidden" id="modalAction" name="action" value="add">
-                <input type="hidden" id="buylistId" name="buy_list_id" value="">
+                <input type="hidden" id="companyId" name="new_companies_id" value="">
                 <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
                 
                 
@@ -500,8 +500,8 @@ ob_start();
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="buylist_status_id">Status</label>
-                            <select id="buylist_status_id" name="buylist_status_id">
+                            <label for="new_companies_status_id">Status</label>
+                            <select id="new_companies_status_id" name="new_companies_status_id">
                                 <option value="">Select Status</option>
                                 <?php foreach ($filterOptions['statuses'] ?? [] as $status): ?>
                                     <option value="<?= $status['id'] ?>">
@@ -545,7 +545,7 @@ ob_start();
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
                     <button type="submit" class="btn btn-primary">
-                        <span id="submitText">Add to Buylist</span>
+                        <span id="submitText">Add New Company</span>
                     </button>
                 </div>
             </form>
@@ -561,7 +561,7 @@ ob_start();
             </div>
             <form id="masterlistForm">
                 <input type="hidden" name="action" value="add_to_masterlist">
-                <input type="hidden" id="masterlistBuylistId" name="buy_list_id" value="">
+                <input type="hidden" id="masterlistCompanyId" name="new_companies_id" value="">
                 <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
                 
                 <div class="modal-body">
@@ -612,12 +612,12 @@ ob_start();
                 <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <p>Are you sure you want to remove <strong id="deleteCompanyName"></strong> from your buylist?</p>
+                <p>Are you sure you want to remove <strong id="deleteCompanyName"></strong> from your new companies list?</p>
             </div>
             <div class="form-actions">
                 <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
                 <button type="button" class="btn btn-danger" onclick="confirmDelete()">
-                    <i class="fas fa-trash"></i> Remove from Buylist
+                    <i class="fas fa-trash"></i> Remove from List
                 </button>
             </div>
         </div>

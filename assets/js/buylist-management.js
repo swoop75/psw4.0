@@ -148,9 +148,9 @@ function showAddModal() {
     form.reset();
     
     // Set modal for create mode
-    modalTitle.textContent = 'Add to Buylist';
+    modalTitle.textContent = 'Add New Company';
     modalAction.value = 'add';
-    submitText.textContent = 'Add to Buylist';
+    submitText.textContent = 'Add New Company';
     
     // No tabs to reset in simplified form
     
@@ -168,21 +168,21 @@ function showAddModal() {
 /**
  * Edit entry
  */
-function editEntry(buylistId) {
+function editEntry(companyId) {
     const modal = document.getElementById('entryModal');
     const modalTitle = document.getElementById('modalTitle');
     const modalAction = document.getElementById('modalAction');
     const submitText = document.getElementById('submitText');
     
     // Set modal for edit mode
-    modalTitle.textContent = 'Edit Buylist Entry';
+    modalTitle.textContent = 'Edit Company Entry';
     modalAction.value = 'update';
     submitText.textContent = 'Update Entry';
     
     // Get entry data via AJAX
     const formData = new FormData();
     formData.append('action', 'get_entry');
-    formData.append('buy_list_id', buylistId);
+    formData.append('new_companies_id', companyId);
     formData.append('csrf_token', document.querySelector('input[name="csrf_token"]').value);
     
     showLoading('Loading entry data...');
@@ -201,8 +201,8 @@ function editEntry(buylistId) {
         if (data.success && data.entry) {
             populateEntryForm(data.entry);
             
-            // Store buylist ID
-            document.getElementById('buylistId').value = buylistId;
+            // Store company ID
+            document.getElementById('companyId').value = companyId;
             
             modal.style.display = 'block';
         } else {
@@ -259,7 +259,7 @@ function handleEntryFormSubmit(event) {
     const action = formData.get('action');
     
     // Validate required fields
-    const requiredFields = ['company_name', 'ticker', 'status_id'];
+    const requiredFields = ['company', 'ticker'];
     let isValid = true;
     
     for (const field of requiredFields) {
@@ -315,8 +315,8 @@ function handleEntryFormSubmit(event) {
 /**
  * Delete entry
  */
-function deleteEntry(buylistId, companyName) {
-    deleteEntryId = buylistId;
+function deleteEntry(companyId, companyName) {
+    deleteEntryId = companyId;
     document.getElementById('deleteCompanyName').textContent = companyName;
     document.getElementById('deleteModal').style.display = 'block';
 }
@@ -337,7 +337,7 @@ function confirmDelete() {
     
     const formData = new FormData();
     formData.append('action', 'delete');
-    formData.append('buy_list_id', deleteEntryId);
+    formData.append('new_companies_id', deleteEntryId);
     formData.append('csrf_token', document.querySelector('input[name="csrf_token"]').value);
     
     const deleteButton = document.querySelector('#deleteModal .btn-danger');
@@ -380,10 +380,10 @@ function confirmDelete() {
 /**
  * Add to masterlist
  */
-function addToMasterlist(buylistId, companyName) {
-    deleteMasterlistId = buylistId;
+function addToMasterlist(companyId, companyName) {
+    deleteMasterlistId = companyId;
     document.getElementById('masterlistCompanyName').textContent = companyName;
-    document.getElementById('masterlistBuylistId').value = buylistId;
+    document.getElementById('masterlistCompanyId').value = companyId;
     document.getElementById('masterlistModal').style.display = 'block';
 }
 

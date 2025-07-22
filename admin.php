@@ -292,7 +292,7 @@ ob_start();
                 <div class="action-grid">
                     <a href="<?= BASE_URL ?>/buylist_management.php" class="action-card">
                         <i class="fas fa-star"></i>
-                        <span>Buylist Management</span>
+                        <span>New Companies Management</span>
                     </a>
                     <a href="<?= BASE_URL ?>/masterlist_management.php" class="action-card">
                         <i class="fas fa-list"></i>
