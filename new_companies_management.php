@@ -114,8 +114,8 @@ $filters = [
     'yield_max' => $_GET['yield_max'] ?? ''
 ];
 
-// Remove empty filters to avoid parameter binding issues
-$filters = array_filter($filters, function($value) {
+// Create filtered array for database query (remove empty values to avoid parameter binding issues)
+$dbFilters = array_filter($filters, function($value) {
     return $value !== null && $value !== '';
 });
 
@@ -124,7 +124,7 @@ $limit = max(10, min(100, (int)($_GET['limit'] ?? 25)));
 
 // Get data
 try {
-    $newCompaniesData = $controller->getNewCompanies($filters, $page, $limit);
+    $newCompaniesData = $controller->getNewCompanies($dbFilters, $page, $limit);
     $filterOptions = $controller->getFilterOptions();
     $statistics = $controller->getNewCompaniesStatistics();
 } catch (Exception $e) {
@@ -199,7 +199,7 @@ ob_start();
                 <div class="toolbar-right">
                     <div class="search-box">
                         <i class="fas fa-search"></i>
-                        <input type="text" id="searchInput" placeholder="Search companies, notes..." value="<?= htmlspecialchars($filters['search']) ?>">
+                        <input type="text" id="searchInput" placeholder="Search companies, notes..." value="<?= htmlspecialchars($filters['search'] ?? '') ?>">
                     </div>
                     <div class="checkbox-dropdown" data-filter="status">
                         <button type="button" class="dropdown-button" id="statusFilter">
