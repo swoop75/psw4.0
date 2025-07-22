@@ -5,6 +5,9 @@
  * Description: Application constants for PSW 4.0
  */
 
+// Session configuration
+define('SESSION_TIMEOUT', 3600); // 1 hour in seconds
+
 // User roles
 define('ROLE_ADMINISTRATOR', 1);
 define('ROLE_USER', 2);
