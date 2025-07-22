@@ -107,27 +107,8 @@ $limit = max(10, min(100, (int)($_GET['limit'] ?? 25)));
 
 // Get data
 try {
-    $filterOptions = $controller->getFilterOptions();
-    
-    // If no status filter is explicitly set, exclude 'no', 'bought', 'blocked' by default
-    if (empty($_GET['status_id'])) {
-        $statusesToExclude = ['no', 'bought', 'blocked'];
-        $defaultStatusIds = [];
-        
-        foreach ($filterOptions['statuses'] ?? [] as $status) {
-            $statusName = strtolower($status['status']);
-            if (!in_array($statusName, $statusesToExclude)) {
-                $defaultStatusIds[] = $status['id'];
-            }
-        }
-        
-        // Set the default filter to show only non-excluded statuses
-        if (!empty($defaultStatusIds)) {
-            $filters['buylist_status_id'] = implode(',', $defaultStatusIds);
-        }
-    }
-    
     $buylistData = $controller->getBuylist(array_filter($filters), $page, $limit);
+    $filterOptions = $controller->getFilterOptions();
     $statistics = $controller->getBuylistStatistics();
 } catch (Exception $e) {
     $errorMessage = 'Error loading data: ' . $e->getMessage();
@@ -211,17 +192,20 @@ ob_start();
                         <div class="dropdown-content">
                             <?php 
                             $selectedStatusIds = !empty($filters['buylist_status_id']) ? explode(',', $filters['buylist_status_id']) : [];
+                            
+                            // Add null option first
+                            $isNullSelected = empty($_GET['status_id']) ? true : in_array('null', $selectedStatusIds);
+                            ?>
+                                <div class="dropdown-option">
+                                    <input type="checkbox" id="status_null" value="null" <?= $isNullSelected ? 'checked' : '' ?>>
+                                    <label for="status_null">No Status (NULL)</label>
+                                </div>
+                            <?php
+                            
                             foreach ($filterOptions['statuses'] ?? [] as $status): 
                                 $statusName = strtolower($status['status']);
                                 $isDefaultUnchecked = in_array($statusName, ['no', 'bought', 'blocked']);
-                                
-                                if (empty($_GET['status_id'])) {
-                                    // No explicit status filter - show default behavior (exclude the 3 special statuses)
-                                    $isChecked = !$isDefaultUnchecked;
-                                } else {
-                                    // Explicit status filter applied - show exactly what user selected
-                                    $isChecked = in_array($status['id'], $selectedStatusIds);
-                                }
+                                $isChecked = in_array($status['id'], $selectedStatusIds);
                             ?>
                                 <div class="dropdown-option">
                                     <input type="checkbox" id="status_<?= $status['id'] ?>" value="<?= $status['id'] ?>" 
@@ -239,6 +223,16 @@ ob_start();
                         <div class="dropdown-content">
                             <?php 
                             $selectedCountries = !empty($filters['country_name']) ? explode(',', $filters['country_name']) : [];
+                            
+                            // Add null option first
+                            $isNullSelected = in_array('null', $selectedCountries);
+                            ?>
+                                <div class="dropdown-option">
+                                    <input type="checkbox" id="country_null" value="null" <?= $isNullSelected ? 'checked' : '' ?>>
+                                    <label for="country_null">No Country (NULL)</label>
+                                </div>
+                            <?php
+                            
                             foreach ($filterOptions['countries'] ?? [] as $country): 
                             ?>
                                 <div class="dropdown-option">
@@ -257,6 +251,16 @@ ob_start();
                         <div class="dropdown-content">
                             <?php 
                             $selectedStrategyIds = !empty($filters['strategy_group_id']) ? explode(',', $filters['strategy_group_id']) : [];
+                            
+                            // Add null option first
+                            $isNullSelected = in_array('null', $selectedStrategyIds);
+                            ?>
+                                <div class="dropdown-option">
+                                    <input type="checkbox" id="strategy_null" value="null" <?= $isNullSelected ? 'checked' : '' ?>>
+                                    <label for="strategy_null">No Strategy Group (NULL)</label>
+                                </div>
+                            <?php
+                            
                             foreach ($filterOptions['strategies'] ?? [] as $strategy): 
                             ?>
                                 <div class="dropdown-option">
@@ -275,6 +279,16 @@ ob_start();
                         <div class="dropdown-content">
                             <?php 
                             $selectedBrokerIds = !empty($filters['broker_id']) ? explode(',', $filters['broker_id']) : [];
+                            
+                            // Add null option first
+                            $isNullSelected = in_array('null', $selectedBrokerIds);
+                            ?>
+                                <div class="dropdown-option">
+                                    <input type="checkbox" id="broker_null" value="null" <?= $isNullSelected ? 'checked' : '' ?>>
+                                    <label for="broker_null">No Broker (NULL)</label>
+                                </div>
+                            <?php
+                            
                             foreach ($filterOptions['brokers'] ?? [] as $broker): 
                             ?>
                                 <div class="dropdown-option">
