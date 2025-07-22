@@ -276,8 +276,9 @@ body {
     background: var(--bg-primary);
     border-radius: var(--radius-2xl);
     box-shadow: var(--shadow-md);
-    overflow: hidden;
     border: 1px solid var(--border-light);
+    position: relative;
+    z-index: 10;
 }
 
 /* Toolbar */
@@ -293,7 +294,8 @@ body {
     flex-wrap: wrap;
     gap: var(--space-4);
     position: relative;
-    overflow: hidden;
+    overflow: visible;
+    z-index: 100;
 }
 
 .toolbar::before {
@@ -499,7 +501,6 @@ select:hover {
     box-shadow: 0 8px 32px rgba(102, 126, 234, 0.1);
     border: 1px solid rgba(102, 126, 234, 0.1);
     position: relative;
-    overflow: hidden;
 }
 
 .table-container::before {
@@ -1122,7 +1123,10 @@ label:not(.checkbox-dropdown label):not(.form-group label) {
 /* Dropdown content hidden by default */
 .checkbox-dropdown .dropdown-content {
     display: none !important;
-    position: fixed;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
     background: var(--bg-white-solid);
     border: 2px solid var(--border-light);
     border-radius: var(--radius-lg);
@@ -1131,6 +1135,7 @@ label:not(.checkbox-dropdown label):not(.form-group label) {
     max-height: 250px;
     overflow-y: auto;
     min-width: 220px;
+    margin-top: var(--space-1);
     backdrop-filter: blur(10px);
 }
 
