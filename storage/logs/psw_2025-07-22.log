@@ -82,3 +82,6 @@
 {"timestamp":"2025-07-22 15:19:21","level":"INFO","user_id":1,"ip":"100.91.97.82","message":"User action: dashboard_viewed","context":{"action":"dashboard_viewed","details":"User accessed dashboard","user_id":1}}
 {"timestamp":"2025-07-22 15:19:31","level":"ERROR","user_id":1,"ip":"100.91.97.82","message":"New companies error: SQLSTATE[HY093]: Invalid parameter number"}
 {"timestamp":"2025-07-22 15:19:31","level":"ERROR","user_id":1,"ip":"100.91.97.82","message":"New companies error: SQLSTATE[HY093]: Invalid parameter number"}
+{"timestamp":"2025-07-22 15:23:23","level":"ERROR","user_id":1,"ip":"100.91.97.82","message":"New companies error: SQLSTATE[HY093]: Invalid parameter number"}
+{"timestamp":"2025-07-22 15:23:24","level":"ERROR","user_id":1,"ip":"100.91.97.82","message":"New companies error: SQLSTATE[HY093]: Invalid parameter number"}
+{"timestamp":"2025-07-22 15:23:28","level":"ERROR","user_id":1,"ip":"100.91.97.82","message":"New companies error: SQLSTATE[HY093]: Invalid parameter number"}
