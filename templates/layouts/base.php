@@ -95,7 +95,10 @@
                             <a href="<?php echo BASE_URL; ?>/masterlist_management.php" class="submenu-link">Masterlist Management</a>
                             <a href="<?php echo BASE_URL; ?>/buylist_management.php" class="submenu-link">Buylist Management</a>
                             <a href="<?php echo BASE_URL; ?>/user_management.php" class="submenu-link">User Management</a>
-                            <?php if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Admin'): ?>
+                            <?php 
+                            $adminRoles = ['Admin', 'admin', 'Administrator', 'administrator'];
+                            if (isset($_SESSION['role_name']) && in_array($_SESSION['role_name'], $adminRoles)): 
+                            ?>
                                 <a href="<?php echo BASE_URL; ?>/admin.php" class="submenu-link">Administration</a>
                             <?php endif; ?>
                         </div>
