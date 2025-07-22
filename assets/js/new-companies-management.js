@@ -670,22 +670,35 @@ function searchAllItems() {
 
 // Toggle company details panel
 function toggleCompanyPanel(button) {
+    alert('Function called! Button: ' + button.tagName);
+    console.log('toggleCompanyPanel called', button);
+    
     // Try to find .company-info in the current element first (for the original "more" button)
     let companyInfo = button.closest('.company-info');
+    console.log('companyInfo from closest:', companyInfo);
     
     // If not found, look for .company-info in the same table row (for action buttons)
     if (!companyInfo) {
         const row = button.closest('tr');
+        console.log('row found:', row);
         companyInfo = row ? row.querySelector('.company-info') : null;
+        console.log('companyInfo from row:', companyInfo);
     }
     
     const panel = document.getElementById('companyPanel');
     const backdrop = document.getElementById('companyPanelBackdrop');
+    console.log('panel:', panel, 'backdrop:', backdrop);
     
-    if (panel.classList.contains('open')) {
+    if (panel && panel.classList.contains('open')) {
+        alert('Closing panel');
         closeCompanyPanel();
-    } else if (companyInfo) {
+    } else if (companyInfo && panel) {
+        alert('Opening panel with company: ' + companyInfo.dataset.company);
+        console.log('Opening panel with companyInfo:', companyInfo.dataset);
         openCompanyPanel(companyInfo);
+    } else {
+        alert('Problem: companyInfo=' + !!companyInfo + ', panel=' + !!panel);
+        console.log('No companyInfo found!');
     }
 }
 
