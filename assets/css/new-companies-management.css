@@ -665,7 +665,7 @@ select:hover {
 }
 
 .country, .exchange {
-    font-weight: var(--font-medium);
+    font-weight: normal;
 }
 
 /* Masterlist Badge */
@@ -690,7 +690,7 @@ select:hover {
     padding: var(--space-2) var(--space-4);
     border-radius: var(--radius-xl);
     font-size: var(--text-xs);
-    font-weight: var(--font-semibold);
+    font-weight: normal;
     color: var(--text-primary);
     white-space: nowrap;
     box-shadow: var(--shadow-sm);
