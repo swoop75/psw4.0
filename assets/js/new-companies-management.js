@@ -2,9 +2,7 @@
  * Buylist Management JavaScript
  */
 
-// Debug: Test if JS file is loading
-console.log('new-companies-management.js is loading...');
-window.testFunction = function() { alert('Test function works!'); };
+// JavaScript file for New Companies Management
 
 // Global variables
 let deleteEntryId = '';
@@ -142,55 +140,30 @@ function refreshData() {
  * Show add entry modal
  */
 function showAddModal() {
-    try {
-        const modal = document.getElementById('entryModal');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalAction = document.getElementById('modalAction');
-        const submitText = document.getElementById('submitText');
-        const form = document.getElementById('entryForm');
-        
-        console.log('Modal elements:', {
-            modal: !!modal,
-            modalTitle: !!modalTitle, 
-            modalAction: !!modalAction,
-            submitText: !!submitText,
-            form: !!form
-        });
-        
-        if (!modal) {
-            alert('Modal not found!');
-            return;
-        }
-        
-        // Reset form
-        if (form) {
-            form.reset();
-        }
-        
-        // Set modal for create mode
-        if (modalTitle) modalTitle.textContent = 'Add New Company';
-        if (modalAction) modalAction.value = 'add';
-        if (submitText) submitText.textContent = 'Add New Company';
-        
-        // Show modal
-        console.log('Setting modal display to block');
-        modal.style.display = 'block';
-        console.log('Modal computed style:', window.getComputedStyle(modal).display);
-        console.log('Modal z-index:', window.getComputedStyle(modal).zIndex);
-        console.log('Modal visibility:', window.getComputedStyle(modal).visibility);
-        
-        // Focus first input
-        setTimeout(() => {
-            const companyField = document.getElementById('company');
-            if (companyField) {
-                companyField.focus();
-            }
-        }, 100);
-        
-    } catch (error) {
-        alert('Error in showAddModal: ' + error.message);
-        console.error('Error in showAddModal:', error);
-    }
+    const modal = document.getElementById('entryModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalAction = document.getElementById('modalAction');
+    const submitText = document.getElementById('submitText');
+    const form = document.getElementById('entryForm');
+    
+    if (!modal) return;
+    
+    // Reset form
+    if (form) form.reset();
+    
+    // Set modal for create mode
+    if (modalTitle) modalTitle.textContent = 'Add New Company';
+    if (modalAction) modalAction.value = 'add';
+    if (submitText) submitText.textContent = 'Add New Company';
+    
+    // Show modal
+    modal.style.display = 'block';
+    
+    // Focus first input
+    setTimeout(() => {
+        const companyField = document.getElementById('company');
+        if (companyField) companyField.focus();
+    }, 100);
 }
 
 /**
@@ -698,38 +671,26 @@ function searchAllItems() {
 
 // Toggle company details panel
 function toggleCompanyPanel(button) {
-    try {
-        // Try to find .company-info in the current element first (for the original "more" button)
-        let companyInfo = button.closest('.company-info');
-        
-        // If not found, look for .company-info in the same table row (for action buttons)
-        if (!companyInfo) {
-            const row = button.closest('tr');
-            if (row) {
-                companyInfo = row.querySelector('.company-info');
-            }
+    // Try to find .company-info in the current element first (for the original "more" button)
+    let companyInfo = button.closest('.company-info');
+    
+    // If not found, look for .company-info in the same table row (for action buttons)
+    if (!companyInfo) {
+        const row = button.closest('tr');
+        if (row) {
+            companyInfo = row.querySelector('.company-info');
         }
-        
-        const panel = document.getElementById('companyPanel');
-        const backdrop = document.getElementById('companyPanelBackdrop');
-        
-        if (!panel || !backdrop) {
-            console.error('Panel elements not found');
-            return;
-        }
-        
-        if (!companyInfo) {
-            console.error('Company info not found');
-            return;
-        }
-        
-        if (panel.classList.contains('open')) {
-            closeCompanyPanel();
-        } else {
-            openCompanyPanel(companyInfo);
-        }
-    } catch (error) {
-        console.error('Error in toggleCompanyPanel:', error);
+    }
+    
+    const panel = document.getElementById('companyPanel');
+    const backdrop = document.getElementById('companyPanelBackdrop');
+    
+    if (!panel || !backdrop || !companyInfo) return;
+    
+    if (panel.classList.contains('open')) {
+        closeCompanyPanel();
+    } else {
+        openCompanyPanel(companyInfo);
     }
 }
 
