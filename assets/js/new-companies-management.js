@@ -141,32 +141,51 @@ function refreshData() {
  * Show add entry modal
  */
 function showAddModal() {
-    alert('showAddModal called!');
-    const modal = document.getElementById('entryModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalAction = document.getElementById('modalAction');
-    const submitText = document.getElementById('submitText');
-    const form = document.getElementById('entryForm');
-    
-    // Reset form
-    form.reset();
-    
-    // Set modal for create mode
-    modalTitle.textContent = 'Add New Company';
-    modalAction.value = 'add';
-    submitText.textContent = 'Add New Company';
-    
-    // No tabs to reset in simplified form
-    
-    modal.style.display = 'block';
-    
-    // Focus first input
-    setTimeout(() => {
-        const companyField = document.getElementById('company');
-        if (companyField) {
-            companyField.focus();
+    try {
+        const modal = document.getElementById('entryModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalAction = document.getElementById('modalAction');
+        const submitText = document.getElementById('submitText');
+        const form = document.getElementById('entryForm');
+        
+        console.log('Modal elements:', {
+            modal: !!modal,
+            modalTitle: !!modalTitle, 
+            modalAction: !!modalAction,
+            submitText: !!submitText,
+            form: !!form
+        });
+        
+        if (!modal) {
+            alert('Modal not found!');
+            return;
         }
-    }, 100);
+        
+        // Reset form
+        if (form) {
+            form.reset();
+        }
+        
+        // Set modal for create mode
+        if (modalTitle) modalTitle.textContent = 'Add New Company';
+        if (modalAction) modalAction.value = 'add';
+        if (submitText) submitText.textContent = 'Add New Company';
+        
+        // Show modal
+        modal.style.display = 'block';
+        
+        // Focus first input
+        setTimeout(() => {
+            const companyField = document.getElementById('company');
+            if (companyField) {
+                companyField.focus();
+            }
+        }, 100);
+        
+    } catch (error) {
+        alert('Error in showAddModal: ' + error.message);
+        console.error('Error in showAddModal:', error);
+    }
 }
 
 /**
@@ -674,14 +693,31 @@ function searchAllItems() {
 
 // Toggle company details panel
 function toggleCompanyPanel(button) {
-    // Simple test first
-    const panel = document.getElementById('companyPanel');
-    if (panel) {
-        panel.classList.add('open');
+    try {
+        alert('toggleCompanyPanel called!');
+        const panel = document.getElementById('companyPanel');
         const backdrop = document.getElementById('companyPanelBackdrop');
-        if (backdrop) {
-            backdrop.classList.add('active');
+        
+        console.log('Panel elements:', {
+            panel: !!panel,
+            backdrop: !!backdrop
+        });
+        
+        if (!panel) {
+            alert('Panel not found!');
+            return;
         }
+        
+        if (panel.classList.contains('open')) {
+            panel.classList.remove('open');
+            if (backdrop) backdrop.classList.remove('active');
+        } else {
+            panel.classList.add('open');
+            if (backdrop) backdrop.classList.add('active');
+        }
+    } catch (error) {
+        alert('Error in toggleCompanyPanel: ' + error.message);
+        console.error('Error:', error);
     }
 }
 
