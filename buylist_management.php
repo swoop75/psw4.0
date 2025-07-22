@@ -90,13 +90,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WI
     exit;
 }
 
-// Get filter parameters
+// Load admin-configured default filter settings
+$defaultsPath = __DIR__ . '/config/filter_defaults.json';
+$adminDefaults = [];
+if (file_exists($defaultsPath)) {
+    $adminDefaults = json_decode(file_get_contents($defaultsPath), true) ?? [];
+}
+
+// Set fallback defaults if admin hasn't configured them yet
+$defaultStatusIds = $adminDefaults['status_defaults'] ?? ['null'];
+$defaultCountries = $adminDefaults['country_defaults'] ?? [];
+$defaultStrategies = $adminDefaults['strategy_defaults'] ?? [];
+$defaultBrokers = $adminDefaults['broker_defaults'] ?? [];
+
+// Get filter parameters, using admin defaults when no explicit filter is set
 $filters = [
     'search' => $_GET['search'] ?? '',
-    'buylist_status_id' => $_GET['status_id'] ?? '',
-    'country_name' => $_GET['country'] ?? '',
-    'strategy_group_id' => $_GET['strategy_group_id'] ?? '',
-    'broker_id' => $_GET['broker_id'] ?? '',
+    'buylist_status_id' => $_GET['status_id'] ?? (!empty($defaultStatusIds) ? implode(',', $defaultStatusIds) : ''),
+    'country_name' => $_GET['country'] ?? (!empty($defaultCountries) ? implode(',', $defaultCountries) : ''),
+    'strategy_group_id' => $_GET['strategy_group_id'] ?? (!empty($defaultStrategies) ? implode(',', $defaultStrategies) : ''),
+    'broker_id' => $_GET['broker_id'] ?? (!empty($defaultBrokers) ? implode(',', $defaultBrokers) : ''),
     'yield_min' => $_GET['yield_min'] ?? '',
     'yield_max' => $_GET['yield_max'] ?? ''
 ];
@@ -193,8 +206,8 @@ ob_start();
                             <?php 
                             $selectedStatusIds = !empty($filters['buylist_status_id']) ? explode(',', $filters['buylist_status_id']) : [];
                             
-                            // Add null option first
-                            $isNullSelected = empty($_GET['status_id']) ? true : in_array('null', $selectedStatusIds);
+                            // Add null option first - check if it's in selected values or admin defaults
+                            $isNullSelected = in_array('null', $selectedStatusIds);
                             ?>
                                 <div class="dropdown-option">
                                     <input type="checkbox" id="status_null" value="null" <?= $isNullSelected ? 'checked' : '' ?>>
@@ -203,8 +216,6 @@ ob_start();
                             <?php
                             
                             foreach ($filterOptions['statuses'] ?? [] as $status): 
-                                $statusName = strtolower($status['status']);
-                                $isDefaultUnchecked = in_array($statusName, ['no', 'bought', 'blocked']);
                                 $isChecked = in_array($status['id'], $selectedStatusIds);
                             ?>
                                 <div class="dropdown-option">
@@ -224,7 +235,7 @@ ob_start();
                             <?php 
                             $selectedCountries = !empty($filters['country_name']) ? explode(',', $filters['country_name']) : [];
                             
-                            // Add null option first
+                            // Add null option first - check if it's in admin defaults
                             $isNullSelected = in_array('null', $selectedCountries);
                             ?>
                                 <div class="dropdown-option">
@@ -252,7 +263,7 @@ ob_start();
                             <?php 
                             $selectedStrategyIds = !empty($filters['strategy_group_id']) ? explode(',', $filters['strategy_group_id']) : [];
                             
-                            // Add null option first
+                            // Add null option first - check if it's in admin defaults  
                             $isNullSelected = in_array('null', $selectedStrategyIds);
                             ?>
                                 <div class="dropdown-option">
@@ -280,7 +291,7 @@ ob_start();
                             <?php 
                             $selectedBrokerIds = !empty($filters['broker_id']) ? explode(',', $filters['broker_id']) : [];
                             
-                            // Add null option first
+                            // Add null option first - check if it's in admin defaults
                             $isNullSelected = in_array('null', $selectedBrokerIds);
                             ?>
                                 <div class="dropdown-option">
