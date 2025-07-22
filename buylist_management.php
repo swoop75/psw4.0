@@ -114,13 +114,18 @@ $filters = [
     'yield_max' => $_GET['yield_max'] ?? ''
 ];
 
+// Remove empty filters to avoid parameter binding issues
+$filters = array_filter($filters, function($value) {
+    return $value !== null && $value !== '';
+});
+
 
 $page = max(1, (int)($_GET['page'] ?? 1));
 $limit = max(10, min(100, (int)($_GET['limit'] ?? 25)));
 
 // Get data
 try {
-    $newCompaniesData = $controller->getNewCompanies(array_filter($filters), $page, $limit);
+    $newCompaniesData = $controller->getNewCompanies($filters, $page, $limit);
     $filterOptions = $controller->getFilterOptions();
     $statistics = $controller->getNewCompaniesStatistics();
 } catch (Exception $e) {
