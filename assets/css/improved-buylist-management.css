@@ -105,9 +105,9 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* Container - Desktop Optimized */
+/* Container - Desktop Optimized with Side Margins */
 .container {
-    max-width: 95vw; /* Use 95% of viewport width for desktop */
+    max-width: 80vw; /* Reduced to 80% for more empty space on sides */
     width: 100%;
     margin: 0 auto;
     padding: var(--space-4) var(--space-6);
@@ -520,7 +520,7 @@ select:hover {
 
 .data-table {
     width: 100%;
-    min-width: 1200px; /* Ensure table has minimum width for desktop */
+    min-width: 1000px; /* Reduced min-width to work better with new container size */
     border-collapse: collapse;
     font-size: var(--text-sm);
     table-layout: auto; /* Allow flexible column widths */

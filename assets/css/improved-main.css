@@ -460,7 +460,7 @@ a:hover {
 /* Adjust main container for fixed header */
 .main-container {
     padding-top: 100px;
-    max-width: 95vw;
+    max-width: 80vw; /* Consistent with main container */
     overflow-x: auto;
     box-sizing: border-box;
 }
@@ -1257,9 +1257,9 @@ a:hover {
     }
 }
 
-/* Main Container Styles - Desktop Optimized */
+/* Main Container Styles - Desktop Optimized with Side Margins */
 .main-container {
-    max-width: 95vw; /* Use 95% of viewport width for better desktop utilization */
+    max-width: 80vw; /* Reduced to 80% to create more empty space on sides */
     width: 100%;
     margin: 0 auto;
     padding: var(--space-6);

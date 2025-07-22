@@ -15,7 +15,7 @@
 }
 
 .container {
-    max-width: 95vw; /* Desktop optimized */
+    max-width: 80vw; /* Consistent with other pages - more side margins */
     width: 100%;
     margin: 0 auto;
     padding: 1.5rem 2rem;
