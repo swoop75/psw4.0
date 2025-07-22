@@ -2,6 +2,9 @@
  * Buylist Management JavaScript
  */
 
+// Debug: Test if JS file is loading
+console.log('new-companies-management.js is loading...');
+
 // Global variables
 let deleteEntryId = '';
 let deleteMasterlistId = '';
@@ -138,6 +141,7 @@ function refreshData() {
  * Show add entry modal
  */
 function showAddModal() {
+    alert('showAddModal called!');
     const modal = document.getElementById('entryModal');
     const modalTitle = document.getElementById('modalTitle');
     const modalAction = document.getElementById('modalAction');
