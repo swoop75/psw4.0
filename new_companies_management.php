@@ -354,8 +354,8 @@ ob_start();
                     <?php if ($hasSearch || $activeFilterCount > 0): ?>
                         <div class="search-actions">
                             <?php if ($activeFilterCount > 0): ?>
-                                <button type="button" class="btn btn-sm btn-outline" onclick="clearAllFilters()">
-                                    <i class="fas fa-times"></i> Clear all filters
+                                <button type="button" class="btn btn-sm btn-outline" onclick="resetToDefaults()">
+                                    <i class="fas fa-undo"></i> Reset to defaults
                                 </button>
                             <?php endif; ?>
                             <?php if ($hasSearch): ?>

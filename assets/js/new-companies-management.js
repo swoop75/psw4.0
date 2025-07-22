@@ -628,3 +628,38 @@ function getDropdownValues(filterType) {
     const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]:checked');
     return Array.from(checkboxes).map(cb => cb.value);
 }
+
+/**
+ * Reset to default filters (removes search and custom filters, keeps admin defaults)
+ */
+function resetToDefaults() {
+    // Clear search input
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.value = '';
+    }
+    
+    // Redirect to base URL without any parameters (will load admin defaults)
+    window.location.href = window.location.pathname;
+}
+
+/**
+ * Search all items (remove filters but keep search)
+ */
+function searchAllItems() {
+    const searchInput = document.getElementById('searchInput');
+    const searchTerm = searchInput ? searchInput.value.trim() : '';
+    
+    if (!searchTerm) {
+        // If no search term, just reset to defaults
+        resetToDefaults();
+        return;
+    }
+    
+    // Redirect with only search parameter
+    const params = new URLSearchParams();
+    params.set('search', searchTerm);
+    params.set('page', '1');
+    
+    window.location.href = window.location.pathname + '?' + params.toString();
+}

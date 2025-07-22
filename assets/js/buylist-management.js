@@ -630,28 +630,16 @@ function getDropdownValues(filterType) {
 }
 
 /**
- * Clear all active filters
+ * Reset to default filters (removes search and custom filters, keeps admin defaults)
  */
-function clearAllFilters() {
+function resetToDefaults() {
     // Clear search input
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
         searchInput.value = '';
     }
     
-    // Uncheck all filter checkboxes
-    const allCheckboxes = document.querySelectorAll('.checkbox-dropdown input[type="checkbox"]');
-    allCheckboxes.forEach(checkbox => {
-        checkbox.checked = false;
-    });
-    
-    // Update dropdown texts
-    const dropdowns = document.querySelectorAll('.checkbox-dropdown');
-    dropdowns.forEach(dropdown => {
-        updateDropdownText(dropdown);
-    });
-    
-    // Redirect to base URL without any parameters
+    // Redirect to base URL without any parameters (will load admin defaults)
     window.location.href = window.location.pathname;
 }
 
@@ -663,8 +651,8 @@ function searchAllItems() {
     const searchTerm = searchInput ? searchInput.value.trim() : '';
     
     if (!searchTerm) {
-        // If no search term, just clear filters
-        clearAllFilters();
+        // If no search term, just reset to defaults
+        resetToDefaults();
         return;
     }
     
