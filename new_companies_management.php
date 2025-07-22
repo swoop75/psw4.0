@@ -114,13 +114,17 @@ $filters = [
     'yield_max' => $_GET['yield_max'] ?? ''
 ];
 
+// Remove empty filters to avoid parameter binding issues
+$filters = array_filter($filters, function($value) {
+    return $value !== null && $value !== '';
+});
 
 $page = max(1, (int)($_GET['page'] ?? 1));
 $limit = max(10, min(100, (int)($_GET['limit'] ?? 25)));
 
 // Get data
 try {
-    $newCompaniesData = $controller->getNewCompanies(array_filter($filters), $page, $limit);
+    $newCompaniesData = $controller->getNewCompanies($filters, $page, $limit);
     $filterOptions = $controller->getFilterOptions();
     $statistics = $controller->getNewCompaniesStatistics();
 } catch (Exception $e) {
@@ -312,6 +316,57 @@ ob_start();
                     </div>
                 </div>
             </div>
+
+            <!-- Search Results Indicator -->
+            <?php 
+            $hasSearch = !empty($filters['search']);
+            $activeFilters = array_filter([
+                !empty($filters['new_companies_status_id']) ? 'status' : null,
+                !empty($filters['country_name']) ? 'country' : null,
+                !empty($filters['strategy_group_id']) ? 'strategy' : null,
+                !empty($filters['broker_id']) ? 'broker' : null,
+                !empty($filters['yield_min']) || !empty($filters['yield_max']) ? 'yield' : null
+            ]);
+            $activeFilterCount = count($activeFilters);
+            $totalRecords = $newCompaniesData['pagination']['total_records'] ?? 0;
+            
+            if ($hasSearch || $activeFilterCount > 0): ?>
+                <div class="search-results-indicator">
+                    <div class="search-info">
+                        <?php if ($hasSearch): ?>
+                            <span class="search-icon">🔍</span>
+                            <span class="search-text">
+                                Search results for "<strong><?= htmlspecialchars($filters['search']) ?></strong>"
+                            </span>
+                        <?php else: ?>
+                            <span class="filter-icon">📊</span>
+                            <span class="filter-text">Filtered results</span>
+                        <?php endif; ?>
+                        
+                        <span class="results-summary">
+                            (showing <?= count($newCompaniesData['entries']) ?> of <?= $totalRecords ?> total
+                            <?php if ($activeFilterCount > 0): ?>
+                                • <?= $activeFilterCount ?> filter<?= $activeFilterCount > 1 ? 's' : '' ?> active
+                            <?php endif; ?>)
+                        </span>
+                    </div>
+                    
+                    <?php if ($hasSearch || $activeFilterCount > 0): ?>
+                        <div class="search-actions">
+                            <?php if ($activeFilterCount > 0): ?>
+                                <button type="button" class="btn btn-sm btn-outline" onclick="clearAllFilters()">
+                                    <i class="fas fa-times"></i> Clear all filters
+                                </button>
+                            <?php endif; ?>
+                            <?php if ($hasSearch): ?>
+                                <button type="button" class="btn btn-sm btn-outline" onclick="searchAllItems()">
+                                    <i class="fas fa-globe"></i> Search all items
+                                </button>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
 
             <!-- Buylist Table -->
             <div class="table-container">

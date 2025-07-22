@@ -331,10 +331,6 @@ ob_start();
             $activeFilterCount = count($activeFilters);
             $totalRecords = $newCompaniesData['pagination']['total_records'] ?? 0;
             
-            // Debug output (remove after testing)
-            echo "<!-- DEBUG: hasSearch=" . ($hasSearch ? 'true' : 'false') . ", activeFilterCount=" . $activeFilterCount . " -->";
-            echo "<!-- DEBUG: filters=" . htmlspecialchars(json_encode($filters)) . " -->";
-            
             if ($hasSearch || $activeFilterCount > 0): ?>
                 <div class="search-results-indicator">
                     <div class="search-info">
