@@ -1,1 +1,29 @@
-{"status_defaults": ["null"], "country_defaults": [], "strategy_defaults": [], "broker_defaults": []}
+{
+    "status_defaults": [
+        "null"
+    ],
+    "country_defaults": [
+        "null",
+        "Canada",
+        "England",
+        "Finland",
+        "France",
+        "Germany",
+        "Norway",
+        "USA"
+    ],
+    "strategy_defaults": [
+        "null",
+        "1",
+        "2",
+        "3"
+    ],
+    "broker_defaults": [
+        "null",
+        "2",
+        "1",
+        "4",
+        "3",
+        "5"
+    ]
+}
