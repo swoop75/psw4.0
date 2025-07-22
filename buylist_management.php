@@ -194,8 +194,14 @@ ob_start();
                             foreach ($filterOptions['statuses'] ?? [] as $status): 
                                 $statusName = strtolower($status['status']);
                                 $isDefaultUnchecked = in_array($statusName, ['no', 'bought', 'blocked']);
-                                // If user has explicitly selected this status, show it checked regardless of default rules
-                                $isChecked = in_array($status['id'], $selectedStatusIds);
+                                
+                                if (empty($filters['buylist_status_id'])) {
+                                    // No filter applied - use default behavior (uncheck the 3 special statuses)
+                                    $isChecked = !$isDefaultUnchecked;
+                                } else {
+                                    // Filter is applied - show exactly what user selected
+                                    $isChecked = in_array($status['id'], $selectedStatusIds);
+                                }
                             ?>
                                 <div class="dropdown-option">
                                     <input type="checkbox" id="status_<?= $status['id'] ?>" value="<?= $status['id'] ?>" 
