@@ -149,6 +149,7 @@ function refreshData() {
  * Show add entry modal
  */
 function showAddModal() {
+    alert('showAddModal function called!');
     const modal = document.getElementById('entryModal');
     const modalTitle = document.getElementById('modalTitle');
     const modalAction = document.getElementById('modalAction');
