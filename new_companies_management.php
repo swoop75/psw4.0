@@ -108,6 +108,12 @@ $isSearchAllMode = !empty($_GET['search']) && empty($_GET['status_id']) && empty
                    empty($_GET['strategy_group_id']) && empty($_GET['broker_id']) && 
                    empty($_GET['yield_min']) && empty($_GET['yield_max']);
 
+// Debug: Check if search all mode is detected and what filters are applied
+if (!empty($_GET['search'])) {
+    error_log("DEBUG: Search term: " . $_GET['search'] . ", Search all mode: " . ($isSearchAllMode ? 'YES' : 'NO'));
+    error_log("DEBUG: Filters passed to DB: " . json_encode($dbFilters));
+}
+
 // Get filter parameters, using admin defaults when no explicit filter is set (unless in search all mode)
 $filters = [
     'search' => $_GET['search'] ?? '',
@@ -325,11 +331,22 @@ ob_start();
             <!-- Search Results Indicator -->
             <?php 
             $hasSearch = !empty($_GET['search']);
+            
+            // Check for active filters (either explicit URL parameters OR applied defaults)
+            $hasExplicitFilters = !empty($_GET['status_id']) || !empty($_GET['country']) || 
+                                !empty($_GET['strategy_group_id']) || !empty($_GET['broker_id']) || 
+                                !empty($_GET['yield_min']) || !empty($_GET['yield_max']);
+            
+            $hasDefaultFilters = (!$isSearchAllMode && (
+                !empty($defaultStatusIds) || !empty($defaultCountries) || 
+                !empty($defaultStrategies) || !empty($defaultBrokers)
+            ));
+            
             $activeFilters = array_filter([
-                !empty($_GET['status_id']) ? 'status' : null,
-                !empty($_GET['country']) ? 'country' : null,
-                !empty($_GET['strategy_group_id']) ? 'strategy' : null,
-                !empty($_GET['broker_id']) ? 'broker' : null,
+                ($hasExplicitFilters && !empty($_GET['status_id'])) || ($hasDefaultFilters && !empty($defaultStatusIds)) ? 'status' : null,
+                ($hasExplicitFilters && !empty($_GET['country'])) || ($hasDefaultFilters && !empty($defaultCountries)) ? 'country' : null,
+                ($hasExplicitFilters && !empty($_GET['strategy_group_id'])) || ($hasDefaultFilters && !empty($defaultStrategies)) ? 'strategy' : null,
+                ($hasExplicitFilters && !empty($_GET['broker_id'])) || ($hasDefaultFilters && !empty($defaultBrokers)) ? 'broker' : null,
                 !empty($_GET['yield_min']) || !empty($_GET['yield_max']) ? 'yield' : null
             ]);
             $activeFilterCount = count($activeFilters);
@@ -358,7 +375,7 @@ ob_start();
                     
                     <?php if ($hasSearch || $activeFilterCount > 0): ?>
                         <div class="search-actions">
-                            <?php if ($activeFilterCount > 0): ?>
+                            <?php if ($hasSearch || $hasExplicitFilters || $hasDefaultFilters): ?>
                                 <button type="button" class="btn btn-sm btn-outline" onclick="resetToDefaults()">
                                     <i class="fas fa-undo"></i> Reset to defaults
                                 </button>
