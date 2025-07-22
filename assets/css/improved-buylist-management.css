@@ -1122,10 +1122,7 @@ label:not(.checkbox-dropdown label):not(.form-group label) {
 /* Dropdown content hidden by default */
 .checkbox-dropdown .dropdown-content {
     display: none !important;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
+    position: fixed;
     background: var(--bg-white-solid);
     border: 2px solid var(--border-light);
     border-radius: var(--radius-lg);
@@ -1134,7 +1131,6 @@ label:not(.checkbox-dropdown label):not(.form-group label) {
     max-height: 250px;
     overflow-y: auto;
     min-width: 220px;
-    margin-top: var(--space-1);
     backdrop-filter: blur(10px);
 }
 

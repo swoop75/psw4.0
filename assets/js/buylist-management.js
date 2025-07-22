@@ -548,8 +548,19 @@ function initializeCheckboxDropdowns() {
             });
             
             // Toggle current dropdown
+            const isOpening = !content.classList.contains('show');
             button.classList.toggle('open');
-            content.classList.toggle('show');
+            
+            if (isOpening) {
+                // Calculate position for fixed positioning
+                const buttonRect = button.getBoundingClientRect();
+                content.style.left = buttonRect.left + 'px';
+                content.style.top = (buttonRect.bottom + 2) + 'px';
+                content.style.width = Math.max(buttonRect.width, 220) + 'px';
+                content.classList.add('show');
+            } else {
+                content.classList.remove('show');
+            }
         });
         
         // Handle checkbox changes
@@ -576,6 +587,24 @@ function initializeCheckboxDropdowns() {
             dropdown.querySelector('.dropdown-content').classList.remove('show');
         });
     });
+    
+    // Reposition dropdowns on scroll and resize
+    function repositionOpenDropdowns() {
+        dropdowns.forEach(dropdown => {
+            const button = dropdown.querySelector('.dropdown-button');
+            const content = dropdown.querySelector('.dropdown-content');
+            
+            if (content.classList.contains('show')) {
+                const buttonRect = button.getBoundingClientRect();
+                content.style.left = buttonRect.left + 'px';
+                content.style.top = (buttonRect.bottom + 2) + 'px';
+                content.style.width = Math.max(buttonRect.width, 220) + 'px';
+            }
+        });
+    }
+    
+    window.addEventListener('scroll', repositionOpenDropdowns);
+    window.addEventListener('resize', repositionOpenDropdowns);
 }
 
 /**
