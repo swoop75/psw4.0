@@ -101,13 +101,33 @@ $filters = [
     'yield_max' => $_GET['yield_max'] ?? ''
 ];
 
+
 $page = max(1, (int)($_GET['page'] ?? 1));
 $limit = max(10, min(100, (int)($_GET['limit'] ?? 25)));
 
 // Get data
 try {
-    $buylistData = $controller->getBuylist(array_filter($filters), $page, $limit);
     $filterOptions = $controller->getFilterOptions();
+    
+    // If no status filter is explicitly set, exclude 'no', 'bought', 'blocked' by default
+    if (empty($_GET['status_id'])) {
+        $statusesToExclude = ['no', 'bought', 'blocked'];
+        $defaultStatusIds = [];
+        
+        foreach ($filterOptions['statuses'] ?? [] as $status) {
+            $statusName = strtolower($status['status']);
+            if (!in_array($statusName, $statusesToExclude)) {
+                $defaultStatusIds[] = $status['id'];
+            }
+        }
+        
+        // Set the default filter to show only non-excluded statuses
+        if (!empty($defaultStatusIds)) {
+            $filters['buylist_status_id'] = implode(',', $defaultStatusIds);
+        }
+    }
+    
+    $buylistData = $controller->getBuylist(array_filter($filters), $page, $limit);
     $statistics = $controller->getBuylistStatistics();
 } catch (Exception $e) {
     $errorMessage = 'Error loading data: ' . $e->getMessage();
@@ -194,8 +214,14 @@ ob_start();
                             foreach ($filterOptions['statuses'] ?? [] as $status): 
                                 $statusName = strtolower($status['status']);
                                 $isDefaultUnchecked = in_array($statusName, ['no', 'bought', 'blocked']);
-                                // If user has explicitly selected this status, show it checked regardless of default rules
-                                $isChecked = in_array($status['id'], $selectedStatusIds);
+                                
+                                if (empty($_GET['status_id'])) {
+                                    // No explicit status filter - show default behavior (exclude the 3 special statuses)
+                                    $isChecked = !$isDefaultUnchecked;
+                                } else {
+                                    // Explicit status filter applied - show exactly what user selected
+                                    $isChecked = in_array($status['id'], $selectedStatusIds);
+                                }
                             ?>
                                 <div class="dropdown-option">
                                     <input type="checkbox" id="status_<?= $status['id'] ?>" value="<?= $status['id'] ?>" 
