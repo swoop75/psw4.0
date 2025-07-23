@@ -42,7 +42,12 @@ def fetch_instruments():
     return instruments
 
 def save_to_db(instruments):
-    conn = pymysql.connect(**db_config)
+    try:
+        conn = pymysql.connect(**db_config)
+        print(f"✅ Connected to database: {db_config['database']}")
+    except Exception as e:
+        print(f"❌ Failed to connect to database: {e}")
+        raise
     try:
         with conn.cursor() as cursor:
             cursor.execute("""
