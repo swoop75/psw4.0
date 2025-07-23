@@ -1,83 +1,124 @@
+import os
+from dotenv import load_dotenv
 import mysql.connector
 import json
-import os
+import logging
 from datetime import datetime, date
-from decimal import Decimal # Import Decimal type
+from decimal import Decimal
 
-# --- Configuration ---
-# Database connection details
-DB_CONFIG = {
-    'host': '100.117.171.98',
-    'user': 'swoop',
-    'password': 'QQ1122ww_1975!#',
+# Load environment variables from .env file located at project root
+load_dotenv(dotenv_path='../../.env')
+
+# Get configuration from environment variables
+db_config = {
+    'host': os.getenv('DB_HOST'),
+    'user': os.getenv('DB_USERNAME'),
+    'password': os.getenv('DB_PASSWORD'),
+    'port': int(os.getenv('DB_PORT', 3306))
 }
 
-# Output file path
-# Ensure this directory exists or create it before running the script.
-# On Windows, use double backslashes or forward slashes for paths.
-OUTPUT_FILE_PATH = r'C:\Users\laoan\Documents\mysql_database_overview.json'
+# Output paths from environment
+documentation_path = os.getenv('DOCUMENTATION_PATH', "../../documentation")
+mysql_overview_dir = os.path.join(documentation_path, "MySQL_overview")
 
-# Databases to include in the overview. All others will be skipped.
-TARGET_DATABASES = [
-    'psw_foundation',
-    'psw_marketdata',
-    'psw_portfolio'
+# Target databases from environment
+target_databases = [
+    os.getenv('DB_FOUNDATION', 'psw_foundation'),
+    os.getenv('DB_MARKETDATA', 'psw_marketdata'),
+    os.getenv('DB_PORTFOLIO', 'psw_portfolio')
 ]
 
-# --- Helper function for JSON serialization ---
-# This function handles types that are not directly JSON serializable
-# like datetime objects or Decimal objects.
+# === Setup Logging ===
+log_dir = os.getenv('LOG_PATH', "../../storage/logs")
+os.makedirs(log_dir, exist_ok=True)
+log_filename = os.path.join(log_dir, "mysql_db_overview.log")
+
+# Setup logger with both file and console output
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+# Clear any existing handlers
+logger.handlers.clear()
+
+# File handler
+file_handler = logging.FileHandler(log_filename)
+file_handler.setLevel(logging.INFO)
+file_formatter = logging.Formatter("%(asctime)s %(levelname)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+file_handler.setFormatter(file_formatter)
+
+# Console handler
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+console_formatter = logging.Formatter("%(levelname)s: %(message)s")
+console_handler.setFormatter(console_formatter)
+
+# Add handlers to logger
+logger.addHandler(file_handler)
+logger.addHandler(console_handler)
+
 def json_serial(obj):
     """JSON serializer for objects not serializable by default json code"""
     if isinstance(obj, (datetime, date)):
         return obj.isoformat()
-    if isinstance(obj, Decimal): # Handle Decimal objects
-        return str(obj) # Convert Decimal to string to preserve precision
-    raise TypeError ("Type %s not serializable" % type(obj))
+    if isinstance(obj, Decimal):
+        return str(obj)
+    raise TypeError(f"Type {type(obj)} not serializable")
 
-# --- Main Script Logic ---
 def get_mysql_overview():
+    """Generate comprehensive MySQL database overview"""
     all_db_data = []
-    conn = None # Initialize conn to None
-    cursor = None # Initialize cursor to None
-
+    conn = None
+    cursor = None
+    
     try:
+        # Validate database configuration
+        missing_config = [k for k, v in db_config.items() if not v]
+        if missing_config:
+            logging.error(f"Missing database configuration: {missing_config}")
+            return False
+            
         # Connect to MySQL
-        print("Attempting to connect to MySQL...")
-        conn = mysql.connector.connect(**DB_CONFIG)
+        logging.info("Connecting to MariaDB database...")
+        conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor()
-        print("Successfully connected to MySQL.")
+        logging.info("Successfully connected to MariaDB database")
 
         # Get all databases
-        print("Fetching database list...")
+        logging.info("Fetching database list...")
         cursor.execute("SHOW DATABASES;")
         databases_found = [db[0] for db in cursor.fetchall()]
-        print(f"Found {len(databases_found)} databases in total.")
+        logging.info(f"Found {len(databases_found)} databases in total")
 
-        for db_name in databases_found:
-            # Filter databases based on TARGET_DATABASES list
-            if db_name not in TARGET_DATABASES:
-                print(f"Skipping database (not in target list): {db_name}")
-                continue
+        # Filter and process target databases
+        target_found = [db for db in databases_found if db in target_databases]
+        target_missing = [db for db in target_databases if db not in databases_found]
+        
+        if target_missing:
+            logging.warning(f"Target databases not found: {target_missing}")
+        
+        logging.info(f"Processing {len(target_found)} target databases: {target_found}")
 
-            print(f"\nProcessing target database: {db_name}")
+        for db_name in target_found:
+            logging.info(f"Processing database: {db_name}")
 
             current_db_info = {
                 "name": db_name,
-                "tables": []
+                "tables": [],
+                "processed_at": datetime.now().isoformat()
             }
 
             try:
-                cursor.execute(f"USE `{db_name}`;") # Use backticks for database names that might contain special characters
-                print(f"  Switched to database: {db_name}")
+                cursor.execute(f"USE `{db_name}`;")
+                logging.info(f"Switched to database: {db_name}")
 
                 # Get all tables in the current database
                 cursor.execute("SHOW TABLES;")
                 tables = [table[0] for table in cursor.fetchall()]
-                print(f"  Found {len(tables)} tables in {db_name}.")
+                logging.info(f"Found {len(tables)} tables in {db_name}")
 
                 if not tables:
-                    print(f"  No tables found in {db_name}. Skipping.")
+                    logging.warning(f"No tables found in {db_name}")
+                    all_db_data.append(current_db_info)
                     continue
 
                 for table_name in tables:
@@ -87,21 +128,31 @@ def get_mysql_overview():
                         "sample_data": {
                             "columns": [],
                             "rows": []
-                        }
+                        },
+                        "row_count": 0
                     }
-                    print(f"    Processing table: {table_name}")
+                    logging.info(f"Processing table: {db_name}.{table_name}")
 
                     # Get table description (schema)
                     try:
-                        cursor.execute(f"DESCRIBE `{table_name}`;") # Use backticks for table names
-                        schema_columns = [i[0] for i in cursor.description] # Get column names for schema output
+                        cursor.execute(f"DESCRIBE `{table_name}`;")
+                        schema_columns = [i[0] for i in cursor.description]
                         for col_info in cursor.fetchall():
                             col_dict = dict(zip(schema_columns, col_info))
                             current_table_info["schema"].append(col_dict)
-                        print(f"      Schema fetched for {table_name}.")
+                        logging.info(f"Schema fetched for {table_name} ({len(current_table_info['schema'])} columns)")
                     except mysql.connector.Error as err:
-                        print(f"      Error fetching schema for table {table_name} in {db_name}: {err}")
-                        # Continue to next table if schema fetch fails
+                        logging.error(f"Failed to fetch schema for {table_name}: {err}")
+                        continue
+
+                    # Get row count
+                    try:
+                        cursor.execute(f"SELECT COUNT(*) FROM `{table_name}`;")
+                        row_count = cursor.fetchone()[0]
+                        current_table_info["row_count"] = row_count
+                        logging.info(f"Row count for {table_name}: {row_count}")
+                    except mysql.connector.Error as err:
+                        logging.error(f"Failed to count rows for {table_name}: {err}")
 
                     # Get 10 sample rows
                     try:
@@ -111,50 +162,87 @@ def get_mysql_overview():
                         if cursor.description:
                             current_table_info["sample_data"]["columns"] = [i[0] for i in cursor.description]
                             current_table_info["sample_data"]["rows"] = [list(row) for row in sample_rows]
-                        else:
-                            print(f"      No columns found for sample data in {table_name}.")
-
-                        print(f"      Sample data fetched for {table_name} ({len(sample_rows)} rows).")
+                        
+                        logging.info(f"Sample data fetched for {table_name} ({len(sample_rows)} rows)")
 
                     except mysql.connector.Error as err:
-                        print(f"      Error fetching sample data for table {table_name} in {db_name}: {err}")
-                        # Continue to next table if sample data fetch fails
+                        logging.error(f"Failed to fetch sample data for {table_name}: {err}")
 
                     current_db_info["tables"].append(current_table_info)
 
             except mysql.connector.Error as err:
-                print(f"  Error accessing database {db_name}: {err}")
-                # Continue to next database if USE fails
+                logging.error(f"Error accessing database {db_name}: {err}")
+                continue
 
             all_db_data.append(current_db_info)
+            logging.info(f"Completed processing database: {db_name}")
 
     except mysql.connector.Error as err:
-        print(f"An error occurred during MySQL operation: {err}")
+        logging.error(f"MySQL operation failed: {err}")
+        return False
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
+        logging.exception(f"Unexpected error occurred: {e}")
+        return False
     finally:
         if cursor:
             cursor.close()
-            print("Cursor closed.")
+            logging.info("Database cursor closed")
         if conn and conn.is_connected():
             conn.close()
-            print("MySQL connection closed.")
+            logging.info("Database connection closed")
 
-    # Write the collected data to a JSON file
+    # Create output directory
     try:
-        # Ensure the directory exists
-        output_dir = os.path.dirname(OUTPUT_FILE_PATH)
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-            print(f"Created directory: {output_dir}")
-
-        with open(OUTPUT_FILE_PATH, 'w', encoding='utf-8') as f:
-            json.dump({"databases": all_db_data}, f, indent=4, default=json_serial, ensure_ascii=False)
-        print(f"\nSuccessfully wrote database overview to: {OUTPUT_FILE_PATH}")
-    except IOError as e:
-        print(f"Error writing to file {OUTPUT_FILE_PATH}: {e}")
+        os.makedirs(mysql_overview_dir, exist_ok=True)
+        logging.info(f"Ensured output directory exists: {mysql_overview_dir}")
     except Exception as e:
-        print(f"An error occurred while writing JSON: {e}")
+        logging.error(f"Failed to create output directory {mysql_overview_dir}: {e}")
+        return False
+
+    # Write JSON overview file
+    try:
+        current_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        json_filename = f"mysql_database_overview_{current_timestamp}.json"
+        json_filepath = os.path.join(mysql_overview_dir, json_filename)
+        
+        overview_data = {
+            "generated_at": datetime.now().isoformat(),
+            "total_databases": len(all_db_data),
+            "total_tables": sum(len(db["tables"]) for db in all_db_data),
+            "databases": all_db_data
+        }
+        
+        with open(json_filepath, 'w', encoding='utf-8') as f:
+            json.dump(overview_data, f, indent=4, default=json_serial, ensure_ascii=False)
+        
+        logging.info(f"Successfully wrote database overview to: {json_filepath}")
+        
+        # Also create a latest copy
+        latest_filepath = os.path.join(mysql_overview_dir, "mysql_database_overview_latest.json")
+        with open(latest_filepath, 'w', encoding='utf-8') as f:
+            json.dump(overview_data, f, indent=4, default=json_serial, ensure_ascii=False)
+        
+        logging.info(f"Also created latest copy at: {latest_filepath}")
+        return True
+        
+    except IOError as e:
+        logging.error(f"Failed to write output file: {e}")
+        return False
+    except Exception as e:
+        logging.exception(f"Error occurred while writing JSON: {e}")
+        return False
+
+def main():
+    start = datetime.now()
+    logging.info("MySQL Database Overview script started")
+    
+    success = get_mysql_overview()
+    
+    duration = datetime.now() - start
+    if success:
+        logging.info(f"Script completed successfully. Duration: {duration}. ✅")
+    else:
+        logging.error(f"Script failed. Duration: {duration}. ❌")
 
 if __name__ == "__main__":
-    get_mysql_overview()
+    main()

@@ -36,10 +36,18 @@ if %errorlevel% neq 0 (
     exit /b %errorlevel%
 )
 
-echo [5/5] Running country_info.py...
+echo [5/6] Running country_info.py...
 python country_info.py
 if %errorlevel% neq 0 (
     echo ERROR: country_info.py failed with exit code %errorlevel%
+    pause
+    exit /b %errorlevel%
+)
+
+echo [6/6] Running mysql_db_overview.py...
+python mysql_db_overview.py
+if %errorlevel% neq 0 (
+    echo ERROR: mysql_db_overview.py failed with exit code %errorlevel%
     pause
     exit /b %errorlevel%
 )

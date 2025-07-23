@@ -13,7 +13,8 @@ SCRIPTS = [
     'global_latest_prices.py', 
     'nordic_instruments.py',
     'nordic_latest_prices.py',
-    'country_info.py'
+    'country_info.py',
+    'mysql_db_overview.py'
 ]
 
 def run_script(script_name):
@@ -74,6 +75,7 @@ def main():
     print(f"❌ Failed: {len(failed_scripts)}/{len(SCRIPTS)}")
     print(f"⏱️  Total duration: {duration}")
     print(f"📝 Check logs in: p:\\logs")
+    print(f"📄 Check documentation in: p:\\documentation\\MySQL_overview")
     
     if failed_scripts:
         print(f"\n❌ Failed scripts: {', '.join(failed_scripts)}")
