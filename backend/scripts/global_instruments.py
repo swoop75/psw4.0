@@ -138,7 +138,9 @@ def save_global_instruments(instruments):
 
 def main():
     start = datetime.now()
-    logging.info("Script started.")
+    logging.info("="*50)
+    logging.info("GLOBAL INSTRUMENTS SCRIPT STARTED")
+    logging.info("="*50)
     instruments = fetch_global_instruments()
     if instruments:
         save_global_instruments(instruments)
