@@ -132,7 +132,9 @@ def save_latest_prices(prices):
 
 def main():
     start = datetime.now()
-    logging.info("Script started.")
+    logging.info("="*50)
+    logging.info("GLOBAL LATEST PRICES SCRIPT STARTED")
+    logging.info("="*50)
     prices = fetch_latest_prices()
     if prices:
         save_latest_prices(prices)

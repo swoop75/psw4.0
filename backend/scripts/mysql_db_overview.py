@@ -249,7 +249,9 @@ def get_mysql_overview():
 
 def main():
     start = datetime.now()
-    logging.info("MySQL Database Overview script started")
+    logging.info("="*50)
+    logging.info("MYSQL DATABASE OVERVIEW SCRIPT STARTED")
+    logging.info("="*50)
     
     success = get_mysql_overview()
     

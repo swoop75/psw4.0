@@ -129,7 +129,9 @@ def save_to_db(instruments):
 
 def main():
     start = datetime.now()
-    logging.info("Script started.")
+    logging.info("="*50)
+    logging.info("NORDIC INSTRUMENTS SCRIPT STARTED")
+    logging.info("="*50)
     
     instruments = fetch_instruments()
     
