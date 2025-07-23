@@ -20,7 +20,7 @@ db_config = {
     'password': os.getenv('DB_PASSWORD'),
     'host': os.getenv('DB_HOST'),
     'port': int(os.getenv('DB_PORT', 3306)),
-    'database': os.getenv('DB_FOUNDATION'),  # Using foundation database
+    'database': os.getenv('DB_MARKETDATA'),  # Using marketdata database for instruments
     'charset': 'utf8mb4',
     'cursorclass': pymysql.cursors.DictCursor
 }
@@ -85,6 +85,10 @@ def save_global_instruments(instruments):
     errors = 0
     logging.info("Connecting to MySQL database...")
     try:
+        logging.info(f"Attempting connection to {db_config['host']}:{db_config['port']}")
+        logging.info(f"Database: {db_config['database']}")
+        logging.info(f"User: {db_config['user']}")
+        
         conn = pymysql.connect(
             user=db_config["user"],
             password=db_config["password"],
@@ -92,7 +96,10 @@ def save_global_instruments(instruments):
             port=db_config["port"],
             database=db_config["database"],
             charset='utf8mb4',
-            cursorclass=pymysql.cursors.DictCursor
+            cursorclass=pymysql.cursors.DictCursor,
+            connect_timeout=10,  # 10 second timeout
+            read_timeout=30,     # 30 second read timeout
+            write_timeout=30     # 30 second write timeout
         )
         with conn.cursor() as cursor:
             cursor.execute("""
