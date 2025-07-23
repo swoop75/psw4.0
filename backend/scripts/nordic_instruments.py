@@ -76,4 +76,21 @@ def save_to_db(instruments):
         conn.close()
 
 if __name__ == "__main__":
+    print("🚀 Starting Nordic instruments fetch...")
+    
     instruments = fetch_instruments()
+    
+    if not instruments:
+        print("❌ No instruments fetched. Exiting.")
+        exit(1)
+    
+    print(f"✅ Successfully fetched {len(instruments)} instruments from API")
+    
+    try:
+        save_to_db(instruments)
+        print(f"✅ Successfully saved {len(instruments)} instruments to database")
+    except Exception as e:
+        print(f"❌ Error saving to database: {e}")
+        exit(1)
+    
+    print("🎉 Nordic instruments update completed successfully!")
