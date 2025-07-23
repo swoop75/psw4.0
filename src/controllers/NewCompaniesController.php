@@ -310,7 +310,7 @@ class NewCompaniesController {
             
         } catch (Exception $e) {
             Logger::error('Add new company entry error: ' . $e->getMessage());
-            return false;
+            return $e->getMessage(); // Return the actual error message
         }
     }
     

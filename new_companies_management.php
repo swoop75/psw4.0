@@ -39,7 +39,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WI
         switch ($action) {
             case 'add':
                 $result = $controller->addNewCompanyEntry($_POST);
-                echo json_encode(['success' => $result, 'message' => $result ? 'Entry added to new companies successfully' : 'Failed to add entry']);
+                if ($result === true) {
+                    echo json_encode(['success' => true, 'message' => 'Entry added to new companies successfully']);
+                } else if (is_string($result)) {
+                    // If result is a string, it's an error message
+                    echo json_encode(['success' => false, 'message' => $result]);
+                } else {
+                    echo json_encode(['success' => false, 'message' => 'Failed to add entry']);
+                }
                 exit;
                 break;
                 
