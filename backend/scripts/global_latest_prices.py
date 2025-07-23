@@ -106,23 +106,52 @@ def save_latest_prices(prices):
                     price_date DATE
                 )
             """)
-            for item in prices:
+            logging.info(f"About to process {len(prices)} price records")
+            
+            # Process in batches for better performance
+            batch_size = 100
+            batch_data = []
+            
+            for i, item in enumerate(prices):
+                if i % 1000 == 0:  # Log progress every 1000 items
+                    logging.info(f"Processing price record {i+1}/{len(prices)}")
+                    
                 if not all(k in item for k in ('i', 'c', 'd')):
                     logging.warning(f"Missing keys in price item: {item}")
                     errors += 1
                     continue
-                try:
-                    cursor.execute("""
-                        INSERT INTO global_latest_prices (instrument_id, closing_price, price_date)
-                        VALUES (%s, %s, %s)
-                        ON DUPLICATE KEY UPDATE
-                            closing_price=VALUES(closing_price),
-                            price_date=VALUES(price_date)
-                    """, (item['i'], item['c'], item['d']))
-                    inserted += 1
-                except Exception as e:
-                    logging.error(f"Failed to insert item {item['i']}: {e}")
-                    errors += 1
+                
+                # Prepare data for batch insert
+                data_tuple = (item['i'], item['c'], item['d'])
+                batch_data.append(data_tuple)
+                
+                # Process batch when it reaches batch_size or is the last item
+                if len(batch_data) >= batch_size or i == len(prices) - 1:
+                    try:
+                        # Execute batch insert
+                        cursor.executemany("""
+                            INSERT INTO global_latest_prices (instrument_id, closing_price, price_date)
+                            VALUES (%s, %s, %s)
+                            ON DUPLICATE KEY UPDATE
+                                closing_price=VALUES(closing_price),
+                                price_date=VALUES(price_date)
+                        """, batch_data)
+                        
+                        inserted += len(batch_data)
+                        
+                        # Commit every 1000 records for safety
+                        if inserted % 1000 == 0 or i == len(prices) - 1:
+                            conn.commit()
+                            logging.info(f"Committed {inserted} price records to database")
+                        
+                        batch_data = []  # Clear batch for next set
+                        
+                    except Exception as e:
+                        logging.error(f"Failed to insert price batch at item {i}: {e}")
+                        errors += len(batch_data)
+                        batch_data = []  # Clear failed batch
+            
+            # Final commit
             conn.commit()
         conn.close()
         logging.info(f"Inserted/updated {inserted} records into the database.")

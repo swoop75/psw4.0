@@ -97,29 +97,56 @@ def save_to_db(instruments):
                 )
             """)
 
-            for item in instruments:
+            logging.info(f"About to process {len(instruments)} Nordic instruments")
+            
+            # Process in batches for better performance
+            batch_size = 100
+            batch_data = []
+
+            for i, item in enumerate(instruments):
+                if i % 500 == 0:  # Log progress every 500 items
+                    logging.info(f"Processing Nordic instrument {i+1}/{len(instruments)}")
+                
                 # Check required keys
                 if not all(k in item for k in ("insId", "name", "ticker", "isin", "sectorId")):
                     logging.warning(f"Missing keys in instrument item: {item}")
                     errors += 1
                     continue
 
-                try:
-                    cursor.execute("""
-                        INSERT INTO nordic_instruments (insId, name, ticker, isin, sectorId)
-                        VALUES (%s, %s, %s, %s, %s)
-                        ON DUPLICATE KEY UPDATE
-                            name=VALUES(name),
-                            ticker=VALUES(ticker),
-                            isin=VALUES(isin),
-                            sectorId=VALUES(sectorId)
-                    """, (item["insId"], item["name"], item["ticker"], item["isin"], item["sectorId"]))
-                    inserted += 1
-                except Exception as e:
-                    logging.error(f"Failed to insert instrument {item.get('insId', 'N/A')}: {e}")
-                    errors += 1
-
-        conn.commit()
+                # Prepare data for batch insert
+                data_tuple = (item["insId"], item["name"], item["ticker"], item["isin"], item["sectorId"])
+                batch_data.append(data_tuple)
+                
+                # Process batch when it reaches batch_size or is the last item
+                if len(batch_data) >= batch_size or i == len(instruments) - 1:
+                    try:
+                        # Execute batch insert
+                        cursor.executemany("""
+                            INSERT INTO nordic_instruments (insId, name, ticker, isin, sectorId)
+                            VALUES (%s, %s, %s, %s, %s)
+                            ON DUPLICATE KEY UPDATE
+                                name=VALUES(name),
+                                ticker=VALUES(ticker),
+                                isin=VALUES(isin),
+                                sectorId=VALUES(sectorId)
+                        """, batch_data)
+                        
+                        inserted += len(batch_data)
+                        
+                        # Commit every 500 records for safety
+                        if inserted % 500 == 0 or i == len(instruments) - 1:
+                            conn.commit()
+                            logging.info(f"Committed {inserted} Nordic instruments to database")
+                        
+                        batch_data = []  # Clear batch for next set
+                        
+                    except Exception as e:
+                        logging.error(f"Failed to insert Nordic instrument batch at item {i}: {e}")
+                        errors += len(batch_data)
+                        batch_data = []  # Clear failed batch
+            
+            # Final commit
+            conn.commit()
         conn.close()
         logging.info(f"Inserted/updated {inserted} instruments into the database.")
         if errors:
