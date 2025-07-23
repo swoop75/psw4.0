@@ -30,12 +30,28 @@ log_dir = os.getenv('LOG_PATH', "../../storage/logs")
 os.makedirs(log_dir, exist_ok=True)
 log_filename = os.path.join(log_dir, "nordic_latest_prices.log")
 
-logging.basicConfig(
-    filename=log_filename,
-    level=logging.INFO,
-    format="%(asctime)s %(levelname)s: %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S"
-)
+# Setup logger with both file and console output
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+# Clear any existing handlers
+logger.handlers.clear()
+
+# File handler
+file_handler = logging.FileHandler(log_filename)
+file_handler.setLevel(logging.INFO)
+file_formatter = logging.Formatter("%(asctime)s %(levelname)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+file_handler.setFormatter(file_formatter)
+
+# Console handler
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+console_formatter = logging.Formatter("%(levelname)s: %(message)s")
+console_handler.setFormatter(console_formatter)
+
+# Add handlers to logger
+logger.addHandler(file_handler)
+logger.addHandler(console_handler)
 
 def fetch_nordic_latest_prices():
     url = f"{BASE_URL}/instruments/stockprices/last?authKey={API_KEY}"
