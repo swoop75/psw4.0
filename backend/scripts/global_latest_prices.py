@@ -55,7 +55,8 @@ logger.addHandler(console_handler)
 
 def fetch_latest_prices():
     url = f"{BASE_URL}/instruments/stockprices/global/last?authKey={API_KEY}"
-    logging.info("Fetching global latest prices from API...")
+    logging.info("Fetching global latest prices from Börsdata API...")
+    logging.info(f"API endpoint: {BASE_URL}/instruments/stockprices/global/last")
     try:
         response = requests.get(url)
         response.raise_for_status()

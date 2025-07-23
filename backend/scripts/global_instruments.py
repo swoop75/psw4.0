@@ -55,7 +55,8 @@ logger.addHandler(console_handler)
 
 def fetch_global_instruments():
     url = f"{BASE_URL}/instruments/global?authKey={API_KEY}"
-    logging.info("Fetching global instruments from API...")
+    logging.info("Fetching global instruments from Börsdata API...")
+    logging.info(f"API endpoint: {BASE_URL}/instruments/global")
     try:
         response = requests.get(url)
         response.raise_for_status()

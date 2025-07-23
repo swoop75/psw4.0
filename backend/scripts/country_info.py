@@ -55,7 +55,8 @@ logger.addHandler(console_handler)
 
 def fetch_instruments():
     url = f"{BASE_URL}/instruments?authKey={API_KEY}"
-    logging.info("Fetching instruments from API...")
+    logging.info("Fetching instruments from Börsdata API...")
+    logging.info(f"API endpoint: {BASE_URL}/instruments")
     try:
         response = requests.get(url)
         response.raise_for_status()

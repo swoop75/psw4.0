@@ -97,7 +97,8 @@ def get_fx_data_freecurrencyapi(api_key: str, base_currency: str, target_currenc
            f"base_currency={base_currency}&"
            f"currencies={currencies_param}")
     
-    logging.info(f"Fetching FX rates for {base_currency} to {currencies_param}")
+    logging.info(f"Fetching FX rates for {base_currency} to {currencies_param} from FreeCurrency API")
+    logging.info(f"API endpoint: https://api.freecurrencyapi.com/v1/latest")
     
     try:
         response = requests.get(url)
