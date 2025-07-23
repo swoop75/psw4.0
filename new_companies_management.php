@@ -527,14 +527,33 @@ ob_start();
                 
                 
                 <div>
+                    <!-- Börsdata Integration Toggle -->
+                    <div class="form-group borsdata-toggle-section">
+                        <label for="borsdata_available">Data Source</label>
+                        <select id="borsdata_available" name="borsdata_available" onchange="toggleBorsdataFields()">
+                            <option value="0">Manual Entry</option>
+                            <option value="1">Auto-populate from Börsdata</option>
+                        </select>
+                        <small class="form-help">Select "Auto-populate" to fetch company data automatically using ISIN</small>
+                    </div>
+                    
+                    <!-- ISIN Field - Made more prominent -->
+                    <div class="form-group" id="isinGroup">
+                        <label for="isin">ISIN <span id="isinRequired" style="display: none; color: red;">*</span></label>
+                        <input type="text" id="isin" name="isin" maxlength="12" placeholder="e.g., US88160R1014">
+                        <small class="form-help" id="isinHelp">International Securities Identification Number</small>
+                    </div>
+                    
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="company">Company Name *</label>
+                            <label for="company">Company Name <span id="companyRequired">*</span></label>
                             <input type="text" id="company" name="company" required maxlength="200" placeholder="e.g., Tesla Inc">
+                            <small class="form-help" id="companyHelp" style="display: none;">This will be auto-filled when using Börsdata</small>
                         </div>
                         <div class="form-group">
-                            <label for="ticker">Ticker *</label>
+                            <label for="ticker">Ticker <span id="tickerRequired">*</span></label>
                             <input type="text" id="ticker" name="ticker" required maxlength="20" placeholder="e.g., TSLA">
+                            <small class="form-help" id="tickerHelp" style="display: none;">This will be auto-filled when using Börsdata</small>
                         </div>
                     </div>
                     
@@ -552,10 +571,12 @@ ob_start();
                                 <option value="DE">Germany</option>
                                 <option value="GB">United Kingdom</option>
                             </select>
+                            <small class="form-help" id="countryHelp" style="display: none;">This will be auto-filled when using Börsdata</small>
                         </div>
                         <div class="form-group">
                             <label for="yield">Yield (%)</label>
                             <input type="number" id="yield" name="yield" step="0.01" min="0" max="100" placeholder="0.00">
+                            <small class="form-help" id="yieldHelp" style="display: none;">This will be auto-filled when using Börsdata</small>
                         </div>
                     </div>
                     
@@ -565,8 +586,7 @@ ob_start();
                             <input type="text" id="inspiration" name="inspiration" maxlength="255" placeholder="What inspired this pick?">
                         </div>
                         <div class="form-group">
-                            <label for="isin">ISIN (Optional)</label>
-                            <input type="text" id="isin" name="isin" maxlength="12" placeholder="e.g., US88160R1014">
+                            <!-- Empty div for layout - ISIN moved to top -->
                         </div>
                     </div>
                     

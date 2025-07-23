@@ -1812,3 +1812,124 @@ label:not(.checkbox-dropdown label):not(.form-group label) {
         padding: var(--space-4);
     }
 }
+
+/* ===== BÖRSDATA INTEGRATION STYLES ===== */
+
+/* Börsdata toggle section */
+.borsdata-toggle-section {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border: 2px solid var(--primary-color);
+    border-radius: 12px;
+    padding: var(--space-4);
+    margin-bottom: var(--space-6);
+    position: relative;
+}
+
+.borsdata-toggle-section::before {
+    content: "🔗";
+    position: absolute;
+    top: -10px;
+    left: 16px;
+    background: white;
+    padding: 0 8px;
+    font-size: 16px;
+}
+
+.borsdata-toggle-section label {
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: var(--space-2);
+}
+
+.borsdata-toggle-section select {
+    border: 2px solid var(--primary-color);
+    border-radius: 8px;
+    background: white;
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+.borsdata-toggle-section select:focus {
+    box-shadow: 0 0 0 3px rgba(0, 200, 150, 0.2);
+}
+
+/* Auto-populated field styling */
+.borsdata-auto-field {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
+    border: 1px solid var(--secondary-color) !important;
+    color: var(--secondary-color) !important;
+    position: relative;
+}
+
+.borsdata-auto-field::after {
+    content: "🤖";
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    font-size: 14px;
+}
+
+.borsdata-auto-field:focus {
+    box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.2) !important;
+}
+
+/* ISIN field enhancement when Börsdata is enabled */
+#isinGroup.borsdata-required {
+    border-left: 4px solid var(--primary-color);
+    padding-left: var(--space-4);
+    background: rgba(0, 200, 150, 0.05);
+    border-radius: 0 8px 8px 0;
+}
+
+/* Help text styling */
+.form-help {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: var(--space-1);
+    font-style: italic;
+}
+
+.form-help.borsdata-help {
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+/* Required field indicators */
+span[id$="Required"] {
+    color: #dc2626;
+    font-weight: bold;
+    margin-left: 2px;
+}
+
+/* Success states for auto-populated data */
+.borsdata-success {
+    border-color: #10b981 !important;
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%) !important;
+}
+
+.borsdata-success::after {
+    content: "✅" !important;
+}
+
+/* Loading state for Börsdata fields */
+.borsdata-loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.borsdata-loading::after {
+    content: "⏳";
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+}

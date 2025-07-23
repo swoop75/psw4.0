@@ -259,7 +259,8 @@ class NewCompaniesController {
                 'inspiration' => !empty($data['inspiration']) ? Security::sanitizeInput($data['inspiration']) : null,
                 'comments' => !empty($data['comments']) ? Security::sanitizeInput($data['comments']) : null,
                 'new_companies_status_id' => !empty($data['new_companies_status_id']) ? (int)$data['new_companies_status_id'] : null,
-                'new_companies_col' => !empty($data['new_companies_col']) ? Security::sanitizeInput($data['new_companies_col']) : null
+                'new_companies_col' => !empty($data['new_companies_col']) ? Security::sanitizeInput($data['new_companies_col']) : null,
+                'borsdata_available' => isset($data['borsdata_available']) ? (bool)$data['borsdata_available'] : false
             ];
             
             // Build INSERT query
@@ -336,6 +337,41 @@ class NewCompaniesController {
             if (isset($data['new_companies_status_id'])) {
                 $updateData[] = "new_companies_status_id = :new_companies_status_id";
                 $params[':new_companies_status_id'] = (int)$data['new_companies_status_id'];
+            }
+            
+            if (isset($data['isin'])) {
+                $updateData[] = "isin = :isin";
+                $params[':isin'] = Security::sanitizeInput($data['isin']);
+            }
+            
+            if (isset($data['country_id'])) {
+                $updateData[] = "country_id = :country_id";
+                $params[':country_id'] = !empty($data['country_id']) ? (int)$data['country_id'] : null;
+            }
+            
+            if (isset($data['strategy_group_id'])) {
+                $updateData[] = "strategy_group_id = :strategy_group_id";
+                $params[':strategy_group_id'] = !empty($data['strategy_group_id']) ? (int)$data['strategy_group_id'] : null;
+            }
+            
+            if (isset($data['new_group_id'])) {
+                $updateData[] = "new_group_id = :new_group_id";
+                $params[':new_group_id'] = !empty($data['new_group_id']) ? (int)$data['new_group_id'] : null;
+            }
+            
+            if (isset($data['broker_id'])) {
+                $updateData[] = "broker_id = :broker_id";
+                $params[':broker_id'] = !empty($data['broker_id']) ? (int)$data['broker_id'] : null;
+            }
+            
+            if (isset($data['inspiration'])) {
+                $updateData[] = "inspiration = :inspiration";
+                $params[':inspiration'] = !empty($data['inspiration']) ? Security::sanitizeInput($data['inspiration']) : null;
+            }
+            
+            if (isset($data['borsdata_available'])) {
+                $updateData[] = "borsdata_available = :borsdata_available";
+                $params[':borsdata_available'] = (bool)$data['borsdata_available'];
             }
             
             if (empty($updateData)) {

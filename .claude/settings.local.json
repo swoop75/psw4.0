@@ -19,7 +19,8 @@
       "Bash(grep:*)",
       "Bash(curl:*)",
       "Bash(mysql:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(wc:*)"
     ],
     "deny": []
   }

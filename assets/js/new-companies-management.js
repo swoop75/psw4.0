@@ -865,3 +865,87 @@ document.addEventListener('keydown', function(event) {
         closeCompanyPanel();
     }
 });
+
+/**
+ * Toggle Börsdata fields based on selection
+ */
+function toggleBorsdataFields() {
+    const borsdataToggle = document.getElementById('borsdata_available');
+    const isEnabled = borsdataToggle.value === '1';
+    
+    // Get form elements
+    const isinField = document.getElementById('isin');
+    const companyField = document.getElementById('company');
+    const tickerField = document.getElementById('ticker');
+    const countryField = document.getElementById('country_name');
+    const yieldField = document.getElementById('yield');
+    
+    // Get help text elements
+    const isinHelp = document.getElementById('isinHelp');
+    const companyHelp = document.getElementById('companyHelp');
+    const tickerHelp = document.getElementById('tickerHelp');
+    const countryHelp = document.getElementById('countryHelp');
+    const yieldHelp = document.getElementById('yieldHelp');
+    
+    // Get required indicators
+    const isinRequired = document.getElementById('isinRequired');
+    const companyRequired = document.getElementById('companyRequired');
+    const tickerRequired = document.getElementById('tickerRequired');
+    
+    if (isEnabled) {
+        // Börsdata mode - ISIN required, other fields auto-populated
+        isinField.required = true;
+        isinRequired.style.display = 'inline';
+        isinHelp.textContent = 'Required for auto-population from Börsdata';
+        
+        // Make other fields not required and show they'll be auto-filled
+        companyField.required = false;
+        tickerField.required = false;
+        companyRequired.style.display = 'none';
+        tickerRequired.style.display = 'none';
+        
+        // Show help text
+        companyHelp.style.display = 'block';
+        tickerHelp.style.display = 'block';
+        countryHelp.style.display = 'block';
+        yieldHelp.style.display = 'block';
+        
+        // Make fields readonly to indicate they'll be auto-filled
+        companyField.setAttribute('placeholder', 'Will be auto-filled from Börsdata');
+        tickerField.setAttribute('placeholder', 'Will be auto-filled from Börsdata');
+        
+        // Add CSS class for styling
+        companyField.classList.add('borsdata-auto-field');
+        tickerField.classList.add('borsdata-auto-field');
+        countryField.classList.add('borsdata-auto-field');
+        yieldField.classList.add('borsdata-auto-field');
+        
+    } else {
+        // Manual mode - ISIN optional, other fields required
+        isinField.required = false;
+        isinRequired.style.display = 'none';
+        isinHelp.textContent = 'International Securities Identification Number';
+        
+        // Make other fields required
+        companyField.required = true;
+        tickerField.required = true;
+        companyRequired.style.display = 'inline';
+        tickerRequired.style.display = 'inline';
+        
+        // Hide help text
+        companyHelp.style.display = 'none';
+        tickerHelp.style.display = 'none';
+        countryHelp.style.display = 'none';
+        yieldHelp.style.display = 'none';
+        
+        // Reset placeholders
+        companyField.setAttribute('placeholder', 'e.g., Tesla Inc');
+        tickerField.setAttribute('placeholder', 'e.g., TSLA');
+        
+        // Remove CSS class
+        companyField.classList.remove('borsdata-auto-field');
+        tickerField.classList.remove('borsdata-auto-field');
+        countryField.classList.remove('borsdata-auto-field');
+        yieldField.classList.remove('borsdata-auto-field');
+    }
+}
