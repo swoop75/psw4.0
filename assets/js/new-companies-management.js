@@ -261,14 +261,29 @@ function handleEntryFormSubmit(event) {
     const formData = new FormData(form);
     const action = formData.get('action');
     
-    // Validate required fields
-    const requiredFields = ['company', 'ticker'];
+    // Validate required fields based on Börsdata mode
+    const borsdataToggle = document.getElementById('borsdata_available');
+    const isBorsdataMode = borsdataToggle && borsdataToggle.value === '1';
+    
+    let requiredFields = [];
+    if (isBorsdataMode) {
+        // In Börsdata mode, only ISIN is required
+        requiredFields = ['isin'];
+    } else {
+        // In manual mode, company and ticker are required
+        requiredFields = ['company', 'ticker'];
+    }
+    
     let isValid = true;
     
     for (const field of requiredFields) {
         const element = document.getElementById(field);
         if (!element || !element.value.trim()) {
-            showAlert(`Please fill in the ${field.replace('_', ' ')} field`, 'error');
+            const fieldName = field === 'isin' ? 'ISIN' : 
+                             field === 'company' ? 'Company Name' :
+                             field === 'ticker' ? 'Ticker' : 
+                             field.replace('_', ' ');
+            showAlert(`Please fill in the ${fieldName} field`, 'error');
             if (element) element.focus();
             isValid = false;
             break;
