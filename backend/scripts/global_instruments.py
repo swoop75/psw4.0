@@ -82,7 +82,7 @@ def fetch_global_instruments():
 def save_global_instruments(instruments):
     inserted = 0
     errors = 0
-    logging.info("Connecting to MariaDB database...")
+    logging.info("Connecting to MySQL database...")
     try:
         conn = pymysql.connect(
             user=db_config["user"],

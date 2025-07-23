@@ -80,7 +80,7 @@ def fetch_instruments():
 def save_to_db(instruments):
     inserted = 0
     errors = 0
-    logging.info("Connecting to MariaDB database...")
+    logging.info("Connecting to MySQL database...")
     try:
         conn = pymysql.connect(**db_config)
         logging.info(f"Connected to database: {db_config['database']}")

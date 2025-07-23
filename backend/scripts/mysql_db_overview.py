@@ -78,10 +78,10 @@ def get_mysql_overview():
             return False
             
         # Connect to MySQL
-        logging.info("Connecting to MariaDB database...")
+        logging.info("Connecting to MySQL database...")
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor()
-        logging.info("Successfully connected to MariaDB database")
+        logging.info("Successfully connected to MySQL database")
 
         # Get all databases
         logging.info("Fetching database list...")

@@ -86,7 +86,7 @@ def fetch_latest_prices():
 def save_latest_prices(prices):
     inserted = 0
     errors = 0
-    logging.info("Connecting to MariaDB database...")
+    logging.info("Connecting to MySQL database...")
     try:
         conn = pymysql.connect(
             user=db_config["user"],
