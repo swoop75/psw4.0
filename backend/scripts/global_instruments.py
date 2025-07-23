@@ -101,37 +101,107 @@ def save_global_instruments(instruments):
             read_timeout=30,     # 30 second read timeout
             write_timeout=30     # 30 second write timeout
         )
+        logging.info("Successfully connected to MySQL database")
+        
         with conn.cursor() as cursor:
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS global_instruments (
-                    insId INT PRIMARY KEY,
-                    name VARCHAR(255),
-                    ticker VARCHAR(50),
-                    isin VARCHAR(50),
-                    sectorId INT
-                )
-            """)
-            for item in instruments:
+            logging.info("Creating cursor successful")
+            logging.info("About to create table...")
+            # Check if table exists and get its structure
+            cursor.execute("SHOW TABLES LIKE 'global_instruments'")
+            table_exists = cursor.fetchone()
+            
+            if table_exists:
+                logging.info("Found existing global_instruments table")
+                cursor.execute("DESCRIBE global_instruments")
+                columns = cursor.fetchall()
+                # With DictCursor, columns are dictionaries with 'Field' key
+                column_names = [col['Field'] for col in columns]
+                logging.info(f"Existing table columns: {column_names}")
+            else:
+                logging.info("Creating new global_instruments table")
+                cursor.execute("""
+                    CREATE TABLE global_instruments (
+                        insId INT PRIMARY KEY,
+                        ref_instrument_id INT,
+                        name VARCHAR(255) NOT NULL,
+                        urlName VARCHAR(255),
+                        instrument INT,
+                        isin CHAR(20),
+                        ticker VARCHAR(50),
+                        yahoo VARCHAR(20),
+                        sectorId INT,
+                        marketId INT,
+                        branchId INT,
+                        countryId INT,
+                        listingDate DATE,
+                        stockPriceCurrency VARCHAR(3),
+                        reportCurrency VARCHAR(3)
+                    )
+                """)
+                logging.info("Table creation completed")
+            
+            logging.info(f"About to process {len(instruments)} instruments")
+            
+            for i, item in enumerate(instruments):
+                if i % 1000 == 0:  # Log progress every 1000 items
+                    logging.info(f"Processing instrument {i+1}/{len(instruments)}")
+                    
                 if not all(k in item for k in ('insId', 'name', 'ticker', 'sectorId')):
                     logging.warning(f"Missing keys in instrument item: {item}")
                     errors += 1
                     continue
+                    
+                # Log first item for debugging
+                if i == 0:
+                    logging.info(f"First instrument data: {item}")
+                    
                 try:
+                    # Log first insert for debugging
+                    if i == 0:
+                        logging.info("Attempting first database INSERT...")
+                    
+                    # Map all available fields from API to database columns
                     cursor.execute("""
-                        INSERT INTO global_instruments (insId, name, ticker, isin, sectorId)
-                        VALUES (%s, %s, %s, %s, %s)
+                        INSERT INTO global_instruments (
+                            insId, name, ticker, isin, sectorId, urlName, instrument, 
+                            yahoo, marketId, branchId, countryId, listingDate, 
+                            stockPriceCurrency, reportCurrency
+                        )
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                         ON DUPLICATE KEY UPDATE
                             name=VALUES(name),
                             ticker=VALUES(ticker),
                             isin=VALUES(isin),
-                            sectorId=VALUES(sectorId)
+                            sectorId=VALUES(sectorId),
+                            urlName=VALUES(urlName),
+                            instrument=VALUES(instrument),
+                            yahoo=VALUES(yahoo),
+                            marketId=VALUES(marketId),
+                            branchId=VALUES(branchId),
+                            countryId=VALUES(countryId),
+                            listingDate=VALUES(listingDate),
+                            stockPriceCurrency=VALUES(stockPriceCurrency),
+                            reportCurrency=VALUES(reportCurrency)
                     """, (
                         item['insId'],
                         item['name'],
                         item['ticker'],
                         item.get('isin'),
-                        item['sectorId']
+                        item['sectorId'],
+                        item.get('urlName'),
+                        item.get('instrument'),
+                        item.get('yahoo'),
+                        item.get('marketId'),
+                        item.get('branchId'),
+                        item.get('countryId'),
+                        item.get('listingDate'),
+                        item.get('stockPriceCurrency'),
+                        item.get('reportCurrency')
                     ))
+                    
+                    if i == 0:
+                        logging.info("First INSERT successful!")
+                    
                     inserted += 1
                 except Exception as e:
                     logging.error(f"Failed to insert instrument {item.get('insId', 'N/A')}: {e}")
