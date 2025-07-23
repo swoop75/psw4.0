@@ -132,7 +132,7 @@ def save_global_instruments(instruments):
         conn.close()
         logging.info(f"Inserted/updated {inserted} instruments into the database.")
         if errors:
-            logging.warning(f"⚠️ {errors} instruments failed to insert.")
+            logging.warning(f"{errors} instruments failed to insert.")
     except Exception as e:
         logging.exception(f"Database error: {e}")
 
@@ -145,7 +145,7 @@ def main():
     else:
         logging.warning("No global instruments found or fetched.")
     duration = datetime.now() - start
-    logging.info(f"Script finished. Duration: {duration}. ✅")
+    logging.info(f"Script finished. Duration: {duration}.")
 
 if __name__ == "__main__":
     main()

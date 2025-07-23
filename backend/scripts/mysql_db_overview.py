@@ -255,9 +255,9 @@ def main():
     
     duration = datetime.now() - start
     if success:
-        logging.info(f"Script completed successfully. Duration: {duration}. ✅")
+        logging.info(f"Script completed successfully. Duration: {duration}.")
     else:
-        logging.error(f"Script failed. Duration: {duration}. ❌")
+        logging.error(f"Script failed. Duration: {duration}.")
 
 if __name__ == "__main__":
     main()

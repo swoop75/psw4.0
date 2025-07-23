@@ -126,7 +126,7 @@ def save_latest_prices(prices):
         conn.close()
         logging.info(f"Inserted/updated {inserted} records into the database.")
         if errors:
-            logging.warning(f"⚠️ {errors} records failed to insert.")
+            logging.warning(f"{errors} records failed to insert.")
     except Exception as e:
         logging.exception(f"Database error: {e}")
 
@@ -139,7 +139,7 @@ def main():
     else:
         logging.warning("No global latest prices found or fetched.")
     duration = datetime.now() - start
-    logging.info(f"Script finished. Duration: {duration}. ✅")
+    logging.info(f"Script finished. Duration: {duration}.")
 
 if __name__ == "__main__":
     main()
