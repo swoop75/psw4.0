@@ -47,3 +47,4 @@
 {"timestamp":"2025-07-23 19:20:10","level":"DEBUG","user_id":1,"ip":"100.91.97.82","message":"Calculated country allocation from dividend data","context":{"countries":0,"total_dividends":0}}
 {"timestamp":"2025-07-23 19:20:10","level":"INFO","user_id":1,"ip":"100.91.97.82","message":"User action: dashboard_viewed","context":{"action":"dashboard_viewed","details":"User accessed dashboard","user_id":1}}
 {"timestamp":"2025-07-23 19:21:03","level":"INFO","user_id":1,"ip":"100.91.97.82","message":"New company entry added successfully","context":{"company":"1111","isin":"US40434L1052"}}
+{"timestamp":"2025-07-23 19:28:17","level":"ERROR","user_id":1,"ip":"100.91.97.82","message":"Add new company entry error: Company name is required"}
