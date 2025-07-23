@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import requests
 import pymysql
 
-# Load environment variables from .env file located at GitHub root (two levels up from this script)
+# Load environment variables from .env file located at project root (two levels up from this script)
 load_dotenv(dotenv_path='../../.env')
 
 # Get configuration from environment variables
