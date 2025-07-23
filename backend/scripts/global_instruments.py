@@ -142,6 +142,10 @@ def save_global_instruments(instruments):
             
             logging.info(f"About to process {len(instruments)} instruments")
             
+            # Process in batches for better performance
+            batch_size = 100
+            batch_data = []
+            
             for i, item in enumerate(instruments):
                 if i % 1000 == 0:  # Log progress every 1000 items
                     logging.info(f"Processing instrument {i+1}/{len(instruments)}")
@@ -154,58 +158,74 @@ def save_global_instruments(instruments):
                 # Log first item for debugging
                 if i == 0:
                     logging.info(f"First instrument data: {item}")
-                    
-                try:
-                    # Log first insert for debugging
-                    if i == 0:
-                        logging.info("Attempting first database INSERT...")
-                    
-                    # Map all available fields from API to database columns
-                    cursor.execute("""
-                        INSERT INTO global_instruments (
-                            insId, name, ticker, isin, sectorId, urlName, instrument, 
-                            yahoo, marketId, branchId, countryId, listingDate, 
-                            stockPriceCurrency, reportCurrency
-                        )
-                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                        ON DUPLICATE KEY UPDATE
-                            name=VALUES(name),
-                            ticker=VALUES(ticker),
-                            isin=VALUES(isin),
-                            sectorId=VALUES(sectorId),
-                            urlName=VALUES(urlName),
-                            instrument=VALUES(instrument),
-                            yahoo=VALUES(yahoo),
-                            marketId=VALUES(marketId),
-                            branchId=VALUES(branchId),
-                            countryId=VALUES(countryId),
-                            listingDate=VALUES(listingDate),
-                            stockPriceCurrency=VALUES(stockPriceCurrency),
-                            reportCurrency=VALUES(reportCurrency)
-                    """, (
-                        item['insId'],
-                        item['name'],
-                        item['ticker'],
-                        item.get('isin'),
-                        item['sectorId'],
-                        item.get('urlName'),
-                        item.get('instrument'),
-                        item.get('yahoo'),
-                        item.get('marketId'),
-                        item.get('branchId'),
-                        item.get('countryId'),
-                        item.get('listingDate'),
-                        item.get('stockPriceCurrency'),
-                        item.get('reportCurrency')
-                    ))
-                    
-                    if i == 0:
-                        logging.info("First INSERT successful!")
-                    
-                    inserted += 1
-                except Exception as e:
-                    logging.error(f"Failed to insert instrument {item.get('insId', 'N/A')}: {e}")
-                    errors += 1
+                
+                # Prepare data for batch insert
+                data_tuple = (
+                    item['insId'],
+                    item['name'],
+                    item['ticker'],
+                    item.get('isin'),
+                    item['sectorId'],
+                    item.get('urlName'),
+                    item.get('instrument'),
+                    item.get('yahoo'),
+                    item.get('marketId'),
+                    item.get('branchId'),
+                    item.get('countryId'),
+                    item.get('listingDate'),
+                    item.get('stockPriceCurrency'),
+                    item.get('reportCurrency')
+                )
+                batch_data.append(data_tuple)
+                
+                # Process batch when it reaches batch_size or is the last item
+                if len(batch_data) >= batch_size or i == len(instruments) - 1:
+                    try:
+                        if i == 0:
+                            logging.info("Attempting first batch INSERT...")
+                        
+                        # Execute batch insert
+                        cursor.executemany("""
+                            INSERT INTO global_instruments (
+                                insId, name, ticker, isin, sectorId, urlName, instrument, 
+                                yahoo, marketId, branchId, countryId, listingDate, 
+                                stockPriceCurrency, reportCurrency
+                            )
+                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                            ON DUPLICATE KEY UPDATE
+                                name=VALUES(name),
+                                ticker=VALUES(ticker),
+                                isin=VALUES(isin),
+                                sectorId=VALUES(sectorId),
+                                urlName=VALUES(urlName),
+                                instrument=VALUES(instrument),
+                                yahoo=VALUES(yahoo),
+                                marketId=VALUES(marketId),
+                                branchId=VALUES(branchId),
+                                countryId=VALUES(countryId),
+                                listingDate=VALUES(listingDate),
+                                stockPriceCurrency=VALUES(stockPriceCurrency),
+                                reportCurrency=VALUES(reportCurrency)
+                        """, batch_data)
+                        
+                        inserted += len(batch_data)
+                        
+                        if i == 0:
+                            logging.info("First batch INSERT successful!")
+                        
+                        # Commit every 1000 records for safety
+                        if inserted % 1000 == 0 or i == len(instruments) - 1:
+                            conn.commit()
+                            logging.info(f"Committed {inserted} records to database")
+                        
+                        batch_data = []  # Clear batch for next set
+                        
+                    except Exception as e:
+                        logging.error(f"Failed to insert batch at item {i}: {e}")
+                        errors += len(batch_data)
+                        batch_data = []  # Clear failed batch
+            
+            # Final commit
             conn.commit()
         conn.close()
         logging.info(f"Inserted/updated {inserted} instruments into the database.")
