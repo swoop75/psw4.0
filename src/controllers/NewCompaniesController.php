@@ -221,35 +221,58 @@ class NewCompaniesController {
      */
     public function addNewCompanyEntry($data) {
         try {
-            // Validate required fields
-            if (empty($data['company'])) {
-                throw new Exception('Company name is required');
+            // Validate required fields based on data source
+            $isBorsdataMode = isset($data['borsdata_available']) && $data['borsdata_available'] == '1';
+            
+            if ($isBorsdataMode) {
+                // In Börsdata mode, only ISIN is required
+                if (empty($data['isin'])) {
+                    throw new Exception('ISIN is required for Börsdata auto-population');
+                }
+            } else {
+                // In manual mode, company name is required
+                if (empty($data['company'])) {
+                    throw new Exception('Company name is required');
+                }
             }
             
-            // Check if this company is already in new_companies (by company name and ticker if available)
-            $checkSql = "SELECT new_company_id FROM new_companies WHERE company = :company";
-            $checkParams = [':company' => $data['company']];
-            
-            if (!empty($data['ticker'])) {
-                $checkSql .= " AND ticker = :ticker";
-                $checkParams[':ticker'] = $data['ticker'];
+            // Check for duplicates based on mode
+            if ($isBorsdataMode && !empty($data['isin'])) {
+                // In Börsdata mode, check by ISIN
+                $checkSql = "SELECT new_company_id FROM new_companies WHERE isin = :isin";
+                $checkParams = [':isin' => $data['isin']];
+            } else if (!empty($data['company'])) {
+                // In manual mode, check by company name and ticker
+                $checkSql = "SELECT new_company_id FROM new_companies WHERE company = :company";
+                $checkParams = [':company' => $data['company']];
+                
+                if (!empty($data['ticker'])) {
+                    $checkSql .= " AND ticker = :ticker";
+                    $checkParams[':ticker'] = $data['ticker'];
+                }
+            } else {
+                // Skip duplicate check if no identifying fields
+                $checkParams = [];
             }
             
-            $stmt = $this->portfolioDb->prepare($checkSql);
-            foreach ($checkParams as $key => $value) {
-                $stmt->bindValue($key, $value);
-            }
-            $stmt->execute();
-            
-            if ($stmt->fetch()) {
-                throw new Exception('This company is already in the new companies list');
+            if (!empty($checkParams)) {
+                $stmt = $this->portfolioDb->prepare($checkSql);
+                foreach ($checkParams as $key => $value) {
+                    $stmt->bindValue($key, $value);
+                }
+                $stmt->execute();
+                
+                if ($stmt->fetch()) {
+                    $identifier = $isBorsdataMode ? 'ISIN' : 'company';
+                    throw new Exception("This $identifier is already in the new companies list");
+                }
             }
             
             // Prepare data for insertion
             $insertData = [
-                'company' => Security::sanitizeInput($data['company']),
+                'company' => !empty($data['company']) ? Security::sanitizeInput($data['company']) : null,
                 'ticker' => !empty($data['ticker']) ? strtoupper(Security::sanitizeInput($data['ticker'])) : null,
-                'isin' => Security::sanitizeInput($data['isin']),
+                'isin' => !empty($data['isin']) ? Security::sanitizeInput($data['isin']) : null,
                 'country_name' => !empty($data['country_name']) ? Security::sanitizeInput($data['country_name']) : null,
                 'country_id' => !empty($data['country_id']) ? (int)$data['country_id'] : null,
                 'yield' => !empty($data['yield']) ? (float)$data['yield'] : null,
