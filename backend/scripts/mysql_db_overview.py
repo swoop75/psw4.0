@@ -191,12 +191,27 @@ def get_mysql_overview():
             conn.close()
             logging.info("Database connection closed")
 
-    # Create output directory
+    # Create output directory and handle old file migration
     try:
         os.makedirs(mysql_overview_dir, exist_ok=True)
         logging.info(f"Ensured output directory exists: {mysql_overview_dir}")
+        
+        # Check for old file and move it to new location
+        old_file_path = r'C:\Users\laoan\Documents\mysql_database_overview.json'
+        if os.path.exists(old_file_path):
+            import shutil
+            # Create timestamped filename for the old file
+            old_timestamp = datetime.fromtimestamp(os.path.getmtime(old_file_path)).strftime("%Y%m%d_%H%M%S")
+            old_filename = f"mysql_database_overview_{old_timestamp}_migrated.json"
+            new_old_file_path = os.path.join(mysql_overview_dir, old_filename)
+            
+            shutil.move(old_file_path, new_old_file_path)
+            logging.info(f"Migrated old file from {old_file_path} to {new_old_file_path}")
+        else:
+            logging.info("No old file found to migrate")
+            
     except Exception as e:
-        logging.error(f"Failed to create output directory {mysql_overview_dir}: {e}")
+        logging.error(f"Failed to create output directory or migrate old file: {e}")
         return False
 
     # Write JSON overview file
