@@ -249,6 +249,11 @@ def get_mysql_overview():
 
 def main():
     start = datetime.now()
+    # Console delimiter (clean display)
+    print("="*50)
+    print("MYSQL DATABASE OVERVIEW SCRIPT STARTED")
+    print("="*50)
+    # File logging (with timestamps)
     logging.info("="*50)
     logging.info("MYSQL DATABASE OVERVIEW SCRIPT STARTED")
     logging.info("="*50)

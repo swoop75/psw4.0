@@ -132,6 +132,11 @@ def save_nordic_latest_prices(prices):
 
 def main():
     start = datetime.now()
+    # Console delimiter (clean display)
+    print("="*50)
+    print("NORDIC LATEST PRICES SCRIPT STARTED")
+    print("="*50)
+    # File logging (with timestamps)
     logging.info("="*50)
     logging.info("NORDIC LATEST PRICES SCRIPT STARTED")
     logging.info("="*50)

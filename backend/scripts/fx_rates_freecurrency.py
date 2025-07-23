@@ -239,6 +239,11 @@ def daily_update():
 
 def main():
     start = datetime.now()
+    # Console delimiter (clean display)
+    print("="*50)
+    print("FX RATES FREECURRENCY SCRIPT STARTED")
+    print("="*50)
+    # File logging (with timestamps)
     logging.info("="*50)
     logging.info("FX RATES FREECURRENCY SCRIPT STARTED")
     logging.info("="*50)

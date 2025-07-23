@@ -138,6 +138,11 @@ def save_global_instruments(instruments):
 
 def main():
     start = datetime.now()
+    # Console delimiter (clean display)
+    print("="*50)
+    print("GLOBAL INSTRUMENTS SCRIPT STARTED")
+    print("="*50)
+    # File logging (with timestamps)
     logging.info("="*50)
     logging.info("GLOBAL INSTRUMENTS SCRIPT STARTED")
     logging.info("="*50)

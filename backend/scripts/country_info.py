@@ -129,6 +129,11 @@ def save_to_db(instruments):
 
 def main():
     start = datetime.now()
+    # Console delimiter (clean display)
+    print("="*50)
+    print("COUNTRY INFO SCRIPT STARTED")
+    print("="*50)
+    # File logging (with timestamps)
     logging.info("="*50)
     logging.info("COUNTRY INFO SCRIPT STARTED")
     logging.info("="*50)
