@@ -1,11 +1,11 @@
-import os
-from dotenv import load_dotenv
 import requests
 import pymysql
 import logging
 from datetime import datetime
+import os
+from dotenv import load_dotenv
 
-# Load environment variables from .env file located at project root (two levels up from this script)
+# Load environment variables from .env file located at project root
 load_dotenv(dotenv_path='../../.env')
 
 # Get configuration from environment variables
@@ -28,7 +28,7 @@ db_config = {
 # === Setup Logging ===
 log_dir = os.getenv('LOG_PATH', "../../storage/logs")
 os.makedirs(log_dir, exist_ok=True)
-log_filename = os.path.join(log_dir, "nordic_instruments.log")
+log_filename = os.path.join(log_dir, "global_instruments.log")
 
 logging.basicConfig(
     filename=log_filename,
@@ -37,41 +37,49 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S"
 )
 
-def fetch_instruments():
-    url = f"{BASE_URL}/instruments?authKey={API_KEY}"
-    logging.info("Fetching Nordic instruments from API...")
+def fetch_global_instruments():
+    url = f"{BASE_URL}/instruments/global?authKey={API_KEY}"
+    logging.info("Fetching global instruments from API...")
     try:
         response = requests.get(url)
         response.raise_for_status()
         data = response.json()
-        
-        instruments = data.get("instruments")
-        if instruments is None:
-            logging.error("No 'instruments' key found in API response.")
-            logging.debug(f"Full API response: {data}")
+
+        if isinstance(data, dict):
+            for key in ['instruments', 'data']:
+                if key in data:
+                    logging.info(f"Found instruments under key '{key}' with {len(data[key])} entries.")
+                    return data[key]
+            logging.warning("No recognized key for instruments found in response.")
+            logging.debug(f"Response keys: {list(data.keys())}")
             return []
-        
-        logging.info(f"Successfully fetched {len(instruments)} instruments from API")
-        return instruments
-        
-    except requests.RequestException as e:
-        logging.error(f"HTTP request failed: {e}")
-        return []
+        elif isinstance(data, list):
+            logging.info(f"Received list of {len(data)} instruments.")
+            return data
+        else:
+            logging.error("Unexpected data structure from API.")
+            return []
     except Exception as e:
         logging.exception(f"Error fetching instruments: {e}")
         return []
 
-def save_to_db(instruments):
+def save_global_instruments(instruments):
     inserted = 0
     errors = 0
     logging.info("Connecting to MariaDB database...")
     try:
-        conn = pymysql.connect(**db_config)
-        logging.info(f"Connected to database: {db_config['database']}")
-        
+        conn = pymysql.connect(
+            user=db_config["user"],
+            password=db_config["password"],
+            host=db_config["host"],
+            port=db_config["port"],
+            database=db_config["database"],
+            charset='utf8mb4',
+            cursorclass=pymysql.cursors.DictCursor
+        )
         with conn.cursor() as cursor:
             cursor.execute("""
-                CREATE TABLE IF NOT EXISTS nordic_instruments (
+                CREATE TABLE IF NOT EXISTS global_instruments (
                     id INT PRIMARY KEY,
                     name VARCHAR(255),
                     ticker VARCHAR(50),
@@ -79,54 +87,47 @@ def save_to_db(instruments):
                     sectorId INT
                 )
             """)
-
             for item in instruments:
-                # Check required keys
-                if not all(k in item for k in ("insId", "name", "ticker", "isin", "sectorId")):
+                if not all(k in item for k in ('insId', 'name', 'ticker', 'sectorId')):
                     logging.warning(f"Missing keys in instrument item: {item}")
                     errors += 1
                     continue
-
                 try:
                     cursor.execute("""
-                        INSERT INTO nordic_instruments (id, name, ticker, isin, sectorId)
+                        INSERT INTO global_instruments (id, name, ticker, isin, sectorId)
                         VALUES (%s, %s, %s, %s, %s)
                         ON DUPLICATE KEY UPDATE
                             name=VALUES(name),
                             ticker=VALUES(ticker),
                             isin=VALUES(isin),
                             sectorId=VALUES(sectorId)
-                    """, (item["insId"], item["name"], item["ticker"], item["isin"], item["sectorId"]))
+                    """, (
+                        item['insId'],
+                        item['name'],
+                        item['ticker'],
+                        item.get('isin'),
+                        item['sectorId']
+                    ))
                     inserted += 1
                 except Exception as e:
                     logging.error(f"Failed to insert instrument {item.get('insId', 'N/A')}: {e}")
                     errors += 1
-
-        conn.commit()
+            conn.commit()
         conn.close()
         logging.info(f"Inserted/updated {inserted} instruments into the database.")
         if errors:
             logging.warning(f"⚠️ {errors} instruments failed to insert.")
     except Exception as e:
         logging.exception(f"Database error: {e}")
-        raise
 
 def main():
     start = datetime.now()
     logging.info("Script started.")
-    
-    instruments = fetch_instruments()
-    
-    if not instruments:
-        logging.warning("No Nordic instruments found or fetched.")
-        return
-    
-    try:
-        save_to_db(instruments)
-    except Exception as e:
-        logging.exception(f"Error saving to database: {e}")
-        return
-    
+    instruments = fetch_global_instruments()
+    if instruments:
+        save_global_instruments(instruments)
+    else:
+        logging.warning("No global instruments found or fetched.")
     duration = datetime.now() - start
     logging.info(f"Script finished. Duration: {duration}. ✅")
 
