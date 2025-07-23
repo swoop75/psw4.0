@@ -104,7 +104,7 @@ def save_global_instruments(instruments):
         with conn.cursor() as cursor:
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS global_instruments (
-                    id INT PRIMARY KEY,
+                    insId INT PRIMARY KEY,
                     name VARCHAR(255),
                     ticker VARCHAR(50),
                     isin VARCHAR(50),
@@ -118,7 +118,7 @@ def save_global_instruments(instruments):
                     continue
                 try:
                     cursor.execute("""
-                        INSERT INTO global_instruments (id, name, ticker, isin, sectorId)
+                        INSERT INTO global_instruments (insId, name, ticker, isin, sectorId)
                         VALUES (%s, %s, %s, %s, %s)
                         ON DUPLICATE KEY UPDATE
                             name=VALUES(name),

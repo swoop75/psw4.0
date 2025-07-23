@@ -89,7 +89,7 @@ def save_to_db(instruments):
         with conn.cursor() as cursor:
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS nordic_instruments (
-                    id INT PRIMARY KEY,
+                    insId INT PRIMARY KEY,
                     name VARCHAR(255),
                     ticker VARCHAR(50),
                     isin VARCHAR(50),
@@ -106,7 +106,7 @@ def save_to_db(instruments):
 
                 try:
                     cursor.execute("""
-                        INSERT INTO nordic_instruments (id, name, ticker, isin, sectorId)
+                        INSERT INTO nordic_instruments (insId, name, ticker, isin, sectorId)
                         VALUES (%s, %s, %s, %s, %s)
                         ON DUPLICATE KEY UPDATE
                             name=VALUES(name),
