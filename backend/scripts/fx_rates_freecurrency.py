@@ -124,8 +124,11 @@ def get_fx_data_freecurrencyapi(api_key: str, base_currency: str, target_currenc
         
     return None, None
 
-def insert_fx_rate(cursor, base_currency: str, target_currency: str, rate_date: str, exchange_rate: float, raw_response: dict):
-    """Insert or update FX rate in database"""
+def insert_fx_rates_batch(cursor, fx_rates_data):
+    """Insert or update multiple FX rates in database using batch processing"""
+    if not fx_rates_data:
+        return 0, 0
+        
     sql = f"""
     INSERT INTO {FX_TABLE_NAME} (
         base_currency, target_currency, exchange_rate, rate_date, provider, raw_response
@@ -136,20 +139,15 @@ def insert_fx_rate(cursor, base_currency: str, target_currency: str, rate_date: 
         raw_response = VALUES(raw_response),
         updated_at = CURRENT_TIMESTAMP
     """
+    
     try:
-        cursor.execute(sql, (
-            base_currency,
-            target_currency,
-            exchange_rate,
-            rate_date,
-            "freecurrencyapi",
-            json.dumps(raw_response)
-        ))
-        logging.info(f"Updated {base_currency}/{target_currency} = {exchange_rate} for {rate_date}")
-        return True
+        cursor.executemany(sql, fx_rates_data)
+        inserted = len(fx_rates_data)
+        logging.info(f"Batch inserted/updated {inserted} FX rates")
+        return inserted, 0
     except mysql.connector.Error as err:
-        logging.error(f"Failed to insert rate for {base_currency}/{target_currency}: {err}")
-        return False
+        logging.error(f"Failed to insert FX rates batch: {err}")
+        return 0, len(fx_rates_data)
 
 def daily_update():
     """Perform daily FX rates update"""
@@ -178,18 +176,22 @@ def daily_update():
         today_str = datetime.now().strftime('%Y-%m-%d')
         logging.info(f"Updating FX rates for date: {today_str}")
 
+        # Collect all FX rate data for batch processing
+        fx_rates_batch = []
+        
         # Always ensure SEK/SEK = 1.0 (no API call needed)
-        if insert_fx_rate(cursor, "SEK", "SEK", today_str, 1.0, {}):
-            total_entered_count += 1
-        else:
-            error_count += 1
+        fx_rates_batch.append((
+            "SEK", "SEK", 1.0, today_str, "freecurrencyapi", json.dumps({})
+        ))
+        logging.info("Added SEK/SEK = 1.0 to batch")
 
         # Process each base currency
-        for base_curr, target_currs_list in CURRENCY_PAIRS_BY_BASE.items():
+        base_currencies = list(CURRENCY_PAIRS_BY_BASE.keys())
+        for i, (base_curr, target_currs_list) in enumerate(CURRENCY_PAIRS_BY_BASE.items()):
             if base_curr == "SEK":
                 continue
                 
-            logging.info(f"Processing {base_curr} to {len(target_currs_list)} target currencies")
+            logging.info(f"Processing {base_curr} to {len(target_currs_list)} target currencies ({i+1}/{len(base_currencies)})")
             
             rates, raw_json = get_fx_data_freecurrencyapi(
                 api_key=API_KEY,
@@ -202,10 +204,11 @@ def daily_update():
                 for target_curr in target_currs_list:
                     rate = rates.get(target_curr)
                     if rate is not None and isinstance(rate, (int, float)):
-                        if insert_fx_rate(cursor, base_curr, target_curr, today_str, rate, raw_json):
-                            total_entered_count += 1
-                        else:
-                            error_count += 1
+                        fx_rates_batch.append((
+                            base_curr, target_curr, rate, today_str, 
+                            "freecurrencyapi", json.dumps(raw_json)
+                        ))
+                        logging.info(f"Added {base_curr}/{target_curr} = {rate} to batch")
                     else:
                         logging.warning(f"Invalid rate for {base_curr}/{target_curr}: {rate}")
                         error_count += 1
@@ -214,9 +217,16 @@ def daily_update():
                 error_count += len(target_currs_list)
                 
             # Rate limiting: pause between API calls (except for last one)
-            if base_curr != list(CURRENCY_PAIRS_BY_BASE.keys())[-1]:
+            if i < len(base_currencies) - 1:
                 logging.info("Pausing 6 seconds for API rate limiting...")
                 time.sleep(6)
+        
+        # Process all FX rates in batch
+        if fx_rates_batch:
+            logging.info(f"Processing batch of {len(fx_rates_batch)} FX rates")
+            batch_inserted, batch_errors = insert_fx_rates_batch(cursor, fx_rates_batch)
+            total_entered_count += batch_inserted
+            error_count += batch_errors
 
         cnx.commit()
         logging.info(f"Database transaction committed")
