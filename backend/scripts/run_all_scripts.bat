@@ -44,10 +44,18 @@ if %errorlevel% neq 0 (
     exit /b %errorlevel%
 )
 
-echo [6/6] Running mysql_db_overview.py...
+echo [6/7] Running mysql_db_overview.py...
 python mysql_db_overview.py
 if %errorlevel% neq 0 (
     echo ERROR: mysql_db_overview.py failed with exit code %errorlevel%
+    pause
+    exit /b %errorlevel%
+)
+
+echo [7/7] Running fx_rates_freecurrency.py...
+python fx_rates_freecurrency.py
+if %errorlevel% neq 0 (
+    echo ERROR: fx_rates_freecurrency.py failed with exit code %errorlevel%
     pause
     exit /b %errorlevel%
 )

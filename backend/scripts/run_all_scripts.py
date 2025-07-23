@@ -14,7 +14,8 @@ SCRIPTS = [
     'nordic_instruments.py',
     'nordic_latest_prices.py',
     'country_info.py',
-    'mysql_db_overview.py'
+    'mysql_db_overview.py',
+    'fx_rates_freecurrency.py'
 ]
 
 def run_script(script_name):
