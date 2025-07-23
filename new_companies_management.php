@@ -25,6 +25,8 @@ $successMessage = '';
 
 // Handle AJAX requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') {
+    // Clean output buffer and prevent any HTML output
+    ob_clean();
     header('Content-Type: application/json');
     
     try {
@@ -38,6 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WI
             case 'add':
                 $result = $controller->addNewCompanyEntry($_POST);
                 echo json_encode(['success' => $result, 'message' => $result ? 'Entry added to new companies successfully' : 'Failed to add entry']);
+                exit;
                 break;
                 
             case 'add_to_masterlist':
@@ -48,26 +51,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WI
                 ];
                 $result = $controller->addToMasterlist($companyId, $masterlistData);
                 echo json_encode(['success' => $result, 'message' => $result ? 'Company added to masterlist successfully' : 'Failed to add to masterlist']);
-                break;
+                exit;
                 
             case 'update':
                 $companyId = $_POST['new_companies_id'] ?? '';
                 unset($_POST['action'], $_POST['csrf_token'], $_POST['new_companies_id']);
                 $result = $controller->updateNewCompanyEntry($companyId, $_POST);
                 echo json_encode(['success' => $result, 'message' => $result ? 'Entry updated successfully' : 'Failed to update entry']);
-                break;
+                exit;
                 
             case 'delete':
                 $companyId = $_POST['new_companies_id'] ?? '';
                 $result = $controller->deleteNewCompanyEntry($companyId);
                 echo json_encode(['success' => $result, 'message' => $result ? 'Entry removed from new companies' : 'Failed to remove entry']);
-                break;
+                exit;
                 
             case 'get_entry':
                 $companyId = $_POST['new_companies_id'] ?? '';
                 $entry = $controller->getNewCompanyEntry($companyId);
                 echo json_encode(['success' => (bool)$entry, 'entry' => $entry]);
-                break;
+                exit;
                 
             case 'search_companies':
                 $search = $_POST['search'] ?? '';
@@ -77,14 +80,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WI
                 } else {
                     echo json_encode(['success' => false, 'message' => 'Search term too short']);
                 }
-                break;
+                exit;
                 
             default:
                 echo json_encode(['success' => false, 'message' => 'Invalid action']);
+                exit;
         }
         
     } catch (Exception $e) {
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        exit;
     }
     
     exit;

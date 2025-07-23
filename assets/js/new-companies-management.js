@@ -306,7 +306,20 @@ function handleEntryFormSubmit(event) {
         },
         body: formData
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.text();
+    })
+    .then(text => {
+        try {
+            return JSON.parse(text);
+        } catch (e) {
+            console.error('Invalid JSON response:', text);
+            throw new Error('Server returned invalid JSON. Check console for details.');
+        }
+    })
     .then(data => {
         submitButton.disabled = false;
         submitButton.innerHTML = originalText;
