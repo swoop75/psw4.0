@@ -229,9 +229,7 @@ ob_start();
         <div class="page-header">
             <div class="header-content">
                 <div class="header-left">
-                    <h1><i class="fas fa-star"></i> New Companies Management</h1>
-                    <p>Manage your watchlist and buy targets</p>
-                    <p class="header-hint"><i class="fas fa-info-circle"></i> Hover over company names for detailed information</p>
+                    <h1><i class="fas fa-star"></i> New Companies</h1>
                 </div>
             </div>
         </div>
