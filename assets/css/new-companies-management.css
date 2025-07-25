@@ -5,10 +5,7 @@
  * Updated: Compatible with unified navigation system
  */
 
-/* Compatibility with unified navigation */
-.container {
-    margin-top: 0; /* Remove any extra margin since main-container already has padding-top */
-}
+/* Compatibility with unified navigation - This override is handled by the main container definition below */
 
 /* CSS Custom Properties - Beautiful Design System */
 :root {
@@ -111,6 +108,7 @@ body {
     width: 100%;
     margin: 0 auto;
     padding: var(--space-4) var(--space-6);
+    padding-top: 100px; /* Account for sticky header (64px) + extra spacing */
     min-height: 150vh; /* Increased height to accommodate 50 rows without scrolling */
     box-sizing: border-box;
 }

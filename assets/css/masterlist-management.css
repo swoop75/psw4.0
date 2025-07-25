@@ -19,6 +19,7 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
+    padding-top: 100px; /* Account for sticky header (64px) + extra spacing */
 }
 
 /* Header Styles - Beautiful Landing Page Style */
