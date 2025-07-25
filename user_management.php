@@ -152,17 +152,10 @@ ob_start();
             </div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon"><i class="fas fa-coins"></i></div>
+            <div class="stat-icon"><i class="fas fa-clock"></i></div>
             <div class="stat-content">
-                <div class="stat-value"><?php echo number_format($stats['dividend_payments_count'] ?? 0); ?></div>
-                <div class="stat-label">Dividend Payments</div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
-            <div class="stat-content">
-                <div class="stat-value"><?php echo number_format($stats['total_dividend_amount'] ?? 0, 0); ?> SEK</div>
-                <div class="stat-label">Total Dividends</div>
+                <div class="stat-value"><?php echo $user['last_login'] ? date('M j, Y', strtotime($user['last_login'])) : 'Never'; ?></div>
+                <div class="stat-label">Last Login</div>
             </div>
         </div>
     </div>
