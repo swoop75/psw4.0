@@ -928,15 +928,24 @@ function closeAllActionsDropdowns() {
  * Open company panel from dropdown button
  */
 function openCompanyPanelFromDropdown(button) {
+    console.log('Info button clicked'); // Debug
+    
     // Close the dropdown first
     closeAllActionsDropdowns();
     
     // Find the company-info element in the same row
     const row = button.closest('tr');
-    const companyInfo = row.querySelector('.company-info');
+    console.log('Found row:', row); // Debug
+    
+    const companyInfo = row ? row.querySelector('.company-info') : null;
+    console.log('Found company-info:', companyInfo); // Debug
     
     if (companyInfo) {
+        console.log('Company data:', companyInfo.dataset); // Debug
         openCompanyPanel(companyInfo);
+    } else {
+        console.error('Could not find company-info element');
+        alert('Error: Could not find company information');
     }
 }
 

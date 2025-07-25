@@ -1532,17 +1532,19 @@ label:not(.checkbox-dropdown label):not(.form-group label) {
     top: 100%;
     left: 0;
     min-width: 180px;
-    background: rgba(255, 255, 255, 0.98);
-    border: 1px solid var(--border-light);
+    background: #ffffff;
+    border: 2px solid #e5e7eb;
     border-radius: var(--radius-lg);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.8);
     z-index: 1050;
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);
     transition: all 0.2s ease;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    /* Multiple background layers for complete opacity */
+    background-image: 
+        linear-gradient(to bottom, #ffffff 0%, #ffffff 100%),
+        linear-gradient(to bottom, #f9fafb 0%, #ffffff 100%);
 }
 
 .actions-dropdown-menu.show {
@@ -1558,14 +1560,16 @@ label:not(.checkbox-dropdown label):not(.form-group label) {
     width: 100%;
     padding: var(--space-3) var(--space-4);
     border: none;
-    background: rgba(255, 255, 255, 0.95);
+    background: #ffffff;
     color: var(--text-primary);
     font-size: var(--text-sm);
     font-weight: var(--font-medium);
     text-align: left;
     cursor: pointer;
     transition: all 0.15s ease;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid #f3f4f6;
+    position: relative;
+    z-index: 1;
 }
 
 .dropdown-action:first-child {
@@ -1594,6 +1598,60 @@ label:not(.checkbox-dropdown label):not(.form-group label) {
     width: 16px;
     text-align: center;
 }
+
+/* ============================================
+   ALTERNATIVE SOLUTIONS FOR DROPDOWN BACKGROUND
+   ============================================ */
+
+/* SOLUTION 2: Backdrop with Blur + Solid Overlay
+   Motivation: Creates a visual separation layer behind the dropdown 
+   that blurs and darkens the background content */
+/*
+.actions-dropdown-menu::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(3px);
+    z-index: -1;
+}
+
+.actions-dropdown-menu {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+*/
+
+/* SOLUTION 3: CSS Mask + Shadow Overlay
+   Motivation: Uses CSS masking to create a "cutout" effect that completely
+   isolates the dropdown from background content */
+/*
+.company-actions-dropdown.active::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 1049;
+    backdrop-filter: blur(2px);
+}
+
+.actions-dropdown-menu {
+    background: #ffffff;
+    box-shadow: 
+        0 0 0 1px rgba(0, 0, 0, 0.05),
+        0 20px 40px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    border: 1px solid #d1d5db;
+    z-index: 1051;
+}
+*/
 
 /* Right-Side Company Panel - Modern Transform Approach */
 .company-panel {
