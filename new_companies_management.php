@@ -505,6 +505,20 @@ ob_start();
                                                     <?php if ($entry['isin'] || $entry['ticker']): ?>
                                                         <?= htmlspecialchars($entry['isin'] ?: 'No ISIN') ?> | <?= htmlspecialchars($entry['ticker'] ?: 'No Ticker') ?>
                                                     <?php endif; ?>
+                                                    <?php 
+                                                    // Check if data comes from Börsdata
+                                                    $isBorsdata = !empty($entry['isin']) && !empty($entry['ticker']) && 
+                                                                 $entry['company'] !== 'Pending Börsdata lookup';
+                                                    ?>
+                                                    <?php if ($isBorsdata): ?>
+                                                        <span class="borsdata-badge" title="Data from Börsdata">
+                                                            <i class="fas fa-database"></i> BD
+                                                        </span>
+                                                    <?php else: ?>
+                                                        <span class="manual-badge" title="Manual entry">
+                                                            <i class="fas fa-user-edit"></i> Manual
+                                                        </span>
+                                                    <?php endif; ?>
                                                 </div>
                                             </div>
                                         </div>

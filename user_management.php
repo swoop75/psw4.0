@@ -102,9 +102,6 @@ include __DIR__ . '/templates/header.php';
                 <i class="fas fa-user-cog"></i>
                 User Management
             </h1>
-            <p class="page-subtitle">
-                Manage your profile, security settings, and preferences
-            </p>
         </div>
         <div class="header-info">
             <div class="user-badge">
