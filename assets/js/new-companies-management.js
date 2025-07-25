@@ -261,7 +261,9 @@ function populateEntryForm(entry) {
         'analyst_rating', 'risk_level', 'sector', 'market_cap_category', 'target_allocation_percent',
         'stop_loss_price', 'take_profit_price', 'entry_strategy', 'exit_strategy',
         'last_analysis_date', 'next_review_date', 'price_alert_enabled', 'price_alert_target',
-        'yield', 'new_companies_status_id', 'strategy_group_id', 'new_group_id', 'broker_id',
+        'yield', 'yield_current', 'yield_1y_avg', 'yield_1y_cagr', 'yield_3y_avg', 'yield_3y_cagr',
+        'yield_5y_avg', 'yield_5y_cagr', 'yield_10y_avg', 'yield_10y_cagr',
+        'new_companies_status_id', 'strategy_group_id', 'new_group_id', 'broker_id',
         'inspiration', 'comments'
     ];
     
@@ -870,8 +872,14 @@ function populateCompanyPanel(companyInfo) {
                     <span class="panel-info-value">${escapeHtml(data.country)}</span>
                 </div>
                 <div class="panel-info-row">
-                    <span class="panel-info-label">Yield:</span>
-                    <span class="panel-info-value panel-badge">${escapeHtml(data.yield)}</span>
+                    <span class="panel-info-label">Current Yield:</span>
+                    <span class="panel-info-value panel-badge yield-clickable" onclick="toggleYieldDetails(this)" data-yield-expanded="false">
+                        ${escapeHtml(data.yield)} 
+                        <i class="fas fa-chevron-down" style="margin-left: 4px; font-size: 10px;"></i>
+                    </span>
+                </div>
+                <div class="yield-details" style="display: none;">
+                    ${generateYieldMetrics(data)}
                 </div>
                 <div class="panel-info-row">
                     <span class="panel-info-label">Status:</span>
@@ -938,6 +946,97 @@ function openCompanyPage(companyId) {
     // For now, show a placeholder message
     alert('Company page feature coming soon!\nCompany ID: ' + companyId);
     // Future: window.location.href = '/company/' + companyId;
+}
+
+/**
+ * Toggle yield details in the info panel
+ */
+function toggleYieldDetails(element) {
+    const yieldDetails = element.closest('.panel-section').querySelector('.yield-details');
+    const icon = element.querySelector('i');
+    const isExpanded = element.getAttribute('data-yield-expanded') === 'true';
+    
+    if (isExpanded) {
+        yieldDetails.style.display = 'none';
+        icon.className = 'fas fa-chevron-down';
+        element.setAttribute('data-yield-expanded', 'false');
+    } else {
+        yieldDetails.style.display = 'block';
+        icon.className = 'fas fa-chevron-up';
+        element.setAttribute('data-yield-expanded', 'true');
+    }
+}
+
+/**
+ * Toggle additional yield data fields in the form
+ */
+function toggleYieldDataFields() {
+    const yieldFields = document.getElementById('additionalYieldFields');
+    const toggleIcon = document.getElementById('yieldToggleIcon');
+    
+    if (yieldFields.style.display === 'none' || yieldFields.style.display === '') {
+        yieldFields.style.display = 'block';
+        toggleIcon.className = 'fas fa-chevron-up';
+    } else {
+        yieldFields.style.display = 'none';
+        toggleIcon.className = 'fas fa-chevron-down';
+    }
+}
+
+/**
+ * Generate yield metrics HTML with color coding
+ */
+function generateYieldMetrics(data) {
+    const currentYield = parseFloat(data.yieldCurrent) || parseFloat(data.yield?.replace('%', '')) || 0;
+    
+    const metrics = [
+        { label: '1 Year Avg', value: data.yield1yAvg, comparison: 'avg' },
+        { label: '1 Year CAGR', value: data.yield1yCagr, comparison: 'cagr' },
+        { label: '3 Year Avg', value: data.yield3yAvg, comparison: 'avg' },
+        { label: '3 Year CAGR', value: data.yield3yCagr, comparison: 'cagr' },
+        { label: '5 Year Avg', value: data.yield5yAvg, comparison: 'avg' },
+        { label: '5 Year CAGR', value: data.yield5yCagr, comparison: 'cagr' },
+        { label: '10 Year Avg', value: data.yield10yAvg, comparison: 'avg' },
+        { label: '10 Year CAGR', value: data.yield10yCagr, comparison: 'cagr' }
+    ];
+    
+    let html = '<div class="yield-metrics-container">';
+    
+    metrics.forEach(metric => {
+        if (metric.value && metric.value !== '') {
+            const metricValue = parseFloat(metric.value);
+            let trendClass = '';
+            
+            // Color coding: green if current is below average (good for buying), red if above
+            if (currentYield && metricValue) {
+                if (metric.comparison === 'avg') {
+                    trendClass = currentYield < metricValue ? 'yield-trend-up' : 'yield-trend-down';
+                } else { // CAGR
+                    trendClass = currentYield > metricValue ? 'yield-trend-up' : 'yield-trend-down';
+                }
+            }
+            
+            html += `
+                <div class="yield-metric ${trendClass}">
+                    <span class="yield-metric-label">${metric.label}:</span>
+                    <span class="yield-metric-value">${metric.value}%</span>
+                </div>
+            `;
+        }
+    });
+    
+    // Add data source and last updated info
+    if (data.yieldSource || data.yieldUpdated) {
+        html += `
+            <div style="grid-column: span 2; margin-top: var(--space-2); padding-top: var(--space-2); border-top: 1px solid var(--border-light); font-size: var(--text-xs); color: var(--text-muted);">
+                <div>Source: ${data.yieldSource || 'manual'}</div>
+                ${data.yieldUpdated && data.yieldUpdated !== 'N/A' ? `<div>Updated: ${new Date(data.yieldUpdated).toLocaleDateString()}</div>` : ''}
+            </div>
+        `;
+    }
+    
+    html += '</div>';
+    return html;
 }
 
 // Escape HTML to prevent XSS

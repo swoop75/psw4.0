@@ -481,7 +481,7 @@ ob_start();
                             <th>Company</th>
                             <th>Country</th>
                             <th>Broker</th>
-                            <th>Yield (%)</th>
+                            <th>Current Yield (%)</th>
                             <th>Strategy Group</th>
                             <th>Status</th>
                         </tr>
@@ -500,7 +500,18 @@ ob_start();
                                              data-strategy-id="<?= $entry['strategy_group_id'] ?: 'N/A' ?>"
                                              data-new-group="<?= $entry['new_group_id'] ?: 'No Group' ?>"
                                              data-broker="<?= htmlspecialchars($entry['broker_name'] ?: 'No Broker') ?>"
-                                             data-yield="<?= $entry['yield'] ? number_format($entry['yield'], 2) . '%' : 'N/A' ?>"
+                                             data-yield="<?= ($entry['yield_current'] ?: $entry['yield']) ? number_format(($entry['yield_current'] ?: $entry['yield']), 2) . '%' : 'N/A' ?>"
+                                             data-yield-current="<?= $entry['yield_current'] ? number_format($entry['yield_current'], 2) : '' ?>"
+                                             data-yield-1y-avg="<?= $entry['yield_1y_avg'] ? number_format($entry['yield_1y_avg'], 2) : '' ?>"
+                                             data-yield-1y-cagr="<?= $entry['yield_1y_cagr'] ? number_format($entry['yield_1y_cagr'], 2) : '' ?>"
+                                             data-yield-3y-avg="<?= $entry['yield_3y_avg'] ? number_format($entry['yield_3y_avg'], 2) : '' ?>"
+                                             data-yield-3y-cagr="<?= $entry['yield_3y_cagr'] ? number_format($entry['yield_3y_cagr'], 2) : '' ?>"
+                                             data-yield-5y-avg="<?= $entry['yield_5y_avg'] ? number_format($entry['yield_5y_avg'], 2) : '' ?>"
+                                             data-yield-5y-cagr="<?= $entry['yield_5y_cagr'] ? number_format($entry['yield_5y_cagr'], 2) : '' ?>"
+                                             data-yield-10y-avg="<?= $entry['yield_10y_avg'] ? number_format($entry['yield_10y_avg'], 2) : '' ?>"
+                                             data-yield-10y-cagr="<?= $entry['yield_10y_cagr'] ? number_format($entry['yield_10y_cagr'], 2) : '' ?>"
+                                             data-yield-updated="<?= $entry['yield_data_updated_at'] ?: 'N/A' ?>"
+                                             data-yield-source="<?= $entry['yield_source'] ?: 'manual' ?>"
                                              data-country="<?= htmlspecialchars($entry['country_name'] ?: 'N/A') ?>"
                                              data-status="<?= htmlspecialchars($entry['status_name'] ?: 'watchlist') ?>"
                                              data-comments="<?= htmlspecialchars($entry['comments'] ?: 'No comments') ?>"
@@ -543,7 +554,22 @@ ob_start();
                                         <?= htmlspecialchars($entry['broker_name'] ?: '-') ?>
                                     </td>
                                     <td class="yield">
-                                        <?= $entry['yield'] ? number_format($entry['yield'], 2) . '%' : '-' ?>
+                                        <?php 
+                                        $currentYield = $entry['yield_current'] ?: $entry['yield'];
+                                        $avg5y = $entry['yield_5y_avg'];
+                                        $yieldClass = '';
+                                        
+                                        if ($currentYield && $avg5y) {
+                                            $yieldClass = $currentYield < $avg5y ? 'yield-below-avg' : 'yield-above-avg';
+                                        }
+                                        ?>
+                                        <?php if ($currentYield): ?>
+                                            <span class="yield-value <?= $yieldClass ?>" title="<?= $avg5y ? 'vs 5yr avg: ' . number_format($avg5y, 2) . '%' : '' ?>">
+                                                <?= number_format($currentYield, 2) ?>%
+                                            </span>
+                                        <?php else: ?>
+                                            -
+                                        <?php endif; ?>
                                     </td>
                                     <td class="strategy-group">
                                         <?= $entry['strategy_group_id'] && $entry['strategy_name'] ? 
@@ -645,7 +671,7 @@ ob_start();
                         </div>
                     </div>
                     
-                    <!-- Row 3: Country | Yield -->
+                    <!-- Row 3: Country | Current Yield -->
                     <div class="form-row">
                         <div class="form-group">
                             <label for="country_name">Country</label>
@@ -653,9 +679,74 @@ ob_start();
                             <small class="form-help" id="countryHelp" style="display: none;">This will be auto-filled when using Börsdata</small>
                         </div>
                         <div class="form-group">
-                            <label for="yield">Yield (%)</label>
-                            <input type="number" id="yield" name="yield" step="0.01" min="0" max="100" placeholder="e.g., 2.50">
+                            <label for="yield_current">Current Yield (%)</label>
+                            <input type="number" id="yield_current" name="yield_current" step="0.01" min="0" max="100" placeholder="e.g., 2.50">
                             <small class="form-help" id="yieldHelp" style="display: none;">This will be auto-filled when using Börsdata</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Row 3.5: Additional Yield Data (collapsed by default) -->
+                    <div class="form-group">
+                        <button type="button" class="btn btn-sm btn-outline yield-data-toggle" onclick="toggleYieldDataFields()">
+                            <i class="fas fa-chevron-down" id="yieldToggleIcon"></i> Additional Yield Data
+                        </button>
+                    </div>
+                    
+                    <div id="additionalYieldFields" style="display: none;">
+                        <!-- Row 3.6: 1 Year Metrics -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="yield_1y_avg">1Y Average (%)</label>
+                                <input type="number" id="yield_1y_avg" name="yield_1y_avg" step="0.01" min="0" max="100" placeholder="1 year average yield">
+                                <small class="form-help">Usually auto-filled from Börsdata</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="yield_1y_cagr">1Y CAGR (%)</label>
+                                <input type="number" id="yield_1y_cagr" name="yield_1y_cagr" step="0.01" placeholder="1 year yield CAGR">
+                                <small class="form-help">Usually auto-filled from Börsdata</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Row 3.7: 3 Year Metrics -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="yield_3y_avg">3Y Average (%)</label>
+                                <input type="number" id="yield_3y_avg" name="yield_3y_avg" step="0.01" min="0" max="100" placeholder="3 year average yield">
+                                <small class="form-help">Usually auto-filled from Börsdata</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="yield_3y_cagr">3Y CAGR (%)</label>
+                                <input type="number" id="yield_3y_cagr" name="yield_3y_cagr" step="0.01" placeholder="3 year yield CAGR">
+                                <small class="form-help">Usually auto-filled from Börsdata</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Row 3.8: 5 Year Metrics -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="yield_5y_avg">5Y Average (%)</label>
+                                <input type="number" id="yield_5y_avg" name="yield_5y_avg" step="0.01" min="0" max="100" placeholder="5 year average yield">
+                                <small class="form-help">Usually auto-filled from Börsdata</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="yield_5y_cagr">5Y CAGR (%)</label>
+                                <input type="number" id="yield_5y_cagr" name="yield_5y_cagr" step="0.01" placeholder="5 year yield CAGR">
+                                <small class="form-help">Usually auto-filled from Börsdata</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Row 3.9: 10 Year Metrics -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="yield_10y_avg">10Y Average (%)</label>
+                                <input type="number" id="yield_10y_avg" name="yield_10y_avg" step="0.01" min="0" max="100" placeholder="10 year average yield">
+                                <small class="form-help">Usually auto-filled from Börsdata</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="yield_10y_cagr">10Y CAGR (%)</label>
+                                <input type="number" id="yield_10y_cagr" name="yield_10y_cagr" step="0.01" placeholder="10 year yield CAGR">
+                                <small class="form-help">Usually auto-filled from Börsdata</small>
+                            </div>
                         </div>
                     </div>
                     

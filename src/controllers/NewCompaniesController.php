@@ -144,6 +144,17 @@ class NewCompaniesController {
                            nc.country_name,
                            nc.country_id,
                            nc.yield,
+                           nc.yield_current,
+                           nc.yield_1y_avg,
+                           nc.yield_1y_cagr,
+                           nc.yield_3y_avg,
+                           nc.yield_3y_cagr,
+                           nc.yield_5y_avg,
+                           nc.yield_5y_cagr,
+                           nc.yield_10y_avg,
+                           nc.yield_10y_cagr,
+                           nc.yield_data_updated_at,
+                           nc.yield_source,
                            nc.strategy_group_id,
                            psg.strategy_name,
                            nc.new_group_id,
@@ -183,6 +194,17 @@ class NewCompaniesController {
                     'country_name' => $entry['country_name'],
                     'country_id' => $entry['country_id'],
                     'yield' => (float) ($entry['yield'] ?? 0),
+                    'yield_current' => (float) ($entry['yield_current'] ?? 0),
+                    'yield_1y_avg' => (float) ($entry['yield_1y_avg'] ?? 0),
+                    'yield_1y_cagr' => (float) ($entry['yield_1y_cagr'] ?? 0),
+                    'yield_3y_avg' => (float) ($entry['yield_3y_avg'] ?? 0),
+                    'yield_3y_cagr' => (float) ($entry['yield_3y_cagr'] ?? 0),
+                    'yield_5y_avg' => (float) ($entry['yield_5y_avg'] ?? 0),
+                    'yield_5y_cagr' => (float) ($entry['yield_5y_cagr'] ?? 0),
+                    'yield_10y_avg' => (float) ($entry['yield_10y_avg'] ?? 0),
+                    'yield_10y_cagr' => (float) ($entry['yield_10y_cagr'] ?? 0),
+                    'yield_data_updated_at' => $entry['yield_data_updated_at'],
+                    'yield_source' => $entry['yield_source'],
                     'strategy_group_id' => $entry['strategy_group_id'],
                     'strategy_name' => $entry['strategy_name'],
                     'new_group_id' => $entry['new_group_id'],
@@ -276,6 +298,15 @@ class NewCompaniesController {
                 'country_name' => !empty($data['country_name']) ? Security::sanitizeInput($data['country_name']) : null,
                 'country_id' => !empty($data['country_id']) ? (int)$data['country_id'] : null,
                 'yield' => !empty($data['yield']) ? (float)$data['yield'] : null,
+                'yield_current' => !empty($data['yield_current']) ? (float)$data['yield_current'] : null,
+                'yield_1y_avg' => !empty($data['yield_1y_avg']) ? (float)$data['yield_1y_avg'] : null,
+                'yield_1y_cagr' => !empty($data['yield_1y_cagr']) ? (float)$data['yield_1y_cagr'] : null,
+                'yield_3y_avg' => !empty($data['yield_3y_avg']) ? (float)$data['yield_3y_avg'] : null,
+                'yield_3y_cagr' => !empty($data['yield_3y_cagr']) ? (float)$data['yield_3y_cagr'] : null,
+                'yield_5y_avg' => !empty($data['yield_5y_avg']) ? (float)$data['yield_5y_avg'] : null,
+                'yield_5y_cagr' => !empty($data['yield_5y_cagr']) ? (float)$data['yield_5y_cagr'] : null,
+                'yield_10y_avg' => !empty($data['yield_10y_avg']) ? (float)$data['yield_10y_avg'] : null,
+                'yield_10y_cagr' => !empty($data['yield_10y_cagr']) ? (float)$data['yield_10y_cagr'] : null,
                 'strategy_group_id' => !empty($data['strategy_group_id']) ? (int)$data['strategy_group_id'] : null,
                 'new_group_id' => !empty($data['new_group_id']) ? (int)$data['new_group_id'] : null,
                 'broker_id' => !empty($data['broker_id']) ? (int)$data['broker_id'] : null,
@@ -357,6 +388,51 @@ class NewCompaniesController {
             if (isset($data['yield'])) {
                 $updateData[] = "yield = :yield";
                 $params[':yield'] = (float)$data['yield'];
+            }
+            
+            if (isset($data['yield_current'])) {
+                $updateData[] = "yield_current = :yield_current";
+                $params[':yield_current'] = !empty($data['yield_current']) ? (float)$data['yield_current'] : null;
+            }
+            
+            if (isset($data['yield_1y_avg'])) {
+                $updateData[] = "yield_1y_avg = :yield_1y_avg";
+                $params[':yield_1y_avg'] = !empty($data['yield_1y_avg']) ? (float)$data['yield_1y_avg'] : null;
+            }
+            
+            if (isset($data['yield_1y_cagr'])) {
+                $updateData[] = "yield_1y_cagr = :yield_1y_cagr";
+                $params[':yield_1y_cagr'] = !empty($data['yield_1y_cagr']) ? (float)$data['yield_1y_cagr'] : null;
+            }
+            
+            if (isset($data['yield_3y_avg'])) {
+                $updateData[] = "yield_3y_avg = :yield_3y_avg";
+                $params[':yield_3y_avg'] = !empty($data['yield_3y_avg']) ? (float)$data['yield_3y_avg'] : null;
+            }
+            
+            if (isset($data['yield_3y_cagr'])) {
+                $updateData[] = "yield_3y_cagr = :yield_3y_cagr";
+                $params[':yield_3y_cagr'] = !empty($data['yield_3y_cagr']) ? (float)$data['yield_3y_cagr'] : null;
+            }
+            
+            if (isset($data['yield_5y_avg'])) {
+                $updateData[] = "yield_5y_avg = :yield_5y_avg";
+                $params[':yield_5y_avg'] = !empty($data['yield_5y_avg']) ? (float)$data['yield_5y_avg'] : null;
+            }
+            
+            if (isset($data['yield_5y_cagr'])) {
+                $updateData[] = "yield_5y_cagr = :yield_5y_cagr";
+                $params[':yield_5y_cagr'] = !empty($data['yield_5y_cagr']) ? (float)$data['yield_5y_cagr'] : null;
+            }
+            
+            if (isset($data['yield_10y_avg'])) {
+                $updateData[] = "yield_10y_avg = :yield_10y_avg";
+                $params[':yield_10y_avg'] = !empty($data['yield_10y_avg']) ? (float)$data['yield_10y_avg'] : null;
+            }
+            
+            if (isset($data['yield_10y_cagr'])) {
+                $updateData[] = "yield_10y_cagr = :yield_10y_cagr";
+                $params[':yield_10y_cagr'] = !empty($data['yield_10y_cagr']) ? (float)$data['yield_10y_cagr'] : null;
             }
             
             if (isset($data['comments'])) {

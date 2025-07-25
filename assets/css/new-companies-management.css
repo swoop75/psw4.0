@@ -733,6 +733,121 @@ select:hover {
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
+/* Yield Color Coding */
+.yield-value {
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.yield-below-avg {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.yield-above-avg {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.yield-metrics-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+}
+
+.yield-metric {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-2);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+}
+
+.yield-metric-label {
+    color: var(--text-muted);
+}
+
+.yield-metric-value {
+    font-weight: var(--font-semibold);
+}
+
+.yield-trend-up {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+    border-left: 3px solid #28a745;
+}
+
+.yield-trend-down {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+    border-left: 3px solid #dc3545;
+}
+
+.yield-clickable {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.yield-clickable:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Yield Data Toggle Button */
+.yield-data-toggle {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-dark);
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+    margin-bottom: var(--space-4);
+}
+
+.yield-data-toggle:hover {
+    background: var(--bg-secondary);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.yield-data-toggle i {
+    transition: transform 0.2s ease;
+    margin-right: var(--space-2);
+}
+
+/* Additional Yield Fields Container */
+#additionalYieldFields {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-dark);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    margin-bottom: var(--space-6);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+#additionalYieldFields .form-row {
+    margin-bottom: var(--space-4);
+}
+
+#additionalYieldFields .form-group label {
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+}
+
+#additionalYieldFields .form-help {
+    color: var(--text-light);
+    font-size: var(--text-xs);
+}
+
 /* Status and Priority Badges */
 .status-badge {
     display: inline-flex;
