@@ -1530,17 +1530,19 @@ label:not(.checkbox-dropdown label):not(.form-group label) {
 .actions-dropdown-menu {
     position: absolute;
     top: 100%;
-    right: 0;
+    left: 0;
     min-width: 180px;
-    background: white;
+    background: rgba(255, 255, 255, 0.98);
     border: 1px solid var(--border-light);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-lg);
-    z-index: 1000;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    z-index: 1050;
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);
     transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 .actions-dropdown-menu.show {
@@ -1556,12 +1558,14 @@ label:not(.checkbox-dropdown label):not(.form-group label) {
     width: 100%;
     padding: var(--space-3) var(--space-4);
     border: none;
-    background: none;
+    background: rgba(255, 255, 255, 0.95);
     color: var(--text-primary);
     font-size: var(--text-sm);
+    font-weight: var(--font-medium);
     text-align: left;
     cursor: pointer;
     transition: all 0.15s ease;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .dropdown-action:first-child {

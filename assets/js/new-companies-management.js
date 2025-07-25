@@ -924,6 +924,22 @@ function closeAllActionsDropdowns() {
     });
 }
 
+/**
+ * Open company panel from dropdown button
+ */
+function openCompanyPanelFromDropdown(button) {
+    // Close the dropdown first
+    closeAllActionsDropdowns();
+    
+    // Find the company-info element in the same row
+    const row = button.closest('tr');
+    const companyInfo = row.querySelector('.company-info');
+    
+    if (companyInfo) {
+        openCompanyPanel(companyInfo);
+    }
+}
+
 // Close dropdowns when clicking outside
 document.addEventListener('click', function(event) {
     if (!event.target.closest('.company-actions-dropdown')) {
