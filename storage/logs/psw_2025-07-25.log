@@ -116,3 +116,5 @@
 {"timestamp":"2025-07-25 22:30:47","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"New company entry added successfully","context":{"company":"Devon Energy Corp","isin":"US25179M1036"}}
 {"timestamp":"2025-07-25 22:36:56","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"B\u00f6rsdata data populated successfully","context":{"entry_id":"62","isin":"US3137451015","company":"Federal Realty Investment Trust"}}
 {"timestamp":"2025-07-25 22:36:56","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"New company entry added successfully","context":{"company":"Federal Realty Investment Trust","isin":"US3137451015"}}
+{"timestamp":"2025-07-25 22:46:54","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"User action: masterlist_update","context":{"action":"masterlist_update","details":"Updated company: Autoliv","user_id":1}}
+{"timestamp":"2025-07-25 22:47:02","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"User action: masterlist_delete","context":{"action":"masterlist_delete","details":"Deleted company: Klarna Bank","user_id":1}}
