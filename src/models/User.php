@@ -194,7 +194,7 @@ class User {
      */
     public function findById($userId) {
         try {
-            $sql = "SELECT u.user_id, u.username, u.email, u.role_id, r.role_name, u.weekly_report, u.created_at, u.password_hash, u.active
+            $sql = "SELECT u.user_id, u.username, u.email, u.role_id, r.role_name, u.weekly_report, u.created_at, u.password_hash, u.active, u.last_login
                     FROM users u 
                     LEFT JOIN roles r ON u.role_id = r.role_id 
                     WHERE u.user_id = :user_id";
@@ -295,5 +295,23 @@ class User {
      */
     public function getUserById($userId) {
         return $this->findById($userId);
+    }
+    
+    /**
+     * Update user's last login timestamp
+     * @param int $userId User ID
+     * @return bool Success status
+     */
+    public function updateLastLogin($userId) {
+        try {
+            $sql = "UPDATE users SET last_login = NOW() WHERE user_id = :user_id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':user_id', $userId);
+            
+            return $stmt->execute();
+        } catch (Exception $e) {
+            Logger::error('Update last login error: ' . $e->getMessage());
+            return false;
+        }
     }
 }
