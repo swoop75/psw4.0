@@ -283,7 +283,7 @@ ob_start();
                             ?>
                                 <div class="dropdown-option">
                                     <input type="checkbox" id="status_null" value="null" <?= $isNullSelected ? 'checked' : '' ?>>
-                                    <label for="status_null">Add to list</label>
+                                    <label for="status_null">Watchlist</label>
                                 </div>
                             <?php
                             
@@ -476,7 +476,7 @@ ob_start();
                                              data-broker="<?= htmlspecialchars($entry['broker_name'] ?: 'No Broker') ?>"
                                              data-yield="<?= $entry['yield'] ? number_format($entry['yield'], 2) . '%' : 'N/A' ?>"
                                              data-country="<?= htmlspecialchars($entry['country_name'] ?: 'N/A') ?>"
-                                             data-status="<?= htmlspecialchars($entry['status_name'] ?: 'Add to list') ?>"
+                                             data-status="<?= htmlspecialchars($entry['status_name'] ?: 'Watchlist') ?>"
                                              data-comments="<?= htmlspecialchars($entry['comments'] ?: 'No comments') ?>"
                                              data-inspiration="<?= htmlspecialchars($entry['inspiration'] ?: 'No inspiration noted') ?>">
                                             <div class="company-name">
@@ -503,7 +503,7 @@ ob_start();
                                     </td>
                                     <td>
                                         <span class="status-badge">
-                                            <?= htmlspecialchars($entry['status_name'] ?: 'Add to list') ?>
+                                            <?= htmlspecialchars($entry['status_name'] ?: 'Watchlist') ?>
                                         </span>
                                     </td>
                                     <td class="broker">
@@ -655,7 +655,7 @@ ob_start();
                     <div class="form-group">
                         <label for="new_companies_status_id">Status</label>
                         <select id="new_companies_status_id" name="new_companies_status_id">
-                            <option value="">Select Status</option>
+                            <option value="">Default (Add to watchlist)</option>
                             <?php foreach ($filterOptions['statuses'] ?? [] as $status): ?>
                                 <option value="<?= $status['id'] ?>">
                                     <?= htmlspecialchars($status['status']) ?>
