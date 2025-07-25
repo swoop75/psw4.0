@@ -89,6 +89,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WI
                 }
                 exit;
                 
+            case 'preview_borsdata':
+                $isin = $_POST['isin'] ?? '';
+                if (empty($isin)) {
+                    echo json_encode(['success' => false, 'message' => 'ISIN is required']);
+                    exit;
+                }
+                
+                try {
+                    $marketdataDb = Database::getConnection('marketdata');
+                    
+                    // Try global_instruments first
+                    $stmt = $marketdataDb->prepare("
+                        SELECT gi.name, gi.yahoo, c.nameEN as country_name, c.id as country_id
+                        FROM global_instruments gi 
+                        LEFT JOIN countries c ON gi.countryId = c.id 
+                        WHERE gi.isin = ? 
+                        LIMIT 1
+                    ");
+                    $stmt->execute([$isin]);
+                    $data = $stmt->fetch();
+                    
+                    // If not found in global, try nordic
+                    if (!$data) {
+                        $stmt = $marketdataDb->prepare("
+                            SELECT ni.name, ni.yahoo, c.nameEN as country_name, c.id as country_id
+                            FROM nordic_instruments ni 
+                            LEFT JOIN countries c ON ni.countryId = c.id 
+                            WHERE ni.isin = ? 
+                            LIMIT 1
+                        ");
+                        $stmt->execute([$isin]);
+                        $data = $stmt->fetch();
+                    }
+                    
+                    if ($data) {
+                        echo json_encode([
+                            'success' => true, 
+                            'company_data' => [
+                                'company' => $data['name'],
+                                'ticker' => $data['yahoo'],
+                                'country' => $data['country_name'],
+                                'country_id' => $data['country_id']
+                            ]
+                        ]);
+                    } else {
+                        echo json_encode(['success' => false, 'message' => 'ISIN not found in Börsdata']);
+                    }
+                } catch (Exception $e) {
+                    echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
+                }
+                exit;
+                
             default:
                 echo json_encode(['success' => false, 'message' => 'Invalid action']);
                 exit;
@@ -231,7 +283,7 @@ ob_start();
                             ?>
                                 <div class="dropdown-option">
                                     <input type="checkbox" id="status_null" value="null" <?= $isNullSelected ? 'checked' : '' ?>>
-                                    <label for="status_null">not bought</label>
+                                    <label for="status_null">Add to list</label>
                                 </div>
                             <?php
                             
@@ -450,7 +502,7 @@ ob_start();
                                     </td>
                                     <td>
                                         <span class="status-badge">
-                                            <?= htmlspecialchars($entry['status_name'] ?: 'No Status') ?>
+                                            <?= htmlspecialchars($entry['status_name'] ?: 'Add to list') ?>
                                         </span>
                                     </td>
                                     <td class="broker">
@@ -539,24 +591,23 @@ ob_start();
                 
                 
                 <div>
-                    <!-- Börsdata Integration Toggle -->
+                    <!-- Row 1: Data Source (full width) -->
                     <div class="form-group borsdata-toggle-section">
                         <label for="borsdata_available">Data Source</label>
-                        <select id="borsdata_available" name="borsdata_available" onchange="toggleBorsdataFields()">
+                        <select id="borsdata_available" name="borsdata_available" onchange="toggleBorsdataFields(); previewBorsdataData();">
                             <option value="0">Manual Entry</option>
-                            <option value="1">Auto-populate from Börsdata</option>
+                            <option value="1" selected>Auto-populate from Börsdata</option>
                         </select>
                         <small class="form-help">Select "Auto-populate" to fetch company data automatically using ISIN</small>
                     </div>
                     
-                    <!-- ISIN Field - Made more prominent -->
-                    <div class="form-group" id="isinGroup">
-                        <label for="isin">ISIN <span id="isinRequired" style="display: none; color: red;">*</span></label>
-                        <input type="text" id="isin" name="isin" maxlength="12" placeholder="e.g., US88160R1014">
-                        <small class="form-help" id="isinHelp">International Securities Identification Number</small>
-                    </div>
-                    
-                    <div class="form-row">
+                    <!-- Row 2: ISIN | Company Name | Ticker -->
+                    <div class="form-row form-row-three">
+                        <div class="form-group">
+                            <label for="isin">ISIN <span id="isinRequired" style="display: none; color: red;">*</span></label>
+                            <input type="text" id="isin" name="isin" maxlength="12" placeholder="e.g., US88160R1014" onblur="previewBorsdataData()">
+                            <small class="form-help" id="isinHelp">International Securities Identification Number</small>
+                        </div>
                         <div class="form-group">
                             <label for="company">Company Name <span id="companyRequired">*</span></label>
                             <input type="text" id="company" name="company" required maxlength="200" placeholder="e.g., Tesla Inc">
@@ -569,70 +620,23 @@ ob_start();
                         </div>
                     </div>
                     
-                    <div class="form-row">
+                    <!-- Row 3: Strategy Group | New Group ID | Broker -->
+                    <div class="form-row form-row-three">
                         <div class="form-group">
-                            <label for="country_name">Country</label>
-                            <select id="country_name" name="country_name">
-                                <option value="">Select Country</option>
-                                <option value="SE">Sweden</option>
-                                <option value="US">United States</option>
-                                <option value="FI">Finland</option>
-                                <option value="NO">Norway</option>
-                                <option value="DK">Denmark</option>
-                                <option value="NL">Netherlands</option>
-                                <option value="DE">Germany</option>
-                                <option value="GB">United Kingdom</option>
-                            </select>
-                            <small class="form-help" id="countryHelp" style="display: none;">This will be auto-filled when using Börsdata</small>
-                        </div>
-                        <div class="form-group">
-                            <label for="yield">Yield (%)</label>
-                            <input type="number" id="yield" name="yield" step="0.01" min="0" max="100" placeholder="0.00">
-                            <small class="form-help" id="yieldHelp" style="display: none;">This will be auto-filled when using Börsdata</small>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="inspiration">Inspiration</label>
-                            <input type="text" id="inspiration" name="inspiration" maxlength="255" placeholder="What inspired this pick?">
-                        </div>
-                        <div class="form-group">
-                            <!-- Empty div for layout - ISIN moved to top -->
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="comments">Comments</label>
-                        <textarea id="comments" name="comments" rows="3" placeholder="Add your notes about this investment..."></textarea>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="new_companies_status_id">Status</label>
-                            <select id="new_companies_status_id" name="new_companies_status_id">
-                                <option value="">Select Status</option>
-                                <?php foreach ($filterOptions['statuses'] ?? [] as $status): ?>
-                                    <option value="<?= $status['id'] ?>">
-                                        <?= htmlspecialchars($status['status']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="strategy_group_id">Strategy Group (ID + Name)</label>
+                            <label for="strategy_group_id">Strategy Group</label>
                             <select id="strategy_group_id" name="strategy_group_id">
                                 <option value="">Select Strategy</option>
                                 <?php foreach ($filterOptions['strategies'] ?? [] as $strategy): ?>
                                     <option value="<?= $strategy['strategy_group_id'] ?>">
-                                        ID <?= $strategy['strategy_group_id'] ?> - <?= htmlspecialchars($strategy['strategy_name']) ?>
+                                        Group <?= $strategy['strategy_group_id'] ?> - <?= htmlspecialchars($strategy['strategy_name']) ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                    </div>
-                    
-                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="new_group_id">New Group ID</label>
+                            <input type="number" id="new_group_id" name="new_group_id" min="0" placeholder="Group ID">
+                        </div>
                         <div class="form-group">
                             <label for="broker_id">Broker</label>
                             <select id="broker_id" name="broker_id">
@@ -644,11 +648,37 @@ ob_start();
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="new_group_id">Group ID</label>
-                            <input type="number" id="new_group_id" name="new_group_id" min="0" placeholder="Group ID">
-                        </div>
                     </div>
+                    
+                    <!-- Row 4: Status (full width) -->
+                    <div class="form-group">
+                        <label for="new_companies_status_id">Status</label>
+                        <select id="new_companies_status_id" name="new_companies_status_id">
+                            <option value="">Select Status</option>
+                            <?php foreach ($filterOptions['statuses'] ?? [] as $status): ?>
+                                <option value="<?= $status['id'] ?>">
+                                    <?= htmlspecialchars($status['status']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    
+                    <!-- Row 5: Inspiration (full width) -->
+                    <div class="form-group">
+                        <label for="inspiration">Inspiration</label>
+                        <input type="text" id="inspiration" name="inspiration" maxlength="255" placeholder="What inspired this pick?">
+                    </div>
+                    
+                    <!-- Row 6: Comments (full width) -->
+                    <div class="form-group">
+                        <label for="comments">Comments</label>
+                        <textarea id="comments" name="comments" rows="3" placeholder="Add your notes about this investment..."></textarea>
+                    </div>
+                    
+                    <!-- Hidden fields for optional data -->
+                    <input type="hidden" id="country_name" name="country_name">
+                    <input type="hidden" id="country_id" name="country_id">
+                    <input type="hidden" id="yield" name="yield">
                 </div>
                 
                 <div class="form-actions">

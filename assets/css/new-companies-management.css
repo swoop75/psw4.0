@@ -1012,6 +1012,14 @@ form::before {
     margin-bottom: var(--space-6);
 }
 
+/* Three-column form row for new layout */
+.form-row-three {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+}
+
 .form-group {
     margin-bottom: var(--space-6);
 }
@@ -1382,6 +1390,11 @@ label:not(.checkbox-dropdown label):not(.form-group label) {
     }
     
     .form-row {
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+    }
+    
+    .form-row-three {
         grid-template-columns: 1fr;
         gap: var(--space-4);
     }
