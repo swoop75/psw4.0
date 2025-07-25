@@ -843,9 +843,18 @@ function populateCompanyPanel(companyInfo) {
     const dataContent = document.querySelector('.company-panel-data');
     const data = companyInfo.dataset;
     
+    // Determine if data comes from Börsdata
+    const isBorsdata = data.isin && data.ticker && data.company !== 'Pending Börsdata lookup';
+    const dataSourceBadge = isBorsdata 
+        ? '<span class="borsdata-badge" title="Data from Börsdata"><i class="fas fa-database"></i> BD</span>'
+        : '<span class="manual-badge" title="Manual entry"><i class="fas fa-user-edit"></i> Manual</span>';
+    
     const html = `
         <div class="company-hero">
-            <h2>${escapeHtml(data.company)}</h2>
+            <h2>
+                ${escapeHtml(data.company)}
+                ${dataSourceBadge}
+            </h2>
             <div class="ticker">${escapeHtml(data.ticker)}</div>
         </div>
         
