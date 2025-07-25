@@ -7,3 +7,4 @@
 {"timestamp":"2025-07-25 06:24:51","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"User action: dashboard_viewed","context":{"action":"dashboard_viewed","details":"User accessed dashboard","user_id":1}}
 {"timestamp":"2025-07-25 06:26:32","level":"ERROR","user_id":1,"ip":"100.120.9.63","message":"Add new company entry error: This ISIN is already in the new companies list"}
 {"timestamp":"2025-07-25 06:26:56","level":"ERROR","user_id":1,"ip":"100.120.9.63","message":"Add new company entry error: This ISIN is already in the new companies list"}
+{"timestamp":"2025-07-25 06:51:21","level":"ERROR","user_id":1,"ip":"100.120.9.63","message":"Add new company entry error: SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'company' cannot be null"}
