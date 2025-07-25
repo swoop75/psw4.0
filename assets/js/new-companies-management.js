@@ -425,6 +425,7 @@ function deleteEntry(companyId, companyName) {
         
         deleteNameElement.textContent = companyName;
         deleteModalElement.style.display = 'block';
+        deleteModalElement.classList.add('show');
         
         console.log('Delete modal should be open now');
     } catch (error) {
@@ -436,7 +437,11 @@ function deleteEntry(companyId, companyName) {
  * Close delete modal
  */
 function closeDeleteModal() {
-    document.getElementById('deleteModal').style.display = 'none';
+    const deleteModalElement = document.getElementById('deleteModal');
+    deleteModalElement.classList.remove('show');
+    setTimeout(() => {
+        deleteModalElement.style.display = 'none';
+    }, 250); // Wait for fade transition
     deleteEntryId = '';
 }
 
