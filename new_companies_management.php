@@ -476,22 +476,23 @@ ob_start();
                                              data-broker="<?= htmlspecialchars($entry['broker_name'] ?: 'No Broker') ?>"
                                              data-yield="<?= $entry['yield'] ? number_format($entry['yield'], 2) . '%' : 'N/A' ?>"
                                              data-country="<?= htmlspecialchars($entry['country_name'] ?: 'N/A') ?>"
-                                             data-status="<?= htmlspecialchars($entry['status_name'] ?: 'No Status') ?>"
+                                             data-status="<?= htmlspecialchars($entry['status_name'] ?: 'Add to list') ?>"
                                              data-comments="<?= htmlspecialchars($entry['comments'] ?: 'No comments') ?>"
                                              data-inspiration="<?= htmlspecialchars($entry['inspiration'] ?: 'No inspiration noted') ?>">
                                             <div class="company-name">
                                                 <a href="#" class="company-name-link" onclick="openCompanyPage(<?= $entry['new_companies_id'] ?>); return false;">
                                                     <strong><?= htmlspecialchars($entry['company']) ?></strong>
                                                 </a>
-                                                <span class="ticker"><?= htmlspecialchars($entry['ticker']) ?></span>
                                                 <button class="company-details-btn" onclick="toggleCompanyPanel(this)" title="View details">
                                                     <i class="fas fa-ellipsis-h"></i>
                                                 </button>
                                             </div>
                                             <div class="company-details">
-                                                <?php if ($entry['isin']): ?>
-                                                    <span class="isin"><?= htmlspecialchars($entry['isin']) ?></span>
-                                                <?php endif; ?>
+                                                <div class="company-identifiers">
+                                                    <?php if ($entry['isin'] || $entry['ticker']): ?>
+                                                        <?= htmlspecialchars($entry['isin'] ?: 'No ISIN') ?> | <?= htmlspecialchars($entry['ticker'] ?: 'No Ticker') ?>
+                                                    <?php endif; ?>
+                                                </div>
                                                 <?php if ($entry['comments']): ?>
                                                     <div class="comments-preview">
                                                         <?= htmlspecialchars(substr($entry['comments'], 0, 80)) ?><?= strlen($entry['comments']) > 80 ? '...' : '' ?>
