@@ -621,8 +621,8 @@ select:hover {
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
-    min-width: 250px; /* Increased for desktop */
-    max-width: 350px; /* Prevent excessive width */
+    min-width: 300px; /* Increased for desktop to show full tickers */
+    max-width: 400px; /* Prevent excessive width */
 }
 
 .company-name {
@@ -655,6 +655,8 @@ select:hover {
     font-size: var(--text-xs);
     color: var(--text-muted);
     margin-top: var(--space-2);
+    min-width: 250px; /* Ensure enough space for full ticker display */
+    overflow: visible; /* Prevent text cutoff */
 }
 
 .company-identifiers {
@@ -1521,83 +1523,7 @@ label:not(.checkbox-dropdown label):not(.form-group label) {
     transform: scale(1.1);
 }
 
-/* Actions Dropdown */
-.company-actions-dropdown {
-    position: relative;
-    display: inline-block;
-}
-
-.actions-dropdown-menu {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    min-width: 180px;
-    background: #ffffff;
-    border: 2px solid #e5e7eb;
-    border-radius: var(--radius-lg);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.8);
-    z-index: 1050;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-10px);
-    transition: all 0.2s ease;
-    /* Multiple background layers for complete opacity */
-    background-image: 
-        linear-gradient(to bottom, #ffffff 0%, #ffffff 100%),
-        linear-gradient(to bottom, #f9fafb 0%, #ffffff 100%);
-}
-
-.actions-dropdown-menu.show {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
-
-.dropdown-action {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    width: 100%;
-    padding: var(--space-3) var(--space-4);
-    border: none;
-    background: #ffffff;
-    color: var(--text-primary);
-    font-size: var(--text-sm);
-    font-weight: var(--font-medium);
-    text-align: left;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    border-bottom: 1px solid #f3f4f6;
-    position: relative;
-    z-index: 1;
-}
-
-.dropdown-action:first-child {
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-}
-
-.dropdown-action:last-child {
-    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-}
-
-.dropdown-action:hover {
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-}
-
-.dropdown-action.danger {
-    color: var(--accent-red);
-}
-
-.dropdown-action.danger:hover {
-    background: rgba(239, 68, 68, 0.1);
-    color: var(--accent-red);
-}
-
-.dropdown-action i {
-    width: 16px;
-    text-align: center;
-}
+/* Removed dropdown CSS - now using direct panel opening */
 
 /* ============================================
    ALTERNATIVE SOLUTIONS FOR DROPDOWN BACKGROUND
@@ -1941,6 +1867,28 @@ label:not(.checkbox-dropdown label):not(.form-group label) {
 
 .panel-action-btn.primary:hover {
     background: var(--secondary-dark);
+}
+
+.panel-action-btn.success {
+    background: #10b981;
+    color: white;
+    border-color: #10b981;
+}
+
+.panel-action-btn.success:hover {
+    background: #059669;
+    border-color: #059669;
+}
+
+.panel-action-btn.danger {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+}
+
+.panel-action-btn.danger:hover {
+    background: #dc2626;
+    border-color: #dc2626;
 }
 
 /* Mobile Responsive */

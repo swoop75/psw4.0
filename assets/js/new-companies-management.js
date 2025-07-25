@@ -851,11 +851,14 @@ function populateCompanyPanel(companyInfo) {
         </div>
         
         <div class="panel-actions">
-            <button class="panel-action-btn" onclick="editEntry(${data.companyId})">
+            <button class="panel-action-btn" onclick="editEntry(${data.companyId}); closeCompanyPanel();">
                 <i class="fas fa-edit"></i> Edit
             </button>
-            <button class="panel-action-btn primary" onclick="openCompanyPage(${data.companyId})">
-                <i class="fas fa-external-link-alt"></i> View Company
+            <button class="panel-action-btn success" onclick="addToMasterlistFromPanel(${data.companyId}, '${escapeHtml(data.company)}'); closeCompanyPanel();">
+                <i class="fas fa-plus-circle"></i> Add to Masterlist
+            </button>
+            <button class="panel-action-btn danger" onclick="deleteEntryFromPanel(${data.companyId}, '${escapeHtml(data.company)}'); closeCompanyPanel();">
+                <i class="fas fa-trash"></i> Delete
             </button>
         </div>
     `;
@@ -864,6 +867,15 @@ function populateCompanyPanel(companyInfo) {
 }
 
 // Open company page (placeholder)
+// Helper functions for panel actions
+function addToMasterlistFromPanel(companyId, companyName) {
+    addToMasterlist(companyId, companyName);
+}
+
+function deleteEntryFromPanel(companyId, companyName) {
+    deleteEntry(companyId, companyName);
+}
+
 function openCompanyPage(companyId) {
     // For now, show a placeholder message
     alert('Company page feature coming soon!\nCompany ID: ' + companyId);
@@ -898,63 +910,7 @@ document.addEventListener('keydown', function(event) {
     }
 });
 
-/**
- * Toggle actions dropdown menu
- */
-function toggleActionsDropdown(button) {
-    const dropdown = button.closest('.company-actions-dropdown');
-    const menu = dropdown.querySelector('.actions-dropdown-menu');
-    
-    // Close all other dropdowns first
-    closeAllActionsDropdowns();
-    
-    // Toggle current dropdown
-    if (!menu.classList.contains('show')) {
-        menu.classList.add('show');
-    }
-}
-
-/**
- * Close all actions dropdowns
- */
-function closeAllActionsDropdowns() {
-    const dropdowns = document.querySelectorAll('.actions-dropdown-menu');
-    dropdowns.forEach(menu => {
-        menu.classList.remove('show');
-    });
-}
-
-/**
- * Open company panel from dropdown button
- */
-function openCompanyPanelFromDropdown(button) {
-    console.log('Info button clicked'); // Debug
-    
-    // Close the dropdown first
-    closeAllActionsDropdowns();
-    
-    // Find the company-info element in the same row
-    const row = button.closest('tr');
-    console.log('Found row:', row); // Debug
-    
-    const companyInfo = row ? row.querySelector('.company-info') : null;
-    console.log('Found company-info:', companyInfo); // Debug
-    
-    if (companyInfo) {
-        console.log('Company data:', companyInfo.dataset); // Debug
-        openCompanyPanel(companyInfo);
-    } else {
-        console.error('Could not find company-info element');
-        alert('Error: Could not find company information');
-    }
-}
-
-// Close dropdowns when clicking outside
-document.addEventListener('click', function(event) {
-    if (!event.target.closest('.company-actions-dropdown')) {
-        closeAllActionsDropdowns();
-    }
-});
+/* Removed dropdown JavaScript - now using direct panel opening */
 
 /**
  * Toggle Börsdata fields based on selection

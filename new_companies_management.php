@@ -481,25 +481,9 @@ ob_start();
                                                 <a href="#" class="company-name-link" onclick="openCompanyPage(<?= $entry['new_companies_id'] ?>); return false;">
                                                     <strong><?= htmlspecialchars($entry['company']) ?></strong>
                                                 </a>
-                                                <div class="company-actions-dropdown">
-                                                    <button class="company-details-btn" onclick="toggleActionsDropdown(this)" title="Actions">
-                                                        <i class="fas fa-ellipsis-h"></i>
-                                                    </button>
-                                                    <div class="actions-dropdown-menu">
-                                                        <button class="dropdown-action" onclick="openCompanyPanelFromDropdown(this)" title="View Details">
-                                                            <i class="fas fa-info-circle"></i> Info
-                                                        </button>
-                                                        <button class="dropdown-action" onclick="closeAllActionsDropdowns(); editEntry(<?= $entry['new_companies_id'] ?>)" title="Edit">
-                                                            <i class="fas fa-edit"></i> Edit
-                                                        </button>
-                                                        <button class="dropdown-action" onclick="closeAllActionsDropdowns(); addToMasterlist(<?= $entry['new_companies_id'] ?>, '<?= htmlspecialchars($entry['company']) ?>')" title="Add to Masterlist">
-                                                            <i class="fas fa-plus-circle"></i> Add to Masterlist
-                                                        </button>
-                                                        <button class="dropdown-action danger" onclick="closeAllActionsDropdowns(); deleteEntry(<?= $entry['new_companies_id'] ?>, '<?= htmlspecialchars($entry['company']) ?>')" title="Remove">
-                                                            <i class="fas fa-trash"></i> Delete
-                                                        </button>
-                                                    </div>
-                                                </div>
+                                                <button class="company-details-btn" onclick="toggleCompanyPanel(this)" title="View details and actions">
+                                                    <i class="fas fa-ellipsis-h"></i>
+                                                </button>
                                             </div>
                                             <div class="company-details">
                                                 <div class="company-identifiers">
