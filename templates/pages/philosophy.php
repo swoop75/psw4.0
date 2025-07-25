@@ -10,9 +10,11 @@
 <style>
         /* Main Content */
         .main-content {
-            max-width: 800px;
+            max-width: 80vw; /* Match management pages width */
             margin: 0 auto;
             padding: 2rem;
+            padding-top: 120px; /* Account for sticky header + spacing */
+            box-sizing: border-box;
         }
         
         .page-header {
@@ -38,13 +40,36 @@
         }
         
         .content-card {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 24px;
             padding: 3rem;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             margin-bottom: 2rem;
+            /* Enhanced styling to match management pages */
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .content-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, 
+                rgba(0, 200, 150, 0.02) 0%, 
+                rgba(26, 115, 232, 0.01) 50%, 
+                rgba(0, 200, 150, 0.02) 100%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .content-card > * {
+            position: relative;
+            z-index: 1;
         }
         
         .intro-text {
@@ -160,7 +185,9 @@
         /* Responsive Design */
         @media (max-width: 768px) {
             .main-content {
+                max-width: 95vw; /* More space on mobile */
                 padding: 1rem;
+                padding-top: 100px; /* Reduced top padding on mobile */
             }
             
             .page-title {
