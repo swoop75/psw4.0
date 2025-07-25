@@ -1,5 +1,10 @@
 /* Masterlist Management Styles - BEAUTIFUL DESIGN v2025-07-20 */
 
+/* Force proper spacing for sticky header - IMPORTANT: Must be at top */
+body .container {
+    padding-top: 120px !important; /* Force override - sticky header (64px) + generous spacing */
+}
+
 * {
     margin: 0;
     padding: 0;
