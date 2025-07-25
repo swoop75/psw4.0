@@ -405,9 +405,31 @@ function handleEntryFormSubmit(event) {
  * Delete entry
  */
 function deleteEntry(companyId, companyName) {
-    deleteEntryId = companyId;
-    document.getElementById('deleteCompanyName').textContent = companyName;
-    document.getElementById('deleteModal').style.display = 'block';
+    console.log('Delete entry called:', companyId, companyName);
+    
+    try {
+        deleteEntryId = companyId;
+        
+        const deleteNameElement = document.getElementById('deleteCompanyName');
+        const deleteModalElement = document.getElementById('deleteModal');
+        
+        if (!deleteNameElement) {
+            console.error('deleteCompanyName element not found');
+            return;
+        }
+        
+        if (!deleteModalElement) {
+            console.error('deleteModal element not found');
+            return;
+        }
+        
+        deleteNameElement.textContent = companyName;
+        deleteModalElement.style.display = 'block';
+        
+        console.log('Delete modal should be open now');
+    } catch (error) {
+        console.error('Error in deleteEntry:', error);
+    }
 }
 
 /**
@@ -923,7 +945,7 @@ function populateCompanyPanel(companyInfo) {
             <button class="panel-action-btn success" onclick="addToMasterlistFromPanel(${data.companyId}, '${escapeHtml(data.company)}'); closeCompanyPanel();">
                 <i class="fas fa-plus-circle"></i> Add to Masterlist
             </button>
-            <button class="panel-action-btn danger" onclick="deleteEntryFromPanel(${data.companyId}, '${escapeHtml(data.company)}'); closeCompanyPanel();">
+            <button class="panel-action-btn danger" onclick="deleteEntryFromPanel(${data.companyId}, '${escapeHtml(data.company)}');">
                 <i class="fas fa-trash"></i> Delete
             </button>
         </div>
@@ -939,7 +961,9 @@ function addToMasterlistFromPanel(companyId, companyName) {
 }
 
 function deleteEntryFromPanel(companyId, companyName) {
-    deleteEntry(companyId, companyName);
+    console.log('deleteEntryFromPanel called:', companyId, companyName);
+    closeCompanyPanel(); // Close the panel first
+    deleteEntry(companyId, companyName); // Then show the delete modal
 }
 
 function openCompanyPage(companyId) {
