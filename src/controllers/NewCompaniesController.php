@@ -281,7 +281,7 @@ class NewCompaniesController {
                 'broker_id' => !empty($data['broker_id']) ? (int)$data['broker_id'] : null,
                 'inspiration' => !empty($data['inspiration']) ? Security::sanitizeInput($data['inspiration']) : null,
                 'comments' => !empty($data['comments']) ? Security::sanitizeInput($data['comments']) : null,
-                'new_companies_status_id' => !empty($data['new_companies_status_id']) ? (int)$data['new_companies_status_id'] : null,
+                'new_companies_status_id' => $this->validateStatusId($data['new_companies_status_id'] ?? ''),
                 'new_companies_col' => !empty($data['new_companies_col']) ? Security::sanitizeInput($data['new_companies_col']) : null,
                 'borsdata_available' => isset($data['borsdata_available']) ? (bool)$data['borsdata_available'] : false
             ];
@@ -366,7 +366,7 @@ class NewCompaniesController {
             
             if (isset($data['new_companies_status_id'])) {
                 $updateData[] = "new_companies_status_id = :new_companies_status_id";
-                $params[':new_companies_status_id'] = (int)$data['new_companies_status_id'];
+                $params[':new_companies_status_id'] = $this->validateStatusId($data['new_companies_status_id']);
             }
             
             if (isset($data['isin'])) {
@@ -698,6 +698,41 @@ class NewCompaniesController {
         } catch (Exception $e) {
             Logger::error('Börsdata population error: ' . $e->getMessage());
             return false;
+        }
+    }
+    
+    /**
+     * Validate status ID and return null for invalid/empty values
+     * @param mixed $statusId Status ID to validate
+     * @return int|null Valid status ID or null
+     */
+    private function validateStatusId($statusId) {
+        try {
+            $statusId = trim((string)$statusId);
+            
+            // Handle empty or special values
+            if (empty($statusId) || $statusId === '' || $statusId === '0' || $statusId === 'null') {
+                error_log("Status ID being set to NULL (empty/default)");
+                return null;
+            }
+            
+            // Validate that the status ID exists in the database
+            $checkSql = "SELECT id FROM new_companies_status WHERE id = :status_id";
+            $checkStmt = $this->portfolioDb->prepare($checkSql);
+            $checkStmt->bindValue(':status_id', (int)$statusId, PDO::PARAM_INT);
+            $checkStmt->execute();
+            
+            if ($checkStmt->fetch()) {
+                error_log("Status ID being set to valid ID: " . $statusId);
+                return (int)$statusId;
+            } else {
+                // Invalid status ID, set to null
+                error_log("Invalid status ID (" . $statusId . "), setting to NULL");
+                return null;
+            }
+        } catch (Exception $e) {
+            error_log("Error validating status ID: " . $e->getMessage());
+            return null;
         }
     }
 }

@@ -22,7 +22,8 @@
       "Bash(node:*)",
       "Bash(wc:*)",
       "Bash(copy \"C:\\Users\\laoan\\Documents\\GitHub\\psw\\psw4.0\\new_companies_management.php\" \"D:\"\")",
-      "Bash(copy \"C:\\Users\\laoan\\Documents\\GitHub\\psw\\psw4.0\\new_companies_management.php\" \"D:\")"
+      "Bash(copy \"C:\\Users\\laoan\\Documents\\GitHub\\psw\\psw4.0\\new_companies_management.php\" \"D:\")",
+      "Bash(del check_status.php)"
     ],
     "deny": []
   }
