@@ -114,3 +114,5 @@
 {"timestamp":"2025-07-25 22:27:29","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"User action: dashboard_viewed","context":{"action":"dashboard_viewed","details":"User accessed dashboard","user_id":1}}
 {"timestamp":"2025-07-25 22:30:47","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"B\u00f6rsdata data populated successfully","context":{"entry_id":"61","isin":"US25179M1036","company":"Devon Energy Corp"}}
 {"timestamp":"2025-07-25 22:30:47","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"New company entry added successfully","context":{"company":"Devon Energy Corp","isin":"US25179M1036"}}
+{"timestamp":"2025-07-25 22:36:56","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"B\u00f6rsdata data populated successfully","context":{"entry_id":"62","isin":"US3137451015","company":"Federal Realty Investment Trust"}}
+{"timestamp":"2025-07-25 22:36:56","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"New company entry added successfully","context":{"company":"Federal Realty Investment Trust","isin":"US3137451015"}}
