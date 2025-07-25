@@ -84,8 +84,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WI
                 
             case 'delete':
                 $companyId = $_POST['new_company_id'] ?? '';
-                $result = $controller->deleteNewCompanyEntry($companyId);
-                echo json_encode(['success' => $result, 'message' => $result ? 'Entry removed from new companies' : 'Failed to remove entry']);
+                error_log("Delete attempt - Company ID: " . $companyId);
+                
+                if (empty($companyId)) {
+                    echo json_encode(['success' => false, 'message' => 'Company ID is required']);
+                    exit;
+                }
+                
+                try {
+                    $result = $controller->deleteNewCompanyEntry($companyId);
+                    error_log("Delete result: " . ($result ? 'SUCCESS' : 'FAILED'));
+                    echo json_encode(['success' => $result, 'message' => $result ? 'Entry removed from new companies' : 'Failed to remove entry']);
+                } catch (Exception $e) {
+                    error_log("Delete exception: " . $e->getMessage());
+                    echo json_encode(['success' => false, 'message' => 'Failed to remove entry: ' . $e->getMessage()]);
+                }
                 exit;
                 
             case 'get_entry':
@@ -632,7 +645,21 @@ ob_start();
                         </div>
                     </div>
                     
-                    <!-- Row 3: Strategy Group | New Group ID | Broker -->
+                    <!-- Row 3: Country | Yield -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="country_name">Country</label>
+                            <input type="text" id="country_name" name="country_name" maxlength="100" placeholder="e.g., United States">
+                            <small class="form-help" id="countryHelp" style="display: none;">This will be auto-filled when using Börsdata</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="yield">Yield (%)</label>
+                            <input type="number" id="yield" name="yield" step="0.01" min="0" max="100" placeholder="e.g., 2.50">
+                            <small class="form-help" id="yieldHelp" style="display: none;">This will be auto-filled when using Börsdata</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Row 4: Strategy Group | New Group ID | Broker -->
                     <div class="form-row form-row-three">
                         <div class="form-group">
                             <label for="strategy_group_id">Strategy Group</label>
@@ -662,21 +689,7 @@ ob_start();
                         </div>
                     </div>
                     
-                    <!-- Row 3.5: Yield | Country -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="yield">Yield (%)</label>
-                            <input type="number" id="yield" name="yield" step="0.01" min="0" max="100" placeholder="e.g., 2.50">
-                            <small class="form-help" id="yieldHelp" style="display: none;">This will be auto-filled when using Börsdata</small>
-                        </div>
-                        <div class="form-group">
-                            <label for="country_name">Country</label>
-                            <input type="text" id="country_name" name="country_name" maxlength="100" placeholder="e.g., United States">
-                            <small class="form-help" id="countryHelp" style="display: none;">This will be auto-filled when using Börsdata</small>
-                        </div>
-                    </div>
-                    
-                    <!-- Row 4: Status (full width) -->
+                    <!-- Row 5: Status (full width) -->
                     <div class="form-group">
                         <label for="new_companies_status_id">Status</label>
                         <select id="new_companies_status_id" name="new_companies_status_id">
@@ -689,13 +702,13 @@ ob_start();
                         </select>
                     </div>
                     
-                    <!-- Row 5: Inspiration (full width) -->
+                    <!-- Row 6: Inspiration (full width) -->
                     <div class="form-group">
                         <label for="inspiration">Inspiration</label>
                         <input type="text" id="inspiration" name="inspiration" maxlength="255" placeholder="What inspired this pick?">
                     </div>
                     
-                    <!-- Row 6: Comments (full width) -->
+                    <!-- Row 7: Comments (full width) -->
                     <div class="form-group">
                         <label for="comments">Comments</label>
                         <textarea id="comments" name="comments" rows="3" placeholder="Add your notes about this investment..."></textarea>

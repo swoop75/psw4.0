@@ -430,13 +430,21 @@ class NewCompaniesController {
      */
     public function deleteNewCompanyEntry($companyId) {
         try {
+            error_log("DeleteNewCompanyEntry called with ID: " . $companyId);
+            
             $sql = "DELETE FROM new_companies WHERE new_company_id = :new_company_id";
             $stmt = $this->portfolioDb->prepare($sql);
             $stmt->bindValue(':new_company_id', $companyId, PDO::PARAM_INT);
             
-            return $stmt->execute();
+            $result = $stmt->execute();
+            $rowCount = $stmt->rowCount();
+            
+            error_log("Delete SQL executed. Result: " . ($result ? 'true' : 'false') . ", Rows affected: " . $rowCount);
+            
+            return $result && $rowCount > 0;
             
         } catch (Exception $e) {
+            error_log('Delete new company entry error: ' . $e->getMessage());
             Logger::error('Delete new company entry error: ' . $e->getMessage());
             return false;
         }
