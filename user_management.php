@@ -99,6 +99,7 @@ $csrfToken = Security::generateCSRFToken();
 
 // Prepare content for user management page
 ob_start();
+?>
 
 <div class="user-management-container">
     <!-- Page Header -->
