@@ -455,7 +455,7 @@ ob_start();
                             <th>Broker</th>
                             <th>Yield (%)</th>
                             <th>Country</th>
-                            <th>Actions</th>
+                            <th>Strategy Group</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -468,22 +468,38 @@ ob_start();
                                              data-company="<?= htmlspecialchars($entry['company']) ?>"
                                              data-ticker="<?= htmlspecialchars($entry['ticker']) ?>"
                                              data-isin="<?= htmlspecialchars($entry['isin'] ?: 'N/A') ?>"
-                                             data-strategy-group="<?= htmlspecialchars($entry['strategy_name'] ?: 'No Strategy') ?>"
+                                             data-strategy-group="<?= $entry['strategy_group_id'] && $entry['strategy_name'] ? htmlspecialchars('Group ' . $entry['strategy_group_id'] . ' - ' . $entry['strategy_name']) : 'No Strategy' ?>"
                                              data-strategy-id="<?= $entry['strategy_group_id'] ?: 'N/A' ?>"
                                              data-new-group="<?= $entry['new_group_id'] ?: 'No Group' ?>"
                                              data-broker="<?= htmlspecialchars($entry['broker_name'] ?: 'No Broker') ?>"
                                              data-yield="<?= $entry['yield'] ? number_format($entry['yield'], 2) . '%' : 'N/A' ?>"
                                              data-country="<?= htmlspecialchars($entry['country_name'] ?: 'N/A') ?>"
-                                             data-status="<?= htmlspecialchars($entry['status_name'] ?: 'Watchlist') ?>"
+                                             data-status="<?= htmlspecialchars($entry['status_name'] ?: 'watchlist') ?>"
                                              data-comments="<?= htmlspecialchars($entry['comments'] ?: 'No comments') ?>"
                                              data-inspiration="<?= htmlspecialchars($entry['inspiration'] ?: 'No inspiration noted') ?>">
                                             <div class="company-name">
                                                 <a href="#" class="company-name-link" onclick="openCompanyPage(<?= $entry['new_companies_id'] ?>); return false;">
                                                     <strong><?= htmlspecialchars($entry['company']) ?></strong>
                                                 </a>
-                                                <button class="company-details-btn" onclick="toggleCompanyPanel(this)" title="View details">
-                                                    <i class="fas fa-ellipsis-h"></i>
-                                                </button>
+                                                <div class="company-actions-dropdown">
+                                                    <button class="company-details-btn" onclick="toggleActionsDropdown(this)" title="Actions">
+                                                        <i class="fas fa-ellipsis-h"></i>
+                                                    </button>
+                                                    <div class="actions-dropdown-menu">
+                                                        <button class="dropdown-action" onclick="toggleCompanyPanel(this)" title="View Details">
+                                                            <i class="fas fa-info-circle"></i> Info
+                                                        </button>
+                                                        <button class="dropdown-action" onclick="editEntry(<?= $entry['new_companies_id'] ?>)" title="Edit">
+                                                            <i class="fas fa-edit"></i> Edit
+                                                        </button>
+                                                        <button class="dropdown-action" onclick="addToMasterlist(<?= $entry['new_companies_id'] ?>, '<?= htmlspecialchars($entry['company']) ?>')" title="Add to Masterlist">
+                                                            <i class="fas fa-plus-circle"></i> Add to Masterlist
+                                                        </button>
+                                                        <button class="dropdown-action danger" onclick="deleteEntry(<?= $entry['new_companies_id'] ?>, '<?= htmlspecialchars($entry['company']) ?>')" title="Remove">
+                                                            <i class="fas fa-trash"></i> Delete
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             </div>
                                             <div class="company-details">
                                                 <div class="company-identifiers">
@@ -496,7 +512,7 @@ ob_start();
                                     </td>
                                     <td>
                                         <span class="status-badge">
-                                            <?= htmlspecialchars($entry['status_name'] ?: 'Watchlist') ?>
+                                            <?= htmlspecialchars($entry['status_name'] ?: 'watchlist') ?>
                                         </span>
                                     </td>
                                     <td class="broker">
@@ -508,21 +524,10 @@ ob_start();
                                     <td class="country">
                                         <?= htmlspecialchars($entry['country_name'] ?: '-') ?>
                                     </td>
-                                    <td>
-                                        <div class="action-buttons">
-                                            <button class="btn-icon" onclick="toggleCompanyPanel(this)" title="View Details">
-                                                <i class="fas fa-info-circle"></i>
-                                            </button>
-                                            <button class="btn-icon btn-success" onclick="addToMasterlist(<?= $entry['new_companies_id'] ?>, '<?= htmlspecialchars($entry['company']) ?>')" title="Add to Masterlist">
-                                                <i class="fas fa-plus-circle"></i>
-                                            </button>
-                                            <button class="btn-icon" onclick="editEntry(<?= $entry['new_companies_id'] ?>)" title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="btn-icon btn-danger" onclick="deleteEntry(<?= $entry['new_companies_id'] ?>, '<?= htmlspecialchars($entry['company']) ?>')" title="Remove">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
+                                    <td class="strategy-group">
+                                        <?= $entry['strategy_group_id'] && $entry['strategy_name'] ? 
+                                            htmlspecialchars('Group ' . $entry['strategy_group_id'] . ' - ' . $entry['strategy_name']) : 
+                                            '-' ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

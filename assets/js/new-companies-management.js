@@ -827,7 +827,7 @@ function populateCompanyPanel(companyInfo) {
             <div class="panel-info-grid">
                 <div class="panel-info-row">
                     <span class="panel-info-label">Strategy Group:</span>
-                    <span class="panel-info-value">${escapeHtml(data.strategyGroup)}</span>
+                    <span class="panel-info-value">${escapeHtml(data.strategyGroup && data.strategyGroup !== 'No Strategy' ? data.strategyGroup : 'No Strategy')}</span>
                 </div>
                 <div class="panel-info-row">
                     <span class="panel-info-label">New Group:</span>
@@ -840,19 +840,15 @@ function populateCompanyPanel(companyInfo) {
             </div>
         </div>
         
-        ${data.comments !== 'No comments' ? `
         <div class="panel-section">
             <div class="panel-section-title">Comments</div>
-            <div class="panel-text-content">${escapeHtml(data.comments)}</div>
+            <div class="panel-text-content">${escapeHtml(data.comments && data.comments !== 'No comments' ? data.comments : 'No comments added')}</div>
         </div>
-        ` : ''}
         
-        ${data.inspiration !== 'No inspiration noted' ? `
         <div class="panel-section">
             <div class="panel-section-title">Inspiration</div>
-            <div class="panel-text-content">${escapeHtml(data.inspiration)}</div>
+            <div class="panel-text-content">${escapeHtml(data.inspiration && data.inspiration !== 'No inspiration noted' ? data.inspiration : 'No inspiration noted')}</div>
         </div>
-        ` : ''}
         
         <div class="panel-actions">
             <button class="panel-action-btn" onclick="editEntry(${data.companyId})">
@@ -898,6 +894,40 @@ document.addEventListener('click', function(event) {
 document.addEventListener('keydown', function(event) {
     if (event.key === 'Escape') {
         closeCompanyPanel();
+        closeAllActionsDropdowns();
+    }
+});
+
+/**
+ * Toggle actions dropdown menu
+ */
+function toggleActionsDropdown(button) {
+    const dropdown = button.closest('.company-actions-dropdown');
+    const menu = dropdown.querySelector('.actions-dropdown-menu');
+    
+    // Close all other dropdowns first
+    closeAllActionsDropdowns();
+    
+    // Toggle current dropdown
+    if (!menu.classList.contains('show')) {
+        menu.classList.add('show');
+    }
+}
+
+/**
+ * Close all actions dropdowns
+ */
+function closeAllActionsDropdowns() {
+    const dropdowns = document.querySelectorAll('.actions-dropdown-menu');
+    dropdowns.forEach(menu => {
+        menu.classList.remove('show');
+    });
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', function(event) {
+    if (!event.target.closest('.company-actions-dropdown')) {
+        closeAllActionsDropdowns();
     }
 });
 
