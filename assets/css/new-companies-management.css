@@ -119,7 +119,7 @@ body {
 .page-header {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
-    padding: var(--space-12) var(--space-8);
+    padding: var(--space-6) var(--space-8);
     border-radius: var(--radius-2xl);
     margin-bottom: var(--space-8);
     position: relative;
@@ -1371,7 +1371,7 @@ label:not(.checkbox-dropdown label):not(.form-group label) {
     }
     
     .page-header {
-        padding: var(--space-8) var(--space-6);
+        padding: var(--space-4) var(--space-6);
         margin-bottom: var(--space-6);
     }
     
