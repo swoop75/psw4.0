@@ -104,3 +104,13 @@
 {"timestamp":"2025-07-25 22:14:41","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"New company entry added successfully","context":{"company":"JPMorgan Chase & Co","isin":"US46625H1005"}}
 {"timestamp":"2025-07-25 22:23:25","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"B\u00f6rsdata data populated successfully","context":{"entry_id":"60","isin":"US86765K1097","company":"Sunoco LP"}}
 {"timestamp":"2025-07-25 22:23:25","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"New company entry added successfully","context":{"company":"Sunoco LP","isin":"US86765K1097"}}
+{"timestamp":"2025-07-25 22:27:21","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"User session destroyed","context":{"user_id":1,"username":"swoop"}}
+{"timestamp":"2025-07-25 22:27:29","level":"INFO","user_id":"anonymous","ip":"100.120.9.63","message":"Successful login for user: swoop","context":{"username":"swoop","success":true,"reason":"","user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/138.0.0.0 Safari\/537.36"}}
+{"timestamp":"2025-07-25 22:27:29","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"User session created","context":{"user_id":1,"username":"swoop"}}
+{"timestamp":"2025-07-25 22:27:29","level":"DEBUG","user_id":1,"ip":"100.120.9.63","message":"Calculated dividend statistics","context":{"ytd_total":0,"ytd_count":0,"all_time_total":0,"monthly_records":0}}
+{"timestamp":"2025-07-25 22:27:29","level":"DEBUG","user_id":1,"ip":"100.120.9.63","message":"Calculated portfolio summary from dividend data","context":{"estimated_value":0,"ytd_dividends":0,"unique_companies":0}}
+{"timestamp":"2025-07-25 22:27:29","level":"ERROR","user_id":1,"ip":"100.120.9.63","message":"Recent dividends error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ld.pay_date' in 'field list'"}
+{"timestamp":"2025-07-25 22:27:29","level":"DEBUG","user_id":1,"ip":"100.120.9.63","message":"Calculated country allocation from dividend data","context":{"countries":0,"total_dividends":0}}
+{"timestamp":"2025-07-25 22:27:29","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"User action: dashboard_viewed","context":{"action":"dashboard_viewed","details":"User accessed dashboard","user_id":1}}
+{"timestamp":"2025-07-25 22:30:47","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"B\u00f6rsdata data populated successfully","context":{"entry_id":"61","isin":"US25179M1036","company":"Devon Energy Corp"}}
+{"timestamp":"2025-07-25 22:30:47","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"New company entry added successfully","context":{"company":"Devon Energy Corp","isin":"US25179M1036"}}
