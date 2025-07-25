@@ -270,7 +270,7 @@ class NewCompaniesController {
             
             // Prepare data for insertion
             $insertData = [
-                'company' => !empty($data['company']) ? Security::sanitizeInput($data['company']) : null,
+                'company' => !empty($data['company']) ? Security::sanitizeInput($data['company']) : ($isBorsdataMode ? 'Pending Börsdata lookup' : null),
                 'ticker' => !empty($data['ticker']) ? strtoupper(Security::sanitizeInput($data['ticker'])) : null,
                 'isin' => !empty($data['isin']) ? Security::sanitizeInput($data['isin']) : null,
                 'country_name' => !empty($data['country_name']) ? Security::sanitizeInput($data['country_name']) : null,
@@ -300,6 +300,13 @@ class NewCompaniesController {
             $success = $stmt->execute();
             
             if ($success) {
+                $newEntryId = $this->portfolioDb->lastInsertId();
+                
+                // If in Börsdata mode, try to populate data immediately
+                if ($isBorsdataMode && !empty($data['isin'])) {
+                    $this->populateBorsdataData($newEntryId, $data['isin']);
+                }
+                
                 Logger::info('New company entry added successfully', [
                     'company' => $data['company'],
                     'isin' => $data['isin']
@@ -617,6 +624,80 @@ class NewCompaniesController {
         } catch (Exception $e) {
             Logger::error('CSV export error: ' . $e->getMessage());
             throw $e;
+        }
+    }
+    
+    /**
+     * Populate Börsdata data for a new company entry
+     * @param int $entryId The new company entry ID
+     * @param string $isin The ISIN to lookup
+     * @return bool Success status
+     */
+    private function populateBorsdataData($entryId, $isin) {
+        try {
+            $marketdataDb = Database::getConnection('marketdata');
+            
+            // Try global_instruments first
+            $stmt = $marketdataDb->prepare("
+                SELECT gi.name, gi.yahoo, c.nameEN as country_name, c.id as country_id
+                FROM global_instruments gi 
+                LEFT JOIN countries c ON gi.countryId = c.id 
+                WHERE gi.isin = ? 
+                LIMIT 1
+            ");
+            $stmt->execute([$isin]);
+            $data = $stmt->fetch();
+            
+            // If not found in global, try nordic
+            if (!$data) {
+                $stmt = $marketdataDb->prepare("
+                    SELECT ni.name, ni.yahoo, c.nameEN as country_name, c.id as country_id
+                    FROM nordic_instruments ni 
+                    LEFT JOIN countries c ON ni.countryId = c.id 
+                    WHERE ni.isin = ? 
+                    LIMIT 1
+                ");
+                $stmt->execute([$isin]);
+                $data = $stmt->fetch();
+            }
+            
+            // If we found data, update the entry
+            if ($data) {
+                $updateSql = "UPDATE new_companies SET 
+                             company = :company,
+                             ticker = :ticker,
+                             country_name = :country_name,
+                             country_id = :country_id
+                             WHERE new_company_id = :id";
+                
+                $stmt = $this->portfolioDb->prepare($updateSql);
+                $stmt->execute([
+                    ':company' => $data['name'],
+                    ':ticker' => $data['yahoo'],
+                    ':country_name' => $data['country_name'],
+                    ':country_id' => $data['country_id'],
+                    ':id' => $entryId
+                ]);
+                
+                Logger::info('Börsdata data populated successfully', [
+                    'entry_id' => $entryId,
+                    'isin' => $isin,
+                    'company' => $data['name']
+                ]);
+                
+                return true;
+            } else {
+                // If no data found, keep the placeholder company name
+                Logger::warning('ISIN not found in Börsdata', [
+                    'entry_id' => $entryId,
+                    'isin' => $isin
+                ]);
+                return false;
+            }
+            
+        } catch (Exception $e) {
+            Logger::error('Börsdata population error: ' . $e->getMessage());
+            return false;
         }
     }
 }
