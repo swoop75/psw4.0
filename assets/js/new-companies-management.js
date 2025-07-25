@@ -165,10 +165,10 @@ function showAddModal() {
     modal.style.display = 'block';
     modal.classList.add('show');
     
-    // Focus first input
+    // Focus ISIN field (since Börsdata mode is default)
     setTimeout(() => {
-        const companyField = document.getElementById('company');
-        if (companyField) companyField.focus();
+        const isinField = document.getElementById('isin');
+        if (isinField) isinField.focus();
     }, 100);
 }
 
@@ -227,12 +227,14 @@ function editEntry(companyId) {
  */
 function populateEntryForm(entry) {
     const fields = [
-        'company_name', 'ticker', 'country', 'currency', 'exchange', 'isin', 'business_description',
+        'company', 'ticker', 'country_name', 'currency', 'exchange', 'isin', 'business_description',
         'status_id', 'priority_level', 'target_price', 'target_quantity', 'notes', 'research_notes',
         'expected_dividend_yield', 'pe_ratio', 'price_to_book', 'debt_to_equity', 'roe',
         'analyst_rating', 'risk_level', 'sector', 'market_cap_category', 'target_allocation_percent',
         'stop_loss_price', 'take_profit_price', 'entry_strategy', 'exit_strategy',
-        'last_analysis_date', 'next_review_date', 'price_alert_enabled', 'price_alert_target'
+        'last_analysis_date', 'next_review_date', 'price_alert_enabled', 'price_alert_target',
+        'yield', 'new_companies_status_id', 'strategy_group_id', 'new_group_id', 'broker_id',
+        'inspiration', 'comments'
     ];
     
     fields.forEach(field => {
@@ -950,8 +952,8 @@ function toggleBorsdataFields() {
         // Add CSS class for styling
         companyField.classList.add('borsdata-auto-field');
         tickerField.classList.add('borsdata-auto-field');
-        countryField.classList.add('borsdata-auto-field');
-        yieldField.classList.add('borsdata-auto-field');
+        if (countryField) countryField.classList.add('borsdata-auto-field');
+        if (yieldField) yieldField.classList.add('borsdata-auto-field');
         
     } else {
         // Manual mode - ISIN optional, other fields required
@@ -978,8 +980,8 @@ function toggleBorsdataFields() {
         // Remove CSS class
         companyField.classList.remove('borsdata-auto-field');
         tickerField.classList.remove('borsdata-auto-field');
-        countryField.classList.remove('borsdata-auto-field');
-        yieldField.classList.remove('borsdata-auto-field');
+        if (countryField) countryField.classList.remove('borsdata-auto-field');
+        if (yieldField) yieldField.classList.remove('borsdata-auto-field');
     }
 }
 
