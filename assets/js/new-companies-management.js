@@ -14,6 +14,11 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeEventListeners();
     initializeSearch();
     initializeCheckboxDropdowns();
+    
+    // Initialize Börsdata fields state (since Börsdata is now default)
+    if (typeof toggleBorsdataFields === 'function') {
+        toggleBorsdataFields();
+    }
 });
 
 /**
@@ -976,4 +981,67 @@ function toggleBorsdataFields() {
         countryField.classList.remove('borsdata-auto-field');
         yieldField.classList.remove('borsdata-auto-field');
     }
+}
+
+/**
+ * Preview Börsdata data when ISIN is entered
+ */
+function previewBorsdataData() {
+    const borsdataToggle = document.getElementById('borsdata_available');
+    const isinField = document.getElementById('isin');
+    const companyField = document.getElementById('company');
+    const tickerField = document.getElementById('ticker');
+    
+    // Only preview if Börsdata mode is enabled and ISIN is provided
+    if (borsdataToggle.value !== '1' || !isinField.value || isinField.value.length < 8) {
+        return;
+    }
+    
+    // Show loading state
+    companyField.placeholder = 'Loading from Börsdata...';
+    tickerField.placeholder = 'Loading...';
+    
+    // Make AJAX request to preview the data
+    const formData = new FormData();
+    formData.append('action', 'preview_borsdata');
+    formData.append('isin', isinField.value);
+    formData.append('csrf_token', document.querySelector('input[name="csrf_token"]').value);
+    
+    fetch(window.location.href, {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.company_data) {
+            // Auto-fill the preview data
+            companyField.value = data.company_data.company || '';
+            tickerField.value = data.company_data.ticker || '';
+            
+            // Update hidden fields
+            const countryField = document.getElementById('country_name');
+            const countryIdField = document.getElementById('country_id');
+            const yieldField = document.getElementById('yield');
+            
+            if (countryField) countryField.value = data.company_data.country || '';
+            if (countryIdField) countryIdField.value = data.company_data.country_id || '';
+            if (yieldField) yieldField.value = data.company_data.yield || '';
+            
+            // Update placeholders to show success
+            companyField.placeholder = 'Auto-filled from Börsdata';
+            tickerField.placeholder = 'Auto-filled from Börsdata';
+        } else {
+            // Reset placeholders if no data found
+            companyField.placeholder = 'Company not found in Börsdata';
+            tickerField.placeholder = 'Enter manually';
+        }
+    })
+    .catch(error => {
+        console.error('Preview error:', error);
+        companyField.placeholder = 'Error loading data';
+        tickerField.placeholder = 'Enter manually';
+    });
 }
