@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WI
                 break;
                 
             case 'add_to_masterlist':
-                $companyId = $_POST['new_companies_id'] ?? '';
+                $companyId = $_POST['new_company_id'] ?? '';
                 $masterlistData = [
                     'market' => $_POST['market'] ?? null,
                     'share_type_id' => $_POST['share_type_id'] ?? 1
@@ -61,11 +61,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WI
                 exit;
                 
             case 'update':
-                $companyId = $_POST['new_companies_id'] ?? '';
+                $companyId = $_POST['new_company_id'] ?? '';
                 error_log("Update attempt - Company ID: " . $companyId); // Debug
                 error_log("Update data: " . print_r($_POST, true)); // Debug
                 
-                unset($_POST['action'], $_POST['csrf_token'], $_POST['new_companies_id']);
+                unset($_POST['action'], $_POST['csrf_token'], $_POST['new_company_id']);
                 
                 try {
                     $result = $controller->updateNewCompanyEntry($companyId, $_POST);
@@ -83,13 +83,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WI
                 exit;
                 
             case 'delete':
-                $companyId = $_POST['new_companies_id'] ?? '';
+                $companyId = $_POST['new_company_id'] ?? '';
                 $result = $controller->deleteNewCompanyEntry($companyId);
                 echo json_encode(['success' => $result, 'message' => $result ? 'Entry removed from new companies' : 'Failed to remove entry']);
                 exit;
                 
             case 'get_entry':
-                $companyId = $_POST['new_companies_id'] ?? '';
+                $companyId = $_POST['new_company_id'] ?? '';
                 $entry = $controller->getNewCompanyEntry($companyId);
                 echo json_encode(['success' => (bool)$entry, 'entry' => $entry]);
                 exit;
@@ -584,7 +584,7 @@ ob_start();
             </div>
             <form id="entryForm">
                 <input type="hidden" id="modalAction" name="action" value="add">
-                <input type="hidden" id="companyId" name="new_companies_id" value="">
+                <input type="hidden" id="companyId" name="new_company_id" value="">
                 <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
                 
                 
@@ -710,7 +710,7 @@ ob_start();
             </div>
             <form id="masterlistForm">
                 <input type="hidden" name="action" value="add_to_masterlist">
-                <input type="hidden" id="masterlistCompanyId" name="new_companies_id" value="">
+                <input type="hidden" id="masterlistCompanyId" name="new_company_id" value="">
                 <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
                 
                 <div class="modal-body">

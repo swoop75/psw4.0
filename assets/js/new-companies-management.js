@@ -197,7 +197,7 @@ function editEntry(companyId) {
     // Get entry data via AJAX
     const formData = new FormData();
     formData.append('action', 'get_entry');
-    formData.append('new_companies_id', companyId);
+    formData.append('new_company_id', companyId);
     
     const csrfToken = document.querySelector('input[name="csrf_token"]');
     if (!csrfToken) {
@@ -335,7 +335,7 @@ function handleEntryFormSubmit(event) {
     
     // Additional validation for update action
     if (action === 'update') {
-        const companyId = formData.get('new_companies_id');
+        const companyId = formData.get('new_company_id');
         console.log('Update - Company ID:', companyId); // Debug
         if (!companyId) {
             console.error('No company ID found for update');
@@ -424,7 +424,7 @@ function confirmDelete() {
     
     const formData = new FormData();
     formData.append('action', 'delete');
-    formData.append('new_companies_id', deleteEntryId);
+    formData.append('new_company_id', deleteEntryId);
     formData.append('csrf_token', document.querySelector('input[name="csrf_token"]').value);
     
     const deleteButton = document.querySelector('#deleteModal .btn-danger');
