@@ -85,14 +85,20 @@ try {
     $activityLog = [];
 }
 
-// Page title and navigation
-$pageTitle = 'User Management';
-$currentPage = 'user_management';
+// Initialize variables for template
+$pageTitle = 'User Management - PSW 4.0';
+$pageDescription = 'User account management and preferences';
+$additionalCSS = [
+    BASE_URL . '/assets/css/improved-user-management.css?v=' . time()
+];
+$additionalJS = [
+    BASE_URL . '/assets/js/user-management.js?v=' . time()
+];
 
-include __DIR__ . '/templates/header.php';
-?>
+$csrfToken = Security::generateCSRFToken();
 
-<link rel="stylesheet" href="../assets/css/improved-user-management.css">
+// Prepare content for user management page
+ob_start();
 
 <div class="user-management-container">
     <!-- Page Header -->
@@ -432,7 +438,6 @@ include __DIR__ . '/templates/header.php';
     </div>
 </div>
 
-<script src="../assets/js/user-management.js"></script>
 <script>
 // Set active tab on page load
 document.addEventListener('DOMContentLoaded', function() {
@@ -440,4 +445,9 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<?php include __DIR__ . '/templates/footer.php'; ?>
+<?php
+$content = ob_get_clean();
+
+// Include base layout
+include __DIR__ . '/templates/layouts/base.php';
+?>
