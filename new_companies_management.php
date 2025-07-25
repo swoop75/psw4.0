@@ -62,9 +62,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WI
                 
             case 'update':
                 $companyId = $_POST['new_companies_id'] ?? '';
+                error_log("Update attempt - Company ID: " . $companyId); // Debug
+                error_log("Update data: " . print_r($_POST, true)); // Debug
+                
                 unset($_POST['action'], $_POST['csrf_token'], $_POST['new_companies_id']);
-                $result = $controller->updateNewCompanyEntry($companyId, $_POST);
-                echo json_encode(['success' => $result, 'message' => $result ? 'Entry updated successfully' : 'Failed to update entry']);
+                
+                try {
+                    $result = $controller->updateNewCompanyEntry($companyId, $_POST);
+                    error_log("Update result: " . ($result ? 'SUCCESS' : 'FAILED')); // Debug
+                    
+                    if ($result) {
+                        echo json_encode(['success' => true, 'message' => 'Entry updated successfully']);
+                    } else {
+                        echo json_encode(['success' => false, 'message' => 'Failed to update entry - no rows affected or database error']);
+                    }
+                } catch (Exception $e) {
+                    error_log("Update exception: " . $e->getMessage()); // Debug
+                    echo json_encode(['success' => false, 'message' => 'Failed to update entry: ' . $e->getMessage()]);
+                }
                 exit;
                 
             case 'delete':

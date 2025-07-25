@@ -296,6 +296,12 @@ function handleEntryFormSubmit(event) {
     const formData = new FormData(form);
     const action = formData.get('action');
     
+    console.log('Form submission - Action:', action); // Debug
+    console.log('Form data entries:'); // Debug
+    for (let [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+    }
+    
     // Validate required fields based on Börsdata mode
     const borsdataToggle = document.getElementById('borsdata_available');
     const isBorsdataMode = borsdataToggle && borsdataToggle.value === '1';
@@ -327,6 +333,17 @@ function handleEntryFormSubmit(event) {
     
     if (!isValid) return;
     
+    // Additional validation for update action
+    if (action === 'update') {
+        const companyId = formData.get('new_companies_id');
+        console.log('Update - Company ID:', companyId); // Debug
+        if (!companyId) {
+            console.error('No company ID found for update');
+            showAlert('Error: Company ID is missing', 'error');
+            return;
+        }
+    }
+    
     const submitButton = form.querySelector('button[type="submit"]');
     const originalText = submitButton.innerHTML;
     
@@ -342,12 +359,14 @@ function handleEntryFormSubmit(event) {
         body: formData
     })
     .then(response => {
+        console.log('Update response status:', response.status); // Debug
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response.text();
     })
     .then(text => {
+        console.log('Raw response text:', text); // Debug
         try {
             return JSON.parse(text);
         } catch (e) {
@@ -356,6 +375,7 @@ function handleEntryFormSubmit(event) {
         }
     })
     .then(data => {
+        console.log('Parsed response data:', data); // Debug
         submitButton.disabled = false;
         submitButton.innerHTML = originalText;
         
@@ -368,6 +388,7 @@ function handleEntryFormSubmit(event) {
                 window.location.reload();
             }, 1500);
         } else {
+            console.error('Update failed:', data); // Debug
             showAlert('Error: ' + (data.message || 'Failed to save entry'), 'error');
         }
     })
