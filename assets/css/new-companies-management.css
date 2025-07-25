@@ -5,6 +5,11 @@
  * Updated: Compatible with unified navigation system
  */
 
+/* Force proper spacing for sticky header - IMPORTANT: Must be at top to avoid cascade issues */
+body .container {
+    padding-top: 120px !important; /* Force override - sticky header (64px) + generous spacing */
+}
+
 /* Compatibility with unified navigation - This override is handled by the main container definition below */
 
 /* CSS Custom Properties - Beautiful Design System */
