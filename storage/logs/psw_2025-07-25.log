@@ -22,3 +22,4 @@
 {"timestamp":"2025-07-25 08:06:26","level":"ERROR","user_id":1,"ip":"100.120.9.63","message":"Recent dividends error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ld.pay_date' in 'field list'"}
 {"timestamp":"2025-07-25 08:06:26","level":"DEBUG","user_id":1,"ip":"100.120.9.63","message":"Calculated country allocation from dividend data","context":{"countries":0,"total_dividends":0}}
 {"timestamp":"2025-07-25 08:06:26","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"User action: dashboard_viewed","context":{"action":"dashboard_viewed","details":"User accessed dashboard","user_id":1}}
+{"timestamp":"2025-07-25 08:07:06","level":"ERROR","user_id":1,"ip":"100.120.9.63","message":"Add new company entry error: SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'company' cannot be null"}
