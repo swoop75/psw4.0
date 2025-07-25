@@ -491,11 +491,6 @@ ob_start();
                                                         <?= htmlspecialchars($entry['isin'] ?: 'No ISIN') ?> | <?= htmlspecialchars($entry['ticker'] ?: 'No Ticker') ?>
                                                     <?php endif; ?>
                                                 </div>
-                                                <?php if ($entry['comments']): ?>
-                                                    <div class="comments-preview">
-                                                        <?= htmlspecialchars(substr($entry['comments'], 0, 80)) ?><?= strlen($entry['comments']) > 80 ? '...' : '' ?>
-                                                    </div>
-                                                <?php endif; ?>
                                             </div>
                                         </div>
                                     </td>
@@ -649,6 +644,20 @@ ob_start();
                         </div>
                     </div>
                     
+                    <!-- Row 3.5: Yield | Country -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="yield">Yield (%)</label>
+                            <input type="number" id="yield" name="yield" step="0.01" min="0" max="100" placeholder="e.g., 2.50">
+                            <small class="form-help" id="yieldHelp" style="display: none;">This will be auto-filled when using Börsdata</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="country_name">Country</label>
+                            <input type="text" id="country_name" name="country_name" maxlength="100" placeholder="e.g., United States">
+                            <small class="form-help" id="countryHelp" style="display: none;">This will be auto-filled when using Börsdata</small>
+                        </div>
+                    </div>
+                    
                     <!-- Row 4: Status (full width) -->
                     <div class="form-group">
                         <label for="new_companies_status_id">Status</label>
@@ -675,9 +684,7 @@ ob_start();
                     </div>
                     
                     <!-- Hidden fields for optional data -->
-                    <input type="hidden" id="country_name" name="country_name">
                     <input type="hidden" id="country_id" name="country_id">
-                    <input type="hidden" id="yield" name="yield">
                 </div>
                 
                 <div class="form-actions">
