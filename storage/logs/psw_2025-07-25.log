@@ -28,3 +28,7 @@
 {"timestamp":"2025-07-25 08:39:28","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"New company entry added successfully","context":{"company":"","isin":"US40434L1052"}}
 {"timestamp":"2025-07-25 08:47:17","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"B\u00f6rsdata data populated successfully","context":{"entry_id":"54","isin":"US46625H1005","company":"JPMorgan Chase & Co"}}
 {"timestamp":"2025-07-25 08:47:17","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"New company entry added successfully","context":{"company":"JPMorgan Chase & Co","isin":"US46625H1005"}}
+{"timestamp":"2025-07-25 09:10:37","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"B\u00f6rsdata data populated successfully","context":{"entry_id":"55","isin":"US8425871071","company":"Southern Co"}}
+{"timestamp":"2025-07-25 09:10:37","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"New company entry added successfully","context":{"company":"Southern Co","isin":"US8425871071"}}
+{"timestamp":"2025-07-25 09:11:42","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"B\u00f6rsdata data populated successfully","context":{"entry_id":"56","isin":"US1729674242","company":"Citigroup Inc"}}
+{"timestamp":"2025-07-25 09:11:43","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"New company entry added successfully","context":{"company":"Citigroup Inc","isin":"US1729674242"}}
