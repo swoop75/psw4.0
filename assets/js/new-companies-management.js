@@ -176,10 +176,18 @@ function showAddModal() {
  * Edit entry
  */
 function editEntry(companyId) {
+    console.log('Edit entry called with ID:', companyId); // Debug
+    
     const modal = document.getElementById('entryModal');
     const modalTitle = document.getElementById('modalTitle');
     const modalAction = document.getElementById('modalAction');
     const submitText = document.getElementById('submitText');
+    
+    if (!modal || !modalTitle || !modalAction || !submitText) {
+        console.error('Modal elements missing:', { modal: !!modal, modalTitle: !!modalTitle, modalAction: !!modalAction, submitText: !!submitText });
+        alert('Error: Modal elements not found');
+        return;
+    }
     
     // Set modal for edit mode
     modalTitle.textContent = 'Edit Company Entry';
@@ -190,8 +198,16 @@ function editEntry(companyId) {
     const formData = new FormData();
     formData.append('action', 'get_entry');
     formData.append('new_companies_id', companyId);
-    formData.append('csrf_token', document.querySelector('input[name="csrf_token"]').value);
     
+    const csrfToken = document.querySelector('input[name="csrf_token"]');
+    if (!csrfToken) {
+        console.error('CSRF token not found');
+        alert('Error: Security token not found');
+        return;
+    }
+    formData.append('csrf_token', csrfToken.value);
+    
+    console.log('Sending AJAX request for company ID:', companyId); // Debug
     showLoading('Loading entry data...');
     
     fetch(window.location.href, {
@@ -201,18 +217,30 @@ function editEntry(companyId) {
         },
         body: formData
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Response status:', response.status); // Debug
+        return response.json();
+    })
     .then(data => {
+        console.log('Response data:', data); // Debug
         hideLoading();
         
         if (data.success && data.entry) {
+            console.log('Entry data received:', data.entry); // Debug
             populateEntryForm(data.entry);
             
             // Store company ID
-            document.getElementById('companyId').value = companyId;
+            const companyIdField = document.getElementById('companyId');
+            if (companyIdField) {
+                companyIdField.value = companyId;
+            } else {
+                console.error('Company ID field not found');
+            }
             
             modal.style.display = 'block';
+            modal.classList.add('show');
         } else {
+            console.error('Failed to load entry:', data); // Debug
             showAlert('Error loading entry data: ' + (data.message || 'Unknown error'), 'error');
         }
     })

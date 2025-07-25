@@ -451,11 +451,11 @@ ob_start();
                     <thead>
                         <tr>
                             <th>Company</th>
-                            <th>Status</th>
+                            <th>Country</th>
                             <th>Broker</th>
                             <th>Yield (%)</th>
-                            <th>Country</th>
                             <th>Strategy Group</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -494,10 +494,8 @@ ob_start();
                                             </div>
                                         </div>
                                     </td>
-                                    <td>
-                                        <span class="status-badge">
-                                            <?= htmlspecialchars($entry['status_name'] ?: 'watchlist') ?>
-                                        </span>
+                                    <td class="country">
+                                        <?= htmlspecialchars($entry['country_name'] ?: '-') ?>
                                     </td>
                                     <td class="broker">
                                         <?= htmlspecialchars($entry['broker_name'] ?: '-') ?>
@@ -505,13 +503,15 @@ ob_start();
                                     <td class="yield">
                                         <?= $entry['yield'] ? number_format($entry['yield'], 2) . '%' : '-' ?>
                                     </td>
-                                    <td class="country">
-                                        <?= htmlspecialchars($entry['country_name'] ?: '-') ?>
-                                    </td>
                                     <td class="strategy-group">
                                         <?= $entry['strategy_group_id'] && $entry['strategy_name'] ? 
                                             htmlspecialchars('Group ' . $entry['strategy_group_id'] . ' - ' . $entry['strategy_name']) : 
                                             '-' ?>
+                                    </td>
+                                    <td>
+                                        <span class="status-badge">
+                                            <?= htmlspecialchars($entry['status_name'] ?: 'watchlist') ?>
+                                        </span>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
