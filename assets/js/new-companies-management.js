@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeEventListeners();
     initializeSearch();
     initializeCheckboxDropdowns();
+    initializeTableSorting();
     
     // Initialize Börsdata fields state (since Börsdata is now default)
     if (typeof toggleBorsdataFields === 'function') {
@@ -84,6 +85,44 @@ function initializeSearch() {
         searchInput.focus();
         searchInput.setSelectionRange(searchInput.value.length, searchInput.value.length);
     }
+}
+
+/**
+ * Initialize table sorting functionality
+ */
+function initializeTableSorting() {
+    const sortableHeaders = document.querySelectorAll('.sortable');
+    
+    sortableHeaders.forEach(header => {
+        header.addEventListener('click', function() {
+            const sortField = this.getAttribute('data-sort');
+            const currentOrder = this.getAttribute('data-order');
+            const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
+            
+            // Update URL with sort parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set('sort_by', sortField);
+            urlParams.set('sort_order', newOrder);
+            urlParams.set('page', '1'); // Reset to first page when sorting
+            
+            // Navigate to sorted results
+            window.location.href = window.location.pathname + '?' + urlParams.toString();
+        });
+        
+        // Add hover effect
+        header.addEventListener('mouseenter', function() {
+            if (!this.classList.contains('active')) {
+                this.style.cursor = 'pointer';
+                this.style.opacity = '0.8';
+            }
+        });
+        
+        header.addEventListener('mouseleave', function() {
+            if (!this.classList.contains('active')) {
+                this.style.opacity = '1';
+            }
+        });
+    });
 }
 
 /**

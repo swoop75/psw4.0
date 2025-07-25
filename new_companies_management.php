@@ -209,7 +209,9 @@ $filters = [
     'strategy_group_id' => $_GET['strategy_group_id'] ?? ($isSearchAllMode ? '' : (!empty($defaultStrategies) ? implode(',', $defaultStrategies) : '')),
     'broker_id' => $_GET['broker_id'] ?? ($isSearchAllMode ? '' : (!empty($defaultBrokers) ? implode(',', $defaultBrokers) : '')),
     'yield_min' => $_GET['yield_min'] ?? '',
-    'yield_max' => $_GET['yield_max'] ?? ''
+    'yield_max' => $_GET['yield_max'] ?? '',
+    'sort_by' => $_GET['sort_by'] ?? 'company',
+    'sort_order' => $_GET['sort_order'] ?? 'asc'
 ];
 
 // Create filtered array for database query (remove empty values to avoid parameter binding issues)
@@ -478,12 +480,36 @@ ob_start();
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Company</th>
-                            <th>Country</th>
-                            <th>Broker</th>
-                            <th>Current Yield (%)</th>
-                            <th>Strategy Group</th>
-                            <th>Status</th>
+                            <?php 
+                            $currentSort = $filters['sort_by'] ?? 'company';
+                            $currentOrder = $filters['sort_order'] ?? 'asc';
+                            
+                            $columns = [
+                                'company' => ['label' => 'Company', 'default_order' => 'asc'],
+                                'country_name' => ['label' => 'Country', 'default_order' => 'asc'],
+                                'broker_name' => ['label' => 'Broker', 'default_order' => 'asc'],
+                                'yield_current' => ['label' => 'Current Yield (%)', 'default_order' => 'desc'],
+                                'strategy_name' => ['label' => 'Strategy Group', 'default_order' => 'asc'],
+                                'status_name' => ['label' => 'Status', 'default_order' => 'asc'],
+                            ];
+                            
+                            foreach ($columns as $columnKey => $columnInfo):
+                                $isActive = ($currentSort === $columnKey);
+                                $nextOrder = $isActive ? ($currentOrder === 'asc' ? 'desc' : 'asc') : $columnInfo['default_order'];
+                                $activeClass = $isActive ? 'active' : '';
+                                
+                                // Determine sort icon
+                                if ($isActive) {
+                                    $sortIcon = $currentOrder === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down';
+                                } else {
+                                    $sortIcon = 'fas fa-sort';
+                                }
+                            ?>
+                            <th class="sortable <?= $activeClass ?>" data-sort="<?= $columnKey ?>" data-order="<?= $nextOrder ?>">
+                                <?= $columnInfo['label'] ?>
+                                <i class="<?= $sortIcon ?> sort-icon"></i>
+                            </th>
+                            <?php endforeach; ?>
                         </tr>
                     </thead>
                     <tbody>

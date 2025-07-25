@@ -118,6 +118,29 @@ class NewCompaniesController {
             
             $whereClause = 'WHERE ' . implode(' AND ', $whereConditions);
             
+            // Handle sorting
+            $validSortFields = [
+                'company' => 'nc.company',
+                'country_name' => 'nc.country_name',
+                'broker_name' => 'br.broker_name', 
+                'yield_current' => 'COALESCE(nc.yield_current, nc.yield)',
+                'strategy_name' => 'psg.strategy_name',
+                'status_name' => 'ncs.status'
+            ];
+            
+            $sortBy = $filters['sort_by'] ?? 'company';
+            $sortOrder = strtoupper($filters['sort_order'] ?? 'ASC');
+            
+            // Validate sort parameters
+            if (!isset($validSortFields[$sortBy])) {
+                $sortBy = 'company';
+            }
+            if (!in_array($sortOrder, ['ASC', 'DESC'])) {
+                $sortOrder = 'ASC';
+            }
+            
+            $orderClause = "ORDER BY {$validSortFields[$sortBy]} $sortOrder";
+            
             // Count total records - include JOINs to match main query
             $countSql = "SELECT COUNT(*) as total 
                         FROM new_companies nc 
@@ -170,7 +193,7 @@ class NewCompaniesController {
                     LEFT JOIN psw_foundation.brokers br ON nc.broker_id = br.broker_id
                     LEFT JOIN new_companies_status ncs ON nc.new_companies_status_id = ncs.id
                     $whereClause 
-                    ORDER BY nc.new_company_id DESC 
+                    $orderClause 
                     LIMIT :limit OFFSET :offset";
             
             $stmt = $this->portfolioDb->prepare($sql);
