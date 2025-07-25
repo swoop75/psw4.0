@@ -33,11 +33,9 @@ try {
     // 2. Enable Börsdata mode and update the entry
     echo "Step 1: Enabling Börsdata mode...\n";
     $updateData = [
-        'borsdata_available' => 1,
-        'company' => null, // Clear the bad company name
-        'ticker' => null,
-        'country_name' => null,
-        'yield' => null
+        'borsdata_available' => 1
+        // Don't set company to null since it has NOT NULL constraint
+        // The stored procedure will update it with the correct data
     ];
     
     $result = $controller->updateNewCompanyEntry($entry['new_company_id'], $updateData);
