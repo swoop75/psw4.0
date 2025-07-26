@@ -261,6 +261,10 @@ ob_start();
                     User Management
                 <?php endif; ?>
             </h1>
+            <div class="current-user-display">
+                <span class="user-name-main"><?php echo htmlspecialchars($user['username'] ?? 'Unknown'); ?></span>, 
+                <span class="user-role-main"><?php echo htmlspecialchars($user['role_name'] ?? 'User'); ?></span>
+            </div>
         </div>
         <div class="header-info">
             <div class="user-badge">

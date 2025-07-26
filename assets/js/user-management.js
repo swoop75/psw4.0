@@ -429,6 +429,9 @@ function getActivityIcon(actionType) {
  */
 function editUser(userId) {
     try {
+        console.log('editUser called with userId:', userId);
+        alert('Edit user clicked for ID: ' + userId);
+        
         // Get user data from the table row
         const userRow = document.querySelector(`[data-user-id="${userId}"]`);
         
@@ -438,11 +441,14 @@ function editUser(userId) {
             return;
         }
         
-        const username = userRow.querySelector('.username')?.textContent || '';
-        const fullName = userRow.querySelector('.full-name')?.textContent || '';
+        console.log('Found user row:', userRow);
+        
+        const username = userRow.querySelector('.username')?.textContent?.trim() || '';
+        const fullName = userRow.querySelector('.full-name')?.textContent?.trim() || '';
         const email = userRow.cells[1]?.textContent?.trim() || '';
         const currentRole = userRow.querySelector('.role-badge')?.textContent?.trim() || '';
-        const isActive = userRow.querySelector('.status-active');
+        const statusIndicator = userRow.querySelector('.status-indicator');
+        const isActive = statusIndicator?.classList.contains('status-active') || false;
         
         const userData = {
             username: username,
@@ -609,8 +615,15 @@ function closeEditUserModal() {
  * @param {HTMLFormElement} form Form element
  */
 function submitEditUserForm(form) {
+    console.log('submitEditUserForm called');
     const formData = new FormData(form);
     const submitButton = form.querySelector('button[type="submit"]');
+    
+    // Log form data for debugging
+    console.log('Form data:');
+    for (let [key, value] of formData.entries()) {
+        console.log(key, value);
+    }
     
     // Show loading state
     submitButton.disabled = true;
@@ -624,12 +637,14 @@ function submitEditUserForm(form) {
         body: formData
     })
     .then(response => {
+        console.log('Response status:', response.status);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response.json();
     })
     .then(data => {
+        console.log('Response data:', data);
         if (data.success) {
             showNotification('User updated successfully', 'success');
             closeEditUserModal();

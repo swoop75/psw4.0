@@ -138,11 +138,12 @@ body .user-management-container {
     font-weight: 600;
 }
 
-.user-role-main {
+.current-user-display .user-role-main,
+.page-header .user-role-main {
     color: white !important;
-    font-style: italic;
-    font-weight: 300;
-    opacity: 0.9;
+    font-style: italic !important;
+    font-weight: 300 !important;
+    opacity: 1 !important;
 }
 
 /* Statistics Grid - EXACT COPY from Masterlist */
