@@ -97,6 +97,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 case 'generate_password':
                     $result = $controller->generateRandomPassword();
                     if ($result['success']) {
+                        // Store the generated password in session to show after redirect
+                        $_SESSION['generated_password'] = $result['password'];
+                        $_SESSION['generated_password_time'] = time();
                         $success = 'New password generated: <strong>' . htmlspecialchars($result['password']) . '</strong> - Please save this password!';
                         $activeTab = 'security';
                     } else {
@@ -140,6 +143,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = $e->getMessage();
         }
     }
+}
+
+// Check for generated password in session (from redirect after password generation)
+if (isset($_SESSION['generated_password']) && isset($_SESSION['generated_password_time'])) {
+    // Only show if generated within the last 30 seconds (security measure)
+    if (time() - $_SESSION['generated_password_time'] < 30) {
+        $success = 'New password generated: <strong>' . htmlspecialchars($_SESSION['generated_password']) . '</strong> - Please save this password!';
+        $activeTab = 'security';
+    }
+    // Clear the session variables after use
+    unset($_SESSION['generated_password']);
+    unset($_SESSION['generated_password_time']);
 }
 
 // Get data based on view and user
