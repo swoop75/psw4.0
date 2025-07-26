@@ -34,3 +34,5 @@
 {"timestamp":"2025-07-26 11:27:37","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"New company entry added successfully","context":{"company":"OGE Energy Corp","isin":"US6708371033"}}
 {"timestamp":"2025-07-26 11:28:06","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"B\u00f6rsdata data populated successfully","context":{"entry_id":"68","isin":"US26441C2044","company":"Duke Energy Corp"}}
 {"timestamp":"2025-07-26 11:28:06","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"New company entry added successfully","context":{"company":"Duke Energy Corp","isin":"US26441C2044"}}
+{"timestamp":"2025-07-26 11:40:00","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"User action: user_status_changed","context":{"action":"user_status_changed","details":"User ruifang was deactivated by admin","user_id":1}}
+{"timestamp":"2025-07-26 11:40:08","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"User action: user_status_changed","context":{"action":"user_status_changed","details":"User ruifang was activated by admin","user_id":1}}
