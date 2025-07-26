@@ -36,3 +36,5 @@
 {"timestamp":"2025-07-26 11:28:06","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"New company entry added successfully","context":{"company":"Duke Energy Corp","isin":"US26441C2044"}}
 {"timestamp":"2025-07-26 11:40:00","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"User action: user_status_changed","context":{"action":"user_status_changed","details":"User ruifang was deactivated by admin","user_id":1}}
 {"timestamp":"2025-07-26 11:40:08","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"User action: user_status_changed","context":{"action":"user_status_changed","details":"User ruifang was activated by admin","user_id":1}}
+{"timestamp":"2025-07-26 12:05:15","level":"ERROR","user_id":1,"ip":"100.120.9.63","message":"Save user preferences error: SQLSTATE[HY093]: Invalid parameter number"}
+{"timestamp":"2025-07-26 12:05:16","level":"ERROR","user_id":1,"ip":"100.120.9.63","message":"Save user preferences error: SQLSTATE[HY093]: Invalid parameter number"}
