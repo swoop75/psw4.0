@@ -102,6 +102,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $_SESSION['generated_password_time'] = time();
                         $success = 'New password generated: <strong>' . htmlspecialchars($result['password']) . '</strong> - Please save this password!';
                         $activeTab = 'security';
+                        
+                        // Debug logging
+                        Logger::info('Generated password stored in session', [
+                            'user_id' => Auth::getUserId(),
+                            'password_length' => strlen($result['password']),
+                            'session_id' => session_id()
+                        ]);
                     } else {
                         $error = $result['message'];
                     }
@@ -151,6 +158,18 @@ if (isset($_SESSION['generated_password']) && isset($_SESSION['generated_passwor
     if (time() - $_SESSION['generated_password_time'] < 30) {
         $success = 'New password generated: <strong>' . htmlspecialchars($_SESSION['generated_password']) . '</strong> - Please save this password!';
         $activeTab = 'security';
+        
+        // Debug logging
+        Logger::info('Displaying generated password from session', [
+            'user_id' => Auth::getUserId(),
+            'password_length' => strlen($_SESSION['generated_password'])
+        ]);
+    } else {
+        // Debug: password expired
+        Logger::info('Generated password expired', [
+            'user_id' => Auth::getUserId(),
+            'age_seconds' => time() - $_SESSION['generated_password_time']
+        ]);
     }
     // Clear the session variables after use
     unset($_SESSION['generated_password']);
