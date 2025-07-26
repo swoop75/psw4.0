@@ -266,8 +266,10 @@ ob_start();
             <div class="user-badge">
                 <i class="fas fa-user-circle"></i>
                 <div>
-                    <div class="user-name"><?php echo htmlspecialchars($user['username'] ?? 'Unknown'); ?></div>
-                    <div class="user-role"><?php echo htmlspecialchars($user['role_name'] ?? 'User'); ?></div>
+                    <div class="user-name">
+                        <?php echo htmlspecialchars($user['username'] ?? 'Unknown'); ?>, 
+                        <span class="user-role"><?php echo htmlspecialchars($user['role_name'] ?? 'User'); ?></span>
+                    </div>
                 </div>
             </div>
             <?php if ($editUserId): ?>
@@ -440,15 +442,32 @@ ob_start();
         <div id="security-tab" class="tab-content <?php echo $activeTab === 'security' ? 'active' : ''; ?>">
             <div class="form-section">
                 <h2>Change Password</h2>
-                <form method="POST" class="security-form">
-                    <input type="hidden" name="csrf_token" value="<?php echo Security::generateCsrfToken(); ?>">
-                    <input type="hidden" name="action" value="change_password">
-
-                    <div class="form-group">
-                        <label for="current_password">Current Password</label>
-                        <input type="password" id="current_password" name="current_password" 
-                               class="form-control" required>
+                <?php if ($editUserId && $editUserId != Auth::getUserId()): ?>
+                    <!-- Admin viewing another user - simplified password change -->
+                    <div class="admin-password-change">
+                        <p><strong>Note:</strong> As an administrator, you can generate a new password for this user.</p>
+                        <div class="generate-password-form">
+                            <h3>Generate Random Password for User</h3>
+                            <p>Generate a secure random password for this user. The password will be displayed once and should be provided to the user.</p>
+                            
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-primary" onclick="showGeneratePasswordModal()">
+                                    <i class="fas fa-random"></i> Generate Password for User
+                                </button>
+                            </div>
+                        </div>
                     </div>
+                <?php else: ?>
+                    <!-- User changing their own password -->
+                    <form method="POST" class="security-form">
+                        <input type="hidden" name="csrf_token" value="<?php echo Security::generateCsrfToken(); ?>">
+                        <input type="hidden" name="action" value="change_password">
+
+                        <div class="form-group">
+                            <label for="current_password">Current Password</label>
+                            <input type="password" id="current_password" name="current_password" 
+                                   class="form-control" required>
+                        </div>
 
                     <div class="form-group">
                         <label for="new_password">New Password</label>
@@ -465,24 +484,25 @@ ob_start();
                                class="form-control" required>
                     </div>
 
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-key"></i> Change Password
-                        </button>
-                    </div>
-                </form>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-key"></i> Change Password
+                            </button>
+                        </div>
+                    </form>
 
-                <!-- Generate Password Form -->
-                <div class="generate-password-form" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e9ecef;">
-                    <h3>Generate Random Password</h3>
-                    <p>Click the button below to generate a secure random password. The new password will be displayed once and should be saved immediately.</p>
-                    
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary" onclick="showGeneratePasswordModal()">
-                            <i class="fas fa-random"></i> Generate Random Password
-                        </button>
+                    <!-- Generate Password Form -->
+                    <div class="generate-password-form" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e9ecef;">
+                        <h3>Generate Random Password</h3>
+                        <p>Click the button below to generate a secure random password. The new password will be displayed once and should be saved immediately.</p>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="showGeneratePasswordModal()">
+                                <i class="fas fa-random"></i> Generate Random Password
+                            </button>
+                        </div>
                     </div>
-                </div>
+                <?php endif; ?>
 
                 <div class="security-info">
                     <h3>Security Information</h3>
@@ -693,9 +713,12 @@ ob_start();
                                         <td><?php echo date('M j, Y', strtotime($userItem['created_at'])); ?></td>
                                         <td>
                                             <div class="action-buttons">
-                                                <a href="user_management.php?user_id=<?php echo $userItem['user_id']; ?>" class="btn-icon" title="Edit User">
-                                                    <i class="fas fa-edit"></i>
+                                                <a href="user_management.php?user_id=<?php echo $userItem['user_id']; ?>" class="btn-icon" title="View User Profile">
+                                                    <i class="fas fa-user"></i>
                                                 </a>
+                                                <button class="btn-icon" onclick="editUser(<?php echo $userItem['user_id']; ?>)" title="Edit User">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
                                                 <button class="btn-icon" onclick="toggleUserStatus(<?php echo $userItem['user_id']; ?>, <?php echo ($userItem['active'] ?? 1) ? 'false' : 'true'; ?>)" 
                                                         title="<?php echo ($userItem['active'] ?? 1) ? 'Deactivate' : 'Activate'; ?> User">
                                                     <i class="fas fa-<?php echo ($userItem['active'] ?? 1) ? 'user-slash' : 'user-check'; ?>"></i>

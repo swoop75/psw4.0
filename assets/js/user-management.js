@@ -467,9 +467,14 @@ let pendingStatusChange = null;
 /**
  * Toggle user active/inactive status
  * @param {number} userId User ID
- * @param {boolean} newStatus New active status
+ * @param {boolean|string} newStatus New active status
  */
 function toggleUserStatus(userId, newStatus) {
+    // Convert string to boolean if needed
+    if (typeof newStatus === 'string') {
+        newStatus = newStatus === 'true';
+    }
+    
     // Get user data from the table row
     const userRow = document.querySelector(`[data-user-id="${userId}"]`);
     if (!userRow) {
