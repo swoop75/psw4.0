@@ -10,15 +10,18 @@
     margin: 0 auto;
     padding: var(--space-6);
     min-height: calc(100vh - 64px);
+    position: relative;
+    z-index: 1;
+    margin-top: 80px; /* Add space for top bar */
 }
 
 /* Dashboard Header */
 .dashboard-header {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
-    padding: var(--space-6) var(--space-8);
+    padding: var(--space-4) var(--space-6);
     border-radius: var(--radius-2xl);
-    margin-bottom: var(--space-8);
+    margin-bottom: var(--space-6);
     position: relative;
     overflow: hidden;
     box-shadow: var(--shadow-xl);

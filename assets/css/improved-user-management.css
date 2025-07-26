@@ -135,14 +135,15 @@ body .user-management-container {
 
 .user-name-main {
     color: white !important;
-    font-weight: 600;
+    font-weight: normal !important;
+    font-style: normal !important;
 }
 
 /* Override any global styles that might affect role color */
 span.user-role-main {
     color: white !important;
     font-style: italic !important;
-    font-weight: 300 !important;
+    font-weight: normal !important;
     opacity: 1 !important;
 }
 
@@ -701,15 +702,27 @@ span.user-role-main {
 }
 
 /* Ensure role select is properly styled and enabled */
-#edit_role.form-control {
+#edit_role.form-control,
+select#edit_role {
     background: white !important;
+    background-color: white !important;
     color: #2d3748 !important;
     cursor: pointer !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    border: 1px solid #d2d6dc !important;
 }
 
-#edit_role.form-control:focus {
+#edit_role.form-control:focus,
+select#edit_role:focus {
     border-color: #4299e1 !important;
     box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1) !important;
+    outline: none !important;
+}
+
+#edit_role option {
+    color: #2d3748 !important;
+    background: white !important;
 }
 
 .form-help {
@@ -1368,4 +1381,18 @@ span.user-role-main {
     .user-email {
         font-size: var(--text-xs);
     }
+}
+
+/* FORCE WHITE COLOR FOR ROLE - HIGHEST SPECIFICITY */
+.user-management-container .page-header .header-content .current-user-display .user-role-main,
+.user-management-container .current-user-display .user-role-main,
+.page-header .current-user-display .user-role-main,
+.current-user-display .user-role-main,
+span.user-role-main {
+    color: #ffffff !important;
+    font-style: italic !important;
+    font-weight: 300 !important;
+    opacity: 1 !important;
+    text-shadow: none !important;
+    background: transparent !important;
 }
