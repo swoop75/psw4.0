@@ -1163,7 +1163,77 @@ body .user-management-container {
     color: #d97706;
     font-size: 0.9rem;
     margin-top: 10px;
-    display: none;
+    display: block;
+}
+
+/* Generate Password Modal Styles - Match the beautiful design */
+#generatePasswordModal .modal-content {
+    max-width: 480px;
+    width: 90%;
+    margin: 15% auto;
+    border-radius: 16px;
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.15),
+        0 8px 16px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(255, 255, 255, 0.9);
+}
+
+#generatePasswordModal .modal-header {
+    padding: 24px 24px 16px;
+    background: linear-gradient(135deg, #00C896 0%, #1A73E8 100%);
+    border-radius: 16px 16px 0 0;
+    border-bottom: none;
+}
+
+#generatePasswordModal .modal-header h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+#generatePasswordModal .modal-close {
+    color: white;
+    opacity: 0.8;
+    font-size: 20px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+#generatePasswordModal .modal-close:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+#generatePasswordModal .modal-body {
+    padding: 24px;
+    text-align: center;
+    color: #1a202c;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+#generatePasswordModal .modal-body p {
+    margin: 0 0 12px 0;
+}
+
+#generatePasswordModal .modal-body strong {
+    color: #00C896;
+    font-weight: 600;
+}
+
+#generatePasswordModal .form-actions {
+    padding: 16px 24px 24px;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    border-top: none;
+    margin-top: 0;
 }
 
 /* Responsive Design */

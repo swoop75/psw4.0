@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 case 'generate_password':
                     $result = $controller->generateRandomPassword();
                     if ($result['success']) {
-                        $success = 'New password generated: <strong>' . $result['password'] . '</strong> - Please save this password!';
+                        $success = 'New password generated: <strong>' . htmlspecialchars($result['password']) . '</strong> - Please save this password!';
                         $activeTab = 'security';
                     } else {
                         $error = $result['message'];
@@ -254,7 +254,7 @@ ob_start();
     <?php if ($success): ?>
         <div class="alert alert-success">
             <i class="fas fa-check-circle"></i>
-            <?php echo htmlspecialchars($success); ?>
+            <?php echo $success; ?>
         </div>
     <?php endif; ?>
 
@@ -439,19 +439,16 @@ ob_start();
                 </form>
 
                 <!-- Generate Password Form -->
-                <form method="POST" class="generate-password-form" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e9ecef;">
-                    <input type="hidden" name="csrf_token" value="<?php echo Security::generateCsrfToken(); ?>">
-                    <input type="hidden" name="action" value="generate_password">
-                    
+                <div class="generate-password-form" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e9ecef;">
                     <h3>Generate Random Password</h3>
                     <p>Click the button below to generate a secure random password. The new password will be displayed once and should be saved immediately.</p>
                     
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-secondary" onclick="return confirm('This will generate a new random password and immediately update your account. Are you sure?')">
+                        <button type="button" class="btn btn-secondary" onclick="showGeneratePasswordModal()">
                             <i class="fas fa-random"></i> Generate Random Password
                         </button>
                     </div>
-                </form>
+                </div>
 
                 <div class="security-info">
                     <h3>Security Information</h3>
@@ -771,6 +768,26 @@ ob_start();
             <button type="button" class="btn btn-secondary" onclick="closeStatusChangeModal()">Cancel</button>
             <button type="button" class="btn" id="confirmStatusChangeBtn" onclick="confirmStatusChange()">
                 <i class="fas fa-user-check"></i> <span id="confirmStatusChangeText">Confirm</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Generate Password Confirmation Modal -->
+<div id="generatePasswordModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Generate Random Password</h3>
+            <button class="modal-close" onclick="closeGeneratePasswordModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>This will generate a new secure random password and immediately update your account.</p>
+            <p class="text-warning"><strong>Warning:</strong> Your current password will be replaced. Make sure to save the new password when it's displayed.</p>
+        </div>
+        <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeGeneratePasswordModal()">Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="confirmGeneratePassword()">
+                <i class="fas fa-random"></i> Generate Password
             </button>
         </div>
     </div>
