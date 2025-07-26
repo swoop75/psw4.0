@@ -796,11 +796,16 @@ class UserManagementController {
      */
     public function editUser($data) {
         try {
+            // Debug logging
+            Logger::info('EditUser called with data: ' . json_encode($data));
+            
             $userId = (int) ($data['user_id'] ?? 0);
             $fullName = Security::sanitizeInput($data['full_name'] ?? '');
             $email = Security::sanitizeInput($data['email'] ?? '');
             $roleId = (int) ($data['role_id'] ?? 2);
             $active = isset($data['active']) ? 1 : 0;
+            
+            Logger::info("Parsed values - UserID: $userId, Email: $email, RoleID: $roleId, Active: $active");
             
             if (!$userId) {
                 throw new Exception('Invalid user ID');

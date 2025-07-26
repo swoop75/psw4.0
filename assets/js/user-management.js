@@ -674,6 +674,7 @@ function submitEditUserForm(form) {
     })
     .then(data => {
         console.log('Response data:', data);
+        alert('Server response: ' + JSON.stringify(data));
         if (data.success) {
             showNotification('User updated successfully', 'success');
             closeEditUserModal();
@@ -682,11 +683,13 @@ function submitEditUserForm(form) {
                 window.location.reload();
             }, 1000);
         } else {
+            alert('Update failed: ' + (data.message || 'Unknown error'));
             showNotification(data.message || 'Failed to update user', 'error');
         }
     })
     .catch(error => {
         console.error('Error:', error);
+        alert('AJAX Error: ' + error.message);
         showNotification('An error occurred while updating user', 'error');
     })
     .finally(() => {
