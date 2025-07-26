@@ -122,7 +122,27 @@ body .user-management-container {
 .user-role {
     font-size: 0.9rem;
     opacity: 0.9;
+    color: white !important;
+    font-style: italic;
+    font-weight: 300;
+}
+
+/* Current user display in header */
+.current-user-display {
+    margin-top: 0.5rem;
+    font-size: 1rem;
+}
+
+.user-name-main {
     color: white;
+    font-weight: 600;
+}
+
+.user-role-main {
+    color: white !important;
+    font-style: italic;
+    font-weight: 300;
+    opacity: 0.9;
 }
 
 /* Statistics Grid - EXACT COPY from Masterlist */
