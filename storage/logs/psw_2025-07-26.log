@@ -211,3 +211,7 @@
 {"timestamp":"2025-07-26 17:40:10","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"Parsed values - UserID: 2, Email: simple_wind@hotmail.com, RoleID: 1, Active: 1"}
 {"timestamp":"2025-07-26 17:40:10","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"User action: user_edited","context":{"action":"user_edited","details":"User ruifang was edited by admin","user_id":1}}
 {"timestamp":"2025-07-26 17:40:10","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"AJAX edit user result: {\"success\":true,\"message\":\"User updated successfully\"}"}
+{"timestamp":"2025-07-26 17:44:02","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"EditUser called with data: {\"csrf_token\":\"0397ca38263bafeb5be8d98d46a0fdd8b50d0f9fa74cac5dc1c8c68c004f0244\",\"action\":\"edit_user\",\"user_id\":\"2\",\"full_name\":\"\",\"email\":\"simple_wind@hotmail.com\",\"role_id\":\"2\",\"active\":\"1\",\"ajax_request\":\"1\"}"}
+{"timestamp":"2025-07-26 17:44:02","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"Parsed values - UserID: 2, Email: simple_wind@hotmail.com, RoleID: 2, Active: 1"}
+{"timestamp":"2025-07-26 17:44:02","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"User action: user_edited","context":{"action":"user_edited","details":"User ruifang was edited by admin","user_id":1}}
+{"timestamp":"2025-07-26 17:44:02","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"AJAX edit user result: {\"success\":true,\"message\":\"User updated successfully\"}"}
