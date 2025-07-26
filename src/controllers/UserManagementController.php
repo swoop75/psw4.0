@@ -821,10 +821,26 @@ class UserManagementController {
                 throw new Exception('Invalid role selected');
             }
             
-            // Get current user to check if we're trying to deactivate ourselves
+            // Get current user to check for self-modifications
             $currentUserId = Auth::getUserId();
+            
+            // Prevent deactivating own account
             if ($userId == $currentUserId && !$active) {
                 throw new Exception('You cannot deactivate your own account');
+            }
+            
+            // Prevent changing role if this is the last administrator
+            if ($roleId != 1) { // If changing FROM admin TO user
+                $sql = "SELECT COUNT(*) as admin_count FROM users WHERE role_id = 1 AND active = 1";
+                $stmt = $this->foundationDb->prepare($sql);
+                $stmt->execute();
+                $adminCount = $stmt->fetch()['admin_count'];
+                
+                // Get current user's role
+                $currentUser = $this->getUserById($userId);
+                if ($currentUser['role_id'] == 1 && $adminCount <= 1) {
+                    throw new Exception('Cannot remove the last administrator role');
+                }
             }
             
             // Update user data

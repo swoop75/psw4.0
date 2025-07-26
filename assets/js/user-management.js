@@ -430,7 +430,6 @@ function getActivityIcon(actionType) {
 function editUser(userId) {
     try {
         console.log('editUser called with userId:', userId);
-        alert('Edit user clicked for ID: ' + userId);
         
         // Get user data from the table row
         const userRow = document.querySelector(`[data-user-id="${userId}"]`);

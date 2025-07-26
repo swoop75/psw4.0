@@ -16,7 +16,7 @@
 .dashboard-header {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
-    padding: var(--space-12) var(--space-8);
+    padding: var(--space-6) var(--space-8);
     border-radius: var(--radius-2xl);
     margin-bottom: var(--space-8);
     position: relative;
@@ -40,18 +40,18 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--space-3);
+    margin-bottom: var(--space-2);
     position: relative;
     z-index: 1;
 }
 
 .dashboard-header h1 {
-    font-size: var(--text-4xl);
+    font-size: var(--text-3xl);
     font-weight: var(--font-bold);
     margin: 0;
     display: flex;
     align-items: center;
-    gap: var(--space-4);
+    gap: var(--space-3);
     color: white;
 }
 

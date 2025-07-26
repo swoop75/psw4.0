@@ -134,16 +134,28 @@ body .user-management-container {
 }
 
 .user-name-main {
-    color: white;
+    color: white !important;
     font-weight: 600;
 }
 
-.current-user-display .user-role-main,
-.page-header .user-role-main {
+/* Override any global styles that might affect role color */
+span.user-role-main {
     color: white !important;
     font-style: italic !important;
     font-weight: 300 !important;
     opacity: 1 !important;
+}
+
+.current-user-display .user-role-main,
+.page-header .user-role-main,
+.header-content .current-user-display .user-role-main,
+.user-management-container .current-user-display .user-role-main,
+.dashboard-header .current-user-display .user-role-main {
+    color: white !important;
+    font-style: italic !important;
+    font-weight: 300 !important;
+    opacity: 1 !important;
+    text-shadow: none !important;
 }
 
 /* Statistics Grid - EXACT COPY from Masterlist */
@@ -686,6 +698,18 @@ body .user-management-container {
 .form-control[readonly] {
     background: #f7fafc;
     color: #718096;
+}
+
+/* Ensure role select is properly styled and enabled */
+#edit_role.form-control {
+    background: white !important;
+    color: #2d3748 !important;
+    cursor: pointer !important;
+}
+
+#edit_role.form-control:focus {
+    border-color: #4299e1 !important;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1) !important;
 }
 
 .form-help {
