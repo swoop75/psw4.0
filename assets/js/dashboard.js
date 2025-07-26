@@ -344,30 +344,16 @@ function hideLoadingIndicator() {
 }
 
 /**
- * Update last refresh time
+ * Update last refresh time - DISABLED
  */
 function updateLastRefreshTime() {
-    const now = new Date();
-    const timeString = now.toLocaleTimeString('sv-SE', { 
-        hour: '2-digit', 
-        minute: '2-digit' 
-    });
-    
-    // Add or update refresh time indicator
-    let indicator = document.getElementById('lastRefresh');
-    if (!indicator) {
-        indicator = document.createElement('div');
-        indicator.id = 'lastRefresh';
-        indicator.className = 'text-muted small text-right';
-        indicator.style.marginTop = '10px';
-        
-        const header = document.querySelector('.dashboard-header');
-        if (header) {
-            header.appendChild(indicator);
-        }
+    // This function is disabled to remove the grey timestamp
+    // Also remove any existing timestamp element
+    const indicator = document.getElementById('lastRefresh');
+    if (indicator) {
+        indicator.remove();
     }
-    
-    indicator.innerHTML = `<i class="fas fa-clock"></i> Last updated: ${timeString}`;
+    return;
 }
 
 /**

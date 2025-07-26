@@ -588,6 +588,18 @@ function showEditUserModal(userId, userData) {
                 submitEditUserForm(this);
             });
             console.log('Form event listener added');
+            
+            // Force enable the role dropdown
+            const roleSelect = document.getElementById('edit_role');
+            if (roleSelect) {
+                roleSelect.disabled = false;
+                roleSelect.removeAttribute('disabled');
+                roleSelect.style.opacity = '1';
+                roleSelect.style.pointerEvents = 'auto';
+                roleSelect.style.backgroundColor = 'white';
+                roleSelect.style.color = '#2d3748';
+                console.log('Role select forced enabled');
+            }
         } else {
             console.error('Form not found after modal creation');
         }
