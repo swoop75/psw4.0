@@ -537,7 +537,7 @@ function showEditUserModal(userId, userData) {
                     </div>
                     <div class="modal-body">
                         <form id="editUserForm">
-                            <input type="hidden" name="csrf_token" value="${getCSRFToken()}">
+                            <input type="hidden" name="csrf_token" value="${getCSRFToken()}" id="edit_csrf_token">
                             <input type="hidden" name="action" value="edit_user">
                             <input type="hidden" name="user_id" value="${userId}">
                             
@@ -652,6 +652,11 @@ function submitEditUserForm(form) {
     
     // Force AJAX detection by adding a parameter
     formData.append('ajax_request', '1');
+    
+    // Ensure CSRF token is present and fresh
+    const csrfToken = getCSRFToken();
+    formData.set('csrf_token', csrfToken);
+    console.log('Using CSRF token:', csrfToken);
     
     // Log form data for debugging
     console.log('Form data:');
@@ -786,8 +791,18 @@ function showNotification(message, type = 'info') {
  * @returns {string} CSRF token
  */
 function getCSRFToken() {
-    const tokenInput = document.querySelector('input[name="csrf_token"]');
-    return tokenInput ? tokenInput.value : '';
+    // Try to get from the edit form first
+    let tokenInput = document.querySelector('#edit_csrf_token');
+    if (tokenInput && tokenInput.value) {
+        console.log('Got CSRF token from edit form:', tokenInput.value);
+        return tokenInput.value;
+    }
+    
+    // Fallback to any CSRF token on the page
+    tokenInput = document.querySelector('input[name="csrf_token"]');
+    const token = tokenInput ? tokenInput.value : '';
+    console.log('Got CSRF token from page:', token);
+    return token;
 }
 
 /**
