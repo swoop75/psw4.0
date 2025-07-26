@@ -650,6 +650,9 @@ function submitEditUserForm(form) {
     const formData = new FormData(form);
     const submitButton = form.querySelector('button[type="submit"]');
     
+    // Force AJAX detection by adding a parameter
+    formData.append('ajax_request', '1');
+    
     // Log form data for debugging
     console.log('Form data:');
     let formDataStr = '';

@@ -128,7 +128,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $result = $controller->editUser($_POST);
                     Logger::info('EditUser result: ' . json_encode($result));
                     
-                    if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') {
+                    $isAjax = (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') 
+                           || (isset($_POST['ajax_request']) && $_POST['ajax_request'] === '1');
+                    
+                    if ($isAjax) {
                         Logger::info('Returning JSON response');
                         header('Content-Type: application/json');
                         echo json_encode($result);
