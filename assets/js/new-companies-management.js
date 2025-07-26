@@ -8,6 +8,7 @@
 let deleteEntryId = '';
 let deleteMasterlistId = '';
 let searchTimeout;
+let isinCheckTimeout;
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
@@ -195,6 +196,24 @@ function showAddModal() {
     // Reset form
     if (form) form.reset();
     
+    // Reset ISIN validation state
+    const isinField = document.getElementById('isin');
+    const isinHelp = document.getElementById('isinHelp');
+    const submitBtn = document.querySelector('button[type="submit"]');
+    
+    if (isinField) {
+        isinField.style.borderColor = '';
+        isinField.style.backgroundColor = '';
+    }
+    if (isinHelp) {
+        isinHelp.textContent = 'International Securities Identification Number';
+        isinHelp.style.color = '';
+    }
+    if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = '1';
+    }
+    
     // Set modal for create mode
     if (modalTitle) modalTitle.textContent = 'Add New Company';
     if (modalAction) modalAction.value = 'add';
@@ -369,6 +388,17 @@ function handleEntryFormSubmit(event) {
             if (element) element.focus();
             isValid = false;
             break;
+        }
+    }
+    
+    // Check for duplicate ISIN if this is a new entry (not an edit)
+    if (isValid && action === 'create') {
+        const isinField = document.getElementById('isin');
+        if (isinField && isinField.value && isinField.style.borderColor === '#dc3545') {
+            // ISIN field has error styling (duplicate detected)
+            showAlert('This ISIN is already in the new companies list', 'error');
+            isinField.focus();
+            isValid = false;
         }
     }
     
@@ -1219,6 +1249,94 @@ function toggleBorsdataFields() {
         if (countryField) countryField.classList.remove('borsdata-auto-field');
         if (yieldField) yieldField.classList.remove('borsdata-auto-field');
     }
+}
+
+/**
+ * Debounce ISIN checking to avoid too many API calls
+ */
+function debounceISINCheck() {
+    clearTimeout(isinCheckTimeout);
+    isinCheckTimeout = setTimeout(checkISINDuplicate, 500); // Wait 500ms after user stops typing
+}
+
+/**
+ * Check if ISIN already exists in real-time
+ */
+function checkISINDuplicate() {
+    const isinField = document.getElementById('isin');
+    const isinHelp = document.getElementById('isinHelp');
+    
+    if (!isinField.value || isinField.value.length < 8) {
+        // Reset to default state
+        isinField.style.borderColor = '';
+        isinField.style.backgroundColor = '';
+        isinHelp.textContent = 'International Securities Identification Number';
+        isinHelp.style.color = '';
+        return;
+    }
+    
+    // Show checking state
+    isinHelp.textContent = 'Checking for duplicates...';
+    isinHelp.style.color = '#6c757d';
+    
+    // Make AJAX request to check for duplicates
+    const formData = new FormData();
+    formData.append('action', 'check_isin_duplicate');
+    formData.append('isin', isinField.value);
+    formData.append('csrf_token', document.querySelector('input[name="csrf_token"]').value);
+    
+    fetch(window.location.href, {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (data.exists) {
+                // ISIN already exists - show error
+                isinField.style.borderColor = '#dc3545';
+                isinField.style.backgroundColor = '#ffeaea';
+                isinHelp.textContent = '⚠️ ' + data.message;
+                isinHelp.style.color = '#dc3545';
+                
+                // Disable the Add button
+                const submitBtn = document.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.style.opacity = '0.6';
+                }
+            } else {
+                // ISIN is available - show success
+                isinField.style.borderColor = '#28a745';
+                isinField.style.backgroundColor = '#eafaf1';
+                isinHelp.textContent = '✓ ISIN is available';
+                isinHelp.style.color = '#28a745';
+                
+                // Re-enable the Add button
+                const submitBtn = document.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '1';
+                }
+            }
+        } else {
+            // Error state
+            isinField.style.borderColor = '#ffc107';
+            isinField.style.backgroundColor = '#fffbf0';
+            isinHelp.textContent = 'Error checking ISIN';
+            isinHelp.style.color = '#ffc107';
+        }
+    })
+    .catch(error => {
+        console.error('ISIN check error:', error);
+        isinField.style.borderColor = '';
+        isinField.style.backgroundColor = '';
+        isinHelp.textContent = 'Error checking ISIN - please try again';
+        isinHelp.style.color = '#dc3545';
+    });
 }
 
 /**
