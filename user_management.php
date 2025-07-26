@@ -223,9 +223,6 @@ ob_start();
                 <i class="fas fa-user-cog"></i>
                 <?php if ($editUserId): ?>
                     User Profile: <?php echo htmlspecialchars($user['username'] ?? 'Unknown'); ?>
-                    <a href="user_management.php" class="btn btn-secondary btn-sm" style="margin-left: 20px;">
-                        <i class="fas fa-arrow-left"></i> Back to All Users
-                    </a>
                 <?php else: ?>
                     User Management
                 <?php endif; ?>
@@ -239,6 +236,11 @@ ob_start();
                     <div class="user-role"><?php echo htmlspecialchars($user['role_name'] ?? 'User'); ?></div>
                 </div>
             </div>
+            <?php if ($editUserId): ?>
+                <a href="user_management.php" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-arrow-left"></i> Back to All Users
+                </a>
+            <?php endif; ?>
         </div>
     </div>
 
