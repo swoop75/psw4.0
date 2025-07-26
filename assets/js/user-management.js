@@ -662,8 +662,8 @@ function submitEditUserForm(form) {
     }
     alert('Form data being sent:\n' + formDataStr);
     
-    // Test: Try a simple AJAX request first
-    const testUrl = 'user_management.php';
+    // Use dedicated AJAX endpoint
+    const testUrl = 'ajax_user_edit.php';
     alert('About to send AJAX request to: ' + testUrl);
     
     // Show loading state
