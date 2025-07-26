@@ -645,20 +645,29 @@ function closeEditUserModal() {
  */
 function submitEditUserForm(form) {
     console.log('submitEditUserForm called');
+    alert('Form submission started');
+    
     const formData = new FormData(form);
     const submitButton = form.querySelector('button[type="submit"]');
     
     // Log form data for debugging
     console.log('Form data:');
+    let formDataStr = '';
     for (let [key, value] of formData.entries()) {
         console.log(key, value);
+        formDataStr += key + ': ' + value + '\n';
     }
+    alert('Form data being sent:\n' + formDataStr);
+    
+    // Test: Try a simple AJAX request first
+    const testUrl = 'user_management.php';
+    alert('About to send AJAX request to: ' + testUrl);
     
     // Show loading state
     submitButton.disabled = true;
     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
     
-    fetch('user_management.php', {
+    fetch(testUrl, {
         method: 'POST',
         headers: {
             'X-Requested-With': 'XMLHttpRequest',
