@@ -9,10 +9,10 @@
     max-width: 1400px;
     margin: 0 auto;
     padding: var(--space-6);
-    min-height: calc(100vh - 64px);
+    min-height: calc(100vh - 120px);
     position: relative;
     z-index: 1;
-    margin-top: 80px; /* Add space for top bar */
+    margin-top: 120px; /* Add space for top bar (80px + padding) */
 }
 
 /* Dashboard Header */
