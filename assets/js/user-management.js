@@ -647,42 +647,47 @@ function submitEditUserForm(form) {
     console.log('submitEditUserForm called');
     alert('Form submission started');
     
-    const formData = new FormData(form);
     const submitButton = form.querySelector('button[type="submit"]');
-    
-    // Force AJAX detection by adding a parameter
-    formData.append('ajax_request', '1');
-    
-    // Ensure CSRF token is present and fresh
-    const csrfToken = getCSRFToken();
-    formData.set('csrf_token', csrfToken);
-    console.log('Using CSRF token:', csrfToken);
-    
-    // Log form data for debugging
-    console.log('Form data:');
-    let formDataStr = '';
-    for (let [key, value] of formData.entries()) {
-        console.log(key, value);
-        formDataStr += key + ': ' + value + '\n';
-    }
-    alert('Form data being sent:\n' + formDataStr);
-    
-    // Use dedicated AJAX endpoint
-    const testUrl = 'ajax_user_edit.php';
-    alert('About to send AJAX request to: ' + testUrl);
     
     // Show loading state
     submitButton.disabled = true;
-    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting token...';
     
-    fetch(testUrl, {
-        method: 'POST',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json'
-        },
-        body: formData
-    })
+    // First, get a fresh CSRF token
+    fetch('get_csrf_token.php')
+        .then(response => response.json())
+        .then(tokenData => {
+            console.log('Fresh CSRF token received:', tokenData.csrf_token);
+            
+            // Now prepare the form data with fresh token
+            const formData = new FormData(form);
+            formData.set('csrf_token', tokenData.csrf_token);
+            formData.append('ajax_request', '1');
+    
+            // Log form data for debugging
+            console.log('Form data:');
+            let formDataStr = '';
+            for (let [key, value] of formData.entries()) {
+                console.log(key, value);
+                formDataStr += key + ': ' + value + '\n';
+            }
+            alert('Form data being sent with fresh token:\n' + formDataStr);
+            
+            // Use dedicated AJAX endpoint
+            const testUrl = 'ajax_user_edit.php';
+            
+            // Update loading state
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            
+            return fetch(testUrl, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                body: formData
+            });
+        })
     .then(response => {
         console.log('Response status:', response.status);
         if (!response.ok) {
