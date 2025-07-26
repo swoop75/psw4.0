@@ -941,4 +941,210 @@ class UserManagementController {
             ];
         }
     }
+    
+    /**
+     * Get user profile by ID (Admin only - for individual user pages)
+     * @param int $userId User ID
+     * @return array User profile data
+     */
+    public function getUserProfileById($userId) {
+        try {
+            $userId = (int) $userId;
+            
+            // Get user basic data
+            $user = $this->getUserById($userId);
+            if (!$user) {
+                throw new Exception('User not found');
+            }
+            
+            // Get user preferences
+            $preferences = $this->getUserPreferences($userId);
+            
+            // Get user statistics
+            $stats = [
+                'account_age_days' => $this->getAccountAgeDays($userId),
+                'login_count' => $this->getLoginCount($userId)
+            ];
+            
+            // Get user activity log
+            $activityLog = $this->getUserActivityLog($userId);
+            
+            return [
+                'user' => $user,
+                'preferences' => $preferences,
+                'profile_stats' => $stats,
+                'activity_log' => $activityLog
+            ];
+            
+        } catch (Exception $e) {
+            Logger::error('Get user profile by ID error: ' . $e->getMessage());
+            return [
+                'user' => [],
+                'preferences' => [],
+                'profile_stats' => [],
+                'activity_log' => []
+            ];
+        }
+    }
+    
+    /**
+     * Get system-wide activity log (Admin only)
+     * @return array System activity log
+     */
+    public function getSystemActivityLog() {
+        try {
+            $activities = [];
+            
+            // Try to get from activity_logs table first
+            try {
+                $sql = "SELECT al.*, u.username 
+                        FROM activity_logs al 
+                        LEFT JOIN users u ON al.user_id = u.user_id 
+                        ORDER BY al.created_at DESC 
+                        LIMIT 50";
+                        
+                $stmt = $this->foundationDb->prepare($sql);
+                $stmt->execute();
+                $activities = $stmt->fetchAll();
+                
+            } catch (Exception $e) {
+                // Table might not exist, try parsing log files
+                $activities = $this->parseSystemLogFiles();
+            }
+            
+            // If no activities found, create some default entries
+            if (empty($activities)) {
+                $activities = $this->getDefaultSystemActivities();
+            }
+            
+            return $activities;
+            
+        } catch (Exception $e) {
+            Logger::error('Get system activity log error: ' . $e->getMessage());
+            return [];
+        }
+    }
+    
+    /**
+     * Parse system log files for activity
+     * @return array Activity entries
+     */
+    private function parseSystemLogFiles() {
+        $activities = [];
+        $logDir = __DIR__ . '/../../logs';
+        
+        if (is_dir($logDir)) {
+            $logFiles = glob($logDir . '/psw_*.log');
+            rsort($logFiles); // Most recent first
+            
+            foreach (array_slice($logFiles, 0, 3) as $logFile) { // Only check last 3 log files
+                $fileActivities = $this->parseSystemLogFile($logFile);
+                $activities = array_merge($activities, $fileActivities);
+                
+                if (count($activities) >= 20) {
+                    break; // Limit to 20 activities
+                }
+            }
+        }
+        
+        return array_slice($activities, 0, 20);
+    }
+    
+    /**
+     * Parse individual system log file
+     * @param string $logFile Log file path
+     * @return array Activity entries
+     */
+    private function parseSystemLogFile($logFile) {
+        $activities = [];
+        
+        try {
+            $lines = file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            
+            foreach ($lines as $line) {
+                $logEntry = json_decode($line, true);
+                
+                if ($logEntry && isset($logEntry['context']['action'])) {
+                    $activities[] = [
+                        'action_type' => $logEntry['context']['action'],
+                        'description' => $logEntry['context']['details'] ?? $logEntry['message'],
+                        'created_at' => $logEntry['timestamp'],
+                        'username' => $logEntry['context']['username'] ?? 'System'
+                    ];
+                }
+            }
+        } catch (Exception $e) {
+            // Continue silently if file can't be read
+        }
+        
+        return $activities;
+    }
+    
+    /**
+     * Get default system activities when no logs are available
+     * @return array Default activity entries
+     */
+    private function getDefaultSystemActivities() {
+        return [
+            [
+                'action_type' => 'system_start',
+                'description' => 'PSW system initialized',
+                'created_at' => date('Y-m-d H:i:s'),
+                'username' => 'System'
+            ]
+        ];
+    }
+    
+    /**
+     * Get system statistics (Admin only)
+     * @return array System statistics
+     */
+    public function getSystemStatistics() {
+        try {
+            $stats = [];
+            
+            // Total users
+            $stmt = $this->foundationDb->prepare("SELECT COUNT(*) as total FROM users");
+            $stmt->execute();
+            $stats['total_users'] = $stmt->fetchColumn();
+            
+            // Total logins (if user_stats table exists)
+            try {
+                $stmt = $this->foundationDb->prepare("SELECT SUM(login_count) as total FROM user_stats");
+                $stmt->execute();
+                $stats['total_logins'] = $stmt->fetchColumn() ?: 0;
+            } catch (Exception $e) {
+                $stats['total_logins'] = 0;
+            }
+            
+            // Most active user
+            try {
+                $stmt = $this->foundationDb->prepare("
+                    SELECT u.username 
+                    FROM users u 
+                    LEFT JOIN user_stats us ON u.user_id = us.user_id 
+                    ORDER BY us.login_count DESC 
+                    LIMIT 1
+                ");
+                $stmt->execute();
+                $stats['most_active_user'] = $stmt->fetchColumn() ?: 'N/A';
+            } catch (Exception $e) {
+                $stats['most_active_user'] = 'N/A';
+            }
+            
+            // Average session time (placeholder)
+            $stats['avg_session_time'] = 45;
+            
+            return $stats;
+            
+        } catch (Exception $e) {
+            Logger::error('Get system statistics error: ' . $e->getMessage());
+            return [
+                'total_users' => 0,
+                'total_logins' => 0,
+                'most_active_user' => 'N/A',
+                'avg_session_time' => 0
+            ];
+        }
+    }
 }
