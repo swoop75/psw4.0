@@ -862,31 +862,29 @@ function confirmGeneratePassword() {
     confirmBtn.disabled = true;
     confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
     
-    // Create form data
-    const formData = new FormData();
-    formData.append('action', 'generate_password');
-    formData.append('csrf_token', getCSRFToken());
+    // Create and submit form directly (not AJAX)
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'user_management.php';
     
-    // Submit request
-    fetch('user_management.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.text())
-    .then(data => {
-        // Reload the page to show the new password
-        window.location.reload();
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showNotification('An error occurred while generating password', 'error');
-    })
-    .finally(() => {
-        // Reset button state
-        confirmBtn.disabled = false;
-        confirmBtn.innerHTML = originalContent;
-        closeGeneratePasswordModal();
-    });
+    const actionInput = document.createElement('input');
+    actionInput.type = 'hidden';
+    actionInput.name = 'action';
+    actionInput.value = 'generate_password';
+    form.appendChild(actionInput);
+    
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrf_token';
+    csrfInput.value = getCSRFToken();
+    form.appendChild(csrfInput);
+    
+    // Add form to page and submit
+    document.body.appendChild(form);
+    form.submit();
+    
+    // Note: The page will reload automatically with the form submission,
+    // so we don't need to reset the button state
 }
 
 // Export functions for global access
