@@ -119,12 +119,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $error = 'Unauthorized access.';
                         break;
                     }
+                    
+                    // Debug logging
+                    Logger::info('Edit user request received');
+                    Logger::info('HTTP_X_REQUESTED_WITH: ' . ($_SERVER['HTTP_X_REQUESTED_WITH'] ?? 'not set'));
+                    Logger::info('POST data: ' . json_encode($_POST));
+                    
                     $result = $controller->editUser($_POST);
+                    Logger::info('EditUser result: ' . json_encode($result));
+                    
                     if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') {
+                        Logger::info('Returning JSON response');
                         header('Content-Type: application/json');
                         echo json_encode($result);
                         exit;
                     }
+                    Logger::info('Not an AJAX request, continuing with HTML response');
                     if ($result['success']) {
                         $success = 'User updated successfully!';
                         $activeTab = 'users';

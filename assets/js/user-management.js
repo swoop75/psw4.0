@@ -661,7 +661,8 @@ function submitEditUserForm(form) {
     fetch('user_management.php', {
         method: 'POST',
         headers: {
-            'X-Requested-With': 'XMLHttpRequest'
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
         },
         body: formData
     })
