@@ -7,15 +7,6 @@
 // Test if JavaScript is loading
 document.addEventListener('DOMContentLoaded', function() {
     console.log('User management JavaScript loaded');
-    alert('User management JavaScript is working!');
-    
-    // Also check if we're on the All Users page
-    const userTable = document.querySelector('.users-table');
-    if (userTable) {
-        alert('Found users table - you are on All Users page');
-    } else {
-        alert('No users table found - you might be on individual user page');
-    }
 });
 
 // Admin view management (All Users, Activity Log, Statistics)
@@ -444,7 +435,6 @@ function getActivityIcon(actionType) {
 function editUser(userId) {
     try {
         console.log('editUser called with userId:', userId);
-        alert('Edit button clicked! Opening modal for user ID: ' + userId);
         
         // Get user data from the table row
         const userRow = document.querySelector(`[data-user-id="${userId}"]`);
@@ -525,7 +515,6 @@ function toggleUserStatus(userId, newStatus) {
 function showEditUserModal(userId, userData) {
     try {
         console.log('showEditUserModal called with:', userId, userData);
-        alert('Creating modal for user: ' + userData.username);
         
         // Create modal HTML
         const modalHTML = `
@@ -645,7 +634,6 @@ function closeEditUserModal() {
  */
 function submitEditUserForm(form) {
     console.log('submitEditUserForm called');
-    alert('Form submission started');
     
     const submitButton = form.querySelector('button[type="submit"]');
     
@@ -671,7 +659,7 @@ function submitEditUserForm(form) {
                 console.log(key, value);
                 formDataStr += key + ': ' + value + '\n';
             }
-            alert('Form data being sent with fresh token:\n' + formDataStr);
+            console.log('Form data being sent with fresh token:', formDataStr);
             
             // Use dedicated AJAX endpoint
             const testUrl = 'ajax_user_edit.php';
@@ -694,21 +682,10 @@ function submitEditUserForm(form) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        // Get the response as text first to see what we're getting
-        return response.text().then(text => {
-            console.log('Raw response:', text);
-            alert('Raw server response: ' + text.substring(0, 500) + '...');
-            
-            try {
-                return JSON.parse(text);
-            } catch (e) {
-                throw new Error('Server returned invalid JSON. Response was: ' + text.substring(0, 200));
-            }
-        });
+        return response.json();
     })
     .then(data => {
         console.log('Response data:', data);
-        alert('Server response: ' + JSON.stringify(data));
         if (data.success) {
             showNotification('User updated successfully', 'success');
             closeEditUserModal();
@@ -717,13 +694,11 @@ function submitEditUserForm(form) {
                 window.location.reload();
             }, 1000);
         } else {
-            alert('Update failed: ' + (data.message || 'Unknown error'));
             showNotification(data.message || 'Failed to update user', 'error');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('AJAX Error: ' + error.message);
         showNotification('An error occurred while updating user', 'error');
     })
     .finally(() => {
