@@ -97,6 +97,20 @@ body .user-management-container {
     backdrop-filter: blur(10px);
 }
 
+/* Header user info styles */
+.page-header .user-name {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: white !important;
+}
+
+.page-header .user-role {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    color: white !important;
+}
+
+/* Generic user name styles */
 .user-name {
     font-weight: 600;
     font-size: 1.1rem;
@@ -106,6 +120,7 @@ body .user-management-container {
 .user-role {
     font-size: 0.9rem;
     opacity: 0.9;
+    color: white;
 }
 
 /* Account Statistics - Beautiful Design */
@@ -455,7 +470,8 @@ body .user-management-container {
     gap: var(--space-1);
 }
 
-.user-name {
+/* Table user name - only apply when not in header */
+.users-table .user-name {
     font-weight: var(--font-semibold);
     color: var(--text-primary);
     font-size: var(--text-base);

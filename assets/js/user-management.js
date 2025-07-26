@@ -388,11 +388,20 @@ function editUser(userId) {
         return;
     }
     
-    const username = userRow.querySelector('.username').textContent;
-    const fullName = userRow.querySelector('.full-name').textContent;
-    const email = userRow.cells[1].textContent;
-    const currentRole = userRow.querySelector('.role-badge').textContent.trim();
+    const username = userRow.querySelector('.username')?.textContent || '';
+    const fullName = userRow.querySelector('.full-name')?.textContent || '';
+    const email = userRow.cells[1]?.textContent?.trim() || '';
+    const currentRole = userRow.querySelector('.role-badge')?.textContent?.trim() || '';
     const isActive = userRow.querySelector('.status-active');
+    
+    console.log('User data extracted:', {
+        userId: userId,
+        username: username,
+        fullName: fullName,
+        email: email,
+        role: currentRole,
+        active: !!isActive
+    });
     
     showEditUserModal(userId, {
         username: username,
@@ -465,6 +474,8 @@ function toggleUserStatus(userId, newStatus) {
  * @param {object} userData User data
  */
 function showEditUserModal(userId, userData) {
+    console.log('Creating edit modal for user:', userId, userData);
+    
     // Create modal HTML
     const modalHTML = `
         <div id="editUserModal" class="modal show">
@@ -531,11 +542,20 @@ function showEditUserModal(userId, userData) {
     // Add modal to page
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     
+    console.log('Modal added to page');
+    
     // Add form submit handler
-    document.getElementById('editUserForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        submitEditUserForm(this);
-    });
+    const form = document.getElementById('editUserForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('Form submitted');
+            submitEditUserForm(this);
+        });
+        console.log('Form event listener added');
+    } else {
+        console.error('Form not found after modal creation');
+    }
 }
 
 /**
@@ -557,16 +577,28 @@ function submitEditUserForm(form) {
     const formData = new FormData(form);
     const submitButton = form.querySelector('button[type="submit"]');
     
+    console.log('Submitting form data:', Object.fromEntries(formData));
+    
     // Show loading state
     submitButton.disabled = true;
     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
     
     fetch('user_management.php', {
         method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
         body: formData
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
+        console.log('Response data:', data);
         if (data.success) {
             showNotification('User updated successfully', 'success');
             closeEditUserModal();
