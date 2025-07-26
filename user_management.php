@@ -267,15 +267,6 @@ ob_start();
             </div>
         </div>
         <div class="header-info">
-            <div class="user-badge">
-                <i class="fas fa-user-circle"></i>
-                <div>
-                    <div class="user-name">
-                        <?php echo htmlspecialchars($user['username'] ?? 'Unknown'); ?>, 
-                        <span class="user-role"><?php echo htmlspecialchars($user['role_name'] ?? 'User'); ?></span>
-                    </div>
-                </div>
-            </div>
             <?php if ($editUserId): ?>
                 <a href="user_management.php" class="btn btn-secondary btn-sm">
                     <i class="fas fa-arrow-left"></i> Back to All Users

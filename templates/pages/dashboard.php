@@ -25,7 +25,7 @@ $quickStats = $dashboardData['quick_stats'];
             </span>
         </div>
         <p class="dashboard-subtitle">
-            Welcome back, <?php echo Auth::getUsername(); ?>! Here's your portfolio overview.
+            Welcome back, <?php echo Auth::getUsername(); ?>! Here's portfolio overview.
         </p>
     </div>
 
