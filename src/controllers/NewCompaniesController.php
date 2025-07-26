@@ -842,5 +842,24 @@ class NewCompaniesController {
             return null;
         }
     }
+    
+    /**
+     * Check if an ISIN already exists in the new companies list
+     * @param string $isin ISIN to check
+     * @return bool True if ISIN exists, false otherwise
+     */
+    public function checkISINExists($isin) {
+        try {
+            $sql = "SELECT COUNT(*) FROM new_companies WHERE isin = :isin";
+            $stmt = $this->portfolioDb->prepare($sql);
+            $stmt->bindValue(':isin', $isin);
+            $stmt->execute();
+            
+            return $stmt->fetchColumn() > 0;
+        } catch (Exception $e) {
+            Logger::error('Error checking ISIN existence: ' . $e->getMessage());
+            throw $e;
+        }
+    }
 }
 ?>

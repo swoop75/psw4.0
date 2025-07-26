@@ -117,6 +117,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WI
                 }
                 exit;
                 
+            case 'check_isin_duplicate':
+                $isin = trim($_POST['isin'] ?? '');
+                if (empty($isin)) {
+                    echo json_encode(['success' => false, 'message' => 'ISIN is required']);
+                    exit;
+                }
+                
+                try {
+                    // Check if ISIN already exists in new companies list
+                    $exists = $controller->checkISINExists($isin);
+                    echo json_encode([
+                        'success' => true, 
+                        'exists' => $exists,
+                        'message' => $exists ? 'This ISIN is already in the new companies list' : 'ISIN is available'
+                    ]);
+                } catch (Exception $e) {
+                    echo json_encode(['success' => false, 'message' => 'Error checking ISIN: ' . $e->getMessage()]);
+                }
+                exit;
+                
             case 'preview_borsdata':
                 $isin = $_POST['isin'] ?? '';
                 if (empty($isin)) {
@@ -682,7 +702,7 @@ ob_start();
                     <div class="form-row form-row-three">
                         <div class="form-group">
                             <label for="isin">ISIN <span id="isinRequired" style="display: none; color: red;">*</span></label>
-                            <input type="text" id="isin" name="isin" maxlength="12" placeholder="e.g., US88160R1014" onblur="previewBorsdataData()">
+                            <input type="text" id="isin" name="isin" maxlength="12" placeholder="e.g., US88160R1014" oninput="debounceISINCheck()" onblur="previewBorsdataData()">
                             <small class="form-help" id="isinHelp">International Securities Identification Number</small>
                         </div>
                         <div class="form-group">
