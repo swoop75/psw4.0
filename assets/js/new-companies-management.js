@@ -1255,6 +1255,7 @@ function toggleBorsdataFields() {
  * Debounce ISIN checking to avoid too many API calls
  */
 function debounceISINCheck() {
+    console.log('debounceISINCheck called'); // Debug
     clearTimeout(isinCheckTimeout);
     isinCheckTimeout = setTimeout(checkISINDuplicate, 500); // Wait 500ms after user stops typing
 }
@@ -1263,8 +1264,12 @@ function debounceISINCheck() {
  * Check if ISIN already exists in real-time
  */
 function checkISINDuplicate() {
+    console.log('checkISINDuplicate called'); // Debug
     const isinField = document.getElementById('isin');
     const isinHelp = document.getElementById('isinHelp');
+    
+    console.log('ISIN field value:', isinField ? isinField.value : 'not found'); // Debug
+    console.log('ISIN help element:', isinHelp ? 'found' : 'not found'); // Debug
     
     if (!isinField.value || isinField.value.length < 8) {
         // Reset to default state
@@ -1285,6 +1290,8 @@ function checkISINDuplicate() {
     formData.append('isin', isinField.value);
     formData.append('csrf_token', document.querySelector('input[name="csrf_token"]').value);
     
+    console.log('Sending ISIN check request for:', isinField.value); // Debug
+    
     fetch(window.location.href, {
         method: 'POST',
         headers: {
@@ -1294,6 +1301,7 @@ function checkISINDuplicate() {
     })
     .then(response => response.json())
     .then(data => {
+        console.log('ISIN check response:', data); // Debug
         if (data.success) {
             if (data.exists) {
                 // ISIN already exists - show error
