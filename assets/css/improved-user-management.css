@@ -123,7 +123,7 @@ body .user-management-container {
     color: white;
 }
 
-/* Statistics Grid - Match Masterlist Design */
+/* Statistics Grid - EXACT COPY from Masterlist */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -168,21 +168,17 @@ body .user-management-container {
     transform: scale(1.1) rotate(5deg);
 }
 
-.stat-content {
-    flex: 1;
-}
-
 .stat-number {
     font-size: 2.5rem;
     font-weight: 700;
     color: #1a202c;
-    margin-bottom: 4px;
 }
 
 .stat-label {
     font-size: 0.9rem;
     color: #718096;
     font-weight: 500;
+    margin-top: 8px;
 }
 
 /* Tabs Container - Beautiful Design */
@@ -542,85 +538,64 @@ body .user-management-container {
     justify-content: flex-end;
 }
 
-/* Enhanced Modal Styles */
+/* Base Modal Styles - EXACT COPY from Masterlist */
 .modal {
     display: none;
     position: fixed;
-    z-index: var(--z-modal);
+    z-index: 1000;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
-    opacity: 0;
-    transition: opacity var(--transition-normal);
-}
-
-.modal.show {
-    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
 }
 
 .modal-content {
-    background: var(--bg-primary);
-    margin: 3% auto;
+    background: white;
+    margin: 5% auto;
     padding: 0;
-    border-radius: var(--radius-2xl);
+    border-radius: 12px;
     width: 90%;
     max-width: 600px;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: var(--shadow-xl);
-    border: 1px solid var(--border-light);
-    transform: scale(0.9);
-    transition: transform var(--transition-normal);
-}
-
-.modal.show .modal-content {
-    transform: scale(1);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: var(--space-8) var(--space-8) var(--space-6);
-    border-bottom: 1px solid var(--border-light);
-    background: var(--bg-tertiary);
-    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+    padding: 24px 30px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #f8fafc;
 }
 
 .modal-header h3 {
-    font-size: var(--text-2xl);
-    font-weight: var(--font-semibold);
-    color: var(--text-primary);
-    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1a202c;
 }
 
 .modal-close {
     background: none;
     border: none;
-    font-size: var(--text-xl);
+    font-size: 24px;
     cursor: pointer;
-    color: var(--text-muted);
-    padding: var(--space-2);
-    border-radius: var(--radius-lg);
-    transition: all var(--transition-fast);
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    color: #718096;
+    padding: 4px;
+    border-radius: 4px;
+    transition: color 0.2s, background 0.2s;
 }
 
 .modal-close:hover {
-    color: var(--accent-red);
-    background: rgba(234, 67, 53, 0.1);
-    transform: scale(1.1);
+    color: #4a5568;
+    background: #e2e8f0;
 }
 
 .modal-body {
-    padding: var(--space-8);
+    padding: 30px;
 }
 
 /* Enhanced Form Styles - Beautiful Design */
@@ -1082,7 +1057,75 @@ body .user-management-container {
     transform: scale(1.1);
 }
 
-/* Status Change Modal Styles */
+/* Status Change Modal Styles - Match Masterlist Design */
+#statusChangeModal .modal-content {
+    max-width: 480px;
+    width: 90%;
+    margin: 15% auto;
+    border-radius: 16px;
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.15),
+        0 8px 16px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(255, 255, 255, 0.9);
+}
+
+#statusChangeModal .modal-header {
+    padding: 24px 24px 16px;
+    background: linear-gradient(135deg, #dc3545 0%, #c62d42 100%);
+    border-radius: 16px 16px 0 0;
+    border-bottom: none;
+}
+
+#statusChangeModal .modal-header h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+#statusChangeModal .modal-close {
+    color: white;
+    opacity: 0.8;
+    font-size: 20px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+#statusChangeModal .modal-close:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+#statusChangeModal .modal-body {
+    padding: 24px;
+    text-align: center;
+    color: #1a202c;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+#statusChangeModal .modal-body p {
+    margin: 0 0 12px 0;
+}
+
+#statusChangeModal .modal-body strong {
+    color: #00C896;
+    font-weight: 600;
+}
+
+#statusChangeModal .form-actions {
+    padding: 16px 24px 24px;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    border-top: none;
+}
+
 .text-warning {
     color: #d97706;
     font-size: 0.9rem;

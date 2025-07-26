@@ -381,27 +381,37 @@ function getActivityIcon(actionType) {
  * @param {number} userId User ID to edit
  */
 function editUser(userId) {
-    // Get user data from the table row
-    const userRow = document.querySelector(`[data-user-id="${userId}"]`);
-    
-    if (!userRow) {
-        alert('User not found');
-        return;
+    try {
+        // Get user data from the table row
+        const userRow = document.querySelector(`[data-user-id="${userId}"]`);
+        
+        if (!userRow) {
+            console.error('User row not found for ID:', userId);
+            alert('User not found');
+            return;
+        }
+        
+        const username = userRow.querySelector('.username')?.textContent || '';
+        const fullName = userRow.querySelector('.full-name')?.textContent || '';
+        const email = userRow.cells[1]?.textContent?.trim() || '';
+        const currentRole = userRow.querySelector('.role-badge')?.textContent?.trim() || '';
+        const isActive = userRow.querySelector('.status-active');
+        
+        const userData = {
+            username: username,
+            fullName: fullName,
+            email: email,
+            role: currentRole,
+            active: !!isActive
+        };
+        
+        console.log('User data extracted:', userData);
+        
+        showEditUserModal(userId, userData);
+    } catch (error) {
+        console.error('Error in editUser function:', error);
+        alert('An error occurred while opening the edit dialog');
     }
-    
-    const username = userRow.querySelector('.username')?.textContent || '';
-    const fullName = userRow.querySelector('.full-name')?.textContent || '';
-    const email = userRow.cells[1]?.textContent?.trim() || '';
-    const currentRole = userRow.querySelector('.role-badge')?.textContent?.trim() || '';
-    const isActive = userRow.querySelector('.status-active');
-    
-    showEditUserModal(userId, {
-        username: username,
-        fullName: fullName,
-        email: email,
-        role: currentRole,
-        active: !!isActive
-    });
 }
 
 // Global variables for status change modal
@@ -441,79 +451,93 @@ function toggleUserStatus(userId, newStatus) {
  * @param {object} userData User data
  */
 function showEditUserModal(userId, userData) {
-    // Create modal HTML
-    const modalHTML = `
-        <div id="editUserModal" class="modal show">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Edit User: ${userData.username}</h3>
-                    <button type="button" class="modal-close" onclick="closeEditUserModal()">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <form id="editUserForm">
-                        <input type="hidden" name="csrf_token" value="${getCSRFToken()}">
-                        <input type="hidden" name="action" value="edit_user">
-                        <input type="hidden" name="user_id" value="${userId}">
-                        
-                        <div class="form-group">
-                            <label for="edit_username">Username</label>
-                            <input type="text" id="edit_username" value="${userData.username}" class="form-control" readonly>
-                            <small class="form-help">Username cannot be changed</small>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="edit_full_name">Full Name</label>
-                            <input type="text" id="edit_full_name" name="full_name" value="${userData.fullName}" class="form-control">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="edit_email">Email</label>
-                            <input type="email" id="edit_email" name="email" value="${userData.email}" class="form-control" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="edit_role">Role</label>
-                            <select id="edit_role" name="role_id" class="form-control" required>
-                                <option value="1" ${userData.role.toLowerCase().includes('admin') ? 'selected' : ''}>Administrator</option>
-                                <option value="2" ${!userData.role.toLowerCase().includes('admin') ? 'selected' : ''}>User</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group checkbox-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="active" value="1" ${userData.active ? 'checked' : ''}>
-                                Active User
-                            </label>
-                        </div>
-                        
-                        <div class="form-actions">
-                            <button type="button" class="btn btn-secondary" onclick="closeEditUserModal()">Cancel</button>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Save Changes
-                            </button>
-                        </div>
-                    </form>
+    try {
+        // Create modal HTML
+        const modalHTML = `
+            <div id="editUserModal" class="modal" style="display: block;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Edit User: ${userData.username}</h3>
+                        <button type="button" class="modal-close" onclick="closeEditUserModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editUserForm">
+                            <input type="hidden" name="csrf_token" value="${getCSRFToken()}">
+                            <input type="hidden" name="action" value="edit_user">
+                            <input type="hidden" name="user_id" value="${userId}">
+                            
+                            <div class="form-group">
+                                <label for="edit_username">Username</label>
+                                <input type="text" id="edit_username" value="${userData.username}" class="form-control" readonly>
+                                <small class="form-help">Username cannot be changed</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="edit_full_name">Full Name</label>
+                                <input type="text" id="edit_full_name" name="full_name" value="${userData.fullName}" class="form-control">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="edit_email">Email</label>
+                                <input type="email" id="edit_email" name="email" value="${userData.email}" class="form-control" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="edit_role">Role</label>
+                                <select id="edit_role" name="role_id" class="form-control" required>
+                                    <option value="1" ${userData.role.toLowerCase().includes('admin') ? 'selected' : ''}>Administrator</option>
+                                    <option value="2" ${!userData.role.toLowerCase().includes('admin') ? 'selected' : ''}>User</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="active" value="1" ${userData.active ? 'checked' : ''}>
+                                    Active User
+                                </label>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary" onclick="closeEditUserModal()">Cancel</button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Save Changes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
-    `;
-    
-    // Remove existing modal if any
-    const existingModal = document.getElementById('editUserModal');
-    if (existingModal) {
-        existingModal.remove();
-    }
-    
-    // Add modal to page
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
-    // Add form submit handler
-    const form = document.getElementById('editUserForm');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            submitEditUserForm(this);
-        });
+        `;
+        
+        console.log('Creating modal with HTML:', modalHTML);
+        
+        // Remove existing modal if any
+        const existingModal = document.getElementById('editUserModal');
+        if (existingModal) {
+            existingModal.remove();
+            console.log('Removed existing modal');
+        }
+        
+        // Add modal to page
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        console.log('Modal added to DOM');
+        
+        // Add form submit handler
+        const form = document.getElementById('editUserForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                console.log('Form submit event triggered');
+                submitEditUserForm(this);
+            });
+            console.log('Form event listener added');
+        } else {
+            console.error('Form not found after modal creation');
+        }
+        
+    } catch (error) {
+        console.error('Error in showEditUserModal:', error);
+        alert('Failed to open edit dialog');
     }
 }
 
