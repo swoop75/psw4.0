@@ -8,6 +8,7 @@
 // Include necessary files
 require_once __DIR__ . '/config/config.php';
 require_once __DIR__ . '/config/constants.php';
+require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/src/utils/Security.php';
 
 // Configuration - CHANGE THESE VALUES
