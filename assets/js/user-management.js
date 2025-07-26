@@ -827,6 +827,68 @@ function confirmStatusChange() {
     });
 }
 
+/**
+ * Show generate password confirmation modal
+ */
+function showGeneratePasswordModal() {
+    const modal = document.getElementById('generatePasswordModal');
+    if (modal) {
+        modal.style.display = 'block';
+        modal.classList.add('show');
+    }
+}
+
+/**
+ * Close generate password modal
+ */
+function closeGeneratePasswordModal() {
+    const modal = document.getElementById('generatePasswordModal');
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }
+}
+
+/**
+ * Confirm password generation
+ */
+function confirmGeneratePassword() {
+    const confirmBtn = document.querySelector('#generatePasswordModal .btn-primary');
+    const originalContent = confirmBtn.innerHTML;
+    
+    // Show loading state
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+    
+    // Create form data
+    const formData = new FormData();
+    formData.append('action', 'generate_password');
+    formData.append('csrf_token', getCSRFToken());
+    
+    // Submit request
+    fetch('user_management.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.text())
+    .then(data => {
+        // Reload the page to show the new password
+        window.location.reload();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('An error occurred while generating password', 'error');
+    })
+    .finally(() => {
+        // Reset button state
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = originalContent;
+        closeGeneratePasswordModal();
+    });
+}
+
 // Export functions for global access
 window.showTab = showTab;
 window.showView = showView;
@@ -839,3 +901,6 @@ window.closeEditUserModal = closeEditUserModal;
 window.showStatusChangeModal = showStatusChangeModal;
 window.closeStatusChangeModal = closeStatusChangeModal;
 window.confirmStatusChange = confirmStatusChange;
+window.showGeneratePasswordModal = showGeneratePasswordModal;
+window.closeGeneratePasswordModal = closeGeneratePasswordModal;
+window.confirmGeneratePassword = confirmGeneratePassword;
