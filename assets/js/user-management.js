@@ -4,8 +4,44 @@
  * Description: User management JavaScript functionality for PSW 4.0
  */
 
-// Tab management
-function showTab(tabName) {
+// Admin view management (All Users, Activity Log, Statistics)
+function showView(viewName) {
+    // Hide all admin view contents
+    const viewContents = document.querySelectorAll('.tab-content');
+    viewContents.forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // Remove active class from all view buttons
+    const viewButtons = document.querySelectorAll('.tab-button');
+    viewButtons.forEach(button => {
+        button.classList.remove('active');
+    });
+    
+    // Show selected view content
+    const selectedView = document.querySelector(`[data-view="${viewName}"]`);
+    if (selectedView) {
+        selectedView.classList.add('active');
+    }
+    
+    // Add active class to selected view button
+    const selectedButton = document.querySelector(`[onclick="showView('${viewName}')"]`);
+    if (selectedButton) {
+        selectedButton.classList.add('active');
+    }
+    
+    // Update URL without reload
+    const url = new URL(window.location);
+    if (viewName === 'users') {
+        url.searchParams.delete('view');
+    } else {
+        url.searchParams.set('view', viewName);
+    }
+    window.history.replaceState({}, '', url);
+}
+
+// Individual user tab management (Profile, Security, Preferences, Activity)
+function showUserTab(tabName) {
     // Hide all tab contents
     const tabContents = document.querySelectorAll('.tab-content');
     tabContents.forEach(content => {
@@ -25,7 +61,7 @@ function showTab(tabName) {
     }
     
     // Add active class to selected tab button
-    const selectedButton = document.querySelector(`[onclick="showTab('${tabName}')"]`);
+    const selectedButton = document.querySelector(`[onclick="showUserTab('${tabName}')"]`);
     if (selectedButton) {
         selectedButton.classList.add('active');
     }
@@ -34,6 +70,17 @@ function showTab(tabName) {
     const url = new URL(window.location);
     url.searchParams.set('tab', tabName);
     window.history.replaceState({}, '', url);
+}
+
+// Legacy tab management for backward compatibility
+function showTab(tabName) {
+    // Check if we're in individual user mode
+    const url = new URL(window.location);
+    if (url.searchParams.has('user_id')) {
+        showUserTab(tabName);
+    } else {
+        showView(tabName);
+    }
 }
 
 // Form validation
@@ -782,6 +829,8 @@ function confirmStatusChange() {
 
 // Export functions for global access
 window.showTab = showTab;
+window.showView = showView;
+window.showUserTab = showUserTab;
 window.getActivityIcon = getActivityIcon;
 window.editUser = editUser;
 window.toggleUserStatus = toggleUserStatus;

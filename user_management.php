@@ -262,22 +262,18 @@ ob_start();
         <!-- Tab Navigation for Individual User -->
         <div class="tabs-container">
             <div class="tab-nav">
-                <a href="user_management.php?user_id=<?php echo $editUserId; ?>&tab=profile" 
-                   class="tab-button <?php echo $activeTab === 'profile' ? 'active' : ''; ?>">
+                <button class="tab-button <?php echo $activeTab === 'profile' ? 'active' : ''; ?>" onclick="showUserTab('profile')">
                     <i class="fas fa-user"></i> Profile Information
-                </a>
-                <a href="user_management.php?user_id=<?php echo $editUserId; ?>&tab=security" 
-                   class="tab-button <?php echo $activeTab === 'security' ? 'active' : ''; ?>">
+                </button>
+                <button class="tab-button <?php echo $activeTab === 'security' ? 'active' : ''; ?>" onclick="showUserTab('security')">
                     <i class="fas fa-shield-alt"></i> Security Settings
-                </a>
-                <a href="user_management.php?user_id=<?php echo $editUserId; ?>&tab=preferences" 
-                   class="tab-button <?php echo $activeTab === 'preferences' ? 'active' : ''; ?>">
+                </button>
+                <button class="tab-button <?php echo $activeTab === 'preferences' ? 'active' : ''; ?>" onclick="showUserTab('preferences')">
                     <i class="fas fa-cog"></i> Preferences
-                </a>
-                <a href="user_management.php?user_id=<?php echo $editUserId; ?>&tab=activity" 
-                   class="tab-button <?php echo $activeTab === 'activity' ? 'active' : ''; ?>">
+                </button>
+                <button class="tab-button <?php echo $activeTab === 'activity' ? 'active' : ''; ?>" onclick="showUserTab('activity')">
                     <i class="fas fa-history"></i> Activity Log
-                </a>
+                </button>
             </div>
             
     <?php else: ?>
@@ -313,16 +309,16 @@ ob_start();
         <!-- Main Menu Navigation -->
         <div class="tabs-container">
             <div class="tab-nav">
-                <a href="user_management.php" class="tab-button <?php echo $view === 'users' ? 'active' : ''; ?>">
+                <button class="tab-button <?php echo $view === 'users' ? 'active' : ''; ?>" onclick="showView('users')">
                     <i class="fas fa-users"></i> All Users
-                </a>
+                </button>
                 <?php if ($isAdmin): ?>
-                    <a href="user_management.php?view=activity" class="tab-button <?php echo $view === 'activity' ? 'active' : ''; ?>">
+                    <button class="tab-button <?php echo $view === 'activity' ? 'active' : ''; ?>" onclick="showView('activity')">
                         <i class="fas fa-history"></i> Activity Log
-                    </a>
-                    <a href="user_management.php?view=statistics" class="tab-button <?php echo $view === 'statistics' ? 'active' : ''; ?>">
+                    </button>
+                    <button class="tab-button <?php echo $view === 'statistics' ? 'active' : ''; ?>" onclick="showView('statistics')">
                         <i class="fas fa-chart-line"></i> Statistics
-                    </a>
+                    </button>
                 <?php endif; ?>
             </div>
             
@@ -607,155 +603,151 @@ ob_start();
         </div>
         
         <?php else: ?>
-            <!-- Admin Overview Content -->
+            <!-- Admin Overview Content - All views rendered, JavaScript controls visibility -->
             
-            <?php if ($view === 'users'): ?>
-                <!-- All Users Content -->
-                <div class="tab-content active">
-                    <div class="users-section">
-                        <div class="section-header">
-                            <h2>User Management</h2>
-                            <button class="btn btn-primary" onclick="showAddUserModal()">
-                                <i class="fas fa-user-plus"></i> Add New User
-                            </button>
-                        </div>
-                        
-                        <div class="users-table-container">
-                            <table class="users-table">
-                                <thead>
-                                    <tr>
-                                        <th>User</th>
-                                        <th>Email</th>
-                                        <th>Role</th>
-                                        <th>Status</th>
-                                        <th>Last Login</th>
-                                        <th>Created</th>
-                                        <th>Actions</th>
+            <!-- All Users Content -->
+            <div class="tab-content <?php echo $view === 'users' ? 'active' : ''; ?>" data-view="users">
+                <div class="users-section">
+                    <div class="section-header">
+                        <h2>User Management</h2>
+                        <button class="btn btn-primary" onclick="showAddUserModal()">
+                            <i class="fas fa-user-plus"></i> Add New User
+                        </button>
+                    </div>
+                    
+                    <div class="users-table-container">
+                        <table class="users-table">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Last Login</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($allUsers as $userItem): ?>
+                                    <tr class="user-row" data-user-id="<?php echo $userItem['user_id']; ?>">
+                                        <td>
+                                            <div class="user-info">
+                                                <div class="user-avatar">
+                                                    <i class="fas fa-user-circle"></i>
+                                                </div>
+                                                <div class="user-details">
+                                                    <div class="username"><?php echo htmlspecialchars($userItem['username']); ?></div>
+                                                    <div class="full-name"><?php echo htmlspecialchars($userItem['full_name'] ?? ''); ?></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td><?php echo htmlspecialchars($userItem['email'] ?? ''); ?></td>
+                                        <td>
+                                            <span class="role-badge role-<?php echo strtolower($userItem['role_name'] ?? 'user'); ?>">
+                                                <?php echo htmlspecialchars($userItem['role_name'] ?? 'User'); ?>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="status-indicator status-<?php echo ($userItem['active'] ?? 1) ? 'active' : 'inactive'; ?>">
+                                                <span class="status-dot"></span>
+                                                <?php echo ($userItem['active'] ?? 1) ? 'Active' : 'Inactive'; ?>
+                                            </span>
+                                        </td>
+                                        <td class="last-activity">
+                                            <?php echo $userItem['last_login'] ? date('M j, Y', strtotime($userItem['last_login'])) : 'Never'; ?>
+                                        </td>
+                                        <td><?php echo date('M j, Y', strtotime($userItem['created_at'])); ?></td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <a href="user_management.php?user_id=<?php echo $userItem['user_id']; ?>" class="btn-icon" title="Edit User">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <button class="btn-icon" onclick="toggleUserStatus(<?php echo $userItem['user_id']; ?>, <?php echo ($userItem['active'] ?? 1) ? 'false' : 'true'; ?>)" 
+                                                        title="<?php echo ($userItem['active'] ?? 1) ? 'Deactivate' : 'Activate'; ?> User">
+                                                    <i class="fas fa-<?php echo ($userItem['active'] ?? 1) ? 'user-slash' : 'user-check'; ?>"></i>
+                                                </button>
+                                            </div>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($allUsers as $userItem): ?>
-                                        <tr class="user-row" data-user-id="<?php echo $userItem['user_id']; ?>">
-                                            <td>
-                                                <div class="user-info">
-                                                    <div class="user-avatar">
-                                                        <i class="fas fa-user-circle"></i>
-                                                    </div>
-                                                    <div class="user-details">
-                                                        <div class="username"><?php echo htmlspecialchars($userItem['username']); ?></div>
-                                                        <div class="full-name"><?php echo htmlspecialchars($userItem['full_name'] ?? ''); ?></div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td><?php echo htmlspecialchars($userItem['email'] ?? ''); ?></td>
-                                            <td>
-                                                <span class="role-badge role-<?php echo strtolower($userItem['role_name'] ?? 'user'); ?>">
-                                                    <?php echo htmlspecialchars($userItem['role_name'] ?? 'User'); ?>
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span class="status-indicator status-<?php echo ($userItem['active'] ?? 1) ? 'active' : 'inactive'; ?>">
-                                                    <span class="status-dot"></span>
-                                                    <?php echo ($userItem['active'] ?? 1) ? 'Active' : 'Inactive'; ?>
-                                                </span>
-                                            </td>
-                                            <td class="last-activity">
-                                                <?php echo $userItem['last_login'] ? date('M j, Y', strtotime($userItem['last_login'])) : 'Never'; ?>
-                                            </td>
-                                            <td><?php echo date('M j, Y', strtotime($userItem['created_at'])); ?></td>
-                                            <td>
-                                                <div class="action-buttons">
-                                                    <a href="user_management.php?user_id=<?php echo $userItem['user_id']; ?>" class="btn-icon" title="Edit User">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                    <button class="btn-icon" onclick="toggleUserStatus(<?php echo $userItem['user_id']; ?>, <?php echo ($userItem['active'] ?? 1) ? 'false' : 'true'; ?>)" 
-                                                            title="<?php echo ($userItem['active'] ?? 1) ? 'Deactivate' : 'Activate'; ?> User">
-                                                        <i class="fas fa-<?php echo ($userItem['active'] ?? 1) ? 'user-slash' : 'user-check'; ?>"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                
-            <?php elseif ($view === 'activity'): ?>
-                <!-- System Activity Log Content -->
-                <div class="tab-content active">
-                    <div class="activity-section">
-                        <h2>System Activity Log</h2>
-                        
-                        <?php if (empty($systemActivityLog)): ?>
-                            <div class="no-activity">
-                                <i class="fas fa-clock"></i>
-                                <h3>No system activity</h3>
-                                <p>System-wide activities will appear here.</p>
-                            </div>
-                        <?php else: ?>
-                            <div class="activity-list">
-                                <?php foreach ($systemActivityLog as $activity): ?>
-                                    <div class="activity-item">
-                                        <div class="activity-icon">
-                                            <i class="fas fa-<?php echo getActivityIcon($activity['action_type']); ?>"></i>
+            </div>
+            
+            <!-- System Activity Log Content -->
+            <div class="tab-content <?php echo $view === 'activity' ? 'active' : ''; ?>" data-view="activity">
+                <div class="activity-section">
+                    <h2>System Activity Log</h2>
+                    
+                    <?php if (empty($systemActivityLog)): ?>
+                        <div class="no-activity">
+                            <i class="fas fa-clock"></i>
+                            <h3>No system activity</h3>
+                            <p>System-wide activities will appear here.</p>
+                        </div>
+                    <?php else: ?>
+                        <div class="activity-list">
+                            <?php foreach ($systemActivityLog as $activity): ?>
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <i class="fas fa-<?php echo getActivityIcon($activity['action_type']); ?>"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <div class="activity-description">
+                                            <strong><?php echo htmlspecialchars($activity['username'] ?? 'System'); ?>:</strong>
+                                            <?php echo htmlspecialchars($activity['description']); ?>
                                         </div>
-                                        <div class="activity-content">
-                                            <div class="activity-description">
-                                                <strong><?php echo htmlspecialchars($activity['username'] ?? 'System'); ?>:</strong>
-                                                <?php echo htmlspecialchars($activity['description']); ?>
-                                            </div>
-                                            <div class="activity-time">
-                                                <?php echo date('Y-m-d H:i:s', strtotime($activity['created_at'])); ?>
-                                            </div>
+                                        <div class="activity-time">
+                                            <?php echo date('Y-m-d H:i:s', strtotime($activity['created_at'])); ?>
                                         </div>
                                     </div>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php endif; ?>
-                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
-                
-            <?php elseif ($view === 'statistics'): ?>
-                <!-- System Statistics Content -->
-                <div class="tab-content active">
-                    <div class="stats-section">
-                        <h2>System Statistics</h2>
-                        
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <div class="stat-icon"><i class="fas fa-users"></i></div>
-                                <div class="stat-content">
-                                    <div class="stat-number"><?php echo number_format($systemStats['total_users'] ?? 0); ?></div>
-                                    <div class="stat-label">Total Users</div>
-                                </div>
+            </div>
+            
+            <!-- System Statistics Content -->
+            <div class="tab-content <?php echo $view === 'statistics' ? 'active' : ''; ?>" data-view="statistics">
+                <div class="stats-section">
+                    <h2>System Statistics</h2>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-users"></i></div>
+                            <div class="stat-content">
+                                <div class="stat-number"><?php echo number_format($systemStats['total_users'] ?? 0); ?></div>
+                                <div class="stat-label">Total Users</div>
                             </div>
-                            <div class="stat-card">
-                                <div class="stat-icon"><i class="fas fa-sign-in-alt"></i></div>
-                                <div class="stat-content">
-                                    <div class="stat-number"><?php echo number_format($systemStats['total_logins'] ?? 0); ?></div>
-                                    <div class="stat-label">Total Logins</div>
-                                </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-sign-in-alt"></i></div>
+                            <div class="stat-content">
+                                <div class="stat-number"><?php echo number_format($systemStats['total_logins'] ?? 0); ?></div>
+                                <div class="stat-label">Total Logins</div>
                             </div>
-                            <div class="stat-card">
-                                <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
-                                <div class="stat-content">
-                                    <div class="stat-number"><?php echo htmlspecialchars($systemStats['most_active_user'] ?? 'N/A'); ?></div>
-                                    <div class="stat-label">Most Active User</div>
-                                </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                            <div class="stat-content">
+                                <div class="stat-number"><?php echo htmlspecialchars($systemStats['most_active_user'] ?? 'N/A'); ?></div>
+                                <div class="stat-label">Most Active User</div>
                             </div>
-                            <div class="stat-card">
-                                <div class="stat-icon"><i class="fas fa-calendar-day"></i></div>
-                                <div class="stat-content">
-                                    <div class="stat-number"><?php echo number_format($systemStats['avg_session_time'] ?? 0); ?></div>
-                                    <div class="stat-label">Avg Session (min)</div>
-                                </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-calendar-day"></i></div>
+                            <div class="stat-content">
+                                <div class="stat-number"><?php echo number_format($systemStats['avg_session_time'] ?? 0); ?></div>
+                                <div class="stat-label">Avg Session (min)</div>
                             </div>
                         </div>
                     </div>
                 </div>
-            <?php endif; ?>
+            </div>
             
         <?php endif; ?>
         
@@ -783,9 +775,15 @@ ob_start();
 </div>
 
 <script>
-// Set active tab on page load
+// Set active tab/view on page load
 document.addEventListener('DOMContentLoaded', function() {
-    showTab('<?php echo $activeTab; ?>');
+    <?php if ($editUserId): ?>
+        // Individual user page - show correct tab
+        showUserTab('<?php echo $activeTab; ?>');
+    <?php else: ?>
+        // Admin overview page - show correct view
+        showView('<?php echo $view; ?>');
+    <?php endif; ?>
 });
 </script>
 
