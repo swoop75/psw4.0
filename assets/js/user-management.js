@@ -670,7 +670,18 @@ function submitEditUserForm(form) {
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        return response.json();
+        
+        // Get the response as text first to see what we're getting
+        return response.text().then(text => {
+            console.log('Raw response:', text);
+            alert('Raw server response: ' + text.substring(0, 500) + '...');
+            
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                throw new Error('Server returned invalid JSON. Response was: ' + text.substring(0, 200));
+            }
+        });
     })
     .then(data => {
         console.log('Response data:', data);
