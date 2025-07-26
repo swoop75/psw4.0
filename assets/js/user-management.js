@@ -4,6 +4,20 @@
  * Description: User management JavaScript functionality for PSW 4.0
  */
 
+// Test if JavaScript is loading
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('User management JavaScript loaded');
+    alert('User management JavaScript is working!');
+    
+    // Also check if we're on the All Users page
+    const userTable = document.querySelector('.users-table');
+    if (userTable) {
+        alert('Found users table - you are on All Users page');
+    } else {
+        alert('No users table found - you might be on individual user page');
+    }
+});
+
 // Admin view management (All Users, Activity Log, Statistics)
 function showView(viewName) {
     // Hide all admin view contents
