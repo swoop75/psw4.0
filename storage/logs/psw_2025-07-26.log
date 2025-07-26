@@ -49,3 +49,6 @@
 {"timestamp":"2025-07-26 12:52:40","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"User action: password_generated","context":{"action":"password_generated","details":"Random password generated for user","user_id":1}}
 {"timestamp":"2025-07-26 12:56:03","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"User action: password_generated","context":{"action":"password_generated","details":"Random password generated for user","user_id":1}}
 {"timestamp":"2025-07-26 12:58:44","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"User action: password_generated","context":{"action":"password_generated","details":"Random password generated for user","user_id":1}}
+{"timestamp":"2025-07-26 13:01:19","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"User action: password_generated","context":{"action":"password_generated","details":"Random password generated for user","user_id":1}}
+{"timestamp":"2025-07-26 13:01:19","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"Generated password stored in session","context":{"user_id":1,"password_length":12,"session_id":"g2urnc4in085f9bdhf0e36q9hd"}}
+{"timestamp":"2025-07-26 13:01:19","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"Displaying generated password from session","context":{"user_id":1,"password_length":12}}
