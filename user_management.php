@@ -205,27 +205,27 @@ ob_start();
     <?php endif; ?>
 
     <!-- Statistics -->
-    <div class="account-stats">
+    <div class="stats-grid">
         <?php if ($isAdmin): ?>
             <!-- Admin Statistics -->
             <div class="stat-card">
                 <div class="stat-icon"><i class="fas fa-users"></i></div>
                 <div class="stat-content">
-                    <div class="stat-value"><?php echo number_format($adminStats['total_users'] ?? count($allUsers)); ?></div>
+                    <div class="stat-number"><?php echo number_format($adminStats['total_users'] ?? count($allUsers)); ?></div>
                     <div class="stat-label">Total Users</div>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon"><i class="fas fa-chart-bar"></i></div>
                 <div class="stat-content">
-                    <div class="stat-value"><?php echo htmlspecialchars($adminStats['most_popular_page'] ?? 'N/A'); ?></div>
+                    <div class="stat-number"><?php echo htmlspecialchars($adminStats['most_popular_page'] ?? 'N/A'); ?></div>
                     <div class="stat-label">Most Popular Page</div>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon"><i class="fas fa-user-check"></i></div>
                 <div class="stat-content">
-                    <div class="stat-value"><?php echo number_format($adminStats['active_users'] ?? 0); ?></div>
+                    <div class="stat-number"><?php echo number_format($adminStats['active_users'] ?? 0); ?></div>
                     <div class="stat-label">Active Users</div>
                 </div>
             </div>
@@ -234,21 +234,21 @@ ob_start();
             <div class="stat-card">
                 <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
                 <div class="stat-content">
-                    <div class="stat-value"><?php echo number_format($stats['account_age_days'] ?? 0); ?> days</div>
-                    <div class="stat-label">Account Age</div>
+                    <div class="stat-number"><?php echo number_format($stats['account_age_days'] ?? 0); ?></div>
+                    <div class="stat-label">Account Days</div>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon"><i class="fas fa-sign-in-alt"></i></div>
                 <div class="stat-content">
-                    <div class="stat-value"><?php echo number_format($stats['login_count'] ?? 0); ?></div>
+                    <div class="stat-number"><?php echo number_format($stats['login_count'] ?? 0); ?></div>
                     <div class="stat-label">Total Logins</div>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon"><i class="fas fa-clock"></i></div>
                 <div class="stat-content">
-                    <div class="stat-value"><?php echo $user['last_login'] ? date('M j, Y', strtotime($user['last_login'])) : 'Never'; ?></div>
+                    <div class="stat-number"><?php echo $user['last_login'] ? date('M j, Y', strtotime($user['last_login'])) : 'Never'; ?></div>
                     <div class="stat-label">Last Login</div>
                 </div>
             </div>
@@ -603,6 +603,26 @@ ob_start();
                     </div>
                 <?php endif; ?>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Status Change Confirmation Modal -->
+<div id="statusChangeModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Confirm Status Change</h3>
+            <button class="modal-close" onclick="closeStatusChangeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to <strong id="statusChangeAction"></strong> user <strong id="statusChangeUserName"></strong>?</p>
+            <p id="statusChangeWarning" class="text-warning"></p>
+        </div>
+        <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeStatusChangeModal()">Cancel</button>
+            <button type="button" class="btn" id="confirmStatusChangeBtn" onclick="confirmStatusChange()">
+                <i class="fas fa-user-check"></i> <span id="confirmStatusChangeText">Confirm</span>
+            </button>
         </div>
     </div>
 </div>

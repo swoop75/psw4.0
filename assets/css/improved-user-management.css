@@ -123,8 +123,8 @@ body .user-management-container {
     color: white;
 }
 
-/* Account Statistics - Beautiful Design */
-.account-stats {
+/* Statistics Grid - Match Masterlist Design */
+.stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
@@ -172,7 +172,7 @@ body .user-management-container {
     flex: 1;
 }
 
-.stat-value {
+.stat-number {
     font-size: 2.5rem;
     font-weight: 700;
     color: #1a202c;
@@ -1080,6 +1080,14 @@ body .user-management-container {
     background: #00C896;
     color: white;
     transform: scale(1.1);
+}
+
+/* Status Change Modal Styles */
+.text-warning {
+    color: #d97706;
+    font-size: 0.9rem;
+    margin-top: 10px;
+    display: none;
 }
 
 /* Responsive Design */

@@ -383,6 +383,7 @@ function getActivityIcon(actionType) {
 function editUser(userId) {
     // Get user data from the table row
     const userRow = document.querySelector(`[data-user-id="${userId}"]`);
+    
     if (!userRow) {
         alert('User not found');
         return;
@@ -394,15 +395,6 @@ function editUser(userId) {
     const currentRole = userRow.querySelector('.role-badge')?.textContent?.trim() || '';
     const isActive = userRow.querySelector('.status-active');
     
-    console.log('User data extracted:', {
-        userId: userId,
-        username: username,
-        fullName: fullName,
-        email: email,
-        role: currentRole,
-        active: !!isActive
-    });
-    
     showEditUserModal(userId, {
         username: username,
         fullName: fullName,
@@ -412,60 +404,35 @@ function editUser(userId) {
     });
 }
 
+// Global variables for status change modal
+let pendingStatusChange = null;
+
 /**
  * Toggle user active/inactive status
  * @param {number} userId User ID
  * @param {boolean} newStatus New active status
  */
 function toggleUserStatus(userId, newStatus) {
-    const action = newStatus ? 'activate' : 'deactivate';
-    const confirmMessage = `Are you sure you want to ${action} this user?`;
-    
-    if (!confirm(confirmMessage)) {
+    // Get user data from the table row
+    const userRow = document.querySelector(`[data-user-id="${userId}"]`);
+    if (!userRow) {
+        alert('User not found');
         return;
     }
     
-    // Show loading state
-    const actionButton = document.querySelector(`[onclick*="toggleUserStatus(${userId}"]`);
-    if (actionButton) {
-        actionButton.disabled = true;
-        actionButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-    }
+    const username = userRow.querySelector('.username')?.textContent || 'Unknown User';
+    const action = newStatus ? 'activate' : 'deactivate';
     
-    // Make AJAX request
-    fetch('user_management.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-            action: 'toggle_user_status',
-            user_id: userId,
-            active: newStatus ? 1 : 0,
-            csrf_token: getCSRFToken()
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Update the UI
-            updateUserStatusInTable(userId, newStatus);
-            showNotification('User status updated successfully', 'success');
-        } else {
-            showNotification(data.message || 'Failed to update user status', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showNotification('An error occurred while updating user status', 'error');
-    })
-    .finally(() => {
-        // Reset button state
-        if (actionButton) {
-            actionButton.disabled = false;
-            actionButton.innerHTML = `<i class="fas fa-${newStatus ? 'user-slash' : 'user-check'}"></i>`;
-        }
-    });
+    // Store the pending change
+    pendingStatusChange = {
+        userId: userId,
+        newStatus: newStatus,
+        username: username,
+        action: action
+    };
+    
+    // Show beautiful modal
+    showStatusChangeModal(action, username, newStatus);
 }
 
 /**
@@ -474,8 +441,6 @@ function toggleUserStatus(userId, newStatus) {
  * @param {object} userData User data
  */
 function showEditUserModal(userId, userData) {
-    console.log('Creating edit modal for user:', userId, userData);
-    
     // Create modal HTML
     const modalHTML = `
         <div id="editUserModal" class="modal show">
@@ -542,19 +507,13 @@ function showEditUserModal(userId, userData) {
     // Add modal to page
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     
-    console.log('Modal added to page');
-    
     // Add form submit handler
     const form = document.getElementById('editUserForm');
     if (form) {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
-            console.log('Form submitted');
             submitEditUserForm(this);
         });
-        console.log('Form event listener added');
-    } else {
-        console.error('Form not found after modal creation');
     }
 }
 
@@ -577,8 +536,6 @@ function submitEditUserForm(form) {
     const formData = new FormData(form);
     const submitButton = form.querySelector('button[type="submit"]');
     
-    console.log('Submitting form data:', Object.fromEntries(formData));
-    
     // Show loading state
     submitButton.disabled = true;
     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
@@ -591,14 +548,12 @@ function submitEditUserForm(form) {
         body: formData
     })
     .then(response => {
-        console.log('Response status:', response.status);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response.json();
     })
     .then(data => {
-        console.log('Response data:', data);
         if (data.success) {
             showNotification('User updated successfully', 'success');
             closeEditUserModal();
@@ -695,6 +650,112 @@ function showAddUserModal() {
     alert('Add user functionality will be implemented in the next phase.');
 }
 
+/**
+ * Show status change modal
+ * @param {string} action Action to perform (activate/deactivate)
+ * @param {string} username Username
+ * @param {boolean} newStatus New status
+ */
+function showStatusChangeModal(action, username, newStatus) {
+    const modal = document.getElementById('statusChangeModal');
+    const actionElement = document.getElementById('statusChangeAction');
+    const userNameElement = document.getElementById('statusChangeUserName');
+    const warningElement = document.getElementById('statusChangeWarning');
+    const confirmBtn = document.getElementById('confirmStatusChangeBtn');
+    const confirmText = document.getElementById('confirmStatusChangeText');
+    
+    if (!modal || !actionElement || !userNameElement) {
+        console.error('Status change modal elements not found');
+        return;
+    }
+    
+    // Set modal content
+    actionElement.textContent = action;
+    userNameElement.textContent = username;
+    confirmText.textContent = action.charAt(0).toUpperCase() + action.slice(1);
+    
+    // Set button style
+    confirmBtn.className = `btn ${newStatus ? 'btn-primary' : 'btn-danger'}`;
+    confirmBtn.querySelector('i').className = `fas fa-${newStatus ? 'user-check' : 'user-slash'}`;
+    
+    // Add warning for deactivation
+    if (!newStatus) {
+        warningElement.textContent = 'The user will not be able to log in while deactivated.';
+        warningElement.style.display = 'block';
+    } else {
+        warningElement.style.display = 'none';
+    }
+    
+    // Show modal
+    modal.style.display = 'block';
+    modal.classList.add('show');
+}
+
+/**
+ * Close status change modal
+ */
+function closeStatusChangeModal() {
+    const modal = document.getElementById('statusChangeModal');
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }
+    pendingStatusChange = null;
+}
+
+/**
+ * Confirm status change
+ */
+function confirmStatusChange() {
+    if (!pendingStatusChange) {
+        return;
+    }
+    
+    const { userId, newStatus } = pendingStatusChange;
+    
+    // Show loading state
+    const confirmBtn = document.getElementById('confirmStatusChangeBtn');
+    const originalContent = confirmBtn.innerHTML;
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    
+    // Make AJAX request
+    fetch('user_management.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            action: 'toggle_user_status',
+            user_id: userId,
+            active: newStatus ? 1 : 0,
+            csrf_token: getCSRFToken()
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update the UI
+            updateUserStatusInTable(userId, newStatus);
+            showNotification('User status updated successfully', 'success');
+            closeStatusChangeModal();
+        } else {
+            showNotification(data.message || 'Failed to update user status', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('An error occurred while updating user status', 'error');
+    })
+    .finally(() => {
+        // Reset button state
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = originalContent;
+    });
+}
+
 // Export functions for global access
 window.showTab = showTab;
 window.getActivityIcon = getActivityIcon;
@@ -702,3 +763,6 @@ window.editUser = editUser;
 window.toggleUserStatus = toggleUserStatus;
 window.showAddUserModal = showAddUserModal;
 window.closeEditUserModal = closeEditUserModal;
+window.showStatusChangeModal = showStatusChangeModal;
+window.closeStatusChangeModal = closeStatusChangeModal;
+window.confirmStatusChange = confirmStatusChange;
