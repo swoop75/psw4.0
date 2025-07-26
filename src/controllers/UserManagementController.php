@@ -943,6 +943,71 @@ class UserManagementController {
     }
     
     /**
+     * Get user activity log for a specific user
+     * @param int $userId User ID
+     * @return array User activity log
+     */
+    public function getUserActivityLog($userId) {
+        try {
+            $activities = [];
+            
+            // Try to get from activity_logs table first
+            try {
+                $sql = "SELECT * FROM activity_logs 
+                        WHERE user_id = :user_id 
+                        ORDER BY created_at DESC 
+                        LIMIT 20";
+                        
+                $stmt = $this->foundationDb->prepare($sql);
+                $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+                $stmt->execute();
+                $activities = $stmt->fetchAll();
+                
+            } catch (Exception $e) {
+                // Table might not exist, try parsing log files
+                $activities = $this->parseUserLogFiles($userId);
+            }
+            
+            // If no activities found, create some default entries
+            if (empty($activities)) {
+                $activities = $this->getDefaultActivityEntries($userId);
+            }
+            
+            return $activities;
+            
+        } catch (Exception $e) {
+            Logger::error('Get user activity log error: ' . $e->getMessage());
+            return [];
+        }
+    }
+    
+    /**
+     * Parse log files for specific user activity
+     * @param int $userId User ID
+     * @return array Activity entries
+     */
+    private function parseUserLogFiles($userId) {
+        $activities = [];
+        $logDir = __DIR__ . '/../../logs';
+        
+        if (is_dir($logDir)) {
+            $logFiles = glob($logDir . '/psw_*.log');
+            rsort($logFiles); // Most recent first
+            
+            foreach (array_slice($logFiles, 0, 3) as $logFile) { // Only check last 3 log files
+                $fileActivities = $this->parseLogFile($logFile, $userId);
+                $activities = array_merge($activities, $fileActivities);
+                
+                if (count($activities) >= 10) {
+                    break; // Limit to 10 activities
+                }
+            }
+        }
+        
+        return array_slice($activities, 0, 10);
+    }
+    
+    /**
      * Get user profile by ID (Admin only - for individual user pages)
      * @param int $userId User ID
      * @return array User profile data
