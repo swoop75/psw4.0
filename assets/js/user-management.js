@@ -430,6 +430,7 @@ function getActivityIcon(actionType) {
 function editUser(userId) {
     try {
         console.log('editUser called with userId:', userId);
+        alert('Edit button clicked! Opening modal for user ID: ' + userId);
         
         // Get user data from the table row
         const userRow = document.querySelector(`[data-user-id="${userId}"]`);
@@ -509,10 +510,13 @@ function toggleUserStatus(userId, newStatus) {
  */
 function showEditUserModal(userId, userData) {
     try {
+        console.log('showEditUserModal called with:', userId, userData);
+        alert('Creating modal for user: ' + userData.username);
+        
         // Create modal HTML
         const modalHTML = `
-            <div id="editUserModal" class="modal" style="display: block;">
-                <div class="modal-content">
+            <div id="editUserModal" class="modal" style="display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999;">
+                <div class="modal-content" style="background: white; margin: 50px auto; padding: 20px; width: 90%; max-width: 500px; border-radius: 8px; position: relative;">
                     <div class="modal-header">
                         <h3>Edit User: ${userData.username}</h3>
                         <button type="button" class="modal-close" onclick="closeEditUserModal()">&times;</button>
@@ -541,7 +545,7 @@ function showEditUserModal(userId, userData) {
                             
                             <div class="form-group">
                                 <label for="edit_role">Role</label>
-                                <select id="edit_role" name="role_id" class="form-control" required>
+                                <select id="edit_role" name="role_id" class="form-control" required style="background: white !important; color: black !important; border: 2px solid #007bff !important; padding: 8px !important; font-size: 14px !important;">
                                     <option value="1" ${userData.role.toLowerCase().includes('admin') ? 'selected' : ''}>Administrator</option>
                                     <option value="2" ${!userData.role.toLowerCase().includes('admin') ? 'selected' : ''}>User</option>
                                 </select>
