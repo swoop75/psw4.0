@@ -93,7 +93,7 @@ try {
     $countSql = "
         SELECT COUNT(*) as total
         FROM psw_portfolio.log_dividends ld
-        LEFT JOIN psw_foundation.masterlist ml ON ld.isin = ml.isin
+        LEFT JOIN psw_foundation.masterlist ml ON ld.isin COLLATE utf8mb4_unicode_ci = ml.isin COLLATE utf8mb4_unicode_ci
         LEFT JOIN psw_foundation.brokers b ON ld.broker_id = b.broker_id
         LEFT JOIN psw_foundation.portfolio_account_groups pag ON ld.portfolio_account_group_id = pag.portfolio_account_group_id
         WHERE $whereClause
@@ -112,7 +112,7 @@ try {
             b.broker_name,
             pag.portfolio_group_name as account_group_name
         FROM psw_portfolio.log_dividends ld
-        LEFT JOIN psw_foundation.masterlist ml ON ld.isin = ml.isin
+        LEFT JOIN psw_foundation.masterlist ml ON ld.isin COLLATE utf8mb4_unicode_ci = ml.isin COLLATE utf8mb4_unicode_ci
         LEFT JOIN psw_foundation.brokers b ON ld.broker_id = b.broker_id
         LEFT JOIN psw_foundation.portfolio_account_groups pag ON ld.portfolio_account_group_id = pag.portfolio_account_group_id
         WHERE $whereClause
@@ -137,7 +137,7 @@ try {
             SUM(ld.net_dividend_sek) as total_net_sek,
             COUNT(DISTINCT ld.isin) as unique_companies
         FROM psw_portfolio.log_dividends ld
-        LEFT JOIN psw_foundation.masterlist ml ON ld.isin = ml.isin
+        LEFT JOIN psw_foundation.masterlist ml ON ld.isin COLLATE utf8mb4_unicode_ci = ml.isin COLLATE utf8mb4_unicode_ci
         LEFT JOIN psw_foundation.brokers b ON ld.broker_id = b.broker_id
         LEFT JOIN psw_foundation.portfolio_account_groups pag ON ld.portfolio_account_group_id = pag.portfolio_account_group_id
         WHERE $whereClause
@@ -538,11 +538,7 @@ $pageTitle = 'Dividend Logs - PSW 4.0';
                                 <i class="fas fa-chart-bar"></i>
                             </div>
                             <h3>No dividend records found</h3>
-                            <p>No dividend data matches your current filters. Try adjusting your search criteria or import some dividend data.</p>
-                            <a href="<?php echo BASE_URL; ?>/dividend_import.php" class="btn btn-primary">
-                                <i class="fas fa-upload"></i>
-                                Import Dividends
-                            </a>
+                            <p>No dividend data matches your current filters. Try adjusting your search criteria.</p>
                         </div>
                     <?php endif; ?>
                 </div>
