@@ -1,107 +1,153 @@
 <?php
+/**
+ * File: dividend_import.php
+ * Description: Dividend CSV import interface for PSW 4.0
+ */
+
+// Start session and include required files
 session_start();
-require_once 'config/config.php';
-require_once 'config/database.php';
-require_once 'src/middleware/Auth.php';
-require_once 'src/utils/Security.php';
 
-// Set page title
-$pageTitle = 'Dividend Import';
+require_once __DIR__ . '/config/config.php';
+require_once __DIR__ . '/config/constants.php';
+require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/src/middleware/Auth.php';
+require_once __DIR__ . '/src/utils/Security.php';
+require_once __DIR__ . '/src/utils/Logger.php';
 
-require_once 'templates/header.php';
+// Require authentication
+Auth::requireAuth();
+
+try {
+    // Set page variables
+    $pageTitle = 'Dividend Import - ' . APP_NAME;
+    $pageDescription = 'Import dividend data from CSV files';
+    $additionalCSS = [ASSETS_URL . '/css/dividend-import.css?v=' . time()];
+    $additionalJS = [];
+    
+    // Prepare content
+    ob_start();
 ?>
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Dividend CSV Import</h3>
-                </div>
-                <div class="card-body">
+<!-- Page Header -->
+<div class="page-header">
+    <div class="page-header-content">
+        <h1 class="page-title">
+            <i class="fas fa-file-csv"></i>
+            Dividend Import
+        </h1>
+        <p class="page-description">
+            Import dividend data from CSV files with automatic validation and company lookup
+        </p>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="dashboard-grid">
+    <div class="dashboard-card full-width">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-upload"></i>
+                CSV Import Tool
+            </h2>
+            <p class="card-subtitle">Upload and process dividend data files</p>
+        </div>
+        <div class="card-content">
                     
                     <!-- Step 1: File Upload -->
                     <div id="upload-section">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="broker-select">Select Broker:</label>
-                                    <select id="broker-select" class="form-control" required>
-                                        <option value="">Loading brokers...</option>
-                                    </select>
-                                </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="broker-select" class="form-label">
+                                    <i class="fas fa-building"></i>
+                                    Select Broker
+                                </label>
+                                <select id="broker-select" class="form-select" required>
+                                    <option value="">Loading brokers...</option>
+                                </select>
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="account-group-select">Portfolio Account Group:</label>
-                                    <select id="account-group-select" class="form-control">
-                                        <option value="">Loading account groups...</option>
-                                    </select>
-                                    <small class="form-text text-muted">Optional: Override CSV account group column</small>
-                                </div>
+                            
+                            <div class="form-group">
+                                <label for="account-group-select" class="form-label">
+                                    <i class="fas fa-folder"></i>
+                                    Portfolio Account Group
+                                </label>
+                                <select id="account-group-select" class="form-select">
+                                    <option value="">Loading account groups...</option>
+                                </select>
+                                <small class="form-help">Optional: Override CSV account group column</small>
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="csv-file">Select CSV File:</label>
-                                    <input type="file" id="csv-file" class="form-control-file" accept=".csv,.xlsx" required>
-                                    <small class="form-text text-muted">Supported formats: CSV, Excel (.xlsx)</small>
-                                </div>
+                            
+                            <div class="form-group">
+                                <label for="csv-file" class="form-label">
+                                    <i class="fas fa-file-csv"></i>
+                                    Select CSV File
+                                </label>
+                                <input type="file" id="csv-file" class="form-file" accept=".csv,.xlsx" required>
+                                <small class="form-help">Supported formats: CSV, Excel (.xlsx)</small>
                             </div>
                         </div>
                         
-                        <div class="row mt-3">
-                            <div class="col-12">
-                                <button id="upload-btn" class="btn btn-primary" disabled>
-                                    <i class="fas fa-upload"></i> Upload and Parse File
-                                </button>
-                                <div id="upload-progress" class="progress mt-2" style="display: none;">
-                                    <div class="progress-bar" role="progressbar" style="width: 0%"></div>
-                                </div>
+                        <div class="button-group">
+                            <button id="upload-btn" class="btn btn-primary" disabled>
+                                <i class="fas fa-upload"></i>
+                                Upload and Parse File
+                            </button>
+                            <div id="upload-progress" class="progress-bar-container" style="display: none;">
+                                <div class="progress-bar" style="width: 0%"></div>
                             </div>
                         </div>
                     </div>
                     
                     <!-- Step 2: Preview and Validation -->
                     <div id="preview-section" style="display: none;">
-                        <hr>
-                        <h4>Import Preview</h4>
+                        <div class="section-divider"></div>
+                        
+                        <div class="section-header">
+                            <h3 class="section-title">
+                                <i class="fas fa-eye"></i>
+                                Import Preview
+                            </h3>
+                        </div>
                         
                         <div id="validation-alerts"></div>
                         
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <div class="info-box">
-                                    <span class="info-box-icon bg-info"><i class="fas fa-file-csv"></i></span>
-                                    <div class="info-box-content">
-                                        <span class="info-box-text">Total Rows</span>
-                                        <span class="info-box-number" id="total-rows">0</span>
-                                    </div>
+                        <!-- Stats Cards -->
+                        <div class="stats-grid">
+                            <div class="stat-card info">
+                                <div class="stat-icon">
+                                    <i class="fas fa-file-csv"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <div class="stat-number" id="total-rows">0</div>
+                                    <div class="stat-label">Total Rows</div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="info-box">
-                                    <span class="info-box-icon bg-warning"><i class="fas fa-exclamation-triangle"></i></span>
-                                    <div class="info-box-content">
-                                        <span class="info-box-text">Warnings</span>
-                                        <span class="info-box-number" id="warning-count">0</span>
-                                    </div>
+                            
+                            <div class="stat-card warning">
+                                <div class="stat-icon">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <div class="stat-number" id="warning-count">0</div>
+                                    <div class="stat-label">Warnings</div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="info-box">
-                                    <span class="info-box-icon bg-danger"><i class="fas fa-times-circle"></i></span>
-                                    <div class="info-box-content">
-                                        <span class="info-box-text">Errors</span>
-                                        <span class="info-box-number" id="error-count">0</span>
-                                    </div>
+                            
+                            <div class="stat-card error">
+                                <div class="stat-icon">
+                                    <i class="fas fa-times-circle"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <div class="stat-number" id="error-count">0</div>
+                                    <div class="stat-label">Errors</div>
                                 </div>
                             </div>
                         </div>
                         
                         <!-- Preview Table -->
-                        <div class="table-responsive">
-                            <table id="preview-table" class="table table-bordered table-striped">
-                                <thead class="thead-dark">
+                        <div class="data-table-container">
+                            <table id="preview-table" class="data-table">
+                                <thead>
                                     <tr>
                                         <th>Payment Date</th>
                                         <th>ISIN</th>
@@ -123,54 +169,59 @@ require_once 'templates/header.php';
                         
                         <!-- Error/Warning Details -->
                         <div id="error-details" style="display: none;">
-                            <h5>Validation Issues</h5>
-                            <div class="accordion" id="validation-accordion">
-                                <div class="card">
-                                    <div class="card-header" id="errors-heading">
-                                        <h6 class="mb-0">
-                                            <button class="btn btn-link text-danger" type="button" data-toggle="collapse" data-target="#errors-collapse">
-                                                <i class="fas fa-times-circle"></i> Errors (<span id="error-detail-count">0</span>)
-                                            </button>
-                                        </h6>
+                            <div class="section-header">
+                                <h4 class="section-title">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    Validation Issues
+                                </h4>
+                            </div>
+                            
+                            <div class="validation-details">
+                                <div class="validation-group">
+                                    <div class="validation-header" onclick="toggleValidationSection('errors')">
+                                        <i class="fas fa-times-circle text-danger"></i>
+                                        <span>Errors (<span id="error-detail-count">0</span>)</span>
+                                        <i class="fas fa-chevron-down toggle-icon"></i>
                                     </div>
-                                    <div id="errors-collapse" class="collapse" data-parent="#validation-accordion">
-                                        <div class="card-body">
-                                            <ul id="error-list" class="list-unstyled"></ul>
-                                        </div>
+                                    <div id="errors-collapse" class="validation-content">
+                                        <ul id="error-list" class="validation-list"></ul>
                                     </div>
                                 </div>
-                                <div class="card">
-                                    <div class="card-header" id="warnings-heading">
-                                        <h6 class="mb-0">
-                                            <button class="btn btn-link text-warning" type="button" data-toggle="collapse" data-target="#warnings-collapse">
-                                                <i class="fas fa-exclamation-triangle"></i> Warnings (<span id="warning-detail-count">0</span>)
-                                            </button>
-                                        </h6>
+                                
+                                <div class="validation-group">
+                                    <div class="validation-header" onclick="toggleValidationSection('warnings')">
+                                        <i class="fas fa-exclamation-triangle text-warning"></i>
+                                        <span>Warnings (<span id="warning-detail-count">0</span>)</span>
+                                        <i class="fas fa-chevron-down toggle-icon"></i>
                                     </div>
-                                    <div id="warnings-collapse" class="collapse" data-parent="#validation-accordion">
-                                        <div class="card-body">
-                                            <ul id="warning-list" class="list-unstyled"></ul>
-                                        </div>
+                                    <div id="warnings-collapse" class="validation-content">
+                                        <ul id="warning-list" class="validation-list"></ul>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
                         <!-- Import Controls -->
-                        <div class="mt-4">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="ignore-duplicates">
-                                <label class="form-check-label" for="ignore-duplicates">
-                                    Ignore duplicate entries (skip existing dividends)
+                        <div class="import-controls">
+                            <div class="control-option">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="ignore-duplicates">
+                                    <span class="checkmark"></span>
+                                    <span class="checkbox-text">
+                                        <i class="fas fa-copy"></i>
+                                        Ignore duplicate entries (skip existing dividends)
+                                    </span>
                                 </label>
                             </div>
                             
-                            <div class="mt-3">
+                            <div class="button-group">
                                 <button id="import-btn" class="btn btn-success" disabled>
-                                    <i class="fas fa-download"></i> Import Dividends
+                                    <i class="fas fa-download"></i>
+                                    Import Dividends
                                 </button>
-                                <button id="cancel-btn" class="btn btn-secondary ml-2">
-                                    <i class="fas fa-times"></i> Cancel
+                                <button id="cancel-btn" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i>
+                                    Cancel
                                 </button>
                             </div>
                         </div>
@@ -178,23 +229,29 @@ require_once 'templates/header.php';
                     
                     <!-- Step 3: Import Results -->
                     <div id="results-section" style="display: none;">
-                        <hr>
-                        <h4>Import Results</h4>
+                        <div class="section-divider"></div>
+                        
+                        <div class="section-header">
+                            <h3 class="section-title">
+                                <i class="fas fa-check-circle"></i>
+                                Import Results
+                            </h3>
+                        </div>
+                        
                         <div id="import-results"></div>
-                        <button id="new-import-btn" class="btn btn-primary mt-3">
-                            <i class="fas fa-plus"></i> Start New Import
-                        </button>
+                        
+                        <div class="button-group">
+                            <button id="new-import-btn" class="btn btn-primary">
+                                <i class="fas fa-plus"></i>
+                                Start New Import
+                            </button>
+                        </div>
                     </div>
                     
                 </div>
-            </div>
-        </div>
     </div>
 </div>
 
-<!-- jQuery and Bootstrap JS -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
 $(document).ready(function() {
@@ -517,16 +574,71 @@ $(document).ready(function() {
     function showAlert(type, message) {
         const alertClass = type === 'error' ? 'danger' : type;
         const alert = `
-            <div class="alert alert-${alertClass} alert-dismissible fade show" role="alert">
+            <div class="alert alert-${alertClass}">
                 ${message}
-                <button type="button" class="close" data-dismiss="alert">
-                    <span>&times;</span>
+                <button type="button" class="alert-close" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
         `;
         $('#validation-alerts').append(alert);
     }
+    
+    // Toggle validation sections
+    function toggleValidationSection(section) {
+        const content = document.getElementById(section + '-collapse');
+        const icon = content.previousElementSibling.querySelector('.toggle-icon');
+        
+        if (content.style.display === 'none' || content.style.display === '') {
+            content.style.display = 'block';
+            icon.style.transform = 'rotate(180deg)';
+        } else {
+            content.style.display = 'none';
+            icon.style.transform = 'rotate(0deg)';
+        }
+    }
 });
+
+// Make toggle function globally available
+window.toggleValidationSection = function(section) {
+    const content = document.getElementById(section + '-collapse');
+    const icon = content.previousElementSibling.querySelector('.toggle-icon');
+    
+    if (content.style.display === 'none' || content.style.display === '') {
+        content.style.display = 'block';
+        icon.style.transform = 'rotate(180deg)';
+    } else {
+        content.style.display = 'none';
+        icon.style.transform = 'rotate(0deg)';
+    }
+};
 </script>
 
-<?php require_once 'templates/footer.php'; ?>
+<?php
+    $content = ob_get_clean();
+    
+    // Include base layout
+    include __DIR__ . '/templates/layouts/base.php';
+    
+    // Log page access
+    Logger::logUserAction('dividend_import_viewed', 'User accessed dividend import page');
+    
+} catch (Exception $e) {
+    Logger::error('Dividend import page error: ' . $e->getMessage());
+    
+    $pageTitle = 'Import Error - ' . APP_NAME;
+    $content = '
+        <div class="error-container text-center">
+            <h1>Import Page Error</h1>
+            <p>We apologize, but there was an error loading the dividend import page.</p>
+            <p class="text-muted">Please try refreshing the page or contact support if the problem persists.</p>
+        </div>
+    ';
+    
+    if (defined('APP_DEBUG') && APP_DEBUG) {
+        $content .= '<div class="alert alert-error mt-3"><strong>Debug:</strong> ' . $e->getMessage() . '</div>';
+    }
+    
+    include __DIR__ . '/templates/layouts/base.php';
+}
+?>
