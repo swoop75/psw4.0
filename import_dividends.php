@@ -16,14 +16,7 @@ try {
     }
     
     $importData = $_SESSION['dividend_import_data'];
-    $selectedBrokerId = $_SESSION['selected_broker_id'] ?? 'minimal';
     $ignoreDuplicates = $_POST['ignore_duplicates'] ?? false;
-    
-    // Convert broker_id to integer if it's numeric, otherwise set to NULL
-    $brokerId = null;
-    if (is_numeric($selectedBrokerId)) {
-        $brokerId = (int)$selectedBrokerId;
-    }
     
     $portfolioDb = Database::getConnection('portfolio');
     $foundationDb = Database::getConnection('foundation');
@@ -120,7 +113,7 @@ try {
                 $dividend['net_dividend_sek'],
                 $dividend['exchange_rate_used'],
                 $portfolioAccountGroupId,
-                $brokerId, // Use the converted broker_id integer or NULL
+                $dividend['broker_id'] ?? null, // Use the broker_id from CSV lookup
                 $dividend['is_complete']
             ]);
             

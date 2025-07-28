@@ -97,6 +97,7 @@ require_once 'templates/header.php';
                                         <th>Payment Date</th>
                                         <th>ISIN</th>
                                         <th>Ticker</th>
+                                        <th>Broker</th>
                                         <th>Account</th>
                                         <th>Shares</th>
                                         <th>Dividend (Local)</th>
@@ -366,6 +367,7 @@ $(document).ready(function() {
                     <td>${dividend.payment_date}</td>
                     <td>${dividend.isin}</td>
                     <td>${dividend.ticker || '-'}</td>
+                    <td>${dividend.broker || '-'}</td>
                     <td>${dividend.portfolio_account_group || '-'}</td>
                     <td>${parseFloat(dividend.shares_held).toFixed(4)}</td>
                     <td>${parseFloat(dividend.dividend_amount_local || 0).toFixed(4)}</td>
