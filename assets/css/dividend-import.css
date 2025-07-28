@@ -153,6 +153,23 @@
     font-size: var(--text-sm);
     transition: all var(--transition-fast);
     background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.form-select option {
+    color: var(--text-primary) !important;
+    background: var(--bg-primary) !important;
+}
+
+/* Ensure select elements have proper styling */
+select.form-select {
+    color: var(--text-primary) !important;
+    background-color: var(--bg-primary) !important;
+}
+
+select.form-select option {
+    color: var(--text-primary) !important;
+    background-color: var(--bg-primary) !important;
 }
 
 .form-select:focus,

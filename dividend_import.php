@@ -22,7 +22,7 @@ try {
     $pageTitle = 'Dividend Import - ' . APP_NAME;
     $pageDescription = 'Import dividend data from CSV files';
     $additionalCSS = [ASSETS_URL . '/css/dividend-import.css?v=' . time()];
-    $additionalJS = [];
+    $additionalJS = ['https://code.jquery.com/jquery-3.6.0.min.js'];
     
     // Prepare content
     ob_start();
@@ -292,7 +292,7 @@ $(document).ready(function() {
     
     function loadBrokers() {
         console.log('Loading brokers...');
-        $.get('get_brokers.php')
+        $.get('./get_brokers.php')
             .done(function(data) {
                 console.log('Broker data received:', data);
                 const select = $('#broker-select');
@@ -329,7 +329,7 @@ $(document).ready(function() {
     
     function loadAccountGroups() {
         console.log('Loading account groups...');
-        $.get('get_account_groups.php')
+        $.get('./get_account_groups.php')
             .done(function(data) {
                 console.log('Account group data received:', data);
                 const select = $('#account-group-select');
@@ -380,7 +380,7 @@ $(document).ready(function() {
         $('#upload-btn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
         
         $.ajax({
-            url: 'proper_csv_upload.php',
+            url: './proper_csv_upload.php',
             type: 'POST',
             data: formData,
             processData: false,
@@ -500,7 +500,7 @@ $(document).ready(function() {
         
         const ignoreDuplicates = $('#ignore-duplicates').is(':checked');
         
-        $.post('import_dividends.php', {
+        $.post('./import_dividends.php', {
             ignore_duplicates: ignoreDuplicates
         })
         .done(function(data) {
