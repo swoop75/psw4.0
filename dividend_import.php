@@ -298,6 +298,17 @@ $(document).ready(function() {
             processData: false,
             contentType: false,
             success: function(data) {
+                console.log('Upload response:', data);
+                if (data.debug_info) {
+                    console.log('Debug info:', data.debug_info);
+                    // Show debug info in the UI
+                    $('#validation-alerts').append(`
+                        <div class="alert alert-info">
+                            <strong>Debug Info:</strong><br>
+                            ${data.debug_info.join('<br>')}
+                        </div>
+                    `);
+                }
                 if (data.success) {
                     importData = data;
                     showPreview(data);
