@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JavaScript Test</title>
+</head>
+<body>
+    <h1>JavaScript Test Page</h1>
+    
+    <select id="broker-select">
+        <option value="">Loading brokers...</option>
+    </select>
+    
+    <select id="account-group-select">
+        <option value="">Loading account groups...</option>
+    </select>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        alert('JavaScript is working!');
+        console.log('Test script loaded');
+        
+        // Test dropdown population
+        document.getElementById('broker-select').innerHTML = '<option value="">Broker Test</option><option value="1">Test Broker</option>';
+        document.getElementById('account-group-select').innerHTML = '<option value="">Account Test</option><option value="1">Test Account</option>';
+    </script>
+</body>
+</html>

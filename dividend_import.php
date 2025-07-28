@@ -18,11 +18,23 @@ require_once __DIR__ . '/src/utils/Logger.php';
 Auth::requireAuth();
 
 try {
+    // Enable error reporting to catch any issues
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+    
     // Set page variables
     $pageTitle = 'Dividend Import - ' . APP_NAME;
     $pageDescription = 'Import dividend data from CSV files';
     $additionalCSS = [ASSETS_URL . '/css/dividend-import.css?v=' . time()];
     $additionalJS = ['https://code.jquery.com/jquery-3.6.0.min.js'];
+    
+    // Debug: Check if constants are defined
+    if (!defined('APP_NAME')) {
+        throw new Exception('APP_NAME not defined');
+    }
+    if (!defined('ASSETS_URL')) {
+        throw new Exception('ASSETS_URL not defined');
+    }
     
     // Prepare content
     ob_start();
