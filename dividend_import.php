@@ -97,6 +97,7 @@ require_once 'templates/header.php';
                                         <th>Payment Date</th>
                                         <th>ISIN</th>
                                         <th>Ticker</th>
+                                        <th>Account</th>
                                         <th>Shares</th>
                                         <th>Dividend (Local)</th>
                                         <th>Currency</th>
@@ -351,14 +352,15 @@ $(document).ready(function() {
         
         data.preview_data.forEach(function(dividend) {
             const statusBadge = dividend.is_complete ? 
-                '<span class="badge badge-success">Complete</span>' : 
-                '<span class="badge badge-warning">Incomplete</span>';
+                '<span class="badge badge-success" style="color: black;">Complete</span>' : 
+                '<span class="badge badge-warning" style="color: black;">Incomplete</span>';
             
             const row = `
                 <tr>
                     <td>${dividend.payment_date}</td>
                     <td>${dividend.isin}</td>
                     <td>${dividend.ticker || '-'}</td>
+                    <td>${dividend.portfolio_account_group || '-'}</td>
                     <td>${parseFloat(dividend.shares_held).toFixed(4)}</td>
                     <td>${parseFloat(dividend.dividend_amount_local || 0).toFixed(4)}</td>
                     <td>${dividend.currency_local || '-'}</td>

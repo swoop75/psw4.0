@@ -69,7 +69,8 @@ try {
         'currency_local' => ['currency_local', 'currency', 'curr'],
         'dividend_amount_sek' => ['dividend_amount_sek', 'dividend_sek'],
         'net_dividend_sek' => ['net_dividend_sek', 'net_sek'],
-        'exchange_rate_used' => ['exchange_rate_used', 'exchange_rate', 'rate']
+        'exchange_rate_used' => ['exchange_rate_used', 'exchange_rate', 'rate'],
+        'portfolio_account_group' => ['portfolio_account_group', 'account_group', 'account', 'portfolio_group']
     ];
     
     // Map header positions
@@ -106,7 +107,8 @@ try {
             'currency_local' => isset($columnMap['currency_local']) ? strtoupper(trim($row[$columnMap['currency_local']] ?? 'SEK')) : 'SEK',
             'dividend_amount_sek' => isset($columnMap['dividend_amount_sek']) ? parseNumber($row[$columnMap['dividend_amount_sek']] ?? '0') : 0,
             'net_dividend_sek' => isset($columnMap['net_dividend_sek']) ? parseNumber($row[$columnMap['net_dividend_sek']] ?? '0') : 0,
-            'exchange_rate_used' => isset($columnMap['exchange_rate_used']) ? parseNumber($row[$columnMap['exchange_rate_used']] ?? '1') : 1
+            'exchange_rate_used' => isset($columnMap['exchange_rate_used']) ? parseNumber($row[$columnMap['exchange_rate_used']] ?? '1') : 1,
+            'portfolio_account_group' => isset($columnMap['portfolio_account_group']) ? trim($row[$columnMap['portfolio_account_group']] ?? '') : ''
         ];
         
         // Validate required fields
@@ -139,6 +141,24 @@ try {
             $warnings[] = "Row $rowNum: Database lookup failed";
             $dividend['company_name'] = 'Unknown';
             $dividend['ticker'] = '';
+        }
+        
+        // Look up or create portfolio account group
+        $dividend['portfolio_account_group_id'] = null;
+        if (!empty($dividend['portfolio_account_group'])) {
+            try {
+                $stmt = $foundationDb->prepare("SELECT portfolio_account_group_id FROM portfolio_account_groups WHERE portfolio_group_name = ?");
+                $stmt->execute([$dividend['portfolio_account_group']]);
+                $accountGroup = $stmt->fetch();
+                
+                if ($accountGroup) {
+                    $dividend['portfolio_account_group_id'] = $accountGroup['portfolio_account_group_id'];
+                } else {
+                    $warnings[] = "Row $rowNum: Account group '{$dividend['portfolio_account_group']}' not found. Will need to be created.";
+                }
+            } catch (Exception $e) {
+                $warnings[] = "Row $rowNum: Account group lookup failed";
+            }
         }
         
         // Calculate derived values
