@@ -262,9 +262,10 @@ try {
     
     fclose($handle);
     
-    // Store data in session for import, including broker_id
+    // Store data in session for import, including broker_id and default account group
     $_SESSION['dividend_import_data'] = $dividendData;
     $_SESSION['selected_broker_id'] = $_POST['broker_id'] ?? 'minimal';
+    $_SESSION['default_account_group_id'] = $_POST['default_account_group_id'] ?? null;
     
     echo json_encode([
         'success' => true,

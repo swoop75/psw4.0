@@ -17,6 +17,7 @@ try {
     
     $importData = $_SESSION['dividend_import_data'];
     $ignoreDuplicates = $_POST['ignore_duplicates'] ?? false;
+    $defaultAccountGroupId = $_SESSION['default_account_group_id'] ?? null;
     
     $portfolioDb = Database::getConnection('portfolio');
     $foundationDb = Database::getConnection('foundation');
@@ -55,6 +56,8 @@ try {
             
             // Handle portfolio account group
             $portfolioAccountGroupId = null;
+            
+            // First check if CSV has account group data
             if (!empty($dividend['portfolio_account_group'])) {
                 // Check if account group exists
                 $stmt = $foundationDb->prepare("
@@ -79,6 +82,9 @@ try {
                 } else {
                     $portfolioAccountGroupId = $accountGroup['portfolio_account_group_id'];
                 }
+            } else if (!empty($defaultAccountGroupId)) {
+                // Use the default account group selected in the UI
+                $portfolioAccountGroupId = $defaultAccountGroupId;
             }
             
             // Insert dividend record

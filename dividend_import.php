@@ -23,7 +23,7 @@ require_once 'templates/header.php';
                     <!-- Step 1: File Upload -->
                     <div id="upload-section">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="broker-select">Select Broker:</label>
                                     <select id="broker-select" class="form-control" required>
@@ -31,7 +31,16 @@ require_once 'templates/header.php';
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="account-group-select">Portfolio Account Group:</label>
+                                    <select id="account-group-select" class="form-control">
+                                        <option value="">Loading account groups...</option>
+                                    </select>
+                                    <small class="form-text text-muted">Optional: Override CSV account group column</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="csv-file">Select CSV File:</label>
                                     <input type="file" id="csv-file" class="form-control-file" accept=".csv,.xlsx" required>
@@ -191,8 +200,9 @@ require_once 'templates/header.php';
 $(document).ready(function() {
     let importData = null;
     
-    // Load brokers on page load
+    // Load brokers and account groups on page load
     loadBrokers();
+    loadAccountGroups();
     
     // File input change handler
     $('#csv-file').on('change', function() {
@@ -262,6 +272,29 @@ $(document).ready(function() {
             });
     }
     
+    function loadAccountGroups() {
+        console.log('Loading account groups...');
+        $.get('get_account_groups.php')
+            .done(function(data) {
+                console.log('Account group data received:', data);
+                const select = $('#account-group-select');
+                select.empty();
+                select.append('<option value="">Use CSV column or none</option>');
+                
+                if (data.success && data.account_groups) {
+                    data.account_groups.forEach(function(group) {
+                        select.append(`<option value="${group.portfolio_account_group_id}">${group.portfolio_group_name}</option>`);
+                    });
+                }
+            })
+            .fail(function(xhr, status, error) {
+                console.error('Failed to load account groups:', status, error);
+                const select = $('#account-group-select');
+                select.empty();
+                select.append('<option value="">Use CSV column or none</option>');
+            });
+    }
+    
     function updateUploadButton() {
         const brokerSelected = $('#broker-select').val() !== '';
         const fileSelected = $('#csv-file')[0].files.length > 0;
@@ -270,10 +303,7 @@ $(document).ready(function() {
     
     function showBrokerInfo() {
         const brokerId = $('#broker-select').val();
-        if (brokerId) {
-            // Show broker-specific format information
-            showAlert('info', `Selected broker ${brokerId}. Please ensure your CSV file matches the expected format for this broker.`);
-        }
+        // Removed generic broker info message as it was not helpful
     }
     
     function uploadFile() {
@@ -288,6 +318,7 @@ $(document).ready(function() {
         const formData = new FormData();
         formData.append('csv_file', fileInput.files[0]);
         formData.append('broker_id', brokerId);
+        formData.append('default_account_group_id', $('#account-group-select').val() || '');
         
         // Show progress
         $('#upload-progress').show();
