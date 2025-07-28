@@ -38,6 +38,9 @@ try {
     // Remove BOM if present
     $firstLine = str_replace("\xEF\xBB\xBF", '', $firstLine);
     
+    // Clean up quotes that might be wrapping the entire line
+    $firstLine = trim($firstLine, '"');
+    
     foreach ($delimiters as $delimiter) {
         // Try both str_getcsv and manual split
         $parts1 = str_getcsv(trim($firstLine), $delimiter);
@@ -79,6 +82,7 @@ try {
     // Get header row - try fgetcsv first, then explode if it fails
     $headerLine = fgets($handle);
     $headerLine = str_replace("\xEF\xBB\xBF", '', trim($headerLine)); // Remove BOM
+    $headerLine = trim($headerLine, '"'); // Remove quotes around entire line
     
     $headerRow = str_getcsv($headerLine, $bestDelimiter);
     
@@ -87,6 +91,11 @@ try {
         $headerRow = array_map('trim', explode($bestDelimiter, $headerLine));
         $debugInfo[] = "Using explode method for header parsing";
     }
+    
+    // Clean up individual header values
+    $headerRow = array_map(function($header) {
+        return trim($header, '"');
+    }, $headerRow);
     
     $debugInfo[] = "Header columns (" . count($headerRow) . "): " . json_encode($headerRow);
     
@@ -128,6 +137,9 @@ try {
         // Skip empty rows
         if (empty($line)) continue;
         
+        // Clean up quotes around entire line
+        $line = trim($line, '"');
+        
         // Try fgetcsv parsing first, then fallback to explode
         $row = str_getcsv($line, $bestDelimiter);
         
@@ -135,6 +147,11 @@ try {
         if (count($row) == 1 && $maxColumns > 1) {
             $row = array_map('trim', explode($bestDelimiter, $line));
         }
+        
+        // Clean up individual values
+        $row = array_map(function($value) {
+            return trim($value, '"');
+        }, $row);
         
         // Skip empty rows after parsing
         if (empty(array_filter($row))) continue;
