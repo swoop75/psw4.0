@@ -108,6 +108,17 @@
                     
                     <div class="nav-item">
                         <a href="javascript:void(0)" class="nav-link nav-dropdown-only">
+                            <i class="fas fa-chart-bar"></i>
+                            Logs
+                            <i class="fas fa-chevron-down nav-arrow"></i>
+                        </a>
+                        <div class="submenu">
+                            <a href="<?php echo BASE_URL; ?>/dividend_logs.php" class="submenu-link">Dividends</a>
+                        </div>
+                    </div>
+                    
+                    <div class="nav-item">
+                        <a href="javascript:void(0)" class="nav-link nav-dropdown-only">
                             <i class="fas fa-book"></i>
                             Rules
                             <i class="fas fa-chevron-down nav-arrow"></i>
