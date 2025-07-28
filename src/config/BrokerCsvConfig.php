@@ -3,8 +3,34 @@
 class BrokerCsvConfig {
     
     private static $brokerConfigs = [
+        'minimal' => [
+            'name' => 'Minimal Format (PSW Standard)',
+            'csv_format' => [
+                'delimiter' => ',',
+                'enclosure' => '"',
+                'escape' => '\\',
+                'skip_header_rows' => 1,
+                'date_format' => 'Y-m-d',
+                'decimal_separator' => '.',
+                'thousand_separator' => '',
+                'encoding' => 'UTF-8'
+            ],
+            'column_mapping' => [
+                'payment_date' => 'payment_date',
+                'isin' => 'isin',
+                'shares_held' => 'shares_held',
+                'dividend_amount_local' => 'dividend_amount_local',
+                'tax_amount_local' => 'tax_amount_local',
+                'currency_local' => 'currency_local',
+                'dividend_amount_sek' => 'dividend_amount_sek',
+                'net_dividend_sek' => 'net_dividend_sek',
+                'exchange_rate_used' => 'exchange_rate_used'
+            ],
+            'required_columns' => ['payment_date', 'isin', 'shares_held', 'dividend_amount_local']
+        ],
+        
         1 => [
-            'name' => 'Broker 1',
+            'name' => 'Generic Broker Format 1',
             'csv_format' => [
                 'delimiter' => ',',
                 'enclosure' => '"',
