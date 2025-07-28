@@ -605,3 +605,276 @@ canvas {
         justify-content: flex-end;
     }
 }
+
+/* =============================================================================
+   Dividend Statistics Styles
+   ============================================================================= */
+
+/* Top Paying Companies */
+.company-rankings {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.company-rank-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-normal);
+    border-left: 4px solid var(--primary-color);
+}
+
+.company-rank-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    background: var(--bg-white-solid);
+}
+
+.rank-badge {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.rank-number {
+    color: white;
+    font-weight: var(--font-bold);
+    font-size: var(--text-lg);
+}
+
+.company-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.company-name {
+    font-weight: var(--font-semibold);
+    color: var(--text-primary);
+    font-size: var(--text-base);
+    margin-bottom: var(--space-1);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.company-stats {
+    display: flex;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
+}
+
+.total-amount {
+    color: var(--primary-color);
+    font-weight: var(--font-semibold);
+}
+
+.payment-count {
+    color: var(--text-secondary);
+}
+
+.company-progress {
+    width: 80px;
+    height: 8px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.company-progress .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
+    border-radius: var(--radius-full);
+    transition: width var(--transition-slow);
+}
+
+/* Best Payment Days */
+.day-rankings {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.day-rank-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-normal);
+}
+
+.day-rank-item:hover {
+    background: var(--bg-white-solid);
+    box-shadow: var(--shadow-sm);
+}
+
+.day-name {
+    font-weight: var(--font-semibold);
+    color: var(--text-primary);
+    min-width: 80px;
+    font-size: var(--text-sm);
+}
+
+.day-stats {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.day-amount {
+    color: var(--primary-color);
+    font-weight: var(--font-semibold);
+    font-size: var(--text-sm);
+}
+
+.day-count {
+    color: var(--text-secondary);
+    font-size: var(--text-xs);
+}
+
+.day-progress {
+    width: 60px;
+    height: 6px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.day-progress .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--secondary-color), #1557B0);
+    border-radius: var(--radius-full);
+    transition: width var(--transition-slow);
+}
+
+/* Dividend Insights */
+.insights-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+}
+
+.insight-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-normal);
+}
+
+.insight-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    background: var(--bg-white-solid);
+}
+
+.insight-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-xl);
+    color: white;
+    flex-shrink: 0;
+}
+
+.insight-item:nth-child(1) .insight-icon {
+    background: linear-gradient(135deg, #10B981, #059669);
+}
+
+.insight-item:nth-child(2) .insight-icon {
+    background: linear-gradient(135deg, #F59E0B, #D97706);
+}
+
+.insight-item:nth-child(3) .insight-icon {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+}
+
+.insight-item:nth-child(4) .insight-icon {
+    background: linear-gradient(135deg, #3B82F6, #2563EB);
+}
+
+.insight-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.insight-value {
+    font-size: var(--text-lg);
+    font-weight: var(--font-bold);
+    color: var(--text-primary);
+    line-height: 1.2;
+}
+
+.insight-label {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    font-weight: var(--font-medium);
+    margin-top: var(--space-1);
+}
+
+/* Widget Subtitle */
+.widget-subtitle {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    font-weight: var(--font-normal);
+    margin-left: var(--space-2);
+}
+
+/* Empty States */
+.empty-state {
+    text-align: center;
+    padding: var(--space-8) var(--space-4);
+    color: var(--text-secondary);
+}
+
+.empty-state i {
+    font-size: var(--text-4xl);
+    color: var(--text-light);
+    margin-bottom: var(--space-4);
+}
+
+.empty-state p {
+    font-size: var(--text-base);
+    margin: 0;
+}
+
+/* Responsive Adjustments for New Components */
+@media (max-width: 768px) {
+    .insights-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-3);
+    }
+    
+    .company-rank-item,
+    .day-rank-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-3);
+    }
+    
+    .company-progress,
+    .day-progress {
+        width: 100%;
+    }
+    
+    .company-stats {
+        flex-direction: column;
+        gap: var(--space-1);
+    }
+}
