@@ -21,3 +21,4 @@
 {"timestamp":"2025-07-28 20:55:52","level":"DEBUG","user_id":1,"ip":"100.91.97.82","message":"Calculated country allocation from dividend data","context":{"countries":0,"total_dividends":0}}
 {"timestamp":"2025-07-28 20:55:52","level":"INFO","user_id":1,"ip":"100.91.97.82","message":"User action: dashboard_viewed","context":{"action":"dashboard_viewed","details":"User accessed dashboard","user_id":1}}
 {"timestamp":"2025-07-28 20:56:39","level":"INFO","user_id":1,"ip":"100.91.97.82","message":"User action: dividend_import_viewed","context":{"action":"dividend_import_viewed","details":"User accessed dividend import page","user_id":1}}
+{"timestamp":"2025-07-28 21:00:20","level":"INFO","user_id":1,"ip":"100.91.97.82","message":"User action: dividend_import_viewed","context":{"action":"dividend_import_viewed","details":"User accessed dividend import page","user_id":1}}
