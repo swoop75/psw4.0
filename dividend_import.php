@@ -250,21 +250,36 @@ try {
     </div>
 </div>
 
+<!-- Load jQuery directly before our script -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-// Wait for jQuery to load, then initialize
-(function checkjQuery() {
+console.log('Script loading...');
+
+// Simple initialization - no jQuery waiting
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, checking jQuery...');
+    
     if (typeof jQuery === 'undefined') {
-        setTimeout(checkjQuery, 100);
+        console.error('jQuery not loaded!');
         return;
     }
     
-    console.log('jQuery loaded, initializing dividend import...');
+    console.log('jQuery available, version:', jQuery.fn.jquery);
     
-    $(document).ready(function() {
+    // Initialize immediately
+    $(function() {
         let importData = null;
         
         console.log('Document ready, loading dropdowns...');
+        console.log('Broker select element found:', $('#broker-select').length > 0);
+        console.log('Account group select element found:', $('#account-group-select').length > 0);
+        
+        // Test basic functionality
+        if ($('#broker-select').length === 0) {
+            console.error('Broker select element not found in DOM!');
+            return;
+        }
         
         // Load brokers and account groups on page load
         loadBrokers();
@@ -652,8 +667,8 @@ window.toggleValidationSection = function(section) {
         icon.style.transform = 'rotate(0deg)';
     }
     
-    }); // End $(document).ready
-})(); // End checkjQuery function
+    }); // End jQuery ready function
+}); // End DOMContentLoaded
 </script>
 
 <?php
