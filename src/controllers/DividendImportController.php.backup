@@ -1,5 +1,4 @@
 <?php
-echo "DEBUG: Loading DividendImportController v2.0<br>";
 
 require_once __DIR__ . '/../../config/config.php';
 require_once __DIR__ . '/../../config/database.php';
@@ -13,14 +12,9 @@ class DividendImportController {
     private $foundationDb;
     
     public function __construct() {
-        try {
-            $this->portfolioDb = Database::getConnection('portfolio');
-            $this->foundationDb = Database::getConnection('foundation');
-            $this->db = $this->portfolioDb; // For backward compatibility
-        } catch (Exception $e) {
-            error_log("DividendImportController DB Error: " . $e->getMessage());
-            throw $e;
-        }
+        $this->portfolioDb = Database::getConnection('portfolio');
+        $this->foundationDb = Database::getConnection('foundation');
+        $this->db = $this->portfolioDb; // For backward compatibility
     }
     
     public function handleRequest() {

@@ -220,7 +220,7 @@ $(document).ready(function() {
     });
     
     function loadBrokers() {
-        $.get('src/controllers/DividendImportController.php?action=brokers')
+        $.get('get_brokers.php')
             .done(function(data) {
                 const select = $('#broker-select');
                 select.empty();

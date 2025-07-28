@@ -1,0 +1,1 @@
+<?php require_once 'config/database.php'; try { echo 'Testing...'; \ = Database::testConnections(); foreach (\ as \ => \) { echo \ . ': ' . \ . '<br>'; } } catch (Exception \) { echo 'Error: ' . \->getMessage(); } ?>

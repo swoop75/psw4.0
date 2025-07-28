@@ -56,10 +56,21 @@ define('API_RETRY_ATTEMPTS', 3);
 define('CACHE_ENABLED', true);
 define('CACHE_DURATION', 3600);
 
+// Load environment variables first
+if (file_exists(__DIR__ . '/../.env')) {
+    $lines = file(__DIR__ . '/../.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos($line, '=') !== false && substr($line, 0, 1) !== '#') {
+            list($key, $value) = explode('=', $line, 2);
+            $_ENV[trim($key)] = trim($value);
+        }
+    }
+}
+
 // Database settings - Load from environment or use defaults
 define('DB_HOST', $_ENV['DB_HOST'] ?? '100.117.171.98');
-define('DB_USER', $_ENV['DB_USERNAME'] ?? 'root');
-define('DB_PASS', $_ENV['DB_PASSWORD'] ?? '');
+define('DB_USER', $_ENV['DB_USERNAME'] ?? 'swoop');
+define('DB_PASS', $_ENV['DB_PASSWORD'] ?? 'QQ1122ww_1975!#');
 
 // Start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
