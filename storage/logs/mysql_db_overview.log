@@ -1,0 +1,5 @@
+2025-07-25 12:51:52 INFO: ==================================================
+2025-07-25 12:51:52 INFO: MYSQL DATABASE OVERVIEW SCRIPT STARTED
+2025-07-25 12:51:52 INFO: ==================================================
+2025-07-25 12:51:52 ERROR: Missing database configuration: ['host', 'user', 'password']
+2025-07-25 12:51:52 ERROR: Script failed. Duration: 0:00:00.000936.

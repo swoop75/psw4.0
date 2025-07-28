@@ -102,6 +102,10 @@ include __DIR__ . '/../templates/header.php';
                 <i class="fas fa-user-cog"></i>
                 User Management
             </h1>
+            <div class="current-user-display">
+                <span class="user-name-main"><?php echo htmlspecialchars($user['username'] ?? 'Unknown'); ?></span>, 
+                <span class="user-role-main"><?php echo htmlspecialchars($user['role_name'] ?? 'User'); ?></span>
+            </div>
             <p class="page-subtitle">
                 Manage your profile, security settings, and preferences
             </p>

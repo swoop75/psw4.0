@@ -9,16 +9,19 @@
     max-width: 1400px;
     margin: 0 auto;
     padding: var(--space-6);
-    min-height: calc(100vh - 64px);
+    min-height: calc(100vh - 120px);
+    position: relative;
+    z-index: 1;
+    margin-top: 120px; /* Add space for top bar (80px + padding) */
 }
 
 /* Dashboard Header */
 .dashboard-header {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
-    padding: var(--space-12) var(--space-8);
+    padding: var(--space-4) var(--space-6);
     border-radius: var(--radius-2xl);
-    margin-bottom: var(--space-8);
+    margin-bottom: var(--space-6);
     position: relative;
     overflow: hidden;
     box-shadow: var(--shadow-xl);
@@ -35,15 +38,32 @@
     pointer-events: none;
 }
 
-.dashboard-header h1 {
-    font-size: var(--text-4xl);
-    font-weight: var(--font-bold);
-    margin: 0 0 var(--space-3) 0;
+/* Header main row with Dashboard title and Last updated */
+.header-main {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: var(--space-4);
+    margin-bottom: var(--space-2);
     position: relative;
     z-index: 1;
+}
+
+.dashboard-header h1 {
+    font-size: var(--text-3xl);
+    font-weight: var(--font-bold);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: white;
+}
+
+.last-updated {
+    font-size: var(--text-base);
+    color: white !important;
+    opacity: 0.9;
+    font-weight: var(--font-normal);
+    white-space: nowrap;
 }
 
 .dashboard-header h1 i {
@@ -60,6 +80,7 @@
     font-weight: var(--font-normal);
     position: relative;
     z-index: 1;
+    color: white;
 }
 
 /* Metrics Grid */

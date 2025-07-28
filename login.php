@@ -63,6 +63,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             Auth::login($result['user']);
             Security::resetLoginAttempts($identifier);
             
+            // Update last login timestamp
+            $userModel->updateLastLogin($result['user']['user_id']);
+            
             // Set success message
             $_SESSION['flash_success'] = 'Welcome back, ' . $result['user']['username'] . '!';
             

@@ -118,6 +118,29 @@ class NewCompaniesController {
             
             $whereClause = 'WHERE ' . implode(' AND ', $whereConditions);
             
+            // Handle sorting
+            $validSortFields = [
+                'company' => 'nc.company',
+                'country_name' => 'nc.country_name',
+                'broker_name' => 'br.broker_name', 
+                'yield_current' => 'COALESCE(nc.yield_current, nc.yield)',
+                'strategy_name' => 'psg.strategy_name',
+                'status_name' => 'ncs.status'
+            ];
+            
+            $sortBy = $filters['sort_by'] ?? 'company';
+            $sortOrder = strtoupper($filters['sort_order'] ?? 'ASC');
+            
+            // Validate sort parameters
+            if (!isset($validSortFields[$sortBy])) {
+                $sortBy = 'company';
+            }
+            if (!in_array($sortOrder, ['ASC', 'DESC'])) {
+                $sortOrder = 'ASC';
+            }
+            
+            $orderClause = "ORDER BY {$validSortFields[$sortBy]} $sortOrder";
+            
             // Count total records - include JOINs to match main query
             $countSql = "SELECT COUNT(*) as total 
                         FROM new_companies nc 
@@ -144,6 +167,17 @@ class NewCompaniesController {
                            nc.country_name,
                            nc.country_id,
                            nc.yield,
+                           nc.yield_current,
+                           nc.yield_1y_avg,
+                           nc.yield_1y_cagr,
+                           nc.yield_3y_avg,
+                           nc.yield_3y_cagr,
+                           nc.yield_5y_avg,
+                           nc.yield_5y_cagr,
+                           nc.yield_10y_avg,
+                           nc.yield_10y_cagr,
+                           nc.yield_data_updated_at,
+                           nc.yield_source,
                            nc.strategy_group_id,
                            psg.strategy_name,
                            nc.new_group_id,
@@ -159,7 +193,7 @@ class NewCompaniesController {
                     LEFT JOIN psw_foundation.brokers br ON nc.broker_id = br.broker_id
                     LEFT JOIN new_companies_status ncs ON nc.new_companies_status_id = ncs.id
                     $whereClause 
-                    ORDER BY nc.new_company_id DESC 
+                    $orderClause 
                     LIMIT :limit OFFSET :offset";
             
             $stmt = $this->portfolioDb->prepare($sql);
@@ -183,6 +217,17 @@ class NewCompaniesController {
                     'country_name' => $entry['country_name'],
                     'country_id' => $entry['country_id'],
                     'yield' => (float) ($entry['yield'] ?? 0),
+                    'yield_current' => (float) ($entry['yield_current'] ?? 0),
+                    'yield_1y_avg' => (float) ($entry['yield_1y_avg'] ?? 0),
+                    'yield_1y_cagr' => (float) ($entry['yield_1y_cagr'] ?? 0),
+                    'yield_3y_avg' => (float) ($entry['yield_3y_avg'] ?? 0),
+                    'yield_3y_cagr' => (float) ($entry['yield_3y_cagr'] ?? 0),
+                    'yield_5y_avg' => (float) ($entry['yield_5y_avg'] ?? 0),
+                    'yield_5y_cagr' => (float) ($entry['yield_5y_cagr'] ?? 0),
+                    'yield_10y_avg' => (float) ($entry['yield_10y_avg'] ?? 0),
+                    'yield_10y_cagr' => (float) ($entry['yield_10y_cagr'] ?? 0),
+                    'yield_data_updated_at' => $entry['yield_data_updated_at'],
+                    'yield_source' => $entry['yield_source'],
                     'strategy_group_id' => $entry['strategy_group_id'],
                     'strategy_name' => $entry['strategy_name'],
                     'new_group_id' => $entry['new_group_id'],
@@ -270,18 +315,27 @@ class NewCompaniesController {
             
             // Prepare data for insertion
             $insertData = [
-                'company' => !empty($data['company']) ? Security::sanitizeInput($data['company']) : null,
+                'company' => !empty($data['company']) ? Security::sanitizeInput($data['company']) : ($isBorsdataMode ? 'Pending Börsdata lookup' : null),
                 'ticker' => !empty($data['ticker']) ? strtoupper(Security::sanitizeInput($data['ticker'])) : null,
                 'isin' => !empty($data['isin']) ? Security::sanitizeInput($data['isin']) : null,
                 'country_name' => !empty($data['country_name']) ? Security::sanitizeInput($data['country_name']) : null,
                 'country_id' => !empty($data['country_id']) ? (int)$data['country_id'] : null,
                 'yield' => !empty($data['yield']) ? (float)$data['yield'] : null,
+                'yield_current' => !empty($data['yield_current']) ? (float)$data['yield_current'] : null,
+                'yield_1y_avg' => !empty($data['yield_1y_avg']) ? (float)$data['yield_1y_avg'] : null,
+                'yield_1y_cagr' => !empty($data['yield_1y_cagr']) ? (float)$data['yield_1y_cagr'] : null,
+                'yield_3y_avg' => !empty($data['yield_3y_avg']) ? (float)$data['yield_3y_avg'] : null,
+                'yield_3y_cagr' => !empty($data['yield_3y_cagr']) ? (float)$data['yield_3y_cagr'] : null,
+                'yield_5y_avg' => !empty($data['yield_5y_avg']) ? (float)$data['yield_5y_avg'] : null,
+                'yield_5y_cagr' => !empty($data['yield_5y_cagr']) ? (float)$data['yield_5y_cagr'] : null,
+                'yield_10y_avg' => !empty($data['yield_10y_avg']) ? (float)$data['yield_10y_avg'] : null,
+                'yield_10y_cagr' => !empty($data['yield_10y_cagr']) ? (float)$data['yield_10y_cagr'] : null,
                 'strategy_group_id' => !empty($data['strategy_group_id']) ? (int)$data['strategy_group_id'] : null,
                 'new_group_id' => !empty($data['new_group_id']) ? (int)$data['new_group_id'] : null,
                 'broker_id' => !empty($data['broker_id']) ? (int)$data['broker_id'] : null,
                 'inspiration' => !empty($data['inspiration']) ? Security::sanitizeInput($data['inspiration']) : null,
                 'comments' => !empty($data['comments']) ? Security::sanitizeInput($data['comments']) : null,
-                'new_companies_status_id' => !empty($data['new_companies_status_id']) ? (int)$data['new_companies_status_id'] : null,
+                'new_companies_status_id' => $this->validateStatusId($data['new_companies_status_id'] ?? ''),
                 'new_companies_col' => !empty($data['new_companies_col']) ? Security::sanitizeInput($data['new_companies_col']) : null,
                 'borsdata_available' => isset($data['borsdata_available']) ? (bool)$data['borsdata_available'] : false
             ];
@@ -300,6 +354,13 @@ class NewCompaniesController {
             $success = $stmt->execute();
             
             if ($success) {
+                $newEntryId = $this->portfolioDb->lastInsertId();
+                
+                // If in Börsdata mode, try to populate data immediately
+                if ($isBorsdataMode && !empty($data['isin'])) {
+                    $this->populateBorsdataData($newEntryId, $data['isin']);
+                }
+                
                 Logger::info('New company entry added successfully', [
                     'company' => $data['company'],
                     'isin' => $data['isin']
@@ -352,6 +413,51 @@ class NewCompaniesController {
                 $params[':yield'] = (float)$data['yield'];
             }
             
+            if (isset($data['yield_current'])) {
+                $updateData[] = "yield_current = :yield_current";
+                $params[':yield_current'] = !empty($data['yield_current']) ? (float)$data['yield_current'] : null;
+            }
+            
+            if (isset($data['yield_1y_avg'])) {
+                $updateData[] = "yield_1y_avg = :yield_1y_avg";
+                $params[':yield_1y_avg'] = !empty($data['yield_1y_avg']) ? (float)$data['yield_1y_avg'] : null;
+            }
+            
+            if (isset($data['yield_1y_cagr'])) {
+                $updateData[] = "yield_1y_cagr = :yield_1y_cagr";
+                $params[':yield_1y_cagr'] = !empty($data['yield_1y_cagr']) ? (float)$data['yield_1y_cagr'] : null;
+            }
+            
+            if (isset($data['yield_3y_avg'])) {
+                $updateData[] = "yield_3y_avg = :yield_3y_avg";
+                $params[':yield_3y_avg'] = !empty($data['yield_3y_avg']) ? (float)$data['yield_3y_avg'] : null;
+            }
+            
+            if (isset($data['yield_3y_cagr'])) {
+                $updateData[] = "yield_3y_cagr = :yield_3y_cagr";
+                $params[':yield_3y_cagr'] = !empty($data['yield_3y_cagr']) ? (float)$data['yield_3y_cagr'] : null;
+            }
+            
+            if (isset($data['yield_5y_avg'])) {
+                $updateData[] = "yield_5y_avg = :yield_5y_avg";
+                $params[':yield_5y_avg'] = !empty($data['yield_5y_avg']) ? (float)$data['yield_5y_avg'] : null;
+            }
+            
+            if (isset($data['yield_5y_cagr'])) {
+                $updateData[] = "yield_5y_cagr = :yield_5y_cagr";
+                $params[':yield_5y_cagr'] = !empty($data['yield_5y_cagr']) ? (float)$data['yield_5y_cagr'] : null;
+            }
+            
+            if (isset($data['yield_10y_avg'])) {
+                $updateData[] = "yield_10y_avg = :yield_10y_avg";
+                $params[':yield_10y_avg'] = !empty($data['yield_10y_avg']) ? (float)$data['yield_10y_avg'] : null;
+            }
+            
+            if (isset($data['yield_10y_cagr'])) {
+                $updateData[] = "yield_10y_cagr = :yield_10y_cagr";
+                $params[':yield_10y_cagr'] = !empty($data['yield_10y_cagr']) ? (float)$data['yield_10y_cagr'] : null;
+            }
+            
             if (isset($data['comments'])) {
                 $updateData[] = "comments = :comments";
                 $params[':comments'] = Security::sanitizeInput($data['comments']);
@@ -359,7 +465,7 @@ class NewCompaniesController {
             
             if (isset($data['new_companies_status_id'])) {
                 $updateData[] = "new_companies_status_id = :new_companies_status_id";
-                $params[':new_companies_status_id'] = (int)$data['new_companies_status_id'];
+                $params[':new_companies_status_id'] = $this->validateStatusId($data['new_companies_status_id']);
             }
             
             if (isset($data['isin'])) {
@@ -423,13 +529,21 @@ class NewCompaniesController {
      */
     public function deleteNewCompanyEntry($companyId) {
         try {
+            error_log("DeleteNewCompanyEntry called with ID: " . $companyId);
+            
             $sql = "DELETE FROM new_companies WHERE new_company_id = :new_company_id";
             $stmt = $this->portfolioDb->prepare($sql);
             $stmt->bindValue(':new_company_id', $companyId, PDO::PARAM_INT);
             
-            return $stmt->execute();
+            $result = $stmt->execute();
+            $rowCount = $stmt->rowCount();
+            
+            error_log("Delete SQL executed. Result: " . ($result ? 'true' : 'false') . ", Rows affected: " . $rowCount);
+            
+            return $result && $rowCount > 0;
             
         } catch (Exception $e) {
+            error_log('Delete new company entry error: ' . $e->getMessage());
             Logger::error('Delete new company entry error: ' . $e->getMessage());
             return false;
         }
@@ -616,6 +730,134 @@ class NewCompaniesController {
             
         } catch (Exception $e) {
             Logger::error('CSV export error: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+    
+    /**
+     * Populate Börsdata data for a new company entry
+     * @param int $entryId The new company entry ID
+     * @param string $isin The ISIN to lookup
+     * @return bool Success status
+     */
+    private function populateBorsdataData($entryId, $isin) {
+        try {
+            $marketdataDb = Database::getConnection('marketdata');
+            
+            // Try global_instruments first
+            $stmt = $marketdataDb->prepare("
+                SELECT gi.name, gi.yahoo, c.nameEN as country_name, c.id as country_id
+                FROM global_instruments gi 
+                LEFT JOIN countries c ON gi.countryId = c.id 
+                WHERE gi.isin = ? 
+                LIMIT 1
+            ");
+            $stmt->execute([$isin]);
+            $data = $stmt->fetch();
+            
+            // If not found in global, try nordic
+            if (!$data) {
+                $stmt = $marketdataDb->prepare("
+                    SELECT ni.name, ni.yahoo, c.nameEN as country_name, c.id as country_id
+                    FROM nordic_instruments ni 
+                    LEFT JOIN countries c ON ni.countryId = c.id 
+                    WHERE ni.isin = ? 
+                    LIMIT 1
+                ");
+                $stmt->execute([$isin]);
+                $data = $stmt->fetch();
+            }
+            
+            // If we found data, update the entry
+            if ($data) {
+                $updateSql = "UPDATE new_companies SET 
+                             company = :company,
+                             ticker = :ticker,
+                             country_name = :country_name,
+                             country_id = :country_id
+                             WHERE new_company_id = :id";
+                
+                $stmt = $this->portfolioDb->prepare($updateSql);
+                $stmt->execute([
+                    ':company' => $data['name'],
+                    ':ticker' => $data['yahoo'],
+                    ':country_name' => $data['country_name'],
+                    ':country_id' => $data['country_id'],
+                    ':id' => $entryId
+                ]);
+                
+                Logger::info('Börsdata data populated successfully', [
+                    'entry_id' => $entryId,
+                    'isin' => $isin,
+                    'company' => $data['name']
+                ]);
+                
+                return true;
+            } else {
+                // If no data found, keep the placeholder company name
+                Logger::warning('ISIN not found in Börsdata', [
+                    'entry_id' => $entryId,
+                    'isin' => $isin
+                ]);
+                return false;
+            }
+            
+        } catch (Exception $e) {
+            Logger::error('Börsdata population error: ' . $e->getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Validate status ID and return null for invalid/empty values
+     * @param mixed $statusId Status ID to validate
+     * @return int|null Valid status ID or null
+     */
+    private function validateStatusId($statusId) {
+        try {
+            $statusId = trim((string)$statusId);
+            
+            // Handle empty or special values
+            if (empty($statusId) || $statusId === '' || $statusId === '0' || $statusId === 'null') {
+                error_log("Status ID being set to NULL (empty/default)");
+                return null;
+            }
+            
+            // Validate that the status ID exists in the database
+            $checkSql = "SELECT id FROM new_companies_status WHERE id = :status_id";
+            $checkStmt = $this->portfolioDb->prepare($checkSql);
+            $checkStmt->bindValue(':status_id', (int)$statusId, PDO::PARAM_INT);
+            $checkStmt->execute();
+            
+            if ($checkStmt->fetch()) {
+                error_log("Status ID being set to valid ID: " . $statusId);
+                return (int)$statusId;
+            } else {
+                // Invalid status ID, set to null
+                error_log("Invalid status ID (" . $statusId . "), setting to NULL");
+                return null;
+            }
+        } catch (Exception $e) {
+            error_log("Error validating status ID: " . $e->getMessage());
+            return null;
+        }
+    }
+    
+    /**
+     * Check if an ISIN already exists in the new companies list
+     * @param string $isin ISIN to check
+     * @return bool True if ISIN exists, false otherwise
+     */
+    public function checkISINExists($isin) {
+        try {
+            $sql = "SELECT COUNT(*) FROM new_companies WHERE isin = :isin";
+            $stmt = $this->portfolioDb->prepare($sql);
+            $stmt->bindValue(':isin', $isin);
+            $stmt->execute();
+            
+            return $stmt->fetchColumn() > 0;
+        } catch (Exception $e) {
+            Logger::error('Error checking ISIN existence: ' . $e->getMessage());
             throw $e;
         }
     }

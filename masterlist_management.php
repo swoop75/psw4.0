@@ -144,7 +144,6 @@ ob_start();
             <div class="header-content">
                 <div class="header-left">
                     <h1><i class="fas fa-building"></i> Masterlist Management</h1>
-                    <p>Manage company masterlist data</p>
                 </div>
             </div>
         </div>

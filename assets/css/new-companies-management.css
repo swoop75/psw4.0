@@ -5,10 +5,12 @@
  * Updated: Compatible with unified navigation system
  */
 
-/* Compatibility with unified navigation */
-.container {
-    margin-top: 0; /* Remove any extra margin since main-container already has padding-top */
+/* Force proper spacing for sticky header - IMPORTANT: Must be at top to avoid cascade issues */
+body .container {
+    padding-top: 120px !important; /* Force override - sticky header (64px) + generous spacing */
 }
+
+/* Compatibility with unified navigation - This override is handled by the main container definition below */
 
 /* CSS Custom Properties - Beautiful Design System */
 :root {
@@ -111,7 +113,8 @@ body {
     width: 100%;
     margin: 0 auto;
     padding: var(--space-4) var(--space-6);
-    min-height: calc(100vh - 64px);
+    padding-top: 100px; /* Account for sticky header (64px) + extra spacing */
+    min-height: 150vh; /* Increased height to accommodate 50 rows without scrolling */
     box-sizing: border-box;
 }
 
@@ -119,7 +122,7 @@ body {
 .page-header {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
-    padding: var(--space-12) var(--space-8);
+    padding: var(--space-6) var(--space-8);
     border-radius: var(--radius-2xl);
     margin-bottom: var(--space-8);
     position: relative;
@@ -151,9 +154,10 @@ body {
 }
 
 .header-left h1 {
-    font-size: var(--text-4xl);
-    font-weight: var(--font-bold);
-    margin-bottom: var(--space-2);
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: inherit;
     display: flex;
     align-items: center;
     gap: var(--space-4);
@@ -526,9 +530,13 @@ select:hover {
     table-layout: auto; /* Allow flexible column widths */
 }
 
+.data-table thead tr {
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+}
+
 .data-table th {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: var(--space-5) var(--space-5); /* Increased padding for desktop */
+    background: transparent;
+    padding: var(--space-3) var(--space-5); /* Reduced vertical padding by half */
     text-align: left;
     font-weight: var(--font-semibold);
     color: white;
@@ -540,6 +548,11 @@ select:hover {
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     position: relative;
     overflow: hidden;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.data-table th:last-child {
+    border-right: none;
 }
 
 .data-table th::before {
@@ -558,7 +571,7 @@ select:hover {
 }
 
 .data-table td {
-    padding: var(--space-5) var(--space-5); /* Increased padding for desktop */
+    padding: var(--space-3) var(--space-5); /* Reduced vertical padding by half */
     border-bottom: 1px solid var(--border-light);
     vertical-align: middle;
     color: var(--text-secondary);
@@ -621,8 +634,8 @@ select:hover {
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
-    min-width: 250px; /* Increased for desktop */
-    max-width: 350px; /* Prevent excessive width */
+    min-width: 300px; /* Increased for desktop to show full tickers */
+    max-width: 400px; /* Prevent excessive width */
 }
 
 .company-name {
@@ -650,10 +663,22 @@ select:hover {
 
 .company-details {
     display: flex;
-    gap: var(--space-3);
+    flex-direction: column;
+    gap: var(--space-2);
     font-size: var(--text-xs);
     color: var(--text-muted);
-    flex-wrap: wrap;
+    margin-top: var(--space-2);
+    min-width: 250px; /* Ensure enough space for full ticker display */
+    overflow: visible; /* Prevent text cutoff */
+}
+
+.company-identifiers {
+    font-family: var(--font-mono);
+    background: rgba(0, 200, 150, 0.05);
+    padding: var(--space-2);
+    border-radius: var(--radius-sm);
+    color: #6b7280;
+    border-left: 2px solid var(--primary-color);
 }
 
 .isin {
@@ -680,6 +705,194 @@ select:hover {
     align-items: center;
     gap: var(--space-1);
     box-shadow: var(--shadow-sm);
+}
+
+/* Data Source Badges */
+.borsdata-badge {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.manual-badge {
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    color: #8b4513;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Yield Color Coding */
+.yield-value {
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.yield-below-avg {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.yield-above-avg {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.yield-metrics-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+}
+
+.yield-metric {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-2);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+}
+
+.yield-metric-label {
+    color: var(--text-muted);
+}
+
+.yield-metric-value {
+    font-weight: var(--font-semibold);
+}
+
+.yield-trend-up {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+    border-left: 3px solid #28a745;
+}
+
+.yield-trend-down {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+    border-left: 3px solid #dc3545;
+}
+
+.yield-clickable {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.yield-clickable:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Yield Data Toggle Button */
+.yield-data-toggle {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-dark);
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+    margin-bottom: var(--space-4);
+}
+
+.yield-data-toggle:hover {
+    background: var(--bg-secondary);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.yield-data-toggle i {
+    transition: transform 0.2s ease;
+    margin-right: var(--space-2);
+}
+
+/* Additional Yield Fields Container */
+#additionalYieldFields {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-dark);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    margin-bottom: var(--space-6);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+#additionalYieldFields .form-row {
+    margin-bottom: var(--space-4);
+}
+
+#additionalYieldFields .form-group label {
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+}
+
+#additionalYieldFields .form-help {
+    color: var(--text-light);
+    font-size: var(--text-xs);
+}
+
+/* Table Sorting Styles */
+.sortable {
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s ease;
+    position: relative;
+    padding-right: 2rem !important;
+}
+
+.sortable:hover {
+    background: rgba(0, 200, 150, 0.05);
+    color: var(--primary-color);
+}
+
+.sortable.active {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    font-weight: 600;
+}
+
+.sortable.active:hover {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
+}
+
+.sort-icon {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.875rem;
+    opacity: 0.7;
+    transition: all 0.2s ease;
+}
+
+.sortable:hover .sort-icon {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.sortable.active .sort-icon {
+    opacity: 1;
+    color: white;
 }
 
 /* Status and Priority Badges */
@@ -799,6 +1012,90 @@ select:hover {
 
 .modal.show .modal-content {
     transform: scale(1) translateY(0);
+}
+
+/* Delete Modal - Smaller and more focused */
+#deleteModal .modal-content {
+    max-width: 480px;
+    width: 90%;
+    margin: 15% auto;
+    border-radius: 16px;
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.15),
+        0 8px 16px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(255, 255, 255, 0.9);
+}
+
+#deleteModal .modal-header {
+    padding: var(--space-6) var(--space-6) var(--space-4);
+    background: linear-gradient(135deg, #dc3545 0%, #c62d42 100%);
+    border-radius: 16px 16px 0 0;
+}
+
+#deleteModal .modal-header h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+#deleteModal .modal-body {
+    padding: var(--space-6);
+    text-align: center;
+    color: var(--text-primary);
+    font-size: var(--text-base);
+    line-height: 1.6;
+}
+
+#deleteModal .modal-body p {
+    margin: 0;
+}
+
+#deleteModal .modal-body strong {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+#deleteModal .form-actions {
+    padding: var(--space-4) var(--space-6) var(--space-6);
+    display: flex;
+    gap: var(--space-3);
+    justify-content: flex-end;
+}
+
+#deleteModal .btn {
+    padding: var(--space-3) var(--space-5);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    border-radius: var(--radius-lg);
+    min-width: 100px;
+    transition: all 0.2s ease;
+}
+
+#deleteModal .btn-secondary {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-dark);
+    color: var(--text-secondary);
+}
+
+#deleteModal .btn-secondary:hover {
+    background: var(--bg-secondary);
+    border-color: var(--text-secondary);
+}
+
+#deleteModal .btn-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #c62d42 100%);
+    border: 1px solid #dc3545;
+    color: white;
+    box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
+}
+
+#deleteModal .btn-danger:hover {
+    background: linear-gradient(135deg, #c62d42 0%, #a52834 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
 }
 
 /* Performance optimization: Use transform instead of box-shadow animations */
@@ -1009,6 +1306,14 @@ form::before {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--space-6);
+    margin-bottom: var(--space-6);
+}
+
+/* Three-column form row for new layout */
+.form-row-three {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--space-4);
     margin-bottom: var(--space-6);
 }
 
@@ -1353,7 +1658,7 @@ label:not(.checkbox-dropdown label):not(.form-group label) {
     }
     
     .page-header {
-        padding: var(--space-8) var(--space-6);
+        padding: var(--space-4) var(--space-6);
         margin-bottom: var(--space-6);
     }
     
@@ -1382,6 +1687,11 @@ label:not(.checkbox-dropdown label):not(.form-group label) {
     }
     
     .form-row {
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+    }
+    
+    .form-row-three {
         grid-template-columns: 1fr;
         gap: var(--space-4);
     }
@@ -1498,12 +1808,68 @@ label:not(.checkbox-dropdown label):not(.form-group label) {
     transform: scale(1.1);
 }
 
+/* Removed dropdown CSS - now using direct panel opening */
+
+/* ============================================
+   ALTERNATIVE SOLUTIONS FOR DROPDOWN BACKGROUND
+   ============================================ */
+
+/* SOLUTION 2: Backdrop with Blur + Solid Overlay
+   Motivation: Creates a visual separation layer behind the dropdown 
+   that blurs and darkens the background content */
+/*
+.actions-dropdown-menu::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(3px);
+    z-index: -1;
+}
+
+.actions-dropdown-menu {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+*/
+
+/* SOLUTION 3: CSS Mask + Shadow Overlay
+   Motivation: Uses CSS masking to create a "cutout" effect that completely
+   isolates the dropdown from background content */
+/*
+.company-actions-dropdown.active::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 1049;
+    backdrop-filter: blur(2px);
+}
+
+.actions-dropdown-menu {
+    background: #ffffff;
+    box-shadow: 
+        0 0 0 1px rgba(0, 0, 0, 0.05),
+        0 20px 40px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    border: 1px solid #d1d5db;
+    z-index: 1051;
+}
+*/
+
 /* Right-Side Company Panel - Modern Transform Approach */
 .company-panel {
     position: fixed;
     top: 0;
     right: 0;
-    width: 380px;
+    width: 420px;
     height: 100vh;
     background: #ffffff;
     border-left: 1px solid var(--border-dark);
@@ -1786,6 +2152,28 @@ label:not(.checkbox-dropdown label):not(.form-group label) {
 
 .panel-action-btn.primary:hover {
     background: var(--secondary-dark);
+}
+
+.panel-action-btn.success {
+    background: #10b981;
+    color: white;
+    border-color: #10b981;
+}
+
+.panel-action-btn.success:hover {
+    background: #059669;
+    border-color: #059669;
+}
+
+.panel-action-btn.danger {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+}
+
+.panel-action-btn.danger:hover {
+    background: #dc2626;
+    border-color: #dc2626;
 }
 
 /* Mobile Responsive */

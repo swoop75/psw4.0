@@ -49,3 +49,5 @@
 {"timestamp":"2025-07-23 19:21:03","level":"INFO","user_id":1,"ip":"100.91.97.82","message":"New company entry added successfully","context":{"company":"1111","isin":"US40434L1052"}}
 {"timestamp":"2025-07-23 19:28:17","level":"ERROR","user_id":1,"ip":"100.91.97.82","message":"Add new company entry error: Company name is required"}
 {"timestamp":"2025-07-23 19:31:36","level":"ERROR","user_id":1,"ip":"100.91.97.82","message":"Add new company entry error: This ISIN is already in the new companies list"}
+{"timestamp":"2025-07-23 19:36:30","level":"ERROR","user_id":1,"ip":"100.91.97.82","message":"Add new company entry error: This ISIN is already in the new companies list"}
+{"timestamp":"2025-07-23 19:36:35","level":"ERROR","user_id":1,"ip":"100.91.97.82","message":"Add new company entry error: This ISIN is already in the new companies list"}

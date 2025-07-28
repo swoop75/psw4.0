@@ -389,7 +389,7 @@
             </div>
             <div class="feature-text">
                 <h3>Portfolio Tracking & Analytics</h3>
-                <p>Complete overview of your dividend investments with detailed performance metrics and real-time tracking</p>
+                <p>Complete overview of dividend investments with detailed performance metrics and real-time tracking</p>
             </div>
         </div>
         
@@ -449,7 +449,7 @@
             </div>
             <div class="feature-text">
                 <h3>Flexible Exporting</h3>
-                <p>Export your portfolio data, dividend reports, and analytics in multiple formats including Excel spreadsheets, CSV files, and professional PDF documents for seamless integration with your financial workflows</p>
+                <p>Export portfolio data, dividend reports, and analytics in multiple formats including Excel spreadsheets, CSV files, and PDF documents for seamless integration with financial workflows</p>
             </div>
         </div>
     </div>

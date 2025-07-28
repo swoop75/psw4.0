@@ -15,12 +15,17 @@ $quickStats = $dashboardData['quick_stats'];
 <div class="dashboard-container">
     <!-- Welcome Header -->
     <div class="dashboard-header">
-        <h1>
-            <i class="fas fa-tachometer-alt"></i>
-            Dashboard
-        </h1>
+        <div class="header-main">
+            <h1>
+                <i class="fas fa-tachometer-alt"></i>
+                Dashboard
+            </h1>
+            <span class="last-updated">
+                Last updated: <?php echo date('M j, Y H:i'); ?>
+            </span>
+        </div>
         <p class="dashboard-subtitle">
-            Welcome back, <?php echo Auth::getUsername(); ?>! Here's your portfolio overview.
+            Welcome back, <?php echo Auth::getUsername(); ?>! Here's portfolio overview.
         </p>
     </div>
 

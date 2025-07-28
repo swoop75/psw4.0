@@ -29,7 +29,7 @@ class Dividend {
             // Query log_dividends table - get company info separately to avoid cross-database issues
             $sql = "SELECT 
                         ld.payment_date as date,
-                        ld.pay_date,
+                        ld.payment_date as pay_date,
                         ld.isin,
                         ld.shares_held as shares,
                         ld.dividend_amount_local / ld.shares_held as dividend_per_share,
@@ -46,7 +46,7 @@ class Dividend {
                 // $sql .= " AND ld.user_id = :user_id";
             }
             
-            $sql .= " ORDER BY ld.payment_date DESC, ld.pay_date DESC LIMIT :limit";
+            $sql .= " ORDER BY ld.payment_date DESC LIMIT :limit";
             
             $stmt = $this->portfolioDb->prepare($sql);
             $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);

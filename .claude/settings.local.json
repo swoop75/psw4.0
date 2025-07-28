@@ -23,7 +23,9 @@
       "Bash(wc:*)",
       "Bash(copy \"C:\\Users\\laoan\\Documents\\GitHub\\psw\\psw4.0\\new_companies_management.php\" \"D:\"\")",
       "Bash(copy \"C:\\Users\\laoan\\Documents\\GitHub\\psw\\psw4.0\\new_companies_management.php\" \"D:\")",
-      "Bash(git log:*)"
+      "Bash(del check_status.php)",
+      "Bash(git checkout:*)",
+      "Bash(del debug_user_tables.php)"
     ],
     "deny": []
   }

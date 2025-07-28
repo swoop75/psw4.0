@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WI
                 break;
                 
             case 'add_to_masterlist':
-                $companyId = $_POST['new_companies_id'] ?? '';
+                $companyId = $_POST['new_company_id'] ?? '';
                 $masterlistData = [
                     'market' => $_POST['market'] ?? null,
                     'share_type_id' => $_POST['share_type_id'] ?? 1
@@ -61,20 +61,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WI
                 exit;
                 
             case 'update':
-                $companyId = $_POST['new_companies_id'] ?? '';
-                unset($_POST['action'], $_POST['csrf_token'], $_POST['new_companies_id']);
-                $result = $controller->updateNewCompanyEntry($companyId, $_POST);
-                echo json_encode(['success' => $result, 'message' => $result ? 'Entry updated successfully' : 'Failed to update entry']);
+                $companyId = $_POST['new_company_id'] ?? '';
+                error_log("Update attempt - Company ID: " . $companyId); // Debug
+                error_log("Update data: " . print_r($_POST, true)); // Debug
+                
+                unset($_POST['action'], $_POST['csrf_token'], $_POST['new_company_id']);
+                
+                try {
+                    $result = $controller->updateNewCompanyEntry($companyId, $_POST);
+                    error_log("Update result: " . ($result ? 'SUCCESS' : 'FAILED')); // Debug
+                    
+                    if ($result) {
+                        echo json_encode(['success' => true, 'message' => 'Entry updated successfully']);
+                    } else {
+                        echo json_encode(['success' => false, 'message' => 'Failed to update entry - no rows affected or database error']);
+                    }
+                } catch (Exception $e) {
+                    error_log("Update exception: " . $e->getMessage()); // Debug
+                    echo json_encode(['success' => false, 'message' => 'Failed to update entry: ' . $e->getMessage()]);
+                }
                 exit;
                 
             case 'delete':
-                $companyId = $_POST['new_companies_id'] ?? '';
-                $result = $controller->deleteNewCompanyEntry($companyId);
-                echo json_encode(['success' => $result, 'message' => $result ? 'Entry removed from new companies' : 'Failed to remove entry']);
+                $companyId = $_POST['new_company_id'] ?? '';
+                error_log("Delete attempt - Company ID: " . $companyId);
+                
+                if (empty($companyId)) {
+                    echo json_encode(['success' => false, 'message' => 'Company ID is required']);
+                    exit;
+                }
+                
+                try {
+                    $result = $controller->deleteNewCompanyEntry($companyId);
+                    error_log("Delete result: " . ($result ? 'SUCCESS' : 'FAILED'));
+                    echo json_encode(['success' => $result, 'message' => $result ? 'Entry removed from new companies' : 'Failed to remove entry']);
+                } catch (Exception $e) {
+                    error_log("Delete exception: " . $e->getMessage());
+                    echo json_encode(['success' => false, 'message' => 'Failed to remove entry: ' . $e->getMessage()]);
+                }
                 exit;
                 
             case 'get_entry':
-                $companyId = $_POST['new_companies_id'] ?? '';
+                $companyId = $_POST['new_company_id'] ?? '';
                 $entry = $controller->getNewCompanyEntry($companyId);
                 echo json_encode(['success' => (bool)$entry, 'entry' => $entry]);
                 exit;
@@ -86,6 +114,78 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WI
                     echo json_encode(['success' => true, 'companies' => $companies['companies']]);
                 } else {
                     echo json_encode(['success' => false, 'message' => 'Search term too short']);
+                }
+                exit;
+                
+            case 'check_isin_duplicate':
+                $isin = trim($_POST['isin'] ?? '');
+                if (empty($isin)) {
+                    echo json_encode(['success' => false, 'message' => 'ISIN is required']);
+                    exit;
+                }
+                
+                try {
+                    // Check if ISIN already exists in new companies list
+                    $exists = $controller->checkISINExists($isin);
+                    echo json_encode([
+                        'success' => true, 
+                        'exists' => $exists,
+                        'message' => $exists ? 'This ISIN is already in the new companies list' : 'ISIN is available'
+                    ]);
+                } catch (Exception $e) {
+                    echo json_encode(['success' => false, 'message' => 'Error checking ISIN: ' . $e->getMessage()]);
+                }
+                exit;
+                
+            case 'preview_borsdata':
+                $isin = $_POST['isin'] ?? '';
+                if (empty($isin)) {
+                    echo json_encode(['success' => false, 'message' => 'ISIN is required']);
+                    exit;
+                }
+                
+                try {
+                    $marketdataDb = Database::getConnection('marketdata');
+                    
+                    // Try global_instruments first
+                    $stmt = $marketdataDb->prepare("
+                        SELECT gi.name, gi.yahoo, c.nameEN as country_name, c.id as country_id
+                        FROM global_instruments gi 
+                        LEFT JOIN countries c ON gi.countryId = c.id 
+                        WHERE gi.isin = ? 
+                        LIMIT 1
+                    ");
+                    $stmt->execute([$isin]);
+                    $data = $stmt->fetch();
+                    
+                    // If not found in global, try nordic
+                    if (!$data) {
+                        $stmt = $marketdataDb->prepare("
+                            SELECT ni.name, ni.yahoo, c.nameEN as country_name, c.id as country_id
+                            FROM nordic_instruments ni 
+                            LEFT JOIN countries c ON ni.countryId = c.id 
+                            WHERE ni.isin = ? 
+                            LIMIT 1
+                        ");
+                        $stmt->execute([$isin]);
+                        $data = $stmt->fetch();
+                    }
+                    
+                    if ($data) {
+                        echo json_encode([
+                            'success' => true, 
+                            'company_data' => [
+                                'company' => $data['name'],
+                                'ticker' => $data['yahoo'],
+                                'country' => $data['country_name'],
+                                'country_id' => $data['country_id']
+                            ]
+                        ]);
+                    } else {
+                        echo json_encode(['success' => false, 'message' => 'ISIN not found in Börsdata']);
+                    }
+                } catch (Exception $e) {
+                    echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
                 }
                 exit;
                 
@@ -129,7 +229,9 @@ $filters = [
     'strategy_group_id' => $_GET['strategy_group_id'] ?? ($isSearchAllMode ? '' : (!empty($defaultStrategies) ? implode(',', $defaultStrategies) : '')),
     'broker_id' => $_GET['broker_id'] ?? ($isSearchAllMode ? '' : (!empty($defaultBrokers) ? implode(',', $defaultBrokers) : '')),
     'yield_min' => $_GET['yield_min'] ?? '',
-    'yield_max' => $_GET['yield_max'] ?? ''
+    'yield_max' => $_GET['yield_max'] ?? '',
+    'sort_by' => $_GET['sort_by'] ?? 'company',
+    'sort_order' => $_GET['sort_order'] ?? 'asc'
 ];
 
 // Create filtered array for database query (remove empty values to avoid parameter binding issues)
@@ -177,9 +279,7 @@ ob_start();
         <div class="page-header">
             <div class="header-content">
                 <div class="header-left">
-                    <h1><i class="fas fa-star"></i> New Companies Management</h1>
-                    <p>Manage your watchlist and buy targets</p>
-                    <p class="header-hint"><i class="fas fa-info-circle"></i> Hover over company names for detailed information</p>
+                    <h1><i class="fas fa-star"></i> New Companies</h1>
                 </div>
             </div>
         </div>
@@ -231,7 +331,7 @@ ob_start();
                             ?>
                                 <div class="dropdown-option">
                                     <input type="checkbox" id="status_null" value="null" <?= $isNullSelected ? 'checked' : '' ?>>
-                                    <label for="status_null">not bought</label>
+                                    <label for="status_null">Watchlist</label>
                                 </div>
                             <?php
                             
@@ -400,12 +500,36 @@ ob_start();
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Company</th>
-                            <th>Status</th>
-                            <th>Broker</th>
-                            <th>Yield (%)</th>
-                            <th>Country</th>
-                            <th>Actions</th>
+                            <?php 
+                            $currentSort = $filters['sort_by'] ?? 'company';
+                            $currentOrder = $filters['sort_order'] ?? 'asc';
+                            
+                            $columns = [
+                                'company' => ['label' => 'Company', 'default_order' => 'asc'],
+                                'country_name' => ['label' => 'Country', 'default_order' => 'asc'],
+                                'broker_name' => ['label' => 'Broker', 'default_order' => 'asc'],
+                                'yield_current' => ['label' => 'Current Yield (%)', 'default_order' => 'desc'],
+                                'strategy_name' => ['label' => 'Strategy Group', 'default_order' => 'asc'],
+                                'status_name' => ['label' => 'Status', 'default_order' => 'asc'],
+                            ];
+                            
+                            foreach ($columns as $columnKey => $columnInfo):
+                                $isActive = ($currentSort === $columnKey);
+                                $nextOrder = $isActive ? ($currentOrder === 'asc' ? 'desc' : 'asc') : $columnInfo['default_order'];
+                                $activeClass = $isActive ? 'active' : '';
+                                
+                                // Determine sort icon
+                                if ($isActive) {
+                                    $sortIcon = $currentOrder === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down';
+                                } else {
+                                    $sortIcon = 'fas fa-sort';
+                                }
+                            ?>
+                            <th class="sortable <?= $activeClass ?>" data-sort="<?= $columnKey ?>" data-order="<?= $nextOrder ?>">
+                                <?= $columnInfo['label'] ?>
+                                <i class="<?= $sortIcon ?> sort-icon"></i>
+                            </th>
+                            <?php endforeach; ?>
                         </tr>
                     </thead>
                     <tbody>
@@ -418,65 +542,90 @@ ob_start();
                                              data-company="<?= htmlspecialchars($entry['company']) ?>"
                                              data-ticker="<?= htmlspecialchars($entry['ticker']) ?>"
                                              data-isin="<?= htmlspecialchars($entry['isin'] ?: 'N/A') ?>"
-                                             data-strategy-group="<?= htmlspecialchars($entry['strategy_name'] ?: 'No Strategy') ?>"
+                                             data-strategy-group="<?= $entry['strategy_group_id'] && $entry['strategy_name'] ? htmlspecialchars('Group ' . $entry['strategy_group_id'] . ' - ' . $entry['strategy_name']) : 'No Strategy' ?>"
                                              data-strategy-id="<?= $entry['strategy_group_id'] ?: 'N/A' ?>"
                                              data-new-group="<?= $entry['new_group_id'] ?: 'No Group' ?>"
                                              data-broker="<?= htmlspecialchars($entry['broker_name'] ?: 'No Broker') ?>"
-                                             data-yield="<?= $entry['yield'] ? number_format($entry['yield'], 2) . '%' : 'N/A' ?>"
+                                             data-yield="<?= ($entry['yield_current'] ?: $entry['yield']) ? number_format(($entry['yield_current'] ?: $entry['yield']), 2) . '%' : 'N/A' ?>"
+                                             data-yield-current="<?= $entry['yield_current'] ? number_format($entry['yield_current'], 2) : '' ?>"
+                                             data-yield-1y-avg="<?= $entry['yield_1y_avg'] ? number_format($entry['yield_1y_avg'], 2) : '' ?>"
+                                             data-yield-1y-cagr="<?= $entry['yield_1y_cagr'] ? number_format($entry['yield_1y_cagr'], 2) : '' ?>"
+                                             data-yield-3y-avg="<?= $entry['yield_3y_avg'] ? number_format($entry['yield_3y_avg'], 2) : '' ?>"
+                                             data-yield-3y-cagr="<?= $entry['yield_3y_cagr'] ? number_format($entry['yield_3y_cagr'], 2) : '' ?>"
+                                             data-yield-5y-avg="<?= $entry['yield_5y_avg'] ? number_format($entry['yield_5y_avg'], 2) : '' ?>"
+                                             data-yield-5y-cagr="<?= $entry['yield_5y_cagr'] ? number_format($entry['yield_5y_cagr'], 2) : '' ?>"
+                                             data-yield-10y-avg="<?= $entry['yield_10y_avg'] ? number_format($entry['yield_10y_avg'], 2) : '' ?>"
+                                             data-yield-10y-cagr="<?= $entry['yield_10y_cagr'] ? number_format($entry['yield_10y_cagr'], 2) : '' ?>"
+                                             data-yield-updated="<?= $entry['yield_data_updated_at'] ?: 'N/A' ?>"
+                                             data-yield-source="<?= $entry['yield_source'] ?: 'manual' ?>"
                                              data-country="<?= htmlspecialchars($entry['country_name'] ?: 'N/A') ?>"
-                                             data-status="<?= htmlspecialchars($entry['status_name'] ?: 'No Status') ?>"
+                                             data-status="<?= htmlspecialchars($entry['status_name'] ?: 'watchlist') ?>"
                                              data-comments="<?= htmlspecialchars($entry['comments'] ?: 'No comments') ?>"
                                              data-inspiration="<?= htmlspecialchars($entry['inspiration'] ?: 'No inspiration noted') ?>">
                                             <div class="company-name">
                                                 <a href="#" class="company-name-link" onclick="openCompanyPage(<?= $entry['new_companies_id'] ?>); return false;">
                                                     <strong><?= htmlspecialchars($entry['company']) ?></strong>
                                                 </a>
-                                                <span class="ticker"><?= htmlspecialchars($entry['ticker']) ?></span>
-                                                <button class="company-details-btn" onclick="toggleCompanyPanel(this)" title="View details">
+                                                <button class="company-details-btn" onclick="toggleCompanyPanel(this)" title="View details and actions">
                                                     <i class="fas fa-ellipsis-h"></i>
                                                 </button>
                                             </div>
                                             <div class="company-details">
-                                                <?php if ($entry['isin']): ?>
-                                                    <span class="isin"><?= htmlspecialchars($entry['isin']) ?></span>
-                                                <?php endif; ?>
-                                                <?php if ($entry['comments']): ?>
-                                                    <div class="comments-preview">
-                                                        <?= htmlspecialchars(substr($entry['comments'], 0, 80)) ?><?= strlen($entry['comments']) > 80 ? '...' : '' ?>
-                                                    </div>
-                                                <?php endif; ?>
+                                                <div class="company-identifiers">
+                                                    <?php if ($entry['isin'] || $entry['ticker']): ?>
+                                                        <?= htmlspecialchars($entry['isin'] ?: 'No ISIN') ?> | <?= htmlspecialchars($entry['ticker'] ?: 'No Ticker') ?>
+                                                    <?php endif; ?>
+                                                    <?php 
+                                                    // Check if data comes from Börsdata
+                                                    $isBorsdata = !empty($entry['isin']) && !empty($entry['ticker']) && 
+                                                                 $entry['company'] !== 'Pending Börsdata lookup';
+                                                    ?>
+                                                    <?php if ($isBorsdata): ?>
+                                                        <span class="borsdata-badge" title="Data from Börsdata">
+                                                            <i class="fas fa-database"></i> BD
+                                                        </span>
+                                                    <?php else: ?>
+                                                        <span class="manual-badge" title="Manual entry">
+                                                            <i class="fas fa-user-edit"></i> Manual
+                                                        </span>
+                                                    <?php endif; ?>
+                                                </div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td>
-                                        <span class="status-badge">
-                                            <?= htmlspecialchars($entry['status_name'] ?: 'No Status') ?>
-                                        </span>
+                                    <td class="country">
+                                        <?= htmlspecialchars($entry['country_name'] ?: '-') ?>
                                     </td>
                                     <td class="broker">
                                         <?= htmlspecialchars($entry['broker_name'] ?: '-') ?>
                                     </td>
                                     <td class="yield">
-                                        <?= $entry['yield'] ? number_format($entry['yield'], 2) . '%' : '-' ?>
+                                        <?php 
+                                        $currentYield = $entry['yield_current'] ?: $entry['yield'];
+                                        $avg5y = $entry['yield_5y_avg'];
+                                        $yieldClass = '';
+                                        
+                                        if ($currentYield && $avg5y) {
+                                            $yieldClass = $currentYield < $avg5y ? 'yield-below-avg' : 'yield-above-avg';
+                                        }
+                                        ?>
+                                        <?php if ($currentYield): ?>
+                                            <span class="yield-value <?= $yieldClass ?>" title="<?= $avg5y ? 'vs 5yr avg: ' . number_format($avg5y, 2) . '%' : '' ?>">
+                                                <?= number_format($currentYield, 2) ?>%
+                                            </span>
+                                        <?php else: ?>
+                                            -
+                                        <?php endif; ?>
                                     </td>
-                                    <td class="country">
-                                        <?= htmlspecialchars($entry['country_name'] ?: '-') ?>
+                                    <td class="strategy-group">
+                                        <?= $entry['strategy_group_id'] && $entry['strategy_name'] ? 
+                                            htmlspecialchars('Group ' . $entry['strategy_group_id'] . ' - ' . $entry['strategy_name']) : 
+                                            '-' ?>
                                     </td>
                                     <td>
-                                        <div class="action-buttons">
-                                            <button class="btn-icon" onclick="toggleCompanyPanel(this)" title="View Details">
-                                                <i class="fas fa-info-circle"></i>
-                                            </button>
-                                            <button class="btn-icon btn-success" onclick="addToMasterlist(<?= $entry['new_companies_id'] ?>, '<?= htmlspecialchars($entry['company']) ?>')" title="Add to Masterlist">
-                                                <i class="fas fa-plus-circle"></i>
-                                            </button>
-                                            <button class="btn-icon" onclick="editEntry(<?= $entry['new_companies_id'] ?>)" title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="btn-icon btn-danger" onclick="deleteEntry(<?= $entry['new_companies_id'] ?>, '<?= htmlspecialchars($entry['company']) ?>')" title="Remove">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
+                                        <span class="status-badge">
+                                            <?= htmlspecialchars($entry['status_name'] ?: 'watchlist') ?>
+                                        </span>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -534,29 +683,28 @@ ob_start();
             </div>
             <form id="entryForm">
                 <input type="hidden" id="modalAction" name="action" value="add">
-                <input type="hidden" id="companyId" name="new_companies_id" value="">
+                <input type="hidden" id="companyId" name="new_company_id" value="">
                 <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
                 
                 
                 <div>
-                    <!-- Börsdata Integration Toggle -->
+                    <!-- Row 1: Data Source (full width) -->
                     <div class="form-group borsdata-toggle-section">
                         <label for="borsdata_available">Data Source</label>
-                        <select id="borsdata_available" name="borsdata_available" onchange="toggleBorsdataFields()">
+                        <select id="borsdata_available" name="borsdata_available" onchange="toggleBorsdataFields(); previewBorsdataData();">
                             <option value="0">Manual Entry</option>
-                            <option value="1">Auto-populate from Börsdata</option>
+                            <option value="1" selected>Auto-populate from Börsdata</option>
                         </select>
                         <small class="form-help">Select "Auto-populate" to fetch company data automatically using ISIN</small>
                     </div>
                     
-                    <!-- ISIN Field - Made more prominent -->
-                    <div class="form-group" id="isinGroup">
-                        <label for="isin">ISIN <span id="isinRequired" style="display: none; color: red;">*</span></label>
-                        <input type="text" id="isin" name="isin" maxlength="12" placeholder="e.g., US88160R1014">
-                        <small class="form-help" id="isinHelp">International Securities Identification Number</small>
-                    </div>
-                    
-                    <div class="form-row">
+                    <!-- Row 2: ISIN | Company Name | Ticker -->
+                    <div class="form-row form-row-three">
+                        <div class="form-group">
+                            <label for="isin">ISIN <span id="isinRequired" style="display: none; color: red;">*</span></label>
+                            <input type="text" id="isin" name="isin" maxlength="12" placeholder="e.g., US88160R1014" oninput="debounceISINCheck()" onblur="previewBorsdataData()">
+                            <small class="form-help" id="isinHelp">International Securities Identification Number</small>
+                        </div>
                         <div class="form-group">
                             <label for="company">Company Name <span id="companyRequired">*</span></label>
                             <input type="text" id="company" name="company" required maxlength="200" placeholder="e.g., Tesla Inc">
@@ -569,70 +717,102 @@ ob_start();
                         </div>
                     </div>
                     
+                    <!-- Row 3: Country | Current Yield -->
                     <div class="form-row">
                         <div class="form-group">
                             <label for="country_name">Country</label>
-                            <select id="country_name" name="country_name">
-                                <option value="">Select Country</option>
-                                <option value="SE">Sweden</option>
-                                <option value="US">United States</option>
-                                <option value="FI">Finland</option>
-                                <option value="NO">Norway</option>
-                                <option value="DK">Denmark</option>
-                                <option value="NL">Netherlands</option>
-                                <option value="DE">Germany</option>
-                                <option value="GB">United Kingdom</option>
-                            </select>
+                            <input type="text" id="country_name" name="country_name" maxlength="100" placeholder="e.g., United States">
                             <small class="form-help" id="countryHelp" style="display: none;">This will be auto-filled when using Börsdata</small>
                         </div>
                         <div class="form-group">
-                            <label for="yield">Yield (%)</label>
-                            <input type="number" id="yield" name="yield" step="0.01" min="0" max="100" placeholder="0.00">
+                            <label for="yield_current">Current Yield (%)</label>
+                            <input type="number" id="yield_current" name="yield_current" step="0.01" min="0" max="100" placeholder="e.g., 2.50">
                             <small class="form-help" id="yieldHelp" style="display: none;">This will be auto-filled when using Börsdata</small>
                         </div>
                     </div>
                     
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="inspiration">Inspiration</label>
-                            <input type="text" id="inspiration" name="inspiration" maxlength="255" placeholder="What inspired this pick?">
-                        </div>
-                        <div class="form-group">
-                            <!-- Empty div for layout - ISIN moved to top -->
-                        </div>
-                    </div>
-                    
+                    <!-- Row 3.5: Additional Yield Data (collapsed by default) -->
                     <div class="form-group">
-                        <label for="comments">Comments</label>
-                        <textarea id="comments" name="comments" rows="3" placeholder="Add your notes about this investment..."></textarea>
+                        <button type="button" class="btn btn-sm btn-outline yield-data-toggle" onclick="toggleYieldDataFields()">
+                            <i class="fas fa-chevron-down" id="yieldToggleIcon"></i> Additional Yield Data
+                        </button>
                     </div>
                     
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="new_companies_status_id">Status</label>
-                            <select id="new_companies_status_id" name="new_companies_status_id">
-                                <option value="">Select Status</option>
-                                <?php foreach ($filterOptions['statuses'] ?? [] as $status): ?>
-                                    <option value="<?= $status['id'] ?>">
-                                        <?= htmlspecialchars($status['status']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
+                    <div id="additionalYieldFields" style="display: none;">
+                        <!-- Row 3.6: 1 Year Metrics -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="yield_1y_avg">1Y Average (%)</label>
+                                <input type="number" id="yield_1y_avg" name="yield_1y_avg" step="0.01" min="0" max="100" placeholder="1 year average yield">
+                                <small class="form-help">Usually auto-filled from Börsdata</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="yield_1y_cagr">1Y CAGR (%)</label>
+                                <input type="number" id="yield_1y_cagr" name="yield_1y_cagr" step="0.01" placeholder="1 year yield CAGR">
+                                <small class="form-help">Usually auto-filled from Börsdata</small>
+                            </div>
                         </div>
+                        
+                        <!-- Row 3.7: 3 Year Metrics -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="yield_3y_avg">3Y Average (%)</label>
+                                <input type="number" id="yield_3y_avg" name="yield_3y_avg" step="0.01" min="0" max="100" placeholder="3 year average yield">
+                                <small class="form-help">Usually auto-filled from Börsdata</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="yield_3y_cagr">3Y CAGR (%)</label>
+                                <input type="number" id="yield_3y_cagr" name="yield_3y_cagr" step="0.01" placeholder="3 year yield CAGR">
+                                <small class="form-help">Usually auto-filled from Börsdata</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Row 3.8: 5 Year Metrics -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="yield_5y_avg">5Y Average (%)</label>
+                                <input type="number" id="yield_5y_avg" name="yield_5y_avg" step="0.01" min="0" max="100" placeholder="5 year average yield">
+                                <small class="form-help">Usually auto-filled from Börsdata</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="yield_5y_cagr">5Y CAGR (%)</label>
+                                <input type="number" id="yield_5y_cagr" name="yield_5y_cagr" step="0.01" placeholder="5 year yield CAGR">
+                                <small class="form-help">Usually auto-filled from Börsdata</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Row 3.9: 10 Year Metrics -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="yield_10y_avg">10Y Average (%)</label>
+                                <input type="number" id="yield_10y_avg" name="yield_10y_avg" step="0.01" min="0" max="100" placeholder="10 year average yield">
+                                <small class="form-help">Usually auto-filled from Börsdata</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="yield_10y_cagr">10Y CAGR (%)</label>
+                                <input type="number" id="yield_10y_cagr" name="yield_10y_cagr" step="0.01" placeholder="10 year yield CAGR">
+                                <small class="form-help">Usually auto-filled from Börsdata</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Row 4: Strategy Group | New Group ID | Broker -->
+                    <div class="form-row form-row-three">
                         <div class="form-group">
-                            <label for="strategy_group_id">Strategy Group (ID + Name)</label>
+                            <label for="strategy_group_id">Strategy Group</label>
                             <select id="strategy_group_id" name="strategy_group_id">
                                 <option value="">Select Strategy</option>
                                 <?php foreach ($filterOptions['strategies'] ?? [] as $strategy): ?>
                                     <option value="<?= $strategy['strategy_group_id'] ?>">
-                                        ID <?= $strategy['strategy_group_id'] ?> - <?= htmlspecialchars($strategy['strategy_name']) ?>
+                                        Group <?= $strategy['strategy_group_id'] ?> - <?= htmlspecialchars($strategy['strategy_name']) ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                    </div>
-                    
-                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="new_group_id">New Group ID</label>
+                            <input type="number" id="new_group_id" name="new_group_id" min="0" placeholder="Group ID">
+                        </div>
                         <div class="form-group">
                             <label for="broker_id">Broker</label>
                             <select id="broker_id" name="broker_id">
@@ -644,11 +824,35 @@ ob_start();
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="new_group_id">Group ID</label>
-                            <input type="number" id="new_group_id" name="new_group_id" min="0" placeholder="Group ID">
-                        </div>
                     </div>
+                    
+                    <!-- Row 5: Status (full width) -->
+                    <div class="form-group">
+                        <label for="new_companies_status_id">Status</label>
+                        <select id="new_companies_status_id" name="new_companies_status_id">
+                            <option value="">Default (Add to watchlist)</option>
+                            <?php foreach ($filterOptions['statuses'] ?? [] as $status): ?>
+                                <option value="<?= $status['id'] ?>">
+                                    <?= htmlspecialchars($status['status']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    
+                    <!-- Row 6: Inspiration (full width) -->
+                    <div class="form-group">
+                        <label for="inspiration">Inspiration</label>
+                        <input type="text" id="inspiration" name="inspiration" maxlength="255" placeholder="What inspired this pick?">
+                    </div>
+                    
+                    <!-- Row 7: Comments (full width) -->
+                    <div class="form-group">
+                        <label for="comments">Comments</label>
+                        <textarea id="comments" name="comments" rows="3" placeholder="Add your notes about this investment..."></textarea>
+                    </div>
+                    
+                    <!-- Hidden fields for optional data -->
+                    <input type="hidden" id="country_id" name="country_id">
                 </div>
                 
                 <div class="form-actions">
@@ -670,7 +874,7 @@ ob_start();
             </div>
             <form id="masterlistForm">
                 <input type="hidden" name="action" value="add_to_masterlist">
-                <input type="hidden" id="masterlistCompanyId" name="new_companies_id" value="">
+                <input type="hidden" id="masterlistCompanyId" name="new_company_id" value="">
                 <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
                 
                 <div class="modal-body">

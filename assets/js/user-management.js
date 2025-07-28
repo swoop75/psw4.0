@@ -4,8 +4,49 @@
  * Description: User management JavaScript functionality for PSW 4.0
  */
 
-// Tab management
-function showTab(tabName) {
+// Test if JavaScript is loading
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('User management JavaScript loaded');
+});
+
+// Admin view management (All Users, Activity Log, Statistics)
+function showView(viewName) {
+    // Hide all admin view contents
+    const viewContents = document.querySelectorAll('.tab-content');
+    viewContents.forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // Remove active class from all view buttons
+    const viewButtons = document.querySelectorAll('.tab-button');
+    viewButtons.forEach(button => {
+        button.classList.remove('active');
+    });
+    
+    // Show selected view content
+    const selectedView = document.querySelector(`[data-view="${viewName}"]`);
+    if (selectedView) {
+        selectedView.classList.add('active');
+    }
+    
+    // Add active class to selected view button
+    const selectedButton = document.querySelector(`[onclick="showView('${viewName}')"]`);
+    if (selectedButton) {
+        selectedButton.classList.add('active');
+    }
+    
+    // Update URL without reload
+    const url = new URL(window.location);
+    if (viewName === 'users') {
+        url.searchParams.delete('view');
+    } else {
+        url.searchParams.set('view', viewName);
+    }
+    window.history.replaceState({}, '', url);
+}
+
+// Individual user tab management (Profile, Security, Preferences, Activity)
+function showUserTab(tabName) {
     // Hide all tab contents
     const tabContents = document.querySelectorAll('.tab-content');
     tabContents.forEach(content => {
@@ -25,7 +66,7 @@ function showTab(tabName) {
     }
     
     // Add active class to selected tab button
-    const selectedButton = document.querySelector(`[onclick="showTab('${tabName}')"]`);
+    const selectedButton = document.querySelector(`[onclick="showUserTab('${tabName}')"]`);
     if (selectedButton) {
         selectedButton.classList.add('active');
     }
@@ -34,6 +75,17 @@ function showTab(tabName) {
     const url = new URL(window.location);
     url.searchParams.set('tab', tabName);
     window.history.replaceState({}, '', url);
+}
+
+// Legacy tab management for backward compatibility
+function showTab(tabName) {
+    // Check if we're in individual user mode
+    const url = new URL(window.location);
+    if (url.searchParams.has('user_id')) {
+        showUserTab(tabName);
+    } else {
+        showView(tabName);
+    }
 }
 
 // Form validation
@@ -374,6 +426,550 @@ function getActivityIcon(actionType) {
     return iconMap[actionType] || iconMap['default'];
 }
 
+// User Management Functions (Admin Only)
+
+/**
+ * Edit user - opens edit modal
+ * @param {number} userId User ID to edit
+ */
+function editUser(userId) {
+    try {
+        console.log('editUser called with userId:', userId);
+        
+        // Get user data from the table row
+        const userRow = document.querySelector(`[data-user-id="${userId}"]`);
+        
+        if (!userRow) {
+            console.error('User row not found for ID:', userId);
+            alert('User not found');
+            return;
+        }
+        
+        console.log('Found user row:', userRow);
+        
+        const username = userRow.querySelector('.username')?.textContent?.trim() || '';
+        const fullName = userRow.querySelector('.full-name')?.textContent?.trim() || '';
+        const email = userRow.cells[1]?.textContent?.trim() || '';
+        const currentRole = userRow.querySelector('.role-badge')?.textContent?.trim() || '';
+        const statusIndicator = userRow.querySelector('.status-indicator');
+        const isActive = statusIndicator?.classList.contains('status-active') || false;
+        
+        const userData = {
+            username: username,
+            fullName: fullName,
+            email: email,
+            role: currentRole,
+            active: !!isActive
+        };
+        
+        console.log('User data extracted:', userData);
+        
+        showEditUserModal(userId, userData);
+    } catch (error) {
+        console.error('Error in editUser function:', error);
+        alert('An error occurred while opening the edit dialog');
+    }
+}
+
+// Global variables for status change modal
+let pendingStatusChange = null;
+
+/**
+ * Toggle user active/inactive status
+ * @param {number} userId User ID
+ * @param {boolean|string} newStatus New active status
+ */
+function toggleUserStatus(userId, newStatus) {
+    // Convert string to boolean if needed
+    if (typeof newStatus === 'string') {
+        newStatus = newStatus === 'true';
+    }
+    
+    // Get user data from the table row
+    const userRow = document.querySelector(`[data-user-id="${userId}"]`);
+    if (!userRow) {
+        alert('User not found');
+        return;
+    }
+    
+    const username = userRow.querySelector('.username')?.textContent || 'Unknown User';
+    const action = newStatus ? 'activate' : 'deactivate';
+    
+    // Store the pending change
+    pendingStatusChange = {
+        userId: userId,
+        newStatus: newStatus,
+        username: username,
+        action: action
+    };
+    
+    // Show beautiful modal
+    showStatusChangeModal(action, username, newStatus);
+}
+
+/**
+ * Show edit user modal
+ * @param {number} userId User ID
+ * @param {object} userData User data
+ */
+function showEditUserModal(userId, userData) {
+    try {
+        console.log('showEditUserModal called with:', userId, userData);
+        
+        // Create modal HTML
+        const modalHTML = `
+            <div id="editUserModal" class="modal" style="display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999;">
+                <div class="modal-content" style="background: white; margin: 50px auto; padding: 20px; width: 90%; max-width: 500px; border-radius: 8px; position: relative;">
+                    <div class="modal-header">
+                        <h3>Edit User: ${userData.username}</h3>
+                        <button type="button" class="modal-close" onclick="closeEditUserModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editUserForm">
+                            <input type="hidden" name="csrf_token" value="${getCSRFToken()}" id="edit_csrf_token">
+                            <input type="hidden" name="action" value="edit_user">
+                            <input type="hidden" name="user_id" value="${userId}">
+                            
+                            <div class="form-group">
+                                <label for="edit_username">Username</label>
+                                <input type="text" id="edit_username" value="${userData.username}" class="form-control" readonly>
+                                <small class="form-help">Username cannot be changed</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="edit_full_name">Full Name</label>
+                                <input type="text" id="edit_full_name" name="full_name" value="${userData.fullName}" class="form-control">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="edit_email">Email</label>
+                                <input type="email" id="edit_email" name="email" value="${userData.email}" class="form-control" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="edit_role">Role</label>
+                                <select id="edit_role" name="role_id" class="form-control" required style="background: white !important; color: black !important; border: 2px solid #007bff !important; padding: 8px !important; font-size: 14px !important;">
+                                    <option value="1" ${userData.role.toLowerCase().includes('admin') ? 'selected' : ''}>Administrator</option>
+                                    <option value="2" ${!userData.role.toLowerCase().includes('admin') ? 'selected' : ''}>User</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="active" value="1" ${userData.active ? 'checked' : ''}>
+                                    Active User
+                                </label>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary" onclick="closeEditUserModal()">Cancel</button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Save Changes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        console.log('Creating modal with HTML:', modalHTML);
+        
+        // Remove existing modal if any
+        const existingModal = document.getElementById('editUserModal');
+        if (existingModal) {
+            existingModal.remove();
+            console.log('Removed existing modal');
+        }
+        
+        // Add modal to page
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        console.log('Modal added to DOM');
+        
+        // Add form submit handler
+        const form = document.getElementById('editUserForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                console.log('Form submit event triggered');
+                submitEditUserForm(this);
+            });
+            console.log('Form event listener added');
+            
+            // Force enable the role dropdown
+            const roleSelect = document.getElementById('edit_role');
+            if (roleSelect) {
+                roleSelect.disabled = false;
+                roleSelect.removeAttribute('disabled');
+                roleSelect.style.opacity = '1';
+                roleSelect.style.pointerEvents = 'auto';
+                roleSelect.style.backgroundColor = 'white';
+                roleSelect.style.color = '#2d3748';
+                console.log('Role select forced enabled');
+            }
+        } else {
+            console.error('Form not found after modal creation');
+        }
+        
+    } catch (error) {
+        console.error('Error in showEditUserModal:', error);
+        alert('Failed to open edit dialog');
+    }
+}
+
+/**
+ * Close edit user modal
+ */
+function closeEditUserModal() {
+    const modal = document.getElementById('editUserModal');
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => modal.remove(), 300);
+    }
+}
+
+/**
+ * Submit edit user form
+ * @param {HTMLFormElement} form Form element
+ */
+function submitEditUserForm(form) {
+    console.log('submitEditUserForm called');
+    
+    const submitButton = form.querySelector('button[type="submit"]');
+    
+    // Show loading state
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting token...';
+    
+    // First, get a fresh CSRF token
+    fetch('get_csrf_token.php')
+        .then(response => response.json())
+        .then(tokenData => {
+            console.log('Fresh CSRF token received:', tokenData.csrf_token);
+            
+            // Now prepare the form data with fresh token
+            const formData = new FormData(form);
+            formData.set('csrf_token', tokenData.csrf_token);
+            formData.append('ajax_request', '1');
+    
+            // Log form data for debugging
+            console.log('Form data:');
+            let formDataStr = '';
+            for (let [key, value] of formData.entries()) {
+                console.log(key, value);
+                formDataStr += key + ': ' + value + '\n';
+            }
+            console.log('Form data being sent with fresh token:', formDataStr);
+            
+            // Use dedicated AJAX endpoint
+            const testUrl = 'ajax_user_edit.php';
+            
+            // Update loading state
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            
+            return fetch(testUrl, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                body: formData
+            });
+        })
+    .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        return response.json();
+    })
+    .then(data => {
+        console.log('Response data:', data);
+        if (data.success) {
+            showNotification('User updated successfully', 'success');
+            closeEditUserModal();
+            // Reload the page to show updated data
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } else {
+            showNotification(data.message || 'Failed to update user', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('An error occurred while updating user', 'error');
+    })
+    .finally(() => {
+        // Reset button state
+        submitButton.disabled = false;
+        submitButton.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+    });
+}
+
+/**
+ * Update user status in table
+ * @param {number} userId User ID
+ * @param {boolean} isActive Active status
+ */
+function updateUserStatusInTable(userId, isActive) {
+    const userRow = document.querySelector(`[data-user-id="${userId}"]`);
+    if (!userRow) return;
+    
+    const statusCell = userRow.querySelector('.status-indicator');
+    const actionButton = userRow.querySelector(`[onclick*="toggleUserStatus(${userId}"]`);
+    
+    if (statusCell) {
+        statusCell.className = `status-indicator status-${isActive ? 'active' : 'inactive'}`;
+        statusCell.innerHTML = `
+            <span class="status-dot"></span>
+            ${isActive ? 'Active' : 'Inactive'}
+        `;
+    }
+    
+    if (actionButton) {
+        actionButton.setAttribute('onclick', `toggleUserStatus(${userId}, ${!isActive})`);
+        actionButton.setAttribute('title', `${isActive ? 'Deactivate' : 'Activate'} User`);
+        actionButton.innerHTML = `<i class="fas fa-${isActive ? 'user-slash' : 'user-check'}"></i>`;
+    }
+}
+
+/**
+ * Show notification
+ * @param {string} message Notification message
+ * @param {string} type Notification type (success, error, warning)
+ */
+function showNotification(message, type = 'info') {
+    // Remove existing notifications
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(notification => notification.remove());
+    
+    const notification = document.createElement('div');
+    notification.className = `notification alert alert-${type === 'error' ? 'error' : type === 'success' ? 'success' : 'info'}`;
+    notification.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+        ${message}
+    `;
+    
+    // Insert at top of user management container
+    const container = document.querySelector('.user-management-container');
+    if (container) {
+        container.insertBefore(notification, container.firstChild);
+    }
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 5000);
+}
+
+/**
+ * Get CSRF token from page
+ * @returns {string} CSRF token
+ */
+function getCSRFToken() {
+    // Try to get from the edit form first
+    let tokenInput = document.querySelector('#edit_csrf_token');
+    if (tokenInput && tokenInput.value) {
+        console.log('Got CSRF token from edit form:', tokenInput.value);
+        return tokenInput.value;
+    }
+    
+    // Fallback to any CSRF token on the page
+    tokenInput = document.querySelector('input[name="csrf_token"]');
+    const token = tokenInput ? tokenInput.value : '';
+    console.log('Got CSRF token from page:', token);
+    return token;
+}
+
+/**
+ * Show add user modal
+ */
+function showAddUserModal() {
+    alert('Add user functionality will be implemented in the next phase.');
+}
+
+/**
+ * Show status change modal
+ * @param {string} action Action to perform (activate/deactivate)
+ * @param {string} username Username
+ * @param {boolean} newStatus New status
+ */
+function showStatusChangeModal(action, username, newStatus) {
+    const modal = document.getElementById('statusChangeModal');
+    const actionElement = document.getElementById('statusChangeAction');
+    const userNameElement = document.getElementById('statusChangeUserName');
+    const warningElement = document.getElementById('statusChangeWarning');
+    const confirmBtn = document.getElementById('confirmStatusChangeBtn');
+    const confirmText = document.getElementById('confirmStatusChangeText');
+    
+    if (!modal || !actionElement || !userNameElement) {
+        console.error('Status change modal elements not found');
+        return;
+    }
+    
+    // Set modal content
+    actionElement.textContent = action;
+    userNameElement.textContent = username;
+    confirmText.textContent = action.charAt(0).toUpperCase() + action.slice(1);
+    
+    // Set button style
+    confirmBtn.className = `btn ${newStatus ? 'btn-primary' : 'btn-danger'}`;
+    confirmBtn.querySelector('i').className = `fas fa-${newStatus ? 'user-check' : 'user-slash'}`;
+    
+    // Add warning for deactivation
+    if (!newStatus) {
+        warningElement.textContent = 'The user will not be able to log in while deactivated.';
+        warningElement.style.display = 'block';
+    } else {
+        warningElement.style.display = 'none';
+    }
+    
+    // Show modal
+    modal.style.display = 'block';
+    modal.classList.add('show');
+}
+
+/**
+ * Close status change modal
+ */
+function closeStatusChangeModal() {
+    const modal = document.getElementById('statusChangeModal');
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }
+    pendingStatusChange = null;
+}
+
+/**
+ * Confirm status change
+ */
+function confirmStatusChange() {
+    if (!pendingStatusChange) {
+        return;
+    }
+    
+    const { userId, newStatus } = pendingStatusChange;
+    
+    // Show loading state
+    const confirmBtn = document.getElementById('confirmStatusChangeBtn');
+    const originalContent = confirmBtn.innerHTML;
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    
+    // Make AJAX request
+    fetch('user_management.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            action: 'toggle_user_status',
+            user_id: userId,
+            active: newStatus ? 1 : 0,
+            csrf_token: getCSRFToken()
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update the UI
+            updateUserStatusInTable(userId, newStatus);
+            showNotification('User status updated successfully', 'success');
+            closeStatusChangeModal();
+        } else {
+            showNotification(data.message || 'Failed to update user status', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('An error occurred while updating user status', 'error');
+    })
+    .finally(() => {
+        // Reset button state
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = originalContent;
+    });
+}
+
+/**
+ * Show generate password confirmation modal
+ */
+function showGeneratePasswordModal() {
+    const modal = document.getElementById('generatePasswordModal');
+    if (modal) {
+        modal.style.display = 'block';
+        modal.classList.add('show');
+    }
+}
+
+/**
+ * Close generate password modal
+ */
+function closeGeneratePasswordModal() {
+    const modal = document.getElementById('generatePasswordModal');
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }
+}
+
+/**
+ * Confirm password generation
+ */
+function confirmGeneratePassword() {
+    const confirmBtn = document.querySelector('#generatePasswordModal .btn-primary');
+    const originalContent = confirmBtn.innerHTML;
+    
+    // Show loading state
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+    
+    // Create and submit form directly (not AJAX)
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'user_management.php';
+    
+    const actionInput = document.createElement('input');
+    actionInput.type = 'hidden';
+    actionInput.name = 'action';
+    actionInput.value = 'generate_password';
+    form.appendChild(actionInput);
+    
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrf_token';
+    csrfInput.value = getCSRFToken();
+    form.appendChild(csrfInput);
+    
+    // Add form to page and submit
+    document.body.appendChild(form);
+    form.submit();
+    
+    // Note: The page will reload automatically with the form submission,
+    // so we don't need to reset the button state
+}
+
 // Export functions for global access
 window.showTab = showTab;
+window.showView = showView;
+window.showUserTab = showUserTab;
 window.getActivityIcon = getActivityIcon;
+window.editUser = editUser;
+window.toggleUserStatus = toggleUserStatus;
+window.showAddUserModal = showAddUserModal;
+window.closeEditUserModal = closeEditUserModal;
+window.showStatusChangeModal = showStatusChangeModal;
+window.closeStatusChangeModal = closeStatusChangeModal;
+window.confirmStatusChange = confirmStatusChange;
+window.showGeneratePasswordModal = showGeneratePasswordModal;
+window.closeGeneratePasswordModal = closeGeneratePasswordModal;
+window.confirmGeneratePassword = confirmGeneratePassword;

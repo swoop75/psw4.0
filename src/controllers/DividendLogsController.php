@@ -149,11 +149,11 @@ class DividendLogsController {
         
         $orderBy = match($sortColumn) {
             'company_name' => "m.company_name {$sortOrder}, ld.payment_date DESC",
-            'payment_date' => "ld.payment_date {$sortOrder}, ld.pay_date DESC",
-            'pay_date' => "ld.pay_date {$sortOrder}, ld.payment_date DESC",
+            'payment_date' => "ld.payment_date {$sortOrder}",
+            'pay_date' => "ld.payment_date {$sortOrder}",
             'dividend_amount_sek' => "ld.dividend_amount_sek {$sortOrder}, ld.payment_date DESC",
             'currency_local' => "ld.currency_local {$sortOrder}, ld.payment_date DESC",
-            default => "ld.payment_date {$sortOrder}, ld.pay_date DESC"
+            default => "ld.payment_date {$sortOrder}"
         };
         
         return [
@@ -204,7 +204,7 @@ class DividendLogsController {
         try {
             $sql = "SELECT 
                         ld.payment_date,
-                        ld.pay_date,
+                        ld.payment_date as pay_date,
                         ld.isin,
                         ld.shares_held as shares,
                         ld.dividend_amount_local / ld.shares_held as dividend_per_share_original_currency,

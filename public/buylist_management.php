@@ -148,7 +148,6 @@ $csrfToken = Security::generateCSRFToken();
             <div class="header-content">
                 <div class="header-left">
                     <h1><i class="fas fa-star"></i> Buylist Management</h1>
-                    <p>Manage your watchlist and buy targets</p>
                 </div>
                 <div class="header-right">
                     <span class="user-info">
