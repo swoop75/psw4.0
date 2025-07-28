@@ -25,7 +25,7 @@ $filters = [
 ];
 
 $page = max(1, (int)($_GET['page'] ?? 1));
-$limit = max(10, min(100, (int)($_GET['limit'] ?? 25)));
+$limit = max(10, min(100, (int)($_GET['limit'] ?? 50)));
 
 // Create filtered array for database query
 $dbFilters = array_filter($filters, function($value) {
@@ -173,6 +173,95 @@ $pageTitle = 'Dividend Logs - PSW 4.0';
     <link rel="stylesheet" href="<?php echo ASSETS_URL; ?>/css/improved-main.css">
     <link rel="stylesheet" href="<?php echo ASSETS_URL; ?>/css/new-companies-management.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Beautiful Date Range Filter Styles */
+        .date-range-filter {
+            display: flex;
+            gap: var(--space-4);
+            align-items: flex-end;
+        }
+        
+        .date-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+            min-width: 140px;
+        }
+        
+        .date-label {
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+        
+        .date-label i {
+            color: var(--primary-color);
+            font-size: var(--text-xs);
+        }
+        
+        .date-input {
+            width: 100%;
+            padding: var(--space-3) var(--space-4);
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            font-size: var(--text-sm);
+            transition: all var(--transition-normal);
+            background: var(--bg-white-solid);
+            color: var(--text-primary);
+            font-family: inherit;
+        }
+        
+        .date-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 200, 150, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .date-input:hover {
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        /* Page size selector styling */
+        .page-size-selector select {
+            padding: var(--space-2) var(--space-4);
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-md);
+            font-size: var(--text-sm);
+            transition: all var(--transition-normal);
+            background: var(--bg-white-solid);
+            color: var(--text-primary);
+            font-family: inherit;
+        }
+        
+        .page-size-selector select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 200, 150, 0.1);
+        }
+        
+        .page-size-selector select:hover {
+            border-color: var(--primary-color);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .date-range-filter {
+                flex-direction: column;
+                gap: var(--space-3);
+            }
+            
+            .date-input-group {
+                min-width: auto;
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
     <header class="unified-header">
@@ -330,11 +419,23 @@ $pageTitle = 'Dividend Logs - PSW 4.0';
                         </div>
                         
                         <!-- Date Range Filter -->
-                        <div class="filter-group">
-                            <label>From:</label>
-                            <input type="date" id="date-from" value="<?php echo htmlspecialchars($filters['date_from']); ?>">
-                            <label>To:</label>
-                            <input type="date" id="date-to" value="<?php echo htmlspecialchars($filters['date_to']); ?>">
+                        <div class="date-range-filter">
+                            <div class="date-input-group">
+                                <label for="date-from" class="date-label">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    From
+                                </label>
+                                <input type="date" id="date-from" class="form-control date-input" 
+                                       value="<?php echo htmlspecialchars($filters['date_from']); ?>">
+                            </div>
+                            <div class="date-input-group">
+                                <label for="date-to" class="date-label">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    To
+                                </label>
+                                <input type="date" id="date-to" class="form-control date-input" 
+                                       value="<?php echo htmlspecialchars($filters['date_to']); ?>">
+                            </div>
                         </div>
                         
                         <!-- Broker Filter -->
