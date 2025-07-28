@@ -25,25 +25,33 @@ try {
     $errors = [];
     $debugInfo = [];
     
-    // Try different delimiters to auto-detect
-    $delimiters = ["\t", ",", ";"];
-    $bestDelimiter = "\t"; // Default to tab
+    // Try different delimiters to auto-detect (semicolon first since it's most common in your data)
+    $delimiters = [";", ",", "\t"];
+    $bestDelimiter = ";"; // Default to semicolon
     $maxColumns = 0;
     
-    // Auto-detect delimiter by counting columns in first data row
+    // Auto-detect delimiter by counting columns in header row
     $handle = fopen($filePath, 'r');
     $firstLine = fgets($handle); // Header
-    $secondLine = fgets($handle); // First data row
     fclose($handle);
     
-    if ($secondLine) {
-        foreach ($delimiters as $delimiter) {
-            $parts = str_getcsv($secondLine, $delimiter);
-            if (count($parts) > $maxColumns) {
-                $maxColumns = count($parts);
-                $bestDelimiter = $delimiter;
-            }
+    // Remove BOM if present
+    $firstLine = str_replace("\xEF\xBB\xBF", '', $firstLine);
+    
+    foreach ($delimiters as $delimiter) {
+        $parts = str_getcsv(trim($firstLine), $delimiter);
+        $debugInfo[] = "Testing delimiter '" . ($delimiter === "\t" ? "TAB" : ($delimiter === "," ? "COMMA" : "SEMICOLON")) . "': " . count($parts) . " columns";
+        if (count($parts) > $maxColumns) {
+            $maxColumns = count($parts);
+            $bestDelimiter = $delimiter;
         }
+    }
+    
+    // If no good delimiter found, force semicolon for your data format
+    if ($maxColumns < 5) {
+        $bestDelimiter = ";";
+        $maxColumns = count(str_getcsv(trim($firstLine), ";"));
+        $debugInfo[] = "Auto-detection failed, forcing SEMICOLON delimiter";
     }
     
     $debugInfo[] = "Auto-detected delimiter: " . ($bestDelimiter === "\t" ? "TAB" : ($bestDelimiter === "," ? "COMMA" : "SEMICOLON"));
