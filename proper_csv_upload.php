@@ -39,19 +39,35 @@ try {
     $firstLine = str_replace("\xEF\xBB\xBF", '', $firstLine);
     
     foreach ($delimiters as $delimiter) {
-        $parts = str_getcsv(trim($firstLine), $delimiter);
-        $debugInfo[] = "Testing delimiter '" . ($delimiter === "\t" ? "TAB" : ($delimiter === "," ? "COMMA" : "SEMICOLON")) . "': " . count($parts) . " columns";
-        if (count($parts) > $maxColumns) {
-            $maxColumns = count($parts);
+        // Try both str_getcsv and manual split
+        $parts1 = str_getcsv(trim($firstLine), $delimiter);
+        $parts2 = array_map('trim', explode($delimiter, trim($firstLine)));
+        
+        $count1 = count($parts1);
+        $count2 = count($parts2);
+        $maxCount = max($count1, $count2);
+        
+        $debugName = ($delimiter === "\t" ? "TAB" : ($delimiter === "," ? "COMMA" : "SEMICOLON"));
+        $debugInfo[] = "Testing delimiter '$debugName': str_getcsv=$count1, explode=$count2 columns";
+        
+        // Debug the actual split results for semicolon
+        if ($delimiter === ";") {
+            $debugInfo[] = "Semicolon split sample: " . json_encode(array_slice($parts2, 0, 5));
+        }
+        
+        if ($maxCount > $maxColumns) {
+            $maxColumns = $maxCount;
             $bestDelimiter = $delimiter;
         }
     }
     
-    // If no good delimiter found, force semicolon for your data format
+    // If no good delimiter found, force semicolon and use explode method
     if ($maxColumns < 5) {
         $bestDelimiter = ";";
-        $maxColumns = count(str_getcsv(trim($firstLine), ";"));
-        $debugInfo[] = "Auto-detection failed, forcing SEMICOLON delimiter";
+        $testParts = array_map('trim', explode(";", trim($firstLine)));
+        $maxColumns = count($testParts);
+        $debugInfo[] = "Auto-detection failed, forcing SEMICOLON delimiter with explode method";
+        $debugInfo[] = "Forced semicolon test parts: " . json_encode(array_slice($testParts, 0, 3)) . "...";
     }
     
     $debugInfo[] = "Auto-detected delimiter: " . ($bestDelimiter === "\t" ? "TAB" : ($bestDelimiter === "," ? "COMMA" : "SEMICOLON"));
@@ -59,11 +75,17 @@ try {
     
     // Now parse the CSV properly
     $handle = fopen($filePath, 'r');
-    $headerRow = fgetcsv($handle, 0, $bestDelimiter);
     
-    // Remove BOM from first header if present
-    if ($headerRow && isset($headerRow[0])) {
-        $headerRow[0] = str_replace("\xEF\xBB\xBF", '', $headerRow[0]);
+    // Get header row - try fgetcsv first, then explode if it fails
+    $headerLine = fgets($handle);
+    $headerLine = str_replace("\xEF\xBB\xBF", '', trim($headerLine)); // Remove BOM
+    
+    $headerRow = str_getcsv($headerLine, $bestDelimiter);
+    
+    // If str_getcsv gives us only 1 column but we expect more, use explode
+    if (count($headerRow) == 1 && $maxColumns > 1) {
+        $headerRow = array_map('trim', explode($bestDelimiter, $headerLine));
+        $debugInfo[] = "Using explode method for header parsing";
     }
     
     $debugInfo[] = "Header columns (" . count($headerRow) . "): " . json_encode($headerRow);
@@ -99,10 +121,22 @@ try {
     
     // Read data rows
     $rowNum = 1;
-    while (($row = fgetcsv($handle, 0, $bestDelimiter)) !== false) {
+    while (($line = fgets($handle)) !== false) {
         $rowNum++;
+        $line = trim($line);
         
         // Skip empty rows
+        if (empty($line)) continue;
+        
+        // Try fgetcsv parsing first, then fallback to explode
+        $row = str_getcsv($line, $bestDelimiter);
+        
+        // If str_getcsv gives us only 1 column but we expect more, use explode
+        if (count($row) == 1 && $maxColumns > 1) {
+            $row = array_map('trim', explode($bestDelimiter, $line));
+        }
+        
+        // Skip empty rows after parsing
         if (empty(array_filter($row))) continue;
         
         $debugInfo[] = "Row $rowNum (" . count($row) . " cols): " . json_encode($row);
