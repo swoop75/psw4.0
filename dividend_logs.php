@@ -190,12 +190,14 @@ $pageTitle = 'Dividend Logs - PSW 4.0';
         }
         
         .date-label {
-            font-size: var(--text-sm);
+            font-size: var(--text-xs);
             font-weight: var(--font-medium);
             color: var(--text-secondary);
             display: flex;
             align-items: center;
-            gap: var(--space-2);
+            gap: var(--space-1);
+            height: 16px;
+            margin-bottom: var(--space-1);
         }
         
         .date-label i {
@@ -213,6 +215,7 @@ $pageTitle = 'Dividend Logs - PSW 4.0';
             background: var(--bg-white-solid);
             color: var(--text-primary);
             font-family: inherit;
+            height: 44px;
         }
         
         .date-input:focus {
@@ -237,6 +240,7 @@ $pageTitle = 'Dividend Logs - PSW 4.0';
             background: var(--bg-white-solid);
             color: var(--text-primary);
             font-family: inherit;
+            height: 44px;
         }
         
         .page-size-selector select:focus {
@@ -252,16 +256,19 @@ $pageTitle = 'Dividend Logs - PSW 4.0';
         /* Filter dropdown styling */
         .filter-dropdown {
             min-width: 140px;
+            display: flex;
+            flex-direction: column;
         }
         
         .filter-dropdown .form-label {
-            font-size: var(--text-sm);
+            font-size: var(--text-xs);
             font-weight: var(--font-medium);
             color: var(--text-secondary);
             display: flex;
             align-items: center;
-            gap: var(--space-2);
-            margin-bottom: var(--space-2);
+            gap: var(--space-1);
+            margin-bottom: var(--space-1);
+            height: 16px;
         }
         
         .filter-dropdown .form-label i {
@@ -279,6 +286,7 @@ $pageTitle = 'Dividend Logs - PSW 4.0';
             background: var(--bg-white-solid);
             color: var(--text-primary);
             font-family: inherit;
+            height: 44px;
         }
         
         .filter-dropdown .form-control:focus {
@@ -399,6 +407,7 @@ $pageTitle = 'Dividend Logs - PSW 4.0';
             font-size: var(--text-sm);
             transition: all var(--transition-normal);
             background: var(--bg-white-solid);
+            height: 44px;
         }
         
         .search-box i {
@@ -413,6 +422,15 @@ $pageTitle = 'Dividend Logs - PSW 4.0';
             display: flex;
             gap: var(--space-2);
             align-items: center;
+        }
+        
+        .filter-controls .btn {
+            height: 44px;
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: 0 var(--space-4);
+            font-size: var(--text-sm);
         }
         
         /* Responsive adjustments */
