@@ -351,9 +351,15 @@ $(document).ready(function() {
         tbody.empty();
         
         data.preview_data.forEach(function(dividend) {
-            const statusBadge = dividend.is_complete ? 
-                '<span class="badge badge-success" style="color: black;">Complete</span>' : 
-                '<span class="badge badge-warning" style="color: black;">Incomplete</span>';
+            // Traffic light colors: Green = Complete, Yellow = Incomplete, Red = Error
+            let statusBadge;
+            if (dividend.is_complete === 1) {
+                statusBadge = '<span class="badge" style="background-color: #28a745; color: white;">Complete</span>';
+            } else if (dividend.is_complete === 0) {
+                statusBadge = '<span class="badge" style="background-color: #ffc107; color: black;">Incomplete</span>';
+            } else {
+                statusBadge = '<span class="badge" style="background-color: #dc3545; color: white;">Error</span>';
+            }
             
             const row = `
                 <tr>
@@ -406,7 +412,7 @@ $(document).ready(function() {
         
         const ignoreDuplicates = $('#ignore-duplicates').is(':checked');
         
-        $.post('src/controllers/DividendImportController.php?action=import', {
+        $.post('import_dividends.php', {
             ignore_duplicates: ignoreDuplicates
         })
         .done(function(data) {

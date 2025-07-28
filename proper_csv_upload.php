@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/json');
+session_start();
 
 require_once 'config/config.php';
 require_once 'config/database.php';
@@ -181,6 +182,9 @@ try {
     }
     
     fclose($handle);
+    
+    // Store data in session for import
+    $_SESSION['dividend_import_data'] = $dividendData;
     
     echo json_encode([
         'success' => true,
