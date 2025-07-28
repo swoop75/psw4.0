@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once 'config/config.php';
-require_once 'includes/header.php';
+require_once 'templates/header.php';
 ?>
 
 <div class="container-fluid">
@@ -451,4 +451,4 @@ $(document).ready(function() {
 });
 </script>
 
-<?php require_once 'includes/footer.php'; ?>
+<?php require_once 'templates/footer.php'; ?>
