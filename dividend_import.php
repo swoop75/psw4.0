@@ -1,6 +1,13 @@
 <?php
 session_start();
 require_once 'config/config.php';
+require_once 'config/database.php';
+require_once 'src/middleware/Auth.php';
+require_once 'src/utils/Security.php';
+
+// Set page title
+$pageTitle = 'Dividend Import';
+
 require_once 'templates/header.php';
 ?>
 

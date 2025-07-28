@@ -20,7 +20,7 @@ if (!isset($currentPage)) {
     <title><?php echo htmlspecialchars($pageTitle); ?> - PSW 4.0</title>
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Security Headers -->
@@ -35,8 +35,8 @@ if (!isset($currentPage)) {
     <nav class="main-nav">
         <div class="nav-container">
             <div class="nav-brand">
-                <a href="../dashboard.php">
-                    <img src="../assets/img/psw-logo.svg" alt="PSW 4.0" class="nav-logo">
+                <a href="dashboard.php">
+                    <img src="assets/img/psw-logo.svg" alt="PSW 4.0" class="nav-logo">
                     <span class="nav-title">PSW 4.0</span>
                 </a>
             </div>
@@ -47,10 +47,10 @@ if (!isset($currentPage)) {
                     <span class="user-role"><?php echo htmlspecialchars($_SESSION['role_name'] ?? 'User'); ?></span>
                 </div>
                 <div class="user-actions">
-                    <a href="../user_management.php" class="nav-link <?php echo $currentPage === 'user_management' ? 'active' : ''; ?>">
+                    <a href="user_management.php" class="nav-link <?php echo $currentPage === 'user_management' ? 'active' : ''; ?>">
                         <i class="fas fa-user-cog"></i> Settings
                     </a>
-                    <a href="../logout.php" class="nav-link logout">
+                    <a href="logout.php" class="nav-link logout">
                         <i class="fas fa-sign-out-alt"></i> Logout
                     </a>
                 </div>

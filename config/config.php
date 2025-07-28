@@ -56,6 +56,11 @@ define('API_RETRY_ATTEMPTS', 3);
 define('CACHE_ENABLED', true);
 define('CACHE_DURATION', 3600);
 
+// Database settings - Load from environment or use defaults
+define('DB_HOST', $_ENV['DB_HOST'] ?? '100.117.171.98');
+define('DB_USER', $_ENV['DB_USERNAME'] ?? 'root');
+define('DB_PASS', $_ENV['DB_PASSWORD'] ?? '');
+
 // Start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();

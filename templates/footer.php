@@ -8,16 +8,16 @@
                     <p class="footer-version">Version 4.0.0</p>
                 </div>
                 <div class="footer-links">
-                    <a href="../dashboard.php">Dashboard</a>
-                    <a href="../user_management.php">Settings</a>
-                    <a href="../logout.php">Logout</a>
+                    <a href="dashboard.php">Dashboard</a>
+                    <a href="user_management.php">Settings</a>
+                    <a href="logout.php">Logout</a>
                 </div>
             </div>
         </div>
     </footer>
     
     <!-- JavaScript -->
-    <script src="../assets/js/main.js"></script>
+    <script src="assets/js/main.js"></script>
     
     <!-- Additional page-specific scripts will be included here -->
     
