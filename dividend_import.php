@@ -254,7 +254,26 @@ try {
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
+// Test if JavaScript is working AT ALL
+alert('JavaScript is executing!');
 console.log('Script loading...');
+
+// Test if we can find DOM elements
+const brokerSelect = document.getElementById('broker-select');
+const accountSelect = document.getElementById('account-group-select');
+console.log('Broker select found:', brokerSelect ? 'YES' : 'NO');
+console.log('Account select found:', accountSelect ? 'YES' : 'NO');
+
+// Manual test - populate dropdowns directly
+if (brokerSelect) {
+    brokerSelect.innerHTML = '<option value="">Manual test - Broker options</option><option value="minimal">Minimal Format</option><option value="1">Avanza</option>';
+    console.log('Manually populated broker dropdown');
+}
+
+if (accountSelect) {
+    accountSelect.innerHTML = '<option value="">Manual test - Account options</option><option value="4">PSW Sverige</option><option value="5">PSW Worldwide</option>';
+    console.log('Manually populated account dropdown');
+}
 
 // Simple initialization - no jQuery waiting
 document.addEventListener('DOMContentLoaded', function() {
