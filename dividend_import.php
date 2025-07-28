@@ -292,7 +292,7 @@ $(document).ready(function() {
         $('#upload-btn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
         
         $.ajax({
-            url: 'upload_dividends.php',
+            url: 'simple_upload.php',
             type: 'POST',
             data: formData,
             processData: false,
