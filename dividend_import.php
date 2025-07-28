@@ -252,12 +252,23 @@ try {
 
 
 <script>
-$(document).ready(function() {
-    let importData = null;
+// Wait for jQuery to load, then initialize
+(function checkjQuery() {
+    if (typeof jQuery === 'undefined') {
+        setTimeout(checkjQuery, 100);
+        return;
+    }
     
-    // Load brokers and account groups on page load
-    loadBrokers();
-    loadAccountGroups();
+    console.log('jQuery loaded, initializing dividend import...');
+    
+    $(document).ready(function() {
+        let importData = null;
+        
+        console.log('Document ready, loading dropdowns...');
+        
+        // Load brokers and account groups on page load
+        loadBrokers();
+        loadAccountGroups();
     
     // File input change handler
     $('#csv-file').on('change', function() {
@@ -312,41 +323,72 @@ $(document).ready(function() {
                 updateUploadButton();
             })
             .fail(function(xhr, status, error) {
-                console.error('Failed to load brokers:', status, error);
+                console.error('Broker loading failed:');
+                console.error('Status:', status);
+                console.error('Error:', error);
+                console.error('Response:', xhr.responseText);
+                console.error('Status Code:', xhr.status);
+                
                 // Fallback to hardcoded brokers
                 const select = $('#broker-select');
                 select.empty();
                 select.append('<option value="">Select a broker...</option>');
-                select.append('<option value="1">Broker 1</option>');
-                select.append('<option value="2">Broker 2</option>');
-                select.append('<option value="3">Broker 3</option>');
-                select.append('<option value="4">Broker 4</option>');
-                select.append('<option value="5">Broker 5</option>');
+                select.append('<option value="minimal">Minimal Format (PSW Standard)</option>');
+                select.append('<option value="1">Avanza</option>');
+                select.append('<option value="2">Nordnet</option>');
                 updateUploadButton();
-                showAlert('warning', 'Using fallback broker list');
+                showAlert('warning', 'Could not load brokers from database. Using fallback list.');
             });
     }
     
     function loadAccountGroups() {
-        console.log('Loading account groups...');
+        console.log('Loading account groups from: ./get_account_groups.php');
+        
         $.get('./get_account_groups.php')
-            .done(function(data) {
+            .done(function(data, textStatus, xhr) {
+                console.log('Account groups AJAX success:', textStatus);
                 console.log('Account group data received:', data);
+                console.log('Response type:', typeof data);
+                
                 const select = $('#account-group-select');
                 select.empty();
                 select.append('<option value="">Use CSV column or none</option>');
                 
-                if (data.success && data.account_groups) {
-                    data.account_groups.forEach(function(group) {
+                // Handle both JSON object and string responses
+                let groupData = data;
+                if (typeof data === 'string') {
+                    try {
+                        groupData = JSON.parse(data);
+                    } catch (e) {
+                        console.error('Failed to parse account group JSON:', e, data);
+                        throw new Error('Invalid JSON response');
+                    }
+                }
+                
+                if (groupData.success && groupData.account_groups) {
+                    console.log('Processing account groups:', groupData.account_groups);
+                    groupData.account_groups.forEach(function(group) {
                         select.append(`<option value="${group.portfolio_account_group_id}">${group.portfolio_group_name}</option>`);
                     });
+                    console.log('Account groups loaded successfully');
+                } else {
+                    console.warn('Account groups data structure invalid or empty');
+                    // This is not an error - just means no account groups configured
                 }
             })
             .fail(function(xhr, status, error) {
-                console.error('Failed to load account groups:', status, error);
+                console.error('Account group loading failed:');
+                console.error('Status:', status);
+                console.error('Error:', error);
+                console.error('Response:', xhr.responseText);
+                console.error('Status Code:', xhr.status);
+                
                 const select = $('#account-group-select');
                 select.empty();
                 select.append('<option value="">Use CSV column or none</option>');
+                select.append('<option value="4">PSW Sverige</option>');
+                select.append('<option value="5">PSW Worldwide</option>');
+                showAlert('warning', 'Could not load account groups from database. Using fallback list.');
             });
     }
     
@@ -609,7 +651,9 @@ window.toggleValidationSection = function(section) {
         content.style.display = 'none';
         icon.style.transform = 'rotate(0deg)';
     }
-};
+    
+    }); // End $(document).ready
+})(); // End checkjQuery function
 </script>
 
 <?php
