@@ -176,130 +176,6 @@ $pageTitle = 'Dividend Logs - PSW 4.0';
     
     <style>
         /* Beautiful Date Range Filter Styles */
-        .date-range-filter {
-            display: flex;
-            gap: var(--space-4);
-            align-items: flex-end;
-        }
-        
-        .date-input-group {
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-2);
-            min-width: 140px;
-        }
-        
-        .date-label {
-            font-size: var(--text-xs);
-            font-weight: var(--font-medium);
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: var(--space-1);
-            height: 16px;
-            margin-bottom: var(--space-1);
-        }
-        
-        .date-label i {
-            color: var(--primary-color);
-            font-size: var(--text-xs);
-        }
-        
-        .date-input {
-            width: 100%;
-            padding: var(--space-3) var(--space-4);
-            border: 2px solid var(--border-light);
-            border-radius: var(--radius-lg);
-            font-size: var(--text-sm);
-            transition: all var(--transition-normal);
-            background: var(--bg-white-solid);
-            color: var(--text-primary);
-            font-family: inherit;
-            height: 44px;
-        }
-        
-        .date-input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(0, 200, 150, 0.1);
-            transform: translateY(-1px);
-        }
-        
-        .date-input:hover {
-            border-color: var(--primary-color);
-            box-shadow: var(--shadow-sm);
-        }
-        
-        /* Page size selector styling */
-        .page-size-selector select {
-            padding: var(--space-2) var(--space-4);
-            border: 2px solid var(--border-light);
-            border-radius: var(--radius-md);
-            font-size: var(--text-sm);
-            transition: all var(--transition-normal);
-            background: var(--bg-white-solid);
-            color: var(--text-primary);
-            font-family: inherit;
-            height: 44px;
-        }
-        
-        .page-size-selector select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(0, 200, 150, 0.1);
-        }
-        
-        .page-size-selector select:hover {
-            border-color: var(--primary-color);
-        }
-        
-        /* Filter dropdown styling */
-        .filter-dropdown {
-            min-width: 140px;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .filter-dropdown .form-label {
-            font-size: var(--text-xs);
-            font-weight: var(--font-medium);
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: var(--space-1);
-            margin-bottom: var(--space-1);
-            height: 16px;
-        }
-        
-        .filter-dropdown .form-label i {
-            color: var(--primary-color);
-            font-size: var(--text-xs);
-        }
-        
-        .filter-dropdown .form-control {
-            width: 100%;
-            padding: var(--space-3) var(--space-4);
-            border: 2px solid var(--border-light);
-            border-radius: var(--radius-lg);
-            font-size: var(--text-sm);
-            transition: all var(--transition-normal);
-            background: var(--bg-white-solid);
-            color: var(--text-primary);
-            font-family: inherit;
-            height: 44px;
-        }
-        
-        .filter-dropdown .form-control:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(0, 200, 150, 0.1);
-            transform: translateY(-1px);
-        }
-        
-        .filter-dropdown .form-control:hover {
-            border-color: var(--primary-color);
-            box-shadow: var(--shadow-sm);
-        }
         
         /* Statistics cards layout */
         .stats-grid {
@@ -376,61 +252,70 @@ $pageTitle = 'Dividend Logs - PSW 4.0';
             margin-top: var(--space-1);
         }
         
-        /* Toolbar improvements */
+        /* Simplified Toolbar */
         .toolbar {
             display: flex;
-            align-items: flex-end;
+            align-items: center;
             gap: var(--space-4);
             margin-bottom: var(--space-6);
             flex-wrap: wrap;
+            min-height: 44px;
         }
         
-        .page-size-selector {
+        .toolbar-item {
             display: flex;
             align-items: center;
             gap: var(--space-2);
-            font-size: var(--text-sm);
-            color: var(--text-secondary);
             white-space: nowrap;
         }
         
-        .search-box {
-            position: relative;
-            min-width: 250px;
+        .toolbar-label {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            font-weight: var(--font-medium);
         }
         
-        .search-box input {
-            width: 100%;
-            padding: var(--space-3) var(--space-10) var(--space-3) var(--space-4);
+        .toolbar-input,
+        .toolbar-select {
+            height: 40px;
+            padding: var(--space-2) var(--space-3);
             border: 2px solid var(--border-light);
-            border-radius: var(--radius-lg);
+            border-radius: var(--radius-md);
             font-size: var(--text-sm);
             transition: all var(--transition-normal);
             background: var(--bg-white-solid);
-            height: 44px;
+            color: var(--text-primary);
+            font-family: inherit;
         }
         
-        .search-box i {
-            position: absolute;
-            right: var(--space-4);
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-light);
+        .toolbar-input:focus,
+        .toolbar-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 200, 150, 0.1);
         }
         
-        .filter-controls {
+        .toolbar-input:hover,
+        .toolbar-select:hover {
+            border-color: var(--primary-color);
+        }
+        
+        .toolbar-input {
+            min-width: 200px;
+        }
+        
+        .toolbar-select {
+            min-width: 120px;
+        }
+        
+        .toolbar-item .btn {
+            height: 40px;
             display: flex;
-            gap: var(--space-2);
-            align-items: center;
-        }
-        
-        .filter-controls .btn {
-            height: 44px;
-            display: flex;
             align-items: center;
             gap: var(--space-2);
-            padding: 0 var(--space-4);
+            padding: 0 var(--space-3);
             font-size: var(--text-sm);
+            margin-left: var(--space-2);
         }
         
         /* Responsive adjustments */
@@ -451,31 +336,20 @@ $pageTitle = 'Dividend Logs - PSW 4.0';
                 gap: var(--space-3);
             }
             
-            .page-size-selector {
+            .toolbar-item {
                 justify-content: center;
+                flex-wrap: wrap;
             }
             
-            .search-box {
+            .toolbar-input {
                 min-width: auto;
                 width: 100%;
+                max-width: 300px;
             }
             
-            .date-range-filter {
-                flex-direction: column;
-                gap: var(--space-3);
-            }
-            
-            .date-input-group {
+            .toolbar-select {
                 min-width: auto;
-                width: 100%;
-            }
-            
-            .filter-dropdown {
-                min-width: auto;
-            }
-            
-            .filter-controls {
-                justify-content: center;
+                width: auto;
             }
         }
     </style>
@@ -622,51 +496,38 @@ $pageTitle = 'Dividend Logs - PSW 4.0';
             <div class="content-wrapper">
                 <!-- Toolbar -->
                 <div class="toolbar">
-                    <div class="page-size-selector">
-                        <label>Show:</label>
-                        <select onchange="changePageSize(this.value)">
+                    <div class="toolbar-item">
+                        <span class="toolbar-label">Show:</span>
+                        <select onchange="changePageSize(this.value)" class="toolbar-select">
                             <option value="10" <?php echo $limit == 10 ? 'selected' : ''; ?>>10</option>
                             <option value="25" <?php echo $limit == 25 ? 'selected' : ''; ?>>25</option>
                             <option value="50" <?php echo $limit == 50 ? 'selected' : ''; ?>>50</option>
                             <option value="100" <?php echo $limit == 100 ? 'selected' : ''; ?>>100</option>
                         </select>
-                        <span>entries</span>
+                        <span class="toolbar-label">entries</span>
                     </div>
                     
-                    <!-- Search Box -->
-                    <div class="search-box">
-                        <input type="text" id="search-input" placeholder="Search by ISIN, company, or ticker..." 
+                    <div class="toolbar-item">
+                        <input type="text" id="search-input" class="toolbar-input" 
+                               placeholder="Search by ISIN, company, or ticker..." 
                                value="<?php echo htmlspecialchars($filters['search']); ?>">
-                        <i class="fas fa-search"></i>
                     </div>
                     
-                    <!-- Date Range Filter -->
-                    <div class="date-range-filter">
-                        <div class="date-input-group">
-                            <label for="date-from" class="date-label">
-                                <i class="fas fa-calendar-alt"></i>
-                                From
-                            </label>
-                            <input type="date" id="date-from" class="form-control date-input" 
-                                   value="<?php echo htmlspecialchars($filters['date_from']); ?>">
-                        </div>
-                        <div class="date-input-group">
-                            <label for="date-to" class="date-label">
-                                <i class="fas fa-calendar-alt"></i>
-                                To
-                            </label>
-                            <input type="date" id="date-to" class="form-control date-input" 
-                                   value="<?php echo htmlspecialchars($filters['date_to']); ?>">
-                        </div>
+                    <div class="toolbar-item">
+                        <span class="toolbar-label">From:</span>
+                        <input type="date" id="date-from" class="toolbar-input" 
+                               value="<?php echo htmlspecialchars($filters['date_from']); ?>">
                     </div>
                     
-                    <!-- Broker Filter -->
-                    <div class="form-group filter-dropdown">
-                        <label class="form-label">
-                            <i class="fas fa-building"></i>
-                            Broker
-                        </label>
-                        <select id="broker-filter" class="form-control">
+                    <div class="toolbar-item">
+                        <span class="toolbar-label">To:</span>
+                        <input type="date" id="date-to" class="toolbar-input" 
+                               value="<?php echo htmlspecialchars($filters['date_to']); ?>">
+                    </div>
+                    
+                    <div class="toolbar-item">
+                        <span class="toolbar-label">Broker:</span>
+                        <select id="broker-filter" class="toolbar-select">
                             <option value="">All Brokers</option>
                             <?php foreach ($brokers as $broker): ?>
                                 <option value="<?php echo $broker['broker_id']; ?>"
@@ -677,14 +538,10 @@ $pageTitle = 'Dividend Logs - PSW 4.0';
                         </select>
                     </div>
                     
-                    <!-- Account Group Filter -->
-                    <div class="form-group filter-dropdown">
-                        <label class="form-label">
-                            <i class="fas fa-folder"></i>
-                            Account Group
-                        </label>
-                        <select id="account-group-filter" class="form-control">
-                            <option value="">All Account Groups</option>
+                    <div class="toolbar-item">
+                        <span class="toolbar-label">Account:</span>
+                        <select id="account-group-filter" class="toolbar-select">
+                            <option value="">All Groups</option>
                             <?php foreach ($accountGroups as $group): ?>
                                 <option value="<?php echo $group['portfolio_account_group_id']; ?>"
                                         <?php echo $filters['account_group_id'] == $group['portfolio_account_group_id'] ? 'selected' : ''; ?>>
@@ -694,10 +551,9 @@ $pageTitle = 'Dividend Logs - PSW 4.0';
                         </select>
                     </div>
                     
-                    <!-- Filter Controls -->
-                    <div class="filter-controls">
+                    <div class="toolbar-item">
                         <button type="button" class="btn btn-primary" onclick="applyFilters()">
-                            <i class="fas fa-filter"></i> Apply Filters
+                            <i class="fas fa-filter"></i> Apply
                         </button>
                         <button type="button" class="btn btn-secondary" onclick="clearFilters()">
                             <i class="fas fa-times"></i> Clear
