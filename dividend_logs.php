@@ -372,7 +372,7 @@ $pageTitle = 'Dividend Logs - PSW 4.0';
         .toolbar {
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
+            align-items: flex-start;
             gap: var(--space-6);
             margin-bottom: var(--space-6);
             flex-wrap: wrap;
@@ -380,9 +380,21 @@ $pageTitle = 'Dividend Logs - PSW 4.0';
         
         .toolbar-right {
             display: flex;
+            flex-direction: column;
+            gap: var(--space-4);
+        }
+        
+        .filters-row {
+            display: flex;
             align-items: flex-end;
             gap: var(--space-4);
             flex-wrap: wrap;
+        }
+        
+        .filter-controls {
+            display: flex;
+            gap: var(--space-2);
+            align-items: center;
         }
         
         /* Responsive adjustments */
@@ -413,12 +425,26 @@ $pageTitle = 'Dividend Logs - PSW 4.0';
             }
             
             .toolbar-right {
+                align-items: stretch;
+            }
+            
+            .filters-row {
                 flex-direction: column;
                 align-items: stretch;
+                gap: var(--space-3);
             }
             
             .filter-dropdown {
                 min-width: auto;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+            
+            .filter-controls {
+                justify-content: center;
+                margin-top: var(--space-2);
             }
         }
     </style>
@@ -579,65 +605,67 @@ $pageTitle = 'Dividend Logs - PSW 4.0';
                     </div>
                     
                     <div class="toolbar-right">
-                        <!-- Search Box -->
-                        <div class="search-box">
-                            <input type="text" id="search-input" placeholder="Search by ISIN, company, or ticker..." 
-                                   value="<?php echo htmlspecialchars($filters['search']); ?>">
-                            <i class="fas fa-search"></i>
-                        </div>
-                        
-                        <!-- Date Range Filter -->
-                        <div class="date-range-filter">
-                            <div class="date-input-group">
-                                <label for="date-from" class="date-label">
-                                    <i class="fas fa-calendar-alt"></i>
-                                    From
-                                </label>
-                                <input type="date" id="date-from" class="form-control date-input" 
-                                       value="<?php echo htmlspecialchars($filters['date_from']); ?>">
+                        <div class="filters-row">
+                            <!-- Search Box -->
+                            <div class="search-box">
+                                <input type="text" id="search-input" placeholder="Search by ISIN, company, or ticker..." 
+                                       value="<?php echo htmlspecialchars($filters['search']); ?>">
+                                <i class="fas fa-search"></i>
                             </div>
-                            <div class="date-input-group">
-                                <label for="date-to" class="date-label">
-                                    <i class="fas fa-calendar-alt"></i>
-                                    To
-                                </label>
-                                <input type="date" id="date-to" class="form-control date-input" 
-                                       value="<?php echo htmlspecialchars($filters['date_to']); ?>">
+                            
+                            <!-- Date Range Filter -->
+                            <div class="date-range-filter">
+                                <div class="date-input-group">
+                                    <label for="date-from" class="date-label">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        From
+                                    </label>
+                                    <input type="date" id="date-from" class="form-control date-input" 
+                                           value="<?php echo htmlspecialchars($filters['date_from']); ?>">
+                                </div>
+                                <div class="date-input-group">
+                                    <label for="date-to" class="date-label">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        To
+                                    </label>
+                                    <input type="date" id="date-to" class="form-control date-input" 
+                                           value="<?php echo htmlspecialchars($filters['date_to']); ?>">
+                                </div>
                             </div>
-                        </div>
-                        
-                        <!-- Broker Filter -->
-                        <div class="form-group filter-dropdown">
-                            <label class="form-label">
-                                <i class="fas fa-building"></i>
-                                Broker
-                            </label>
-                            <select id="broker-filter" class="form-control">
-                                <option value="">All Brokers</option>
-                                <?php foreach ($brokers as $broker): ?>
-                                    <option value="<?php echo $broker['broker_id']; ?>"
-                                            <?php echo $filters['broker_id'] == $broker['broker_id'] ? 'selected' : ''; ?>>
-                                        <?php echo htmlspecialchars($broker['broker_name']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        
-                        <!-- Account Group Filter -->
-                        <div class="form-group filter-dropdown">
-                            <label class="form-label">
-                                <i class="fas fa-folder"></i>
-                                Account Group
-                            </label>
-                            <select id="account-group-filter" class="form-control">
-                                <option value="">All Account Groups</option>
-                                <?php foreach ($accountGroups as $group): ?>
-                                    <option value="<?php echo $group['portfolio_account_group_id']; ?>"
-                                            <?php echo $filters['account_group_id'] == $group['portfolio_account_group_id'] ? 'selected' : ''; ?>>
-                                        <?php echo htmlspecialchars($group['portfolio_group_name']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
+                            
+                            <!-- Broker Filter -->
+                            <div class="form-group filter-dropdown">
+                                <label class="form-label">
+                                    <i class="fas fa-building"></i>
+                                    Broker
+                                </label>
+                                <select id="broker-filter" class="form-control">
+                                    <option value="">All Brokers</option>
+                                    <?php foreach ($brokers as $broker): ?>
+                                        <option value="<?php echo $broker['broker_id']; ?>"
+                                                <?php echo $filters['broker_id'] == $broker['broker_id'] ? 'selected' : ''; ?>>
+                                            <?php echo htmlspecialchars($broker['broker_name']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            
+                            <!-- Account Group Filter -->
+                            <div class="form-group filter-dropdown">
+                                <label class="form-label">
+                                    <i class="fas fa-folder"></i>
+                                    Account Group
+                                </label>
+                                <select id="account-group-filter" class="form-control">
+                                    <option value="">All Account Groups</option>
+                                    <?php foreach ($accountGroups as $group): ?>
+                                        <option value="<?php echo $group['portfolio_account_group_id']; ?>"
+                                                <?php echo $filters['account_group_id'] == $group['portfolio_account_group_id'] ? 'selected' : ''; ?>>
+                                            <?php echo htmlspecialchars($group['portfolio_group_name']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
                         </div>
                         
                         <!-- Filter Controls -->
