@@ -64,6 +64,7 @@ try {
     $expectedColumns = [
         'payment_date' => ['payment_date', 'date', 'pay_date'],
         'isin' => ['isin', 'isin_code'],
+        'broker' => ['broker', 'broker_name'],
         'shares_held' => ['shares_held', 'shares', 'quantity'],
         'dividend_amount_local' => ['dividend_amount_local', 'dividend_local', 'dividend'],
         'tax_amount_local' => ['tax_amount_local', 'tax_local', 'tax'],
@@ -96,7 +97,7 @@ try {
         // Skip empty rows
         if (empty(array_filter($row))) continue;
         
-        $debugInfo[] = "Row $rowNum (" . count($row) . " cols): " . json_encode(array_slice($row, 0, 5)) . "...";
+        $debugInfo[] = "Row $rowNum (" . count($row) . " cols): " . json_encode($row);
         
         // Extract values using column mapping
         $dividend = [
@@ -183,8 +184,9 @@ try {
     
     fclose($handle);
     
-    // Store data in session for import
+    // Store data in session for import, including broker_id
     $_SESSION['dividend_import_data'] = $dividendData;
+    $_SESSION['selected_broker_id'] = $_POST['broker_id'] ?? 'minimal';
     
     echo json_encode([
         'success' => true,
@@ -193,7 +195,7 @@ try {
         'warnings' => $warnings,
         'preview_data' => $dividendData,
         'debug_info' => $debugInfo,
-        'broker_id' => 'minimal'
+        'broker_id' => $_SESSION['selected_broker_id']
     ]);
     
 } catch (Exception $e) {
