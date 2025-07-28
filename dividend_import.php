@@ -220,15 +220,19 @@ $(document).ready(function() {
     });
     
     function loadBrokers() {
+        console.log('Loading brokers...');
         $.get('get_brokers.php')
             .done(function(data) {
+                console.log('Broker data received:', data);
                 const select = $('#broker-select');
                 select.empty();
                 select.append('<option value="">Select a broker...</option>');
                 
                 // Use database brokers if available, otherwise use config brokers
-                const brokers = data.brokers.length > 0 ? data.brokers : 
-                    Object.entries(data.config_brokers).map(([id, name]) => ({broker_id: id, broker_name: name}));
+                const brokers = data.brokers && data.brokers.length > 0 ? data.brokers : 
+                    Object.entries(data.config_brokers || {}).map(([id, name]) => ({broker_id: id, broker_name: name}));
+                
+                console.log('Processed brokers:', brokers);
                 
                 brokers.forEach(function(broker) {
                     select.append(`<option value="${broker.broker_id}">${broker.broker_name}</option>`);
@@ -236,8 +240,19 @@ $(document).ready(function() {
                 
                 updateUploadButton();
             })
-            .fail(function() {
-                showAlert('error', 'Failed to load brokers');
+            .fail(function(xhr, status, error) {
+                console.error('Failed to load brokers:', status, error);
+                // Fallback to hardcoded brokers
+                const select = $('#broker-select');
+                select.empty();
+                select.append('<option value="">Select a broker...</option>');
+                select.append('<option value="1">Broker 1</option>');
+                select.append('<option value="2">Broker 2</option>');
+                select.append('<option value="3">Broker 3</option>');
+                select.append('<option value="4">Broker 4</option>');
+                select.append('<option value="5">Broker 5</option>');
+                updateUploadButton();
+                showAlert('warning', 'Using fallback broker list');
             });
     }
     
