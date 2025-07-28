@@ -6,12 +6,12 @@ class BrokerCsvConfig {
         'minimal' => [
             'name' => 'Minimal Format (PSW Standard)',
             'csv_format' => [
-                'delimiter' => ',',
+                'delimiter' => "\t",
                 'enclosure' => '"',
                 'escape' => '\\',
                 'skip_header_rows' => 1,
                 'date_format' => 'Y-m-d',
-                'decimal_separator' => '.',
+                'decimal_separator' => ',',
                 'thousand_separator' => '',
                 'encoding' => 'UTF-8'
             ],
