@@ -249,8 +249,154 @@ $pageTitle = 'Dividend Logs - PSW 4.0';
             border-color: var(--primary-color);
         }
         
+        /* Filter dropdown styling */
+        .filter-dropdown {
+            min-width: 140px;
+        }
+        
+        .filter-dropdown .form-label {
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            margin-bottom: var(--space-2);
+        }
+        
+        .filter-dropdown .form-label i {
+            color: var(--primary-color);
+            font-size: var(--text-xs);
+        }
+        
+        .filter-dropdown .form-control {
+            width: 100%;
+            padding: var(--space-3) var(--space-4);
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            font-size: var(--text-sm);
+            transition: all var(--transition-normal);
+            background: var(--bg-white-solid);
+            color: var(--text-primary);
+            font-family: inherit;
+        }
+        
+        .filter-dropdown .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 200, 150, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .filter-dropdown .form-control:hover {
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        /* Statistics cards layout */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-6);
+            margin-bottom: var(--space-8);
+        }
+        
+        .stats-grid .stat-card {
+            padding: 0;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-light);
+            background: var(--bg-white-solid);
+            transition: all var(--transition-normal);
+        }
+        
+        .stats-grid .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .stats-grid .stat-card .card-content {
+            padding: var(--space-6);
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+        }
+        
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-xl);
+            color: white;
+            flex-shrink: 0;
+        }
+        
+        .stat-icon.primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        }
+        
+        .stat-icon.success {
+            background: linear-gradient(135deg, #10B981, #059669);
+        }
+        
+        .stat-icon.warning {
+            background: linear-gradient(135deg, #F59E0B, #D97706);
+        }
+        
+        .stat-icon.info {
+            background: linear-gradient(135deg, #3B82F6, #2563EB);
+        }
+        
+        .stat-info {
+            flex: 1;
+        }
+        
+        .stat-number {
+            font-size: var(--text-2xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+        
+        .stat-label {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            font-weight: var(--font-medium);
+            margin-top: var(--space-1);
+        }
+        
+        /* Toolbar improvements */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: var(--space-6);
+            margin-bottom: var(--space-6);
+            flex-wrap: wrap;
+        }
+        
+        .toolbar-right {
+            display: flex;
+            align-items: flex-end;
+            gap: var(--space-4);
+            flex-wrap: wrap;
+        }
+        
         /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
         @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
             .date-range-filter {
                 flex-direction: column;
                 gap: var(--space-3);
@@ -259,6 +405,20 @@ $pageTitle = 'Dividend Logs - PSW 4.0';
             .date-input-group {
                 min-width: auto;
                 width: 100%;
+            }
+            
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .toolbar-right {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-dropdown {
+                min-width: auto;
             }
         }
     </style>
@@ -351,44 +511,52 @@ $pageTitle = 'Dividend Logs - PSW 4.0';
             <?php endif; ?>
 
             <!-- Statistics Cards -->
-            <div class="statistics-grid">
-                <div class="stat-card primary">
-                    <div class="stat-icon">
-                        <i class="fas fa-coins"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-number"><?php echo number_format($stats['total_dividends']); ?></div>
-                        <div class="stat-label">Total Dividends</div>
-                    </div>
-                </div>
-                
-                <div class="stat-card success">
-                    <div class="stat-icon">
-                        <i class="fas fa-money-bill-wave"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-number"><?php echo number_format($stats['total_net_sek'], 2); ?> SEK</div>
-                        <div class="stat-label">Net Dividend</div>
+            <div class="stats-grid">
+                <div class="dashboard-card stat-card">
+                    <div class="card-content">
+                        <div class="stat-icon primary">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number"><?php echo number_format($stats['total_dividends']); ?></div>
+                            <div class="stat-label">Total Dividends</div>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="stat-card warning">
-                    <div class="stat-icon">
-                        <i class="fas fa-receipt"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-number"><?php echo number_format($stats['total_tax_sek'], 2); ?> SEK</div>
-                        <div class="stat-label">Total Tax</div>
+                <div class="dashboard-card stat-card">
+                    <div class="card-content">
+                        <div class="stat-icon success">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number"><?php echo number_format($stats['total_net_sek'], 2); ?> SEK</div>
+                            <div class="stat-label">Net Dividend</div>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="stat-card info">
-                    <div class="stat-icon">
-                        <i class="fas fa-building"></i>
+                <div class="dashboard-card stat-card">
+                    <div class="card-content">
+                        <div class="stat-icon warning">
+                            <i class="fas fa-receipt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number"><?php echo number_format($stats['total_tax_sek'], 2); ?> SEK</div>
+                            <div class="stat-label">Total Tax</div>
+                        </div>
                     </div>
-                    <div class="stat-content">
-                        <div class="stat-number"><?php echo number_format($stats['unique_companies']); ?></div>
-                        <div class="stat-label">Companies</div>
+                </div>
+                
+                <div class="dashboard-card stat-card">
+                    <div class="card-content">
+                        <div class="stat-icon info">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number"><?php echo number_format($stats['unique_companies']); ?></div>
+                            <div class="stat-label">Companies</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -439,49 +607,37 @@ $pageTitle = 'Dividend Logs - PSW 4.0';
                         </div>
                         
                         <!-- Broker Filter -->
-                        <div class="checkbox-dropdown" data-filter="broker">
-                            <button type="button" class="dropdown-toggle">
+                        <div class="form-group filter-dropdown">
+                            <label class="form-label">
                                 <i class="fas fa-building"></i>
-                                Broker <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="dropdown-content">
-                                <div class="dropdown-header">
-                                    <button type="button" class="select-all" onclick="selectAllOptions('broker')">All</button>
-                                    <button type="button" class="select-none" onclick="selectNoneOptions('broker')">None</button>
-                                </div>
+                                Broker
+                            </label>
+                            <select id="broker-filter" class="form-control">
+                                <option value="">All Brokers</option>
                                 <?php foreach ($brokers as $broker): ?>
-                                    <div class="dropdown-option">
-                                        <label>
-                                            <input type="checkbox" name="broker_id[]" value="<?php echo $broker['broker_id']; ?>"
-                                                   <?php echo $filters['broker_id'] == $broker['broker_id'] ? 'checked' : ''; ?>>
-                                            <?php echo htmlspecialchars($broker['broker_name']); ?>
-                                        </label>
-                                    </div>
+                                    <option value="<?php echo $broker['broker_id']; ?>"
+                                            <?php echo $filters['broker_id'] == $broker['broker_id'] ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($broker['broker_name']); ?>
+                                    </option>
                                 <?php endforeach; ?>
-                            </div>
+                            </select>
                         </div>
                         
                         <!-- Account Group Filter -->
-                        <div class="checkbox-dropdown" data-filter="account_group">
-                            <button type="button" class="dropdown-toggle">
+                        <div class="form-group filter-dropdown">
+                            <label class="form-label">
                                 <i class="fas fa-folder"></i>
-                                Account Group <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="dropdown-content">
-                                <div class="dropdown-header">
-                                    <button type="button" class="select-all" onclick="selectAllOptions('account_group')">All</button>
-                                    <button type="button" class="select-none" onclick="selectNoneOptions('account_group')">None</button>
-                                </div>
+                                Account Group
+                            </label>
+                            <select id="account-group-filter" class="form-control">
+                                <option value="">All Account Groups</option>
                                 <?php foreach ($accountGroups as $group): ?>
-                                    <div class="dropdown-option">
-                                        <label>
-                                            <input type="checkbox" name="account_group_id[]" value="<?php echo $group['portfolio_account_group_id']; ?>"
-                                                   <?php echo $filters['account_group_id'] == $group['portfolio_account_group_id'] ? 'checked' : ''; ?>>
-                                            <?php echo htmlspecialchars($group['portfolio_group_name']); ?>
-                                        </label>
-                                    </div>
+                                    <option value="<?php echo $group['portfolio_account_group_id']; ?>"
+                                            <?php echo $filters['account_group_id'] == $group['portfolio_account_group_id'] ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($group['portfolio_group_name']); ?>
+                                    </option>
                                 <?php endforeach; ?>
-                            </div>
+                            </select>
                         </div>
                         
                         <!-- Filter Controls -->
@@ -706,6 +862,10 @@ $pageTitle = 'Dividend Logs - PSW 4.0';
         document.getElementById('date-from').addEventListener('change', applyFilters);
         document.getElementById('date-to').addEventListener('change', applyFilters);
         
+        // Dropdown filter change handlers
+        document.getElementById('broker-filter').addEventListener('change', applyFilters);
+        document.getElementById('account-group-filter').addEventListener('change', applyFilters);
+        
         // Column sorting
         document.querySelectorAll('.sortable').forEach(header => {
             header.addEventListener('click', function() {
@@ -741,15 +901,15 @@ $pageTitle = 'Dividend Logs - PSW 4.0';
             if (dateTo) params.set('date_to', dateTo);
             
             // Broker filter
-            const brokerCheckboxes = document.querySelectorAll('input[name="broker_id[]"]:checked');
-            if (brokerCheckboxes.length === 1) {
-                params.set('broker_id', brokerCheckboxes[0].value);
+            const brokerSelect = document.getElementById('broker-filter');
+            if (brokerSelect.value) {
+                params.set('broker_id', brokerSelect.value);
             }
             
             // Account group filter
-            const accountCheckboxes = document.querySelectorAll('input[name="account_group_id[]"]:checked');
-            if (accountCheckboxes.length === 1) {
-                params.set('account_group_id', accountCheckboxes[0].value);
+            const accountGroupSelect = document.getElementById('account-group-filter');
+            if (accountGroupSelect.value) {
+                params.set('account_group_id', accountGroupSelect.value);
             }
             
             // Preserve current sorting
@@ -782,15 +942,6 @@ $pageTitle = 'Dividend Logs - PSW 4.0';
             window.location.href = '?' + params.toString();
         }
         
-        function selectAllOptions(filterType) {
-            const checkboxes = document.querySelectorAll(`input[name="${filterType}_id[]"]`);
-            checkboxes.forEach(cb => cb.checked = true);
-        }
-        
-        function selectNoneOptions(filterType) {
-            const checkboxes = document.querySelectorAll(`input[name="${filterType}_id[]"]`);
-            checkboxes.forEach(cb => cb.checked = false);
-        }
         
         // User menu toggle
         function toggleUserMenu() {
