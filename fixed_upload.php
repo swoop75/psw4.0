@@ -19,6 +19,10 @@ try {
     }
     
     $content = file_get_contents($file['tmp_name']);
+    
+    // Remove BOM if present
+    $content = str_replace("\xEF\xBB\xBF", '', $content);
+    
     $lines = preg_split('/\r\n|\r|\n/', $content);
     
     $dividendData = [];
@@ -36,23 +40,26 @@ try {
             continue;
         }
         
-        // Parse using tabs first, then spaces if tabs don't work
-        $parts = explode("\t", $line);
+        // Parse using semicolons first (based on debug info), then tabs, then spaces
+        $parts = explode(";", $line);
+        if (count($parts) < 5) {
+            $parts = explode("\t", $line);
+        }
         if (count($parts) < 5) {
             $parts = preg_split('/\s+/', $line);
         }
         
         $debugInfo[] = "Line $lineNum: " . count($parts) . " parts: " . json_encode($parts);
         
-        if (count($parts) >= 6) {
-            // Based on your data structure, let me try this mapping:
-            // 0: payment_date, 1: isin, 2: shares_held, 3: ???, 4: dividend_amount_local, 5: currency_local, 6: dividend_amount_sek, 7: net_dividend_sek, 8: exchange_rate_used
+        if (count($parts) >= 8) {
+            // Based on your actual data: 2015-12-02;SE0021309614;37;2;23,42;SEK;156,18;132,76;1
+            // 0: payment_date, 1: isin, 2: shares_held, 3: ???(skip), 4: dividend_amount_local, 5: currency_local, 6: dividend_amount_sek, 7: net_dividend_sek, 8: exchange_rate_used
             
             $dividend = [
                 'payment_date' => trim($parts[0]),
                 'isin' => trim($parts[1]),
                 'shares_held' => parseNumber($parts[2]),
-                'dividend_amount_local' => parseNumber($parts[4]), // Skip parts[3] which seems to be wrong
+                'dividend_amount_local' => parseNumber($parts[4]), // Skip parts[3] 
                 'tax_amount_local' => 0, // Calculate later
                 'currency_local' => strtoupper(trim($parts[5])),
                 'dividend_amount_sek' => parseNumber($parts[6]),
