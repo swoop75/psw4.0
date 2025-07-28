@@ -7,6 +7,7 @@
 // Global variables
 let allocationChart = null;
 let performanceChart = null;
+let dividendTrendsChart = null;
 let currentAllocationView = 'sector';
 
 /**
@@ -43,6 +44,7 @@ function initializeCharts() {
     try {
         initializeAllocationChart();
         initializePerformanceChart();
+        initializeDividendTrendsChart();
     } catch (error) {
         console.error('Error initializing charts:', error);
     }
@@ -378,6 +380,144 @@ function formatDate(dateString, format = 'short') {
 function exportDashboardData() {
     // TODO: Implement Excel export functionality
     showAlert('Export functionality coming soon', 'info');
+}
+
+/**
+ * Initialize dividend trends chart
+ */
+function initializeDividendTrendsChart() {
+    const canvas = document.getElementById('dividendTrendsChart');
+    if (!canvas) {
+        console.warn('Dividend trends chart canvas not found');
+        return;
+    }
+    
+    const ctx = canvas.getContext('2d');
+    const dividendStats = window.dashboardData.dividendStats;
+    
+    if (!dividendStats || !dividendStats.monthly_trends || dividendStats.monthly_trends.length === 0) {
+        // Show empty state message
+        ctx.fillStyle = '#f8f9fa';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#6c757d';
+        ctx.font = '16px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('No Dividend Data', canvas.width / 2, canvas.height / 2 - 10);
+        ctx.font = '12px Arial';
+        ctx.fillText('Import dividends to see trends', canvas.width / 2, canvas.height / 2 + 10);
+        return;
+    }
+    
+    // Prepare data for chart
+    const monthlyData = dividendStats.monthly_trends;
+    const labels = monthlyData.map(item => item.month_name || item.month);
+    const amounts = monthlyData.map(item => parseFloat(item.total_amount || 0));
+    const payments = monthlyData.map(item => parseInt(item.payment_count || 0));
+    
+    // Simple canvas chart implementation (without Chart.js for now)
+    drawDividendTrendsChart(ctx, canvas, labels, amounts, payments);
+}
+
+/**
+ * Draw dividend trends chart on canvas
+ */
+function drawDividendTrendsChart(ctx, canvas, labels, amounts, payments) {
+    const padding = 40;
+    const chartWidth = canvas.width - (padding * 2);
+    const chartHeight = canvas.height - (padding * 2);
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Set background
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    if (amounts.length === 0) return;
+    
+    // Find max values for scaling
+    const maxAmount = Math.max(...amounts);
+    const maxPayments = Math.max(...payments);
+    
+    if (maxAmount === 0) return;
+    
+    // Draw grid lines
+    ctx.strokeStyle = '#e9ecef';
+    ctx.lineWidth = 1;
+    
+    // Vertical grid lines
+    const stepX = chartWidth / (labels.length - 1 || 1);
+    for (let i = 0; i < labels.length; i++) {
+        const x = padding + (i * stepX);
+        ctx.beginPath();
+        ctx.moveTo(x, padding);
+        ctx.lineTo(x, padding + chartHeight);
+        ctx.stroke();
+    }
+    
+    // Horizontal grid lines
+    for (let i = 0; i <= 5; i++) {
+        const y = padding + (i * chartHeight / 5);
+        ctx.beginPath();
+        ctx.moveTo(padding, y);
+        ctx.lineTo(padding + chartWidth, y);
+        ctx.stroke();
+    }
+    
+    // Draw amount line (primary color)
+    ctx.strokeStyle = '#00C896';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    
+    amounts.forEach((amount, index) => {
+        const x = padding + (index * stepX);
+        const y = padding + chartHeight - ((amount / maxAmount) * chartHeight);
+        
+        if (index === 0) {
+            ctx.moveTo(x, y);
+        } else {
+            ctx.lineTo(x, y);
+        }
+    });
+    ctx.stroke();
+    
+    // Draw amount points
+    ctx.fillStyle = '#00C896';
+    amounts.forEach((amount, index) => {
+        const x = padding + (index * stepX);
+        const y = padding + chartHeight - ((amount / maxAmount) * chartHeight);
+        
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, 2 * Math.PI);
+        ctx.fill();
+    });
+    
+    // Draw labels
+    ctx.fillStyle = '#6c757d';
+    ctx.font = '11px Arial';
+    ctx.textAlign = 'center';
+    
+    labels.forEach((label, index) => {
+        const x = padding + (index * stepX);
+        const y = canvas.height - 10;
+        
+        // Rotate and abbreviate long month names
+        const shortLabel = label.length > 8 ? label.substring(0, 3) : label;
+        ctx.fillText(shortLabel, x, y);
+    });
+    
+    // Draw title
+    ctx.fillStyle = '#495057';
+    ctx.font = 'bold 14px Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText('Monthly Dividend Income (SEK)', padding, 20);
+    
+    // Draw legend
+    ctx.fillStyle = '#00C896';
+    ctx.fillRect(padding, 25, 15, 3);
+    ctx.fillStyle = '#6c757d';
+    ctx.font = '12px Arial';
+    ctx.fillText('Total Amount', padding + 20, 32);
 }
 
 /**

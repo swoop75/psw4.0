@@ -10,6 +10,7 @@ $recentDividends = $dashboardData['recent_dividends'];
 $upcomingDividends = $dashboardData['upcoming_dividends'];
 $allocation = $dashboardData['allocation_data'];
 $quickStats = $dashboardData['quick_stats'];
+$dividendStats = $dashboardData['dividend_stats'];
 ?>
 
 <div class="dashboard-container">
@@ -108,6 +109,73 @@ $quickStats = $dashboardData['quick_stats'];
                         <div class="allocation-legend" id="allocationLegend">
                             <!-- Legend will be populated by JavaScript -->
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Paying Companies -->
+            <div class="dashboard-widget">
+                <div class="widget-header">
+                    <h2><i class="fas fa-trophy"></i> Top Paying Companies</h2>
+                    <span class="widget-subtitle">Last 12 months</span>
+                </div>
+                <div class="widget-content">
+                    <div class="company-rankings">
+                        <?php if (!empty($dividendStats['top_paying_companies'])): ?>
+                            <?php foreach ($dividendStats['top_paying_companies'] as $index => $company): ?>
+                                <div class="company-rank-item">
+                                    <div class="rank-badge">
+                                        <span class="rank-number"><?php echo $index + 1; ?></span>
+                                    </div>
+                                    <div class="company-info">
+                                        <div class="company-name"><?php echo htmlspecialchars($company['company_name'] ?? 'Unknown Company'); ?></div>
+                                        <div class="company-stats">
+                                            <span class="total-amount"><?php echo number_format($company['total_dividends'], 2); ?> SEK</span>
+                                            <span class="payment-count"><?php echo $company['payment_count']; ?> payments</span>
+                                        </div>
+                                    </div>
+                                    <div class="company-progress">
+                                        <div class="progress-bar" style="width: <?php echo $index === 0 ? 100 : ($company['total_dividends'] / $dividendStats['top_paying_companies'][0]['total_dividends'] * 100); ?>%"></div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div class="empty-state">
+                                <i class="fas fa-chart-bar"></i>
+                                <p>No dividend data available for the last 12 months</p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Best Payment Days -->
+            <div class="dashboard-widget">
+                <div class="widget-header">
+                    <h2><i class="fas fa-calendar-day"></i> Best Payment Days</h2>
+                    <span class="widget-subtitle">By day of week</span>
+                </div>
+                <div class="widget-content">
+                    <div class="day-rankings">
+                        <?php if (!empty($dividendStats['best_payment_days'])): ?>
+                            <?php foreach ($dividendStats['best_payment_days'] as $day): ?>
+                                <div class="day-rank-item">
+                                    <div class="day-name"><?php echo $day['day_name']; ?></div>
+                                    <div class="day-stats">
+                                        <div class="day-amount"><?php echo number_format($day['total_amount'], 2); ?> SEK</div>
+                                        <div class="day-count"><?php echo $day['payment_count']; ?> payments</div>
+                                    </div>
+                                    <div class="day-progress">
+                                        <div class="progress-bar" style="width: <?php echo ($day['total_amount'] / $dividendStats['best_payment_days'][0]['total_amount'] * 100); ?>%"></div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div class="empty-state">
+                                <i class="fas fa-calendar-alt"></i>
+                                <p>No payment day data available</p>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -286,21 +354,71 @@ $quickStats = $dashboardData['quick_stats'];
                 </div>
             </div>
 
-            <!-- Performance Chart Placeholder -->
+            <!-- Dividend Trends Chart -->
             <div class="dashboard-widget">
                 <div class="widget-header">
-                    <h2><i class="fas fa-chart-area"></i> Portfolio Performance</h2>
-                    <div class="widget-controls">
-                        <select id="performanceTimeframe" class="form-control-sm">
-                            <option value="1M">1 Month</option>
-                            <option value="3M">3 Months</option>
-                            <option value="6M">6 Months</option>
-                            <option value="1Y" selected>1 Year</option>
-                        </select>
-                    </div>
+                    <h2><i class="fas fa-chart-line"></i> Dividend Trends</h2>
+                    <span class="widget-subtitle">Monthly trends (last 12 months)</span>
                 </div>
                 <div class="widget-content">
-                    <canvas id="performanceChart" width="400" height="200"></canvas>
+                    <canvas id="dividendTrendsChart" width="400" height="200"></canvas>
+                    <?php if (empty($dividendStats['monthly_trends'])): ?>
+                        <div class="empty-state">
+                            <i class="fas fa-chart-line"></i>
+                            <p>No dividend trend data available</p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- Dividend Insights -->
+            <div class="dashboard-widget">
+                <div class="widget-header">
+                    <h2><i class="fas fa-lightbulb"></i> Dividend Insights</h2>
+                    <span class="widget-subtitle">Past 12 months</span>
+                </div>
+                <div class="widget-content">
+                    <div class="insights-grid">
+                        <div class="insight-item">
+                            <div class="insight-icon">
+                                <i class="fas fa-hand-holding-usd"></i>
+                            </div>
+                            <div class="insight-content">
+                                <div class="insight-value"><?php echo number_format($dividendStats['insights']['avg_payment'], 2); ?> SEK</div>
+                                <div class="insight-label">Average Payment</div>
+                            </div>
+                        </div>
+                        
+                        <div class="insight-item">
+                            <div class="insight-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="insight-content">
+                                <div class="insight-value"><?php echo number_format($dividendStats['insights']['largest_payment'], 2); ?> SEK</div>
+                                <div class="insight-label">Largest Payment</div>
+                            </div>
+                        </div>
+                        
+                        <div class="insight-item">
+                            <div class="insight-icon">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div class="insight-content">
+                                <div class="insight-value"><?php echo $dividendStats['insights']['total_companies']; ?></div>
+                                <div class="insight-label">Paying Companies</div>
+                            </div>
+                        </div>
+                        
+                        <div class="insight-item">
+                            <div class="insight-icon">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div class="insight-content">
+                                <div class="insight-value"><?php echo $dividendStats['insights']['total_payments']; ?></div>
+                                <div class="insight-label">Total Payments</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -312,6 +430,7 @@ $quickStats = $dashboardData['quick_stats'];
 window.dashboardData = {
     allocation: <?php echo json_encode($allocation); ?>,
     performance: <?php echo json_encode($dashboardData['performance_data']); ?>,
+    dividendStats: <?php echo json_encode($dividendStats); ?>,
     user: {
         isAdmin: <?php echo Auth::isAdmin() ? 'true' : 'false'; ?>,
         username: '<?php echo Auth::getUsername(); ?>'
