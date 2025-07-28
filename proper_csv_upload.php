@@ -103,6 +103,7 @@ try {
         $dividend = [
             'payment_date' => isset($columnMap['payment_date']) ? trim($row[$columnMap['payment_date']] ?? '') : '',
             'isin' => isset($columnMap['isin']) ? trim($row[$columnMap['isin']] ?? '') : '',
+            'broker' => isset($columnMap['broker']) ? trim($row[$columnMap['broker']] ?? '') : '',
             'shares_held' => isset($columnMap['shares_held']) ? parseNumber($row[$columnMap['shares_held']] ?? '0') : 0,
             'dividend_amount_local' => isset($columnMap['dividend_amount_local']) ? parseNumber($row[$columnMap['dividend_amount_local']] ?? '0') : 0,
             'tax_amount_local' => isset($columnMap['tax_amount_local']) ? parseNumber($row[$columnMap['tax_amount_local']] ?? '0') : 0,
@@ -143,6 +144,24 @@ try {
             $warnings[] = "Row $rowNum: Database lookup failed";
             $dividend['company_name'] = 'Unknown';
             $dividend['ticker'] = '';
+        }
+        
+        // Look up broker_id from broker name
+        $dividend['broker_id'] = null;
+        if (!empty($dividend['broker'])) {
+            try {
+                $stmt = $foundationDb->prepare("SELECT broker_id FROM brokers WHERE broker_name = ?");
+                $stmt->execute([$dividend['broker']]);
+                $broker = $stmt->fetch();
+                
+                if ($broker) {
+                    $dividend['broker_id'] = $broker['broker_id'];
+                } else {
+                    $warnings[] = "Row $rowNum: Broker '{$dividend['broker']}' not found in database";
+                }
+            } catch (Exception $e) {
+                $warnings[] = "Row $rowNum: Broker lookup failed";
+            }
         }
         
         // Look up or create portfolio account group
