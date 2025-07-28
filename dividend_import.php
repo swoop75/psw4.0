@@ -28,30 +28,27 @@ try {
     ob_start();
 ?>
 
-<!-- Page Header -->
-<div class="page-header">
-    <div class="page-header-content">
-        <h1 class="page-title">
-            <i class="fas fa-file-csv"></i>
-            Dividend Import
-        </h1>
-        <p class="page-description">
-            Import dividend data from CSV files with automatic validation and company lookup
-        </p>
-    </div>
-</div>
-
-<!-- Main Content -->
-<div class="dashboard-grid">
-    <div class="dashboard-card full-width">
-        <div class="card-header">
-            <h2 class="card-title">
-                <i class="fas fa-upload"></i>
-                CSV Import Tool
-            </h2>
-            <p class="card-subtitle">Upload and process dividend data files</p>
+<div class="container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-left">
+                <h1><i class="fas fa-file-csv"></i> Dividend Import</h1>
+            </div>
         </div>
-        <div class="card-content">
+    </div>
+
+    <!-- Main Content -->
+    <div class="content-wrapper">
+        <div class="dashboard-card full-width">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fas fa-upload"></i>
+                    CSV Import Tool
+                </h2>
+                <p class="card-subtitle">Upload and process dividend data files</p>
+            </div>
+            <div class="card-content">
                     
                     <!-- Step 1: File Upload -->
                     <div id="upload-section">
@@ -248,7 +245,8 @@ try {
                         </div>
                     </div>
                     
-                </div>
+            </div>
+        </div>
     </div>
 </div>
 
