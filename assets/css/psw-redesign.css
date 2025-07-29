@@ -235,7 +235,7 @@ body {
 .psw-nav-link {
   display: flex;
   align-items: center;
-  padding: var(--spacing-3) var(--spacing-4);
+  padding: var(--spacing-1) var(--spacing-4);
   color: var(--text-secondary);
   text-decoration: none;
   transition: all var(--transition-fast);

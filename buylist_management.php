@@ -138,12 +138,9 @@ try {
 // Initialize variables for template
 $pageTitle = 'New Companies Management - PSW 4.0';
 $pageDescription = 'Manage your watchlist and buy targets';
-$additionalCSS = [
-    BASE_URL . '/assets/css/tooltip.css?v=' . time()
-];
+$additionalCSS = [];
 $additionalJS = [
-    BASE_URL . '/assets/js/buylist-management.js?v=' . time(),
-    BASE_URL . '/assets/js/tooltip.js?v=' . time()
+    BASE_URL . '/assets/js/buylist-management.js?v=' . time()
 ];
 
 $user = [
@@ -339,24 +336,10 @@ ob_start();
                             <?php foreach ($newCompaniesData['entries'] as $entry): ?>
                                 <tr>
                                     <td>
-                                        <div class="company-info" 
-                                             data-tooltip="true"
-                                             data-company="<?= htmlspecialchars($entry['company']) ?>"
-                                             data-ticker="<?= htmlspecialchars($entry['ticker']) ?>"
-                                             data-isin="<?= htmlspecialchars($entry['isin'] ?: 'N/A') ?>"
-                                             data-strategy-group="<?= htmlspecialchars($entry['strategy_name'] ?: 'No Strategy') ?>"
-                                             data-strategy-id="<?= $entry['strategy_group_id'] ?: 'N/A' ?>"
-                                             data-new-group="<?= $entry['new_group_id'] ?: 'No Group' ?>"
-                                             data-broker="<?= htmlspecialchars($entry['broker_name'] ?: 'No Broker') ?>"
-                                             data-yield="<?= $entry['yield'] ? number_format($entry['yield'], 2) . '%' : 'N/A' ?>"
-                                             data-country="<?= htmlspecialchars($entry['country_name'] ?: 'N/A') ?>"
-                                             data-status="<?= htmlspecialchars($entry['status_name'] ?: 'No Status') ?>"
-                                             data-comments="<?= htmlspecialchars($entry['comments'] ?: 'No comments') ?>"
-                                             data-inspiration="<?= htmlspecialchars($entry['inspiration'] ?: 'No inspiration noted') ?>">
+                                        <div class="company-info">
                                             <div class="company-name">
                                                 <strong><?= htmlspecialchars($entry['company']) ?></strong>
                                                 <span class="ticker"><?= htmlspecialchars($entry['ticker']) ?></span>
-                                                <i class="fas fa-info-circle tooltip-icon" title="Hover for details"></i>
                                             </div>
                                             <div class="company-details">
                                                 <?php if ($entry['isin']): ?>
