@@ -233,22 +233,29 @@ function editEntry(companyId) {
  * Populate entry form with data
  */
 function populateEntryForm(entry) {
-    const fields = [
-        'company_name', 'ticker', 'country', 'currency', 'exchange', 'isin', 'business_description',
-        'status_id', 'priority_level', 'target_price', 'target_quantity', 'notes', 'research_notes',
-        'expected_dividend_yield', 'pe_ratio', 'price_to_book', 'debt_to_equity', 'roe',
-        'analyst_rating', 'risk_level', 'sector', 'market_cap_category', 'target_allocation_percent',
-        'stop_loss_price', 'take_profit_price', 'entry_strategy', 'exit_strategy',
-        'last_analysis_date', 'next_review_date', 'price_alert_enabled', 'price_alert_target'
-    ];
+    // Map database field names to form field IDs
+    const fieldMappings = {
+        'company': 'company',
+        'ticker': 'ticker', 
+        'country_name': 'country_name',
+        'isin': 'isin',
+        'yield': 'yield',
+        'inspiration': 'inspiration',
+        'comments': 'comments',
+        'new_companies_status_id': 'new_companies_status_id',
+        'strategy_group_id': 'strategy_group_id',
+        'broker_id': 'broker_id',
+        'new_group_id': 'new_group_id'
+    };
     
-    fields.forEach(field => {
-        const element = document.getElementById(field);
-        if (element && entry[field] !== undefined && entry[field] !== null) {
+    // Populate form fields
+    Object.entries(fieldMappings).forEach(([dbField, formId]) => {
+        const element = document.getElementById(formId);
+        if (element && entry[dbField] !== undefined && entry[dbField] !== null) {
             if (element.type === 'checkbox') {
-                element.checked = !!entry[field];
+                element.checked = !!entry[dbField];
             } else {
-                element.value = entry[field];
+                element.value = entry[dbField];
             }
         }
     });
