@@ -1,8 +1,8 @@
 <?php
 /**
- * File: philosophy.php
- * Path: C:\Users\laoan\Documents\GitHub\psw\psw4.0\philosophy.php
- * Description: Philosophy page for PSW 4.0 - integrated with unified navigation
+ * File: philosophy-redesign.php
+ * Path: C:\Users\laoan\Documents\GitHub\psw\psw4.0\philosophy-redesign.php
+ * Description: Redesigned philosophy page for PSW 4.0 using new design system
  */
 
 // Start session and include required files
@@ -23,11 +23,11 @@ $pageDescription = 'A Disciplined Approach to Dividend Investing';
 try {
     // Prepare content for philosophy page
     ob_start();
-    include __DIR__ . '/templates/pages/philosophy.php';
+    include __DIR__ . '/templates/pages/philosophy-redesign.php';
     $content = ob_get_clean();
     
-    // Include base layout
-    include __DIR__ . '/templates/layouts/base.php';
+    // Include redesigned base layout
+    include __DIR__ . '/templates/layouts/base-redesign.php';
     
 } catch (Exception $e) {
     // Log error and show generic error page
@@ -35,17 +35,24 @@ try {
     
     $pageTitle = 'Error - ' . APP_NAME;
     $content = '
-        <div class="error-container text-center">
-            <h1>System Error</h1>
-            <p>We apologize, but there was an error loading the philosophy page.</p>
-            <p class="text-muted">Please try again later or contact support if the problem persists.</p>
+        <div class="psw-card">
+            <div class="psw-card-content" style="text-align: center; padding: var(--spacing-8);">
+                <i class="fas fa-exclamation-triangle" style="font-size: var(--font-size-4xl); color: var(--error-color); margin-bottom: var(--spacing-4);"></i>
+                <h1 style="color: var(--text-primary); margin-bottom: var(--spacing-4);">System Error</h1>
+                <p style="color: var(--text-secondary); margin-bottom: var(--spacing-2);">We apologize, but there was an error loading the philosophy page.</p>
+                <p style="color: var(--text-muted);">Please try again later or contact support if the problem persists.</p>
+            </div>
         </div>
     ';
     
     if (APP_DEBUG) {
-        $content .= '<div class="alert alert-error mt-3"><strong>Debug:</strong> ' . $e->getMessage() . '</div>';
+        $content .= '
+            <div class="psw-alert psw-alert-error psw-mb-4">
+                <strong>Debug:</strong> ' . htmlspecialchars($e->getMessage()) . '
+            </div>
+        ';
     }
     
-    include __DIR__ . '/templates/layouts/base.php';
+    include __DIR__ . '/templates/layouts/base-redesign.php';
 }
 ?>
