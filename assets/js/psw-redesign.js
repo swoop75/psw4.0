@@ -40,20 +40,63 @@ class PSWApp {
         const currentPath = window.location.pathname.split('/').pop();
         const navLinks = document.querySelectorAll('.psw-nav-link, .psw-nav-submenu-link');
         
+        // Track which parent menus should be highlighted
+        const activeParents = new Set();
+        
         navLinks.forEach(link => {
             const href = link.getAttribute('href');
             if (href && href.includes(currentPath)) {
                 link.classList.add('active');
                 
-                // If it's a submenu link, expand the parent
+                // If it's a submenu link, expand the parent and mark it as active
                 if (link.classList.contains('psw-nav-submenu-link')) {
                     const parentItem = link.closest('.psw-nav-item');
                     if (parentItem) {
                         parentItem.classList.add('expanded');
+                        const parentLink = parentItem.querySelector('.psw-nav-link');
+                        if (parentLink) {
+                            activeParents.add(parentLink);
+                        }
                     }
                 }
             }
         });
+        
+        // Apply parent-active class to parent menu items that have active children
+        activeParents.forEach(parentLink => {
+            parentLink.classList.add('parent-active');
+        });
+        
+        // Handle specific page to parent menu mappings
+        this.setParentActiveByPage(currentPath);
+    }
+    
+    /**
+     * Set parent menu active based on specific page mappings
+     * @param {string} currentPath - Current page filename
+     */
+    setParentActiveByPage(currentPath) {
+        const pageToParentMap = {
+            'dividend_log.php': 'Logs',
+            'dividend_estimate.php': 'Dashboard',
+            'buylist_management.php': 'Administration',
+            'new_companies_management.php': 'Administration',
+            'masterlist_management.php': 'Administration',
+            'user_management.php': 'Administration',
+            'admin.php': 'Administration',
+            'philosophy.php': 'Rules'
+        };
+        
+        const parentMenuName = pageToParentMap[currentPath];
+        if (parentMenuName) {
+            const parentLinks = document.querySelectorAll('.psw-nav-link');
+            parentLinks.forEach(link => {
+                const linkText = link.querySelector('.psw-nav-text')?.textContent.trim();
+                if (linkText === parentMenuName) {
+                    link.classList.add('parent-active');
+                }
+            });
+        }
     }
 
     /**

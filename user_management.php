@@ -262,12 +262,12 @@ $csrfToken = Security::generateCSRFToken();
 ob_start();
 ?>
 
-<div class="user-management-container">
+<div class="psw-user-management">
     <!-- Page Header -->
-    <div class="page-header">
-        <div class="header-content">
-            <h1>
-                <i class="fas fa-user-cog"></i>
+    <div class="psw-card psw-mb-6">
+        <div class="psw-card-header">
+            <h1 class="psw-card-title">
+                <i class="fas fa-user-cog psw-card-title-icon"></i>
                 <?php if ($editUserId): ?>
                     User Profile: <?php echo htmlspecialchars($user['username'] ?? 'Unknown'); ?>
                 <?php else: ?>
