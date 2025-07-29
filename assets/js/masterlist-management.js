@@ -16,17 +16,26 @@ document.addEventListener('DOMContentLoaded', function() {
  * Initialize event listeners
  */
 function initializeEventListeners() {
-    // Search input
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        searchInput.addEventListener('input', debounceSearch);
-        searchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                applyFilters();
-            }
-        });
-    }
+    // Search inputs
+    const searchInputs = [
+        'searchInput',
+        'isinFilter',
+        'tickerFilter',
+        'companyNameFilter'
+    ];
+    
+    searchInputs.forEach(inputId => {
+        const input = document.getElementById(inputId);
+        if (input) {
+            input.addEventListener('input', debounceSearch);
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    applyFilters();
+                }
+            });
+        }
+    });
 
     // Form submission
     const companyForm = document.getElementById('companyForm');
@@ -87,6 +96,9 @@ function debounceSearch() {
  */
 function applyFilters() {
     const searchInput = document.getElementById('searchInput');
+    const isinFilter = document.getElementById('isinFilter');
+    const tickerFilter = document.getElementById('tickerFilter');
+    const companyNameFilter = document.getElementById('companyNameFilter');
     const countryFilter = document.getElementById('countryFilter');
     const marketFilter = document.getElementById('marketFilter');
     const delistedFilter = document.getElementById('delistedFilter');
@@ -95,6 +107,18 @@ function applyFilters() {
     
     if (searchInput && searchInput.value.trim()) {
         params.set('search', searchInput.value.trim());
+    }
+    
+    if (isinFilter && isinFilter.value.trim()) {
+        params.set('isin', isinFilter.value.trim());
+    }
+    
+    if (tickerFilter && tickerFilter.value.trim()) {
+        params.set('ticker', tickerFilter.value.trim());
+    }
+    
+    if (companyNameFilter && companyNameFilter.value.trim()) {
+        params.set('company_name', companyNameFilter.value.trim());
     }
     
     if (countryFilter && countryFilter.value) {
@@ -114,6 +138,13 @@ function applyFilters() {
     
     const url = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
     window.location.href = url;
+}
+
+/**
+ * Clear all filters and reload page
+ */
+function clearAllFilters() {
+    window.location.href = window.location.pathname;
 }
 
 /**

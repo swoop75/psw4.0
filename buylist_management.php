@@ -157,48 +157,49 @@ $csrfToken = Security::generateCSRFToken();
 // Prepare content for buylist page
 ob_start();
 ?>
-    <div class="container">
-        <!-- Page Header -->
-        <div class="page-header">
-            <div class="header-content">
-                <div class="header-left">
-                    <h1><i class="fas fa-star"></i> New Companies Management</h1>
-                </div>
-            </div>
+    <div class="psw-card psw-mb-6">
+        <div class="psw-card-header">
+            <h1 class="psw-card-title">
+                <i class="fas fa-star psw-card-title-icon"></i>
+                New Companies Management
+            </h1>
+            <p class="psw-card-subtitle">Manage your watchlist and buy targets</p>
         </div>
+    </div>
 
-        <?php if ($errorMessage): ?>
-            <div class="alert alert-error">
-                <i class="fas fa-exclamation-triangle"></i>
-                <?= htmlspecialchars($errorMessage) ?>
-            </div>
-        <?php endif; ?>
+    <?php if ($errorMessage): ?>
+        <div class="psw-alert psw-alert-error">
+            <i class="fas fa-exclamation-triangle"></i>
+            <?= htmlspecialchars($errorMessage) ?>
+        </div>
+    <?php endif; ?>
 
-        <?php if ($successMessage): ?>
-            <div class="alert alert-success">
-                <i class="fas fa-check-circle"></i>
-                <?= htmlspecialchars($successMessage) ?>
-            </div>
-        <?php endif; ?>
+    <?php if ($successMessage): ?>
+        <div class="psw-alert psw-alert-success">
+            <i class="fas fa-check-circle"></i>
+            <?= htmlspecialchars($successMessage) ?>
+        </div>
+    <?php endif; ?>
 
         <!-- Statistics removed for cleaner interface -->
 
-        <!-- Main Content -->
-        <div class="content-wrapper">
+    <!-- Main Content -->
+    <div class="psw-card">
+        <div class="psw-card-content">
             <!-- Toolbar -->
-            <div class="toolbar">
-                <div class="toolbar-left">
-                    <button class="btn btn-primary" onclick="showAddModal()">
-                        <i class="fas fa-plus"></i> Add New Company
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-6);">
+                <div style="display: flex; gap: var(--spacing-3);">
+                    <button class="psw-btn psw-btn-primary" onclick="showAddModal()">
+                        <i class="fas fa-plus psw-btn-icon"></i> Add New Company
                     </button>
-                    <button class="btn btn-secondary" onclick="refreshData()">
-                        <i class="fas fa-sync-alt"></i> Refresh
+                    <button class="psw-btn psw-btn-secondary" onclick="refreshData()">
+                        <i class="fas fa-sync-alt psw-btn-icon"></i> Refresh
                     </button>
                 </div>
-                <div class="toolbar-right">
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="searchInput" placeholder="Search companies, notes..." value="<?= htmlspecialchars($filters['search']) ?>">
+                <div style="display: flex; gap: var(--spacing-3); align-items: center;">
+                    <div style="position: relative; display: flex; align-items: center;">
+                        <i class="fas fa-search" style="position: absolute; left: var(--spacing-3); color: var(--text-muted);"></i>
+                        <input type="text" id="searchInput" placeholder="Search companies, notes..." value="<?= htmlspecialchars($filters['search']) ?>" class="psw-form-input" style="padding-left: var(--spacing-10); min-width: 300px;">
                     </div>
                     <div class="checkbox-dropdown" data-filter="status">
                         <button type="button" class="dropdown-button" id="statusFilter">
@@ -368,8 +369,8 @@ ob_start();
             <?php endif; ?>
 
             <!-- Buylist Table -->
-            <div class="table-container">
-                <table class="data-table">
+            <div style="overflow-x: auto;">
+                <table class="psw-table">
                     <thead>
                         <tr>
                             <th>Company</th>
@@ -431,14 +432,14 @@ ob_start();
                                         <?= htmlspecialchars($entry['country_name'] ?: '-') ?>
                                     </td>
                                     <td>
-                                        <div class="action-buttons">
-                                                <button class="btn-icon btn-success" onclick="addToMasterlist(<?= $entry['new_companies_id'] ?>, '<?= htmlspecialchars($entry['company']) ?>')" title="Add to Masterlist">
-                                                    <i class="fas fa-plus-circle"></i>
-                                                </button>
-                                            <button class="btn-icon" onclick="editEntry(<?= $entry['new_companies_id'] ?>)" title="Edit">
+                                        <div style="display: flex; gap: var(--spacing-1);">
+                                            <button style="display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: var(--success-bg); border: 1px solid var(--success-color); border-radius: var(--radius-md); color: var(--success-color); cursor: pointer; transition: all var(--transition-fast);" onclick="addToMasterlist(<?= $entry['new_companies_id'] ?>, '<?= htmlspecialchars($entry['company']) ?>')" title="Add to Masterlist" onmouseover="this.style.background='var(--success-color)'; this.style.color='var(--text-inverse)';" onmouseout="this.style.background='var(--success-bg)'; this.style.color='var(--success-color)';">
+                                                <i class="fas fa-plus-circle"></i>
+                                            </button>
+                                            <button style="display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--radius-md); color: var(--text-secondary); cursor: pointer; transition: all var(--transition-fast);" onclick="editEntry(<?= $entry['new_companies_id'] ?>)" title="Edit" onmouseover="this.style.background='var(--primary-accent-light)'; this.style.color='var(--primary-accent)';" onmouseout="this.style.background='var(--bg-secondary)'; this.style.color='var(--text-secondary)';">
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            <button class="btn-icon btn-danger" onclick="deleteEntry(<?= $entry['new_companies_id'] ?>, '<?= htmlspecialchars($entry['company']) ?>')" title="Remove">
+                                            <button style="display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--radius-md); color: var(--text-secondary); cursor: pointer; transition: all var(--transition-fast);" onclick="deleteEntry(<?= $entry['new_companies_id'] ?>, '<?= htmlspecialchars($entry['company']) ?>')" title="Remove" onmouseover="this.style.background='var(--error-bg)'; this.style.color='var(--error-color)';" onmouseout="this.style.background='var(--bg-secondary)'; this.style.color='var(--text-secondary)';">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </div>
@@ -447,12 +448,12 @@ ob_start();
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="6" class="text-center">
+                                <td colspan="6" style="text-align: center; padding: var(--spacing-8); color: var(--text-muted);">
                                     <div class="empty-state">
                                         <i class="fas fa-star"></i>
                                         <p>Your new companies list is empty</p>
-                                        <button class="btn btn-primary" onclick="showAddModal()">
-                                            <i class="fas fa-plus"></i> Add First Entry
+                                        <button class="psw-btn psw-btn-primary" onclick="showAddModal()">
+                                            <i class="fas fa-plus psw-btn-icon"></i> Add First Entry
                                         </button>
                                     </div>
                                 </td>
@@ -464,23 +465,23 @@ ob_start();
 
             <!-- Pagination -->
             <?php if (!empty($newCompaniesData['pagination'])): ?>
-                <div class="pagination">
-                    <div class="pagination-info">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: var(--spacing-6); padding-top: var(--spacing-4); border-top: 1px solid var(--border-primary);">
+                    <div style="color: var(--text-secondary); font-size: var(--font-size-sm);">
                         Showing <?= count($newCompaniesData['entries']) ?> of <?= $newCompaniesData['pagination']['total_records'] ?> entries
                     </div>
-                    <div class="pagination-controls">
+                    <div style="display: flex; align-items: center; gap: var(--spacing-3);">
                         <?php if ($newCompaniesData['pagination']['has_previous']): ?>
-                            <a href="?<?= http_build_query(array_merge($_GET, ['page' => $newCompaniesData['pagination']['current_page'] - 1])) ?>" class="btn btn-sm">
+                            <a href="?<?= http_build_query(array_merge($_GET, ['page' => $newCompaniesData['pagination']['current_page'] - 1])) ?>" class="psw-btn psw-btn-secondary" style="padding: var(--spacing-2) var(--spacing-3); font-size: var(--font-size-sm);">
                                 <i class="fas fa-chevron-left"></i> Previous
                             </a>
                         <?php endif; ?>
                         
-                        <span class="page-info">
+                        <span style="color: var(--text-secondary); font-size: var(--font-size-sm);">
                             Page <?= $newCompaniesData['pagination']['current_page'] ?> of <?= $newCompaniesData['pagination']['total_pages'] ?>
                         </span>
                         
                         <?php if ($newCompaniesData['pagination']['has_next']): ?>
-                            <a href="?<?= http_build_query(array_merge($_GET, ['page' => $newCompaniesData['pagination']['current_page'] + 1])) ?>" class="btn btn-sm">
+                            <a href="?<?= http_build_query(array_merge($_GET, ['page' => $newCompaniesData['pagination']['current_page'] + 1])) ?>" class="psw-btn psw-btn-secondary" style="padding: var(--spacing-2) var(--spacing-3); font-size: var(--font-size-sm);">
                                 Next <i class="fas fa-chevron-right"></i>
                             </a>
                         <?php endif; ?>
@@ -597,8 +598,8 @@ ob_start();
                 </div>
                 
                 <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">
+                    <button type="button" class="psw-btn psw-btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="psw-btn psw-btn-primary">
                         <span id="submitText">Add New Company</span>
                     </button>
                 </div>
@@ -649,9 +650,9 @@ ob_start();
                 </div>
                 
                 <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeMasterlistModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-plus-circle"></i> Add to Masterlist
+                    <button type="button" class="psw-btn psw-btn-secondary" onclick="closeMasterlistModal()">Cancel</button>
+                    <button type="submit" class="psw-btn psw-btn-primary">
+                        <i class="fas fa-plus-circle psw-btn-icon"></i> Add to Masterlist
                     </button>
                 </div>
             </form>
@@ -669,14 +670,13 @@ ob_start();
                 <p>Are you sure you want to remove <strong id="deleteCompanyName"></strong> from your new companies list?</p>
             </div>
             <div class="form-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
-                <button type="button" class="btn btn-danger" onclick="confirmDelete()">
-                    <i class="fas fa-trash"></i> Remove from List
+                <button type="button" class="psw-btn psw-btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+                <button type="button" style="background: var(--error-color); color: var(--text-inverse); border: none; padding: var(--spacing-3) var(--spacing-4); border-radius: var(--radius-lg); font-size: var(--font-size-base); font-weight: 500; cursor: pointer; transition: all var(--transition-fast);" onclick="confirmDelete()" onmouseover="this.style.background='var(--error-color)'; this.style.transform='translateY(-1px)';" onmouseout="this.style.background='var(--error-color)'; this.style.transform='translateY(0)';">
+                    <i class="fas fa-trash" style="margin-right: var(--spacing-2);"></i> Remove from List
                 </button>
             </div>
         </div>
-    </div>
-
+        </div>
     </div>
 
 <?php

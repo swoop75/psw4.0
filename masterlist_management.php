@@ -99,6 +99,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WI
 // Get filter parameters
 $filters = [
     'search' => $_GET['search'] ?? '',
+    'isin' => $_GET['isin'] ?? '',
+    'ticker' => $_GET['ticker'] ?? '',
+    'company_name' => $_GET['company_name'] ?? '',
     'country' => $_GET['country'] ?? '',
     'market' => $_GET['market'] ?? '',
     'share_type' => $_GET['share_type'] ?? '',
@@ -221,32 +224,63 @@ ob_start();
                         <i class="fas fa-download psw-btn-icon"></i> Export CSV
                     </button>
                 </div>
-                <div style="display: flex; gap: var(--spacing-3); align-items: center;">
-                    <div style="position: relative; display: flex; align-items: center;">
-                        <i class="fas fa-search" style="position: absolute; left: var(--spacing-3); color: var(--text-muted);"></i>
-                        <input type="text" id="searchInput" placeholder="Search companies..." value="<?= htmlspecialchars($filters['search']) ?>" class="psw-form-input" style="padding-left: var(--spacing-10); min-width: 250px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--spacing-3); align-items: end;">
+                    <!-- General Search -->
+                    <div>
+                        <label style="display: block; font-size: var(--font-size-xs); font-weight: 500; color: var(--text-secondary); margin-bottom: var(--spacing-1);">General Search</label>
+                        <div style="position: relative; display: flex; align-items: center;">
+                            <i class="fas fa-search" style="position: absolute; left: var(--spacing-3); color: var(--text-muted);"></i>
+                            <input type="text" id="searchInput" placeholder="All fields..." value="<?= htmlspecialchars($filters['search']) ?>" class="psw-form-input" style="padding-left: var(--spacing-10);">
+                        </div>
                     </div>
-                    <select id="countryFilter" onchange="applyFilters()" class="psw-form-input" style="min-width: 150px;">
-                        <option value="">All Countries</option>
-                        <?php foreach ($filterOptions['countries'] ?? [] as $country): ?>
-                            <option value="<?= htmlspecialchars($country) ?>" <?= $filters['country'] === $country ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($country) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <select id="marketFilter" onchange="applyFilters()" class="psw-form-input" style="min-width: 120px;">
-                        <option value="">All Markets</option>
-                        <?php foreach ($filterOptions['markets'] ?? [] as $market): ?>
-                            <option value="<?= htmlspecialchars($market) ?>" <?= $filters['market'] === $market ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($market) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <select id="delistedFilter" onchange="applyFilters()" class="psw-form-input" style="min-width: 120px;">
-                        <option value="">All Status</option>
-                        <option value="0" <?= $filters['delisted'] === 0 ? 'selected' : '' ?>>Active</option>
-                        <option value="1" <?= $filters['delisted'] === 1 ? 'selected' : '' ?>>Delisted</option>
-                    </select>
+                    
+                    <!-- ISIN Filter -->
+                    <div>
+                        <label style="display: block; font-size: var(--font-size-xs); font-weight: 500; color: var(--text-secondary); margin-bottom: var(--spacing-1);">ISIN</label>
+                        <input type="text" id="isinFilter" placeholder="Filter by ISIN..." value="<?= htmlspecialchars($filters['isin']) ?>" class="psw-form-input" onchange="applyFilters()">
+                    </div>
+                    
+                    <!-- Ticker Filter -->
+                    <div>
+                        <label style="display: block; font-size: var(--font-size-xs); font-weight: 500; color: var(--text-secondary); margin-bottom: var(--spacing-1);">Ticker</label>
+                        <input type="text" id="tickerFilter" placeholder="Filter by ticker..." value="<?= htmlspecialchars($filters['ticker']) ?>" class="psw-form-input" onchange="applyFilters()">
+                    </div>
+                    
+                    <!-- Company Name Filter -->
+                    <div>
+                        <label style="display: block; font-size: var(--font-size-xs); font-weight: 500; color: var(--text-secondary); margin-bottom: var(--spacing-1);">Company Name</label>
+                        <input type="text" id="companyNameFilter" placeholder="Filter by name..." value="<?= htmlspecialchars($filters['company_name']) ?>" class="psw-form-input" onchange="applyFilters()">
+                    </div>
+                    
+                    <!-- Country Filter -->
+                    <div>
+                        <label style="display: block; font-size: var(--font-size-xs); font-weight: 500; color: var(--text-secondary); margin-bottom: var(--spacing-1);">Country</label>
+                        <select id="countryFilter" onchange="applyFilters()" class="psw-form-input">
+                            <option value="">All Countries</option>
+                            <?php foreach ($filterOptions['countries'] ?? [] as $country): ?>
+                                <option value="<?= htmlspecialchars($country) ?>" <?= $filters['country'] === $country ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($country) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    
+                    <!-- Status Filter -->
+                    <div>
+                        <label style="display: block; font-size: var(--font-size-xs); font-weight: 500; color: var(--text-secondary); margin-bottom: var(--spacing-1);">Status</label>
+                        <select id="delistedFilter" onchange="applyFilters()" class="psw-form-input">
+                            <option value="">All Status</option>
+                            <option value="0" <?= $filters['delisted'] === 0 ? 'selected' : '' ?>>Active</option>
+                            <option value="1" <?= $filters['delisted'] === 1 ? 'selected' : '' ?>>Delisted</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Clear Filters Button -->
+                    <div>
+                        <button type="button" class="psw-btn psw-btn-secondary" onclick="clearAllFilters()" style="width: 100%;">
+                            <i class="fas fa-times" style="margin-right: var(--spacing-2);"></i> Clear
+                        </button>
+                    </div>
                 </div>
             </div>
 
