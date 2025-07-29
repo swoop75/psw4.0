@@ -686,45 +686,82 @@ body {
   box-shadow: 0 0 0 3px var(--primary-accent-light);
 }
 
-/* Select dropdown arrow styling */
+/* Select dropdown arrow styling - applies to ALL select elements */
 .psw-form-input[type="select"],
-select.psw-form-input {
+select.psw-form-input,
+select {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%2364748b' d='M4.5 6.5L8 10l3.5-3.5H4.5z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right var(--spacing-3) center;
   background-size: 12px;
   padding-right: var(--spacing-8);
   appearance: none;
-  color: var(--text-muted);
+  color: var(--text-muted) !important;
 }
 
-/* Placeholder text styling */
-.psw-form-input::placeholder {
-  color: var(--text-muted);
+/* Placeholder text styling - applies to ALL inputs */
+.psw-form-input::placeholder,
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted) !important;
   opacity: 1;
 }
 
-.psw-form-input::-webkit-input-placeholder {
-  color: var(--text-muted);
+.psw-form-input::-webkit-input-placeholder,
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
+  color: var(--text-muted) !important;
 }
 
-.psw-form-input::-moz-placeholder {
-  color: var(--text-muted);
+.psw-form-input::-moz-placeholder,
+input::-moz-placeholder,
+textarea::-moz-placeholder {
+  color: var(--text-muted) !important;
   opacity: 1;
 }
 
-.psw-form-input:-ms-input-placeholder {
-  color: var(--text-muted);
+.psw-form-input:-ms-input-placeholder,
+input:-ms-input-placeholder,
+textarea:-ms-input-placeholder {
+  color: var(--text-muted) !important;
 }
 
-/* Make dropdown option text grey */
-select.psw-form-input option {
-  color: var(--text-muted);
+/* Make ALL dropdown option text grey */
+select.psw-form-input option,
+select option {
+  color: var(--text-muted) !important;
 }
 
 /* When focused or has value, make text normal color */
 select.psw-form-input:focus,
-select.psw-form-input:not([value=""]) {
+select.psw-form-input:not([value=""]),
+select:focus,
+select:not([value=""]) {
+  color: var(--text-primary) !important;
+}
+
+/* Ensure all form controls have consistent text color */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="search"],
+textarea {
+  color: var(--text-muted);
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+input[type="search"]:focus,
+textarea:focus,
+input[type="text"]:not([value=""]),
+input[type="email"]:not([value=""]),
+input[type="password"]:not([value=""]),
+input[type="number"]:not([value=""]),
+input[type="search"]:not([value=""]),
+textarea:not(:empty) {
   color: var(--text-primary);
 }
 

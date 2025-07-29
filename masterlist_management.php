@@ -167,44 +167,59 @@ ob_start();
 
     <!-- Statistics Cards -->
     <?php if (!empty($statistics)): ?>
-    <div class="psw-card psw-mb-6">
-        <div class="psw-card-content">
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--spacing-4);">
-                <div style="display: flex; align-items: center; padding: var(--spacing-4); background: var(--bg-secondary); border-radius: var(--radius-lg);">
-                    <div style="display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: var(--primary-accent); border-radius: var(--radius-lg); color: var(--text-inverse); margin-right: var(--spacing-4);">
-                        <i class="fas fa-building"></i>
-                    </div>
-                    <div>
-                        <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--text-primary);"><?= $statistics['total_companies'] ?></div>
-                        <div style="font-size: var(--font-size-sm); color: var(--text-secondary);">Total Companies</div>
-                    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+        <div class="psw-card">
+            <div class="psw-card-content" style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 48px; height: 48px; background: linear-gradient(135deg, var(--primary-accent), var(--primary-accent-hover)); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-building" style="color: var(--text-inverse); font-size: 1.25rem;"></i>
                 </div>
-                <div style="display: flex; align-items: center; padding: var(--spacing-4); background: var(--bg-secondary); border-radius: var(--radius-lg);">
-                    <div style="display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: var(--success-color); border-radius: var(--radius-lg); color: var(--text-inverse); margin-right: var(--spacing-4);">
-                        <i class="fas fa-check-circle"></i>
+                <div>
+                    <div style="font-size: 1.875rem; font-weight: 700; color: var(--text-primary);">
+                        <?= $statistics['total_companies'] ?>
                     </div>
-                    <div>
-                        <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--text-primary);"><?= $statistics['active_companies'] ?></div>
-                        <div style="font-size: var(--font-size-sm); color: var(--text-secondary);">Active</div>
-                    </div>
+                    <div style="color: var(--text-secondary); font-size: 0.875rem;">Total Companies</div>
                 </div>
-                <div style="display: flex; align-items: center; padding: var(--spacing-4); background: var(--bg-secondary); border-radius: var(--radius-lg);">
-                    <div style="display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: var(--error-color); border-radius: var(--radius-lg); color: var(--text-inverse); margin-right: var(--spacing-4);">
-                        <i class="fas fa-times-circle"></i>
-                    </div>
-                    <div>
-                        <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--text-primary);"><?= $statistics['delisted_companies'] ?></div>
-                        <div style="font-size: var(--font-size-sm); color: var(--text-secondary);">Delisted</div>
-                    </div>
+            </div>
+        </div>
+        
+        <div class="psw-card">
+            <div class="psw-card-content" style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 48px; height: 48px; background: linear-gradient(135deg, var(--success-color), #059669); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-check-circle" style="color: var(--text-inverse); font-size: 1.25rem;"></i>
                 </div>
-                <div style="display: flex; align-items: center; padding: var(--spacing-4); background: var(--bg-secondary); border-radius: var(--radius-lg);">
-                    <div style="display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: var(--info-color); border-radius: var(--radius-lg); color: var(--text-inverse); margin-right: var(--spacing-4);">
-                        <i class="fas fa-globe"></i>
+                <div>
+                    <div style="font-size: 1.875rem; font-weight: 700; color: var(--text-primary);">
+                        <?= $statistics['active_companies'] ?>
                     </div>
-                    <div>
-                        <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--text-primary);"><?= $statistics['total_countries'] ?></div>
-                        <div style="font-size: var(--font-size-sm); color: var(--text-secondary);">Countries</div>
+                    <div style="color: var(--text-secondary); font-size: 0.875rem;">Active</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="psw-card">
+            <div class="psw-card-content" style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 48px; height: 48px; background: linear-gradient(135deg, var(--error-color), #dc2626); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-times-circle" style="color: var(--text-inverse); font-size: 1.25rem;"></i>
+                </div>
+                <div>
+                    <div style="font-size: 1.875rem; font-weight: 700; color: var(--text-primary);">
+                        <?= $statistics['delisted_companies'] ?>
                     </div>
+                    <div style="color: var(--text-secondary); font-size: 0.875rem;">Delisted</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="psw-card">
+            <div class="psw-card-content" style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 48px; height: 48px; background: linear-gradient(135deg, var(--info-color), #1d4ed8); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-globe" style="color: var(--text-inverse); font-size: 1.25rem;"></i>
+                </div>
+                <div>
+                    <div style="font-size: 1.875rem; font-weight: 700; color: var(--text-primary);">
+                        <?= $statistics['total_countries'] ?>
+                    </div>
+                    <div style="color: var(--text-secondary); font-size: 0.875rem;">Countries</div>
                 </div>
             </div>
         </div>

@@ -173,12 +173,14 @@ ob_start();
 ?>
 <div class="psw-content">
     <!-- Page Header -->
-    <div style="margin-bottom: 2rem;">
-        <h1 style="font-size: 2.25rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem;">
-            <i class="fas fa-coins" style="color: var(--primary-accent); margin-right: 0.75rem;"></i>
-            Dividend Logs
-        </h1>
-        <p style="color: var(--text-secondary); font-size: 1.125rem;">Track and analyze dividend payments across the portfolio</p>
+    <div class="psw-card psw-mb-6">
+        <div class="psw-card-header">
+            <h1 class="psw-card-title">
+                <i class="fas fa-coins psw-card-title-icon"></i>
+                Dividend Logs
+            </h1>
+            <p class="psw-card-subtitle">Track and analyze dividend payments across the portfolio</p>
+        </div>
     </div>
 
     <!-- Statistics Cards -->
