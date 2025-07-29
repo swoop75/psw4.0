@@ -45,7 +45,7 @@
             </h2>
         </div>
         <div class="psw-card-content">
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--spacing-4);">
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-4); max-width: 1200px; margin: 0 auto;">
                 <!-- Focus on Dividends -->
                 <div style="display: flex; align-items: flex-start; gap: var(--spacing-4); padding: var(--spacing-4); background-color: var(--bg-secondary); border-radius: var(--radius-lg);">
                     <div style="display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: linear-gradient(135deg, var(--primary-accent), var(--primary-accent-hover)); border-radius: 50%; flex-shrink: 0;">

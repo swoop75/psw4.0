@@ -274,7 +274,7 @@ class DashboardController {
                     COUNT(DISTINCT ld.isin) as unique_companies
                 FROM psw_portfolio.log_dividends ld
                 WHERE ld.payment_date IS NOT NULL
-                GROUP BY DATE_FORMAT(ld.payment_date, '%Y-%m')
+                GROUP BY DATE_FORMAT(ld.payment_date, '%Y-%m'), DATE_FORMAT(ld.payment_date, '%M %Y')
                 HAVING total_amount > 0
                 ORDER BY month ASC
                 LIMIT 24

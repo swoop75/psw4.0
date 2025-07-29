@@ -31,6 +31,14 @@ $userTheme = $_SESSION['user_theme'] ?? 'light';
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="<?php echo BASE_URL; ?>/public/assets/img/psw-logo.png">
     <link rel="shortcut icon" type="image/png" href="<?php echo BASE_URL; ?>/public/assets/img/psw-logo.png">
+    
+    <!-- Prevent theme flickering -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('psw-theme') || '<?php echo $userTheme; ?>';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
 </head>
 <body class="psw-theme-transition">
     <div class="psw-app">

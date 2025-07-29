@@ -73,8 +73,14 @@ class PSWApp {
      * Initialize theme system
      */
     initTheme() {
-        // Get saved theme from localStorage or default to light
-        const savedTheme = localStorage.getItem('psw-theme') || 'light';
+        // Get saved theme from localStorage or session
+        const savedTheme = localStorage.getItem('psw-theme') || 
+                          document.documentElement.getAttribute('data-theme') || 
+                          'light';
+        
+        // Set theme immediately to avoid flickering
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        
         this.setTheme(savedTheme);
         
         // Listen for theme toggle events
