@@ -94,11 +94,15 @@ class PSWApp {
      * @param {string} theme - 'light' or 'dark'
      */
     setTheme(theme) {
+        // Set theme immediately
         document.documentElement.setAttribute('data-theme', theme);
         localStorage.setItem('psw-theme', theme);
         
         // Update server-side session via AJAX
         this.updateServerTheme(theme);
+        
+        // Dispatch event for other components
+        window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme } }));
     }
 
     /**
@@ -112,7 +116,16 @@ class PSWApp {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ theme: theme })
-        }).catch(error => {
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Theme updated on server:', data.theme);
+            } else {
+                console.warn('Server theme update failed:', data);
+            }
+        })
+        .catch(error => {
             console.warn('Could not update server theme:', error);
         });
     }

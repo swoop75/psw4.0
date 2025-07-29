@@ -1,7 +1,7 @@
 <?php
 /**
  * File: dividend_import.php
- * Description: Dividend CSV import interface for PSW 4.0
+ * Description: Dividend CSV import interface for PSW 4.0 - Redesigned
  */
 
 // Start session and include required files
@@ -14,290 +14,186 @@ require_once __DIR__ . '/src/middleware/Auth.php';
 // Require authentication
 Auth::requireAuth();
 
+// Set page variables
 $pageTitle = 'Dividend Import - PSW 4.0';
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $pageTitle; ?></title>
-    <link rel="stylesheet" href="<?php echo ASSETS_URL; ?>/css/improved-main.css">
-    <link rel="stylesheet" href="<?php echo ASSETS_URL; ?>/css/dividend-import.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
-    <header class="unified-header">
-        <div class="header-container">
-            <a href="<?php echo BASE_URL; ?>" class="logo-header">
-                <div class="logo-mini">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <span class="logo-text">PSW 4.0</span>
-            </a>
-            
-            <div class="nav-links">
-                <a href="<?php echo BASE_URL; ?>/dashboard.php" class="nav-link">
-                    <i class="fas fa-tachometer-alt"></i>
-                    Dashboard
-                </a>
-                
-                <div class="nav-item">
-                    <a href="javascript:void(0)" class="nav-link nav-dropdown-only">
-                        <i class="fas fa-cogs"></i>
-                        Functions
-                        <i class="fas fa-chevron-down nav-arrow"></i>
-                    </a>
-                    <div class="submenu">
-                        <a href="<?php echo BASE_URL; ?>/dividend_import.php" class="submenu-link">Dividend Import</a>
-                        <a href="<?php echo BASE_URL; ?>/masterlist_management.php" class="submenu-link">Masterlist Management</a>
-                        <a href="<?php echo BASE_URL; ?>/new_companies_management.php" class="submenu-link">New Companies</a>
-                        <a href="<?php echo BASE_URL; ?>/user_management.php" class="submenu-link">User Management</a>
-                    </div>
-                </div>
-                
-                <div class="nav-item">
-                    <a href="javascript:void(0)" class="nav-link nav-dropdown-only">
-                        <i class="fas fa-chart-bar"></i>
-                        Logs
-                        <i class="fas fa-chevron-down nav-arrow"></i>
-                    </a>
-                    <div class="submenu">
-                        <a href="<?php echo BASE_URL; ?>/dividend_logs.php" class="submenu-link">Dividends</a>
-                    </div>
-                </div>
-                
-                <div class="nav-item">
-                    <a href="javascript:void(0)" class="nav-link nav-dropdown-only">
-                        <i class="fas fa-book"></i>
-                        Rules
-                        <i class="fas fa-chevron-down nav-arrow"></i>
-                    </a>
-                    <div class="submenu">
-                        <a href="<?php echo BASE_URL; ?>/philosophy.php" class="submenu-link">Philosophy</a>
-                        <a href="#" class="submenu-link">Rulebook</a>
-                    </div>
-                </div>
-                
-                <div class="user-menu">
-                    <button class="login-toggle" onclick="toggleUserMenu()">
-                        <i class="fas fa-user"></i>
-                        <?php echo Auth::getUsername(); ?>
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
-                    <div class="login-dropdown" id="userMenu">
-                        <div class="user-info">
-                            <p><strong><?php echo Auth::getUsername(); ?></strong></p>
-                        </div>
-                        <hr style="margin: 12px 0; border: none; border-top: 1px solid #e9ecef;">
-                        <a href="<?php echo BASE_URL; ?>/logout.php" class="dropdown-link text-danger">
-                            <i class="fas fa-sign-out-alt"></i> Logout
-                        </a>
-                    </div>
-                </div>
+$pageDescription = 'Upload and process dividend data files';
+
+try {
+    // Prepare content
+    ob_start();
+    ?>
+    
+    <div class="psw-dividend-import">
+        <!-- Page Header -->
+        <div class="psw-card psw-mb-6">
+            <div class="psw-card-header">
+                <h1 class="psw-card-title">
+                    <i class="fas fa-file-csv psw-card-title-icon"></i>
+                    CSV Import Tool
+                </h1>
+                <p class="psw-card-subtitle">Upload and process dividend data files</p>
             </div>
         </div>
-    </header>
 
-    <main class="main-container">
-        <div class="container">
-            <!-- Page Header -->
-            <div class="page-header">
-                <div class="header-content">
-                    <div class="header-left">
-                        <h1><i class="fas fa-file-csv"></i> Dividend Import</h1>
+        <!-- Main Content -->
+        <div class="psw-card">
+            <div class="psw-card-content">
+                
+                <!-- Step 1: File Upload -->
+                <div id="upload-section">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--spacing-4); margin-bottom: var(--spacing-6);">
+                        <div class="psw-form-group">
+                            <label for="broker-select" class="psw-form-label">
+                                <i class="fas fa-building"></i>
+                                Select Broker
+                            </label>
+                            <select id="broker-select" class="psw-form-input" required>
+                                <option value="">Loading brokers...</option>
+                            </select>
+                        </div>
+                        
+                        <div class="psw-form-group">
+                            <label for="account-group-select" class="psw-form-label">
+                                <i class="fas fa-folder"></i>
+                                Portfolio Account Group
+                            </label>
+                            <select id="account-group-select" class="psw-form-input">
+                                <option value="">Loading account groups...</option>
+                            </select>
+                            <small style="color: var(--text-muted); font-size: var(--font-size-sm);">Optional: Override CSV account group column</small>
+                        </div>
+                        
+                        <div class="psw-form-group">
+                            <label for="csv-file" class="psw-form-label">
+                                <i class="fas fa-file-csv"></i>
+                                Select CSV File
+                            </label>
+                            <input type="file" id="csv-file" class="psw-form-input" accept=".csv,.xlsx" required>
+                            <small style="color: var(--text-muted); font-size: var(--font-size-sm);">Supported formats: CSV, Excel (.xlsx)</small>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: var(--spacing-4); align-items: center;">
+                        <button id="upload-btn" class="psw-btn psw-btn-primary" disabled>
+                            <i class="fas fa-upload psw-btn-icon"></i>
+                            Upload and Parse File
+                        </button>
+                        <div id="upload-progress" style="display: none; flex: 1; height: 6px; background-color: var(--bg-secondary); border-radius: var(--radius-sm); overflow: hidden;">
+                            <div style="height: 100%; background-color: var(--primary-accent); width: 0%; transition: width var(--transition-base);"></div>
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Main Content -->
-            <div class="content-wrapper">
-                <div class="dashboard-card full-width">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <i class="fas fa-upload"></i>
-                            CSV Import Tool
-                        </h2>
-                        <p class="card-subtitle">Upload and process dividend data files</p>
+                
+                <!-- Step 2: Preview and Validation -->
+                <div id="preview-section" style="display: none;">
+                    <div style="border-top: 1px solid var(--border-primary); margin: var(--spacing-6) 0; padding-top: var(--spacing-6);"></div>
+                    
+                    <div style="margin-bottom: var(--spacing-6);">
+                        <h3 style="font-size: var(--font-size-xl); font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-2);">
+                            <i class="fas fa-eye" style="color: var(--primary-accent); margin-right: var(--spacing-2);"></i>
+                            Import Preview
+                        </h3>
                     </div>
-                    <div class="card-content">
-                        
-                        <!-- Step 1: File Upload -->
-                        <div id="upload-section">
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label for="broker-select" class="form-label">
-                                        <i class="fas fa-building"></i>
-                                        Select Broker
-                                    </label>
-                                    <select id="broker-select" class="form-select" required>
-                                        <option value="">Loading brokers...</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="account-group-select" class="form-label">
-                                        <i class="fas fa-folder"></i>
-                                        Portfolio Account Group
-                                    </label>
-                                    <select id="account-group-select" class="form-select">
-                                        <option value="">Loading account groups...</option>
-                                    </select>
-                                    <small class="form-help">Optional: Override CSV account group column</small>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="csv-file" class="form-label">
-                                        <i class="fas fa-file-csv"></i>
-                                        Select CSV File
-                                    </label>
-                                    <input type="file" id="csv-file" class="form-file" accept=".csv,.xlsx" required>
-                                    <small class="form-help">Supported formats: CSV, Excel (.xlsx)</small>
-                                </div>
-                            </div>
-                            
-                            <div class="button-group">
-                                <button id="upload-btn" class="btn btn-primary" disabled>
-                                    <i class="fas fa-upload"></i>
-                                    Upload and Parse File
-                                </button>
-                                <div id="upload-progress" class="progress-bar-container" style="display: none;">
-                                    <div class="progress-bar" style="width: 0%"></div>
-                                </div>
+                    
+                    <div id="validation-alerts" style="margin-bottom: var(--spacing-4);"></div>
+                    
+                    <!-- Stats Cards -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-4); margin-bottom: var(--spacing-6);">
+                        <div class="psw-card" style="text-align: center;">
+                            <div class="psw-card-content">
+                                <i class="fas fa-file-csv" style="color: var(--info-color); font-size: var(--font-size-2xl); margin-bottom: var(--spacing-2);"></i>
+                                <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--text-primary);" id="total-rows">0</div>
+                                <div style="color: var(--text-muted);">Total Rows</div>
                             </div>
                         </div>
                         
-                        <!-- Step 2: Preview and Validation -->
-                        <div id="preview-section" style="display: none;">
-                            <div class="section-divider"></div>
-                            
-                            <div class="section-header">
-                                <h3 class="section-title">
-                                    <i class="fas fa-eye"></i>
-                                    Import Preview
-                                </h3>
-                            </div>
-                            
-                            <div id="validation-alerts"></div>
-                            
-                            <!-- Stats Cards -->
-                            <div class="stats-grid">
-                                <div class="stat-card info">
-                                    <div class="stat-icon">
-                                        <i class="fas fa-file-csv"></i>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="stat-number" id="total-rows">0</div>
-                                        <div class="stat-label">Total Rows</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="stat-card warning">
-                                    <div class="stat-icon">
-                                        <i class="fas fa-exclamation-triangle"></i>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="stat-number" id="warning-count">0</div>
-                                        <div class="stat-label">Warnings</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="stat-card error">
-                                    <div class="stat-icon">
-                                        <i class="fas fa-times-circle"></i>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="stat-number" id="error-count">0</div>
-                                        <div class="stat-label">Errors</div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Preview Table -->
-                            <div class="data-table-container">
-                                <table id="preview-table" class="data-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Payment Date</th>
-                                            <th>ISIN</th>
-                                            <th>Ticker</th>
-                                            <th>Broker</th>
-                                            <th>Account</th>
-                                            <th>Shares</th>
-                                            <th>Dividend (Local)</th>
-                                            <th>Currency</th>
-                                            <th>Dividend (SEK)</th>
-                                            <th>Tax (SEK)</th>
-                                            <th>Net (SEK)</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody></tbody>
-                                </table>
-                            </div>
-                            
-                            <!-- Import Controls -->
-                            <div class="import-controls">
-                                <div class="control-option">
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" id="ignore-duplicates">
-                                        <span class="checkmark"></span>
-                                        <span class="checkbox-text">
-                                            <i class="fas fa-copy"></i>
-                                            Ignore duplicate entries (skip existing dividends)
-                                        </span>
-                                    </label>
-                                </div>
-                                
-                                <div class="button-group">
-                                    <button id="import-btn" class="btn btn-success" disabled>
-                                        <i class="fas fa-download"></i>
-                                        Import Dividends
-                                    </button>
-                                    <button id="cancel-btn" class="btn btn-secondary">
-                                        <i class="fas fa-times"></i>
-                                        Cancel
-                                    </button>
-                                </div>
+                        <div class="psw-card" style="text-align: center;">
+                            <div class="psw-card-content">
+                                <i class="fas fa-exclamation-triangle" style="color: var(--warning-color); font-size: var(--font-size-2xl); margin-bottom: var(--spacing-2);"></i>
+                                <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--text-primary);" id="warning-count">0</div>
+                                <div style="color: var(--text-muted);">Warnings</div>
                             </div>
                         </div>
                         
-                        <!-- Step 3: Import Results -->
-                        <div id="results-section" style="display: none;">
-                            <div class="section-divider"></div>
-                            
-                            <div class="section-header">
-                                <h3 class="section-title">
-                                    <i class="fas fa-check-circle"></i>
-                                    Import Results
-                                </h3>
-                            </div>
-                            
-                            <div id="import-results"></div>
-                            
-                            <div class="button-group">
-                                <button id="new-import-btn" class="btn btn-primary">
-                                    <i class="fas fa-plus"></i>
-                                    Start New Import
-                                </button>
+                        <div class="psw-card" style="text-align: center;">
+                            <div class="psw-card-content">
+                                <i class="fas fa-times-circle" style="color: var(--error-color); font-size: var(--font-size-2xl); margin-bottom: var(--spacing-2);"></i>
+                                <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--text-primary);" id="error-count">0</div>
+                                <div style="color: var(--text-muted);">Errors</div>
                             </div>
                         </div>
+                    </div>
+                    
+                    <!-- Preview Table -->
+                    <div style="overflow-x: auto; margin-bottom: var(--spacing-6);">
+                        <table id="preview-table" class="psw-table">
+                            <thead>
+                                <tr>
+                                    <th>Payment Date</th>
+                                    <th>ISIN</th>
+                                    <th>Ticker</th>
+                                    <th>Broker</th>
+                                    <th>Account</th>
+                                    <th>Shares</th>
+                                    <th>Dividend (Local)</th>
+                                    <th>Currency</th>
+                                    <th>Dividend (SEK)</th>
+                                    <th>Tax (SEK)</th>
+                                    <th>Net (SEK)</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Import Controls -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--spacing-4);">
+                        <label style="display: flex; align-items: center; gap: var(--spacing-2); cursor: pointer;">
+                            <input type="checkbox" id="ignore-duplicates" style="margin-right: var(--spacing-2);">
+                            <i class="fas fa-copy" style="color: var(--primary-accent);"></i>
+                            <span>Ignore duplicate entries (skip existing dividends)</span>
+                        </label>
                         
+                        <div style="display: flex; gap: var(--spacing-3);">
+                            <button id="import-btn" class="psw-btn psw-btn-primary" disabled>
+                                <i class="fas fa-download psw-btn-icon"></i>
+                                Import Dividends
+                            </button>
+                            <button id="cancel-btn" class="psw-btn psw-btn-secondary">
+                                <i class="fas fa-times psw-btn-icon"></i>
+                                Cancel
+                            </button>
+                        </div>
                     </div>
                 </div>
+                
+                <!-- Step 3: Import Results -->
+                <div id="results-section" style="display: none;">
+                    <div style="border-top: 1px solid var(--border-primary); margin: var(--spacing-6) 0; padding-top: var(--spacing-6);"></div>
+                    
+                    <div style="margin-bottom: var(--spacing-6);">
+                        <h3 style="font-size: var(--font-size-xl); font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-2);">
+                            <i class="fas fa-check-circle" style="color: var(--success-color); margin-right: var(--spacing-2);"></i>
+                            Import Results
+                        </h3>
+                    </div>
+                    
+                    <div id="import-results" style="margin-bottom: var(--spacing-6);"></div>
+                    
+                    <div>
+                        <button id="new-import-btn" class="psw-btn psw-btn-primary">
+                            <i class="fas fa-plus psw-btn-icon"></i>
+                            Start New Import
+                        </button>
+                    </div>
+                </div>
+                
             </div>
         </div>
-    </main>
-
-    <footer class="footer">
-        <div class="footer-content">
-            <p>&copy; <?php echo date('Y'); ?> PSW 4.0 | Built with PHP</p>
-        </div>
-    </footer>
+    </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="<?php echo ASSETS_URL; ?>/js/improved-main.js"></script>
-    
     <script>
         console.log('Dividend import page loaded');
         
@@ -416,7 +312,7 @@ $pageTitle = 'Dividend Import - PSW 4.0';
                 
                 // Show progress
                 $('#upload-progress').show();
-                $('#upload-btn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
+                $('#upload-btn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin psw-btn-icon"></i> Processing...');
                 
                 $.ajax({
                     url: './proper_csv_upload.php',
@@ -439,7 +335,7 @@ $pageTitle = 'Dividend Import - PSW 4.0';
                     },
                     complete: function() {
                         $('#upload-progress').hide();
-                        $('#upload-btn').prop('disabled', false).html('<i class="fas fa-upload"></i> Upload and Parse File');
+                        $('#upload-btn').prop('disabled', false).html('<i class="fas fa-upload psw-btn-icon"></i> Upload and Parse File');
                     }
                 });
             }
@@ -452,7 +348,7 @@ $pageTitle = 'Dividend Import - PSW 4.0';
                 
                 // Show validation alerts
                 if (data.errors.length > 0) {
-                    showAlert('danger', `Found ${data.errors.length} errors that must be fixed before importing`);
+                    showAlert('error', `Found ${data.errors.length} errors that must be fixed before importing`);
                     $('#import-btn').prop('disabled', true);
                 } else if (data.warnings.length > 0) {
                     showAlert('warning', `Found ${data.warnings.length} warnings. Review before importing`);
@@ -470,11 +366,11 @@ $pageTitle = 'Dividend Import - PSW 4.0';
                     // Traffic light colors: Green = Complete, Yellow = Incomplete, Red = Error
                     let statusBadge;
                     if (dividend.is_complete === 1) {
-                        statusBadge = '<span class="badge" style="background-color: #28a745; color: white;">Complete</span>';
+                        statusBadge = '<span style="background-color: var(--success-color); color: var(--text-inverse); padding: var(--spacing-1) var(--spacing-2); border-radius: var(--radius-sm); font-size: var(--font-size-xs);">Complete</span>';
                     } else if (dividend.is_complete === 0) {
-                        statusBadge = '<span class="badge" style="background-color: #ffc107; color: black;">Incomplete</span>';
+                        statusBadge = '<span style="background-color: var(--warning-color); color: var(--text-inverse); padding: var(--spacing-1) var(--spacing-2); border-radius: var(--radius-sm); font-size: var(--font-size-xs);">Incomplete</span>';
                     } else {
-                        statusBadge = '<span class="badge" style="background-color: #dc3545; color: white;">Error</span>';
+                        statusBadge = '<span style="background-color: var(--error-color); color: var(--text-inverse); padding: var(--spacing-1) var(--spacing-2); border-radius: var(--radius-sm); font-size: var(--font-size-xs);">Error</span>';
                     }
                     
                     const row = `
@@ -501,7 +397,7 @@ $pageTitle = 'Dividend Import - PSW 4.0';
             }
             
             function importDividends() {
-                $('#import-btn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Importing...');
+                $('#import-btn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin psw-btn-icon"></i> Importing...');
                 
                 const ignoreDuplicates = $('#ignore-duplicates').is(':checked');
                 
@@ -520,19 +416,19 @@ $pageTitle = 'Dividend Import - PSW 4.0';
                     showAlert('error', response.error || 'Import failed');
                 })
                 .always(function() {
-                    $('#import-btn').prop('disabled', false).html('<i class="fas fa-download"></i> Import Dividends');
+                    $('#import-btn').prop('disabled', false).html('<i class="fas fa-download psw-btn-icon"></i> Import Dividends');
                 });
             }
             
             function showImportResults(data) {
                 const results = `
-                    <div class="alert alert-success">
+                    <div class="psw-alert psw-alert-success">
                         <h5><i class="fas fa-check-circle"></i> Import Completed Successfully</h5>
-                        <ul class="mb-0">
-                            <li><strong>${data.imported}</strong> dividends imported</li>
-                            ${data.skipped > 0 ? `<li><strong>${data.skipped}</strong> duplicate entries skipped</li>` : ''}
-                            <li><strong>${data.total_processed}</strong> total records processed</li>
-                        </ul>
+                        <div style="margin-top: var(--spacing-2);">
+                            <div><strong>${data.imported}</strong> dividends imported</div>
+                            ${data.skipped > 0 ? `<div><strong>${data.skipped}</strong> duplicate entries skipped</div>` : ''}
+                            <div><strong>${data.total_processed}</strong> total records processed</div>
+                        </div>
                     </div>
                 `;
                 
@@ -554,11 +450,11 @@ $pageTitle = 'Dividend Import - PSW 4.0';
             }
             
             function showAlert(type, message) {
-                const alertClass = type === 'error' ? 'danger' : type;
+                const alertClass = type === 'error' ? 'error' : type;
                 const alert = `
-                    <div class="alert alert-${alertClass}">
+                    <div class="psw-alert psw-alert-${alertClass}" style="position: relative;">
                         ${message}
-                        <button type="button" class="alert-close" onclick="this.parentElement.remove()">
+                        <button type="button" style="position: absolute; top: var(--spacing-2); right: var(--spacing-2); background: none; border: none; color: inherit; cursor: pointer;" onclick="this.parentElement.remove()">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
@@ -566,12 +462,26 @@ $pageTitle = 'Dividend Import - PSW 4.0';
                 $('#validation-alerts').append(alert);
             }
         });
-        
-        // User menu toggle
-        function toggleUserMenu() {
-            const menu = document.getElementById('userMenu');
-            menu.classList.toggle('active');
-        }
     </script>
-</body>
-</html>
+
+    <?php
+    $content = ob_get_clean();
+    
+    // Include redesigned base layout
+    include __DIR__ . '/templates/layouts/base-redesign.php';
+    
+} catch (Exception $e) {
+    $pageTitle = 'Import Error - ' . APP_NAME;
+    $content = '
+        <div class="psw-card">
+            <div class="psw-card-content" style="text-align: center; padding: var(--spacing-8);">
+                <i class="fas fa-exclamation-triangle" style="font-size: var(--font-size-4xl); color: var(--error-color); margin-bottom: var(--spacing-4);"></i>
+                <h1 style="color: var(--text-primary); margin-bottom: var(--spacing-4);">Import Error</h1>
+                <p style="color: var(--text-secondary);">There was an error loading the import page.</p>
+            </div>
+        </div>
+    ';
+    
+    include __DIR__ . '/templates/layouts/base-redesign.php';
+}
+?>

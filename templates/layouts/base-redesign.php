@@ -35,8 +35,24 @@ $userTheme = $_SESSION['user_theme'] ?? 'light';
     <!-- Prevent theme flickering -->
     <script>
         (function() {
-            const savedTheme = localStorage.getItem('psw-theme') || '<?php echo $userTheme; ?>';
-            document.documentElement.setAttribute('data-theme', savedTheme);
+            // Priority: localStorage > session > default
+            const sessionTheme = '<?php echo $userTheme; ?>';
+            const localTheme = localStorage.getItem('psw-theme');
+            const finalTheme = localTheme || sessionTheme;
+            
+            document.documentElement.setAttribute('data-theme', finalTheme);
+            
+            // Sync localStorage with session if they differ
+            if (localTheme !== sessionTheme && sessionTheme !== 'light') {
+                localStorage.setItem('psw-theme', sessionTheme);
+            } else if (localTheme && localTheme !== sessionTheme) {
+                // Update session to match localStorage
+                fetch('/update_theme.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ theme: localTheme })
+                }).catch(e => console.warn('Theme sync failed:', e));
+            }
         })();
     </script>
 </head>

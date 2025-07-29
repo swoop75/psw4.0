@@ -196,15 +196,10 @@ try {
             </div>
             <div class="psw-card-content">
                 <div style="display: flex; gap: var(--spacing-4); flex-wrap: wrap;">
-                    <a href="<?php echo BASE_URL; ?>/dashboard-redesign.php" class="psw-btn psw-btn-secondary">
+                    <a href="<?php echo BASE_URL; ?>/dashboard.php" class="psw-btn psw-btn-secondary">
                         <i class="fas fa-tachometer-alt psw-btn-icon"></i>
                         Back to Dashboard
                     </a>
-                    
-                    <button onclick="toggleTheme()" class="psw-btn psw-btn-secondary">
-                        <i class="fas fa-adjust psw-btn-icon"></i>
-                        Toggle Theme
-                    </button>
                     
                     <a href="<?php echo BASE_URL; ?>/logout.php" class="psw-btn psw-btn-secondary" style="color: var(--error-color); border-color: var(--error-color);">
                         <i class="fas fa-sign-out-alt psw-btn-icon"></i>
