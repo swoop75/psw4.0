@@ -296,8 +296,13 @@ body {
   opacity: 1;
 }
 
-/* Only hide submenu text when sidebar is collapsed, but keep expanded state */
-.psw-sidebar:not(:hover) .psw-nav-submenu {
+/* Show submenus when expanded, even if sidebar not hovered */
+.psw-nav-item.expanded .psw-nav-submenu {
+  opacity: 1 !important;
+}
+
+/* Only hide submenu text when sidebar is collapsed AND not expanded */
+.psw-sidebar:not(:hover) .psw-nav-item:not(.expanded) .psw-nav-submenu {
   opacity: 0;
   transition: opacity var(--transition-fast);
 }
