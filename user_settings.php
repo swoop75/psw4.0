@@ -215,10 +215,37 @@ try {
     document.querySelectorAll('input[name="theme"]').forEach(radio => {
         radio.addEventListener('change', function() {
             if (this.checked) {
-                // Small delay to show selection before submitting
-                setTimeout(() => {
-                    this.closest('form').submit();
-                }, 300);
+                const selectedTheme = this.value;
+                
+                // Update theme immediately
+                document.documentElement.setAttribute('data-theme', selectedTheme);
+                localStorage.setItem('psw-theme', selectedTheme);
+                
+                // Update server via AJAX instead of form submission
+                fetch('/update_theme.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ theme: selectedTheme })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success message
+                        if (window.pswApp) {
+                            window.pswApp.showNotification('Theme preference updated successfully', 'success');
+                        }
+                        console.log('Theme updated successfully:', selectedTheme);
+                    } else {
+                        console.error('Theme update failed:', data);
+                    }
+                })
+                .catch(error => {
+                    console.error('Theme update error:', error);
+                    // Revert if failed
+                    const currentTheme = '<?php echo $currentTheme; ?>';
+                    document.documentElement.setAttribute('data-theme', currentTheme);
+                    localStorage.setItem('psw-theme', currentTheme);
+                });
             }
         });
     });

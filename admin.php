@@ -315,5 +315,5 @@ ob_start();
 $content = ob_get_clean();
 
 // Include base layout
-include __DIR__ . '/templates/layouts/base.php';
+include __DIR__ . '/templates/layouts/base-redesign.php';
 ?>

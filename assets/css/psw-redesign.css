@@ -186,6 +186,7 @@ body {
   border-bottom: 1px solid var(--border-primary);
   height: 70px;
   min-height: 70px;
+  margin-bottom: 2px;
 }
 
 .psw-logo-icon {

@@ -38,7 +38,7 @@ try {
     $content = ob_get_clean();
     
     // Include base layout
-    include __DIR__ . '/../templates/layouts/base.php';
+    include __DIR__ . '/../templates/layouts/base-redesign.php';
     
     // Log page access
     Logger::logUserAction('dividend_estimate_viewed', 'User accessed dividend estimate overview');
@@ -59,6 +59,6 @@ try {
         $content .= '<div class="alert alert-error mt-3"><strong>Debug:</strong> ' . $e->getMessage() . '</div>';
     }
     
-    include __DIR__ . '/../templates/layouts/base.php';
+    include __DIR__ . '/../templates/layouts/base-redesign.php';
 }
 ?>
