@@ -309,17 +309,27 @@ body {
 .psw-nav-submenu-link {
   display: flex;
   align-items: center;
-  padding: var(--spacing-4) var(--spacing-4) var(--spacing-4) var(--spacing-12);
+  padding: var(--spacing-6) var(--spacing-4) var(--spacing-6) var(--spacing-12) !important;
   color: var(--text-muted);
   text-decoration: none;
   font-size: var(--font-size-sm);
   transition: all var(--transition-fast);
-  margin-bottom: var(--spacing-2);
+  margin-bottom: var(--spacing-4) !important;
+  border-bottom: 1px solid var(--border-primary) !important;
 }
 
 .psw-nav-submenu-link:hover {
   background-color: var(--primary-accent-light);
   color: var(--primary-accent);
+}
+
+/* Additional spacing for submenus to ensure visibility */
+.psw-nav-submenu-link:not(:last-child) {
+  margin-bottom: var(--spacing-6) !important;
+}
+
+.psw-nav-submenu {
+  padding: var(--spacing-2) 0 !important;
 }
 
 .psw-nav-submenu-link.active {
