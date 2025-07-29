@@ -309,11 +309,12 @@ body {
 .psw-nav-submenu-link {
   display: flex;
   align-items: center;
-  padding: var(--spacing-2) var(--spacing-4) var(--spacing-2) var(--spacing-12);
+  padding: var(--spacing-3) var(--spacing-4) var(--spacing-3) var(--spacing-12);
   color: var(--text-muted);
   text-decoration: none;
   font-size: var(--font-size-sm);
   transition: all var(--transition-fast);
+  margin-bottom: var(--spacing-1);
 }
 
 .psw-nav-submenu-link:hover {
