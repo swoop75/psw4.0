@@ -139,7 +139,6 @@ try {
 $pageTitle = 'New Companies Management - PSW 4.0';
 $pageDescription = 'Manage your watchlist and buy targets';
 $additionalCSS = [
-    BASE_URL . '/assets/css/improved-buylist-management.css?v=' . time(),
     BASE_URL . '/assets/css/tooltip.css?v=' . time()
 ];
 $additionalJS = [
@@ -157,29 +156,29 @@ $csrfToken = Security::generateCSRFToken();
 // Prepare content for buylist page
 ob_start();
 ?>
-    <div class="container">
-        <!-- Page Header -->
-        <div class="page-header">
-            <div class="header-content">
-                <div class="header-left">
-                    <h1><i class="fas fa-star"></i> New Companies Management</h1>
-                </div>
-            </div>
+<div class="psw-content">
+    <!-- Page Header -->
+    <div style="margin-bottom: 2rem;">
+        <h1 style="font-size: 2.25rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem;">
+            <i class="fas fa-star" style="color: var(--primary-accent); margin-right: 0.75rem;"></i>
+            New Companies Management
+        </h1>
+        <p style="color: var(--text-secondary); font-size: 1.125rem;">Manage your watchlist and buy targets</p>
+    </div>
+
+    <?php if ($errorMessage): ?>
+        <div class="psw-alert psw-alert-error">
+            <i class="fas fa-exclamation-triangle"></i>
+            <?= htmlspecialchars($errorMessage) ?>
         </div>
+    <?php endif; ?>
 
-        <?php if ($errorMessage): ?>
-            <div class="alert alert-error">
-                <i class="fas fa-exclamation-triangle"></i>
-                <?= htmlspecialchars($errorMessage) ?>
-            </div>
-        <?php endif; ?>
-
-        <?php if ($successMessage): ?>
-            <div class="alert alert-success">
-                <i class="fas fa-check-circle"></i>
-                <?= htmlspecialchars($successMessage) ?>
-            </div>
-        <?php endif; ?>
+    <?php if ($successMessage): ?>
+        <div class="psw-alert psw-alert-success">
+            <i class="fas fa-check-circle"></i>
+            <?= htmlspecialchars($successMessage) ?>
+        </div>
+    <?php endif; ?>
 
         <!-- Statistics removed for cleaner interface -->
 
