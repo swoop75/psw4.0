@@ -281,22 +281,22 @@ ob_start();
         </div>
         <div class="header-info">
             <?php if ($editUserId): ?>
-                <a href="user_management.php" class="btn btn-secondary btn-sm">
-                    <i class="fas fa-arrow-left"></i> Back to All Users
+                <a href="user_management.php" class="psw-btn psw-btn-secondary" style="padding: var(--spacing-2) var(--spacing-3); font-size: var(--font-size-sm);">
+                    <i class="fas fa-arrow-left psw-btn-icon"></i> Back to All Users
                 </a>
             <?php endif; ?>
         </div>
     </div>
 
     <?php if ($error): ?>
-        <div class="alert alert-error">
+        <div class="psw-alert psw-alert-error">
             <i class="fas fa-exclamation-circle"></i>
             <?php echo htmlspecialchars($error); ?>
         </div>
     <?php endif; ?>
 
     <?php if ($success): ?>
-        <div class="alert alert-success">
+        <div class="psw-alert psw-alert-success">
             <i class="fas fa-check-circle"></i>
             <?php echo $success; ?>
         </div>
@@ -438,8 +438,8 @@ ob_start();
                     </div>
 
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Update Profile
+                        <button type="submit" class="psw-btn psw-btn-primary">
+                            <i class="fas fa-save psw-btn-icon"></i> Update Profile
                         </button>
                     </div>
                 </form>
@@ -459,8 +459,8 @@ ob_start();
                             <p>Generate a secure random password for this user. The password will be displayed once and should be provided to the user.</p>
                             
                             <div class="form-actions">
-                                <button type="button" class="btn btn-primary" onclick="showGeneratePasswordModal()">
-                                    <i class="fas fa-random"></i> Generate Password for User
+                                <button type="button" class="psw-btn psw-btn-primary" onclick="showGeneratePasswordModal()">
+                                    <i class="fas fa-random psw-btn-icon"></i> Generate Password for User
                                 </button>
                             </div>
                         </div>
@@ -493,8 +493,8 @@ ob_start();
                     </div>
 
                         <div class="form-actions">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-key"></i> Change Password
+                            <button type="submit" class="psw-btn psw-btn-primary">
+                                <i class="fas fa-key psw-btn-icon"></i> Change Password
                             </button>
                         </div>
                     </form>
@@ -505,8 +505,8 @@ ob_start();
                         <p>Click the button below to generate a secure random password. The new password will be displayed once and should be saved immediately.</p>
                         
                         <div class="form-actions">
-                            <button type="button" class="btn btn-secondary" onclick="showGeneratePasswordModal()">
-                                <i class="fas fa-random"></i> Generate Random Password
+                            <button type="button" class="psw-btn psw-btn-secondary" onclick="showGeneratePasswordModal()">
+                                <i class="fas fa-random psw-btn-icon"></i> Generate Random Password
                             </button>
                         </div>
                     </div>
@@ -622,8 +622,8 @@ ob_start();
                     </div>
 
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Save Preferences
+                        <button type="submit" class="psw-btn psw-btn-primary">
+                            <i class="fas fa-save psw-btn-icon"></i> Save Preferences
                         </button>
                     </div>
                 </form>
@@ -671,8 +671,8 @@ ob_start();
                 <div class="users-section">
                     <div class="section-header">
                         <h2>User Management</h2>
-                        <button class="btn btn-primary" onclick="showAddUserModal()">
-                            <i class="fas fa-user-plus"></i> Add New User
+                        <button class="psw-btn psw-btn-primary" onclick="showAddUserModal()">
+                            <i class="fas fa-user-plus psw-btn-icon"></i> Add New User
                         </button>
                     </div>
                     
@@ -830,9 +830,9 @@ ob_start();
             <p id="statusChangeWarning" class="text-warning"></p>
         </div>
         <div class="form-actions">
-            <button type="button" class="btn btn-secondary" onclick="closeStatusChangeModal()">Cancel</button>
-            <button type="button" class="btn" id="confirmStatusChangeBtn" onclick="confirmStatusChange()">
-                <i class="fas fa-user-check"></i> <span id="confirmStatusChangeText">Confirm</span>
+            <button type="button" class="psw-btn psw-btn-secondary" onclick="closeStatusChangeModal()">Cancel</button>
+            <button type="button" class="psw-btn psw-btn-primary" id="confirmStatusChangeBtn" onclick="confirmStatusChange()">
+                <i class="fas fa-user-check psw-btn-icon"></i> <span id="confirmStatusChangeText">Confirm</span>
             </button>
         </div>
     </div>
@@ -850,9 +850,9 @@ ob_start();
             <p class="text-warning"><strong>Warning:</strong> Your current password will be replaced. Make sure to save the new password when it's displayed.</p>
         </div>
         <div class="form-actions">
-            <button type="button" class="btn btn-secondary" onclick="closeGeneratePasswordModal()">Cancel</button>
-            <button type="button" class="btn btn-primary" onclick="confirmGeneratePassword()">
-                <i class="fas fa-random"></i> Generate Password
+            <button type="button" class="psw-btn psw-btn-secondary" onclick="closeGeneratePasswordModal()">Cancel</button>
+            <button type="button" class="psw-btn psw-btn-primary" onclick="confirmGeneratePassword()">
+                <i class="fas fa-random psw-btn-icon"></i> Generate Password
             </button>
         </div>
     </div>

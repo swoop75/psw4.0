@@ -138,90 +138,95 @@ $csrfToken = Security::generateCSRFToken();
 // Prepare content for masterlist page
 ob_start();
 ?>
-    <div class="container">
-        <!-- Page Header -->
-        <div class="page-header">
-            <div class="header-content">
-                <div class="header-left">
-                    <h1><i class="fas fa-building"></i> Masterlist Management</h1>
-                </div>
-            </div>
+    <div class="psw-card psw-mb-6">
+        <div class="psw-card-header">
+            <h1 class="psw-card-title">
+                <i class="fas fa-building psw-card-title-icon"></i>
+                Masterlist Management
+            </h1>
+            <p class="psw-card-subtitle">Manage company masterlist data</p>
         </div>
+    </div>
 
-        <?php if ($errorMessage): ?>
-            <div class="alert alert-error">
-                <i class="fas fa-exclamation-triangle"></i>
-                <?= htmlspecialchars($errorMessage) ?>
-            </div>
-        <?php endif; ?>
-
-        <?php if ($successMessage): ?>
-            <div class="alert alert-success">
-                <i class="fas fa-check-circle"></i>
-                <?= htmlspecialchars($successMessage) ?>
-            </div>
-        <?php endif; ?>
-
-        <!-- Statistics Cards -->
-        <?php if (!empty($statistics)): ?>
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-building"></i>
-                </div>
-                <div class="stat-content">
-                    <div class="stat-number"><?= $statistics['total_companies'] ?></div>
-                    <div class="stat-label">Total Companies</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon active">
-                    <i class="fas fa-check-circle"></i>
-                </div>
-                <div class="stat-content">
-                    <div class="stat-number"><?= $statistics['active_companies'] ?></div>
-                    <div class="stat-label">Active</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon delisted">
-                    <i class="fas fa-times-circle"></i>
-                </div>
-                <div class="stat-content">
-                    <div class="stat-number"><?= $statistics['delisted_companies'] ?></div>
-                    <div class="stat-label">Delisted</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-globe"></i>
-                </div>
-                <div class="stat-content">
-                    <div class="stat-number"><?= $statistics['total_countries'] ?></div>
-                    <div class="stat-label">Countries</div>
-                </div>
-            </div>
+    <?php if ($errorMessage): ?>
+        <div class="psw-alert psw-alert-error">
+            <i class="fas fa-exclamation-triangle"></i>
+            <?= htmlspecialchars($errorMessage) ?>
         </div>
-        <?php endif; ?>
+    <?php endif; ?>
 
-        <!-- Main Content -->
-        <div class="content-wrapper">
-            <!-- Filters and Actions -->
-            <div class="toolbar">
-                <div class="toolbar-left">
-                    <button class="btn btn-primary" onclick="showCreateModal()">
-                        <i class="fas fa-plus"></i> Add Company
-                    </button>
-                    <button class="btn btn-secondary" onclick="exportToCSV()">
-                        <i class="fas fa-download"></i> Export CSV
-                    </button>
-                </div>
-                <div class="toolbar-right">
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="searchInput" placeholder="Search companies..." value="<?= htmlspecialchars($filters['search']) ?>">
+    <?php if ($successMessage): ?>
+        <div class="psw-alert psw-alert-success">
+            <i class="fas fa-check-circle"></i>
+            <?= htmlspecialchars($successMessage) ?>
+        </div>
+    <?php endif; ?>
+
+    <!-- Statistics Cards -->
+    <?php if (!empty($statistics)): ?>
+    <div class="psw-card psw-mb-6">
+        <div class="psw-card-content">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--spacing-4);">
+                <div style="display: flex; align-items: center; padding: var(--spacing-4); background: var(--bg-secondary); border-radius: var(--radius-lg);">
+                    <div style="display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: var(--primary-accent); border-radius: var(--radius-lg); color: var(--text-inverse); margin-right: var(--spacing-4);">
+                        <i class="fas fa-building"></i>
                     </div>
-                    <select id="countryFilter" onchange="applyFilters()">
+                    <div>
+                        <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--text-primary);"><?= $statistics['total_companies'] ?></div>
+                        <div style="font-size: var(--font-size-sm); color: var(--text-secondary);">Total Companies</div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; padding: var(--spacing-4); background: var(--bg-secondary); border-radius: var(--radius-lg);">
+                    <div style="display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: var(--success-color); border-radius: var(--radius-lg); color: var(--text-inverse); margin-right: var(--spacing-4);">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--text-primary);"><?= $statistics['active_companies'] ?></div>
+                        <div style="font-size: var(--font-size-sm); color: var(--text-secondary);">Active</div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; padding: var(--spacing-4); background: var(--bg-secondary); border-radius: var(--radius-lg);">
+                    <div style="display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: var(--error-color); border-radius: var(--radius-lg); color: var(--text-inverse); margin-right: var(--spacing-4);">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--text-primary);"><?= $statistics['delisted_companies'] ?></div>
+                        <div style="font-size: var(--font-size-sm); color: var(--text-secondary);">Delisted</div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; padding: var(--spacing-4); background: var(--bg-secondary); border-radius: var(--radius-lg);">
+                    <div style="display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: var(--info-color); border-radius: var(--radius-lg); color: var(--text-inverse); margin-right: var(--spacing-4);">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--text-primary);"><?= $statistics['total_countries'] ?></div>
+                        <div style="font-size: var(--font-size-sm); color: var(--text-secondary);">Countries</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <!-- Main Content -->
+    <div class="psw-card">
+        <div class="psw-card-content">
+            <!-- Filters and Actions -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-6);">
+                <div style="display: flex; gap: var(--spacing-3);">
+                    <button class="psw-btn psw-btn-primary" onclick="showCreateModal()">
+                        <i class="fas fa-plus psw-btn-icon"></i> Add Company
+                    </button>
+                    <button class="psw-btn psw-btn-secondary" onclick="exportToCSV()">
+                        <i class="fas fa-download psw-btn-icon"></i> Export CSV
+                    </button>
+                </div>
+                <div style="display: flex; gap: var(--spacing-3); align-items: center;">
+                    <div style="position: relative; display: flex; align-items: center;">
+                        <i class="fas fa-search" style="position: absolute; left: var(--spacing-3); color: var(--text-muted);"></i>
+                        <input type="text" id="searchInput" placeholder="Search companies..." value="<?= htmlspecialchars($filters['search']) ?>" class="psw-form-input" style="padding-left: var(--spacing-10); min-width: 250px;">
+                    </div>
+                    <select id="countryFilter" onchange="applyFilters()" class="psw-form-input" style="min-width: 150px;">
                         <option value="">All Countries</option>
                         <?php foreach ($filterOptions['countries'] ?? [] as $country): ?>
                             <option value="<?= htmlspecialchars($country) ?>" <?= $filters['country'] === $country ? 'selected' : '' ?>>
@@ -229,7 +234,7 @@ ob_start();
                             </option>
                         <?php endforeach; ?>
                     </select>
-                    <select id="marketFilter" onchange="applyFilters()">
+                    <select id="marketFilter" onchange="applyFilters()" class="psw-form-input" style="min-width: 120px;">
                         <option value="">All Markets</option>
                         <?php foreach ($filterOptions['markets'] ?? [] as $market): ?>
                             <option value="<?= htmlspecialchars($market) ?>" <?= $filters['market'] === $market ? 'selected' : '' ?>>
@@ -237,7 +242,7 @@ ob_start();
                             </option>
                         <?php endforeach; ?>
                     </select>
-                    <select id="delistedFilter" onchange="applyFilters()">
+                    <select id="delistedFilter" onchange="applyFilters()" class="psw-form-input" style="min-width: 120px;">
                         <option value="">All Status</option>
                         <option value="0" <?= $filters['delisted'] === 0 ? 'selected' : '' ?>>Active</option>
                         <option value="1" <?= $filters['delisted'] === 1 ? 'selected' : '' ?>>Delisted</option>
@@ -246,8 +251,8 @@ ob_start();
             </div>
 
             <!-- Companies Table -->
-            <div class="table-container">
-                <table class="data-table">
+            <div style="overflow-x: auto;">
+                <table class="psw-table">
                     <thead>
                         <tr>
                             <th>ISIN</th>
@@ -264,37 +269,37 @@ ob_start();
                         <?php if (!empty($companiesData['companies'])): ?>
                             <?php foreach ($companiesData['companies'] as $company): ?>
                                 <tr>
-                                    <td class="mono"><?= htmlspecialchars($company['isin']) ?></td>
-                                    <td class="mono font-bold"><?= htmlspecialchars($company['ticker']) ?></td>
+                                    <td style="font-family: var(--font-family-mono); font-size: var(--font-size-sm);"><?= htmlspecialchars($company['isin']) ?></td>
+                                    <td style="font-family: var(--font-family-mono); font-weight: 600;"><?= htmlspecialchars($company['ticker']) ?></td>
                                     <td>
-                                        <a href="<?= BASE_URL ?>/public/company_detail.php?isin=<?= urlencode($company['isin']) ?>" class="company-link">
+                                        <a href="<?= BASE_URL ?>/public/company_detail.php?isin=<?= urlencode($company['isin']) ?>" style="color: var(--primary-accent); text-decoration: none; font-weight: 500;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
                                             <?= htmlspecialchars($company['name']) ?>
                                         </a>
                                     </td>
                                     <td><?= htmlspecialchars($company['country']) ?></td>
                                     <td><?= htmlspecialchars($company['market'] ?? '-') ?></td>
                                     <td>
-                                        <span class="share-type-badge">
+                                        <span style="background: var(--bg-secondary); color: var(--text-primary); padding: var(--spacing-1) var(--spacing-2); border-radius: var(--radius-sm); font-size: var(--font-size-xs); font-weight: 500;">
                                             <?= htmlspecialchars($company['share_type_code'] ?? 'N/A') ?>
                                         </span>
                                     </td>
                                     <td>
                                         <?php if ($company['delisted']): ?>
-                                            <span class="status-badge delisted">
-                                                <i class="fas fa-times-circle"></i> Delisted
+                                            <span style="display: inline-flex; align-items: center; background: var(--error-bg); color: var(--error-color); padding: var(--spacing-1) var(--spacing-2); border-radius: var(--radius-sm); font-size: var(--font-size-xs); font-weight: 500;">
+                                                <i class="fas fa-times-circle" style="margin-right: var(--spacing-1);"></i> Delisted
                                             </span>
                                         <?php else: ?>
-                                            <span class="status-badge active">
-                                                <i class="fas fa-check-circle"></i> Active
+                                            <span style="display: inline-flex; align-items: center; background: var(--success-bg); color: var(--success-color); padding: var(--spacing-1) var(--spacing-2); border-radius: var(--radius-sm); font-size: var(--font-size-xs); font-weight: 500;">
+                                                <i class="fas fa-check-circle" style="margin-right: var(--spacing-1);"></i> Active
                                             </span>
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <div class="action-buttons">
-                                            <button class="btn-icon" onclick="editCompany('<?= htmlspecialchars($company['isin']) ?>')" title="Edit">
+                                        <div style="display: flex; gap: var(--spacing-1);">
+                                            <button style="display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--radius-md); color: var(--text-secondary); cursor: pointer; transition: all var(--transition-fast);" onclick="editCompany('<?= htmlspecialchars($company['isin']) ?>')" title="Edit" onmouseover="this.style.background='var(--primary-accent-light)'; this.style.color='var(--primary-accent)';" onmouseout="this.style.background='var(--bg-secondary)'; this.style.color='var(--text-secondary)';">
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            <button class="btn-icon btn-danger" onclick="deleteCompany('<?= htmlspecialchars($company['isin']) ?>', '<?= htmlspecialchars($company['name']) ?>')" title="Delete">
+                                            <button style="display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--radius-md); color: var(--text-secondary); cursor: pointer; transition: all var(--transition-fast);" onclick="deleteCompany('<?= htmlspecialchars($company['isin']) ?>', '<?= htmlspecialchars($company['name']) ?>')" title="Delete" onmouseover="this.style.background='var(--error-bg)'; this.style.color='var(--error-color)';" onmouseout="this.style.background='var(--bg-secondary)'; this.style.color='var(--text-secondary)';">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </div>
@@ -303,7 +308,7 @@ ob_start();
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="8" class="text-center">No companies found</td>
+                                <td colspan="8" style="text-align: center; padding: var(--spacing-8); color: var(--text-muted);">No companies found</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
@@ -312,23 +317,23 @@ ob_start();
 
             <!-- Pagination -->
             <?php if (!empty($companiesData['pagination'])): ?>
-                <div class="pagination">
-                    <div class="pagination-info">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: var(--spacing-6); padding-top: var(--spacing-4); border-top: 1px solid var(--border-primary);">
+                    <div style="color: var(--text-secondary); font-size: var(--font-size-sm);">
                         Showing <?= count($companiesData['companies']) ?> of <?= $companiesData['pagination']['total_records'] ?> companies
                     </div>
-                    <div class="pagination-controls">
+                    <div style="display: flex; align-items: center; gap: var(--spacing-3);">
                         <?php if ($companiesData['pagination']['has_prev']): ?>
-                            <a href="?<?= http_build_query(array_merge($_GET, ['page' => $companiesData['pagination']['current_page'] - 1])) ?>" class="btn btn-sm">
+                            <a href="?<?= http_build_query(array_merge($_GET, ['page' => $companiesData['pagination']['current_page'] - 1])) ?>" class="psw-btn psw-btn-secondary" style="padding: var(--spacing-2) var(--spacing-3); font-size: var(--font-size-sm);">
                                 <i class="fas fa-chevron-left"></i> Previous
                             </a>
                         <?php endif; ?>
                         
-                        <span class="page-info">
+                        <span style="color: var(--text-secondary); font-size: var(--font-size-sm);">
                             Page <?= $companiesData['pagination']['current_page'] ?> of <?= $companiesData['pagination']['total_pages'] ?>
                         </span>
                         
                         <?php if ($companiesData['pagination']['has_next']): ?>
-                            <a href="?<?= http_build_query(array_merge($_GET, ['page' => $companiesData['pagination']['current_page'] + 1])) ?>" class="btn btn-sm">
+                            <a href="?<?= http_build_query(array_merge($_GET, ['page' => $companiesData['pagination']['current_page'] + 1])) ?>" class="psw-btn psw-btn-secondary" style="padding: var(--spacing-2) var(--spacing-3); font-size: var(--font-size-sm);">
                                 Next <i class="fas fa-chevron-right"></i>
                             </a>
                         <?php endif; ?>
