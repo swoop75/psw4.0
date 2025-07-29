@@ -18,7 +18,7 @@ $userTheme = $_SESSION['user_theme'] ?? 'light';
     <meta name="description" content="<?php echo $pageDescription ?? 'Pengamaskinen Sverige + Worldwide - Dividend Portfolio Management'; ?>">
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="<?php echo ASSETS_URL; ?>/css/psw-redesign.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="<?php echo ASSETS_URL; ?>/css/psw-redesign.css?v=<?php echo time(); ?>&bust=<?php echo rand(1000, 9999); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Additional CSS -->
