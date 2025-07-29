@@ -98,7 +98,7 @@ $userTheme = $_SESSION['user_theme'] ?? 'light';
                                     <a href="<?php echo BASE_URL; ?>/masterlist_management.php" class="psw-nav-submenu-link <?php echo (basename($_SERVER['PHP_SELF']) == 'masterlist_management.php') ? 'active' : ''; ?>">
                                         <i class="fas fa-building"></i> Masterlist
                                     </a>
-                                    <a href="<?php echo BASE_URL; ?>/new_companies_management.php" class="psw-nav-submenu-link <?php echo (basename($_SERVER['PHP_SELF']) == 'new_companies_management.php') ? 'active' : ''; ?>">
+                                    <a href="<?php echo BASE_URL; ?>/buylist_management.php" class="psw-nav-submenu-link <?php echo (basename($_SERVER['PHP_SELF']) == 'buylist_management.php' || basename($_SERVER['PHP_SELF']) == 'new_companies_management.php') ? 'active' : ''; ?>">
                                         <i class="fas fa-plus-circle"></i> New Companies
                                     </a>
                                     <a href="<?php echo BASE_URL; ?>/user_management.php" class="psw-nav-submenu-link <?php echo (basename($_SERVER['PHP_SELF']) == 'user_management.php') ? 'active' : ''; ?>">
