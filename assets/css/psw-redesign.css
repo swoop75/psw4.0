@@ -266,6 +266,12 @@ body {
   margin-right: var(--spacing-3);
   font-size: var(--font-size-lg);
   flex-shrink: 0;
+  transition: margin-left var(--transition-base);
+}
+
+/* Move icons 5px to the left when sidebar is collapsed */
+.psw-sidebar:not(:hover) .psw-nav-icon {
+  margin-left: -5px;
 }
 
 .psw-nav-text {

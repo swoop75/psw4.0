@@ -354,13 +354,13 @@ ob_start();
                     <?php if ($hasSearch || $activeFilterCount > 0): ?>
                         <div class="search-actions">
                             <?php if ($activeFilterCount > 0): ?>
-                                <button type="button" class="btn btn-sm btn-outline" onclick="resetToDefaults()">
-                                    <i class="fas fa-undo"></i> Reset to defaults
+                                <button type="button" class="psw-btn psw-btn-secondary" style="padding: var(--spacing-2) var(--spacing-3); font-size: var(--font-size-sm);" onclick="resetToDefaults()">
+                                    <i class="fas fa-undo" style="margin-right: var(--spacing-2);"></i> Reset to defaults
                                 </button>
                             <?php endif; ?>
                             <?php if ($hasSearch): ?>
-                                <button type="button" class="btn btn-sm btn-outline" onclick="searchAllItems()">
-                                    <i class="fas fa-globe"></i> Search all items
+                                <button type="button" class="psw-btn psw-btn-secondary" style="padding: var(--spacing-2) var(--spacing-3); font-size: var(--font-size-sm);" onclick="searchAllItems()">
+                                    <i class="fas fa-globe" style="margin-right: var(--spacing-2);"></i> Search all items
                                 </button>
                             <?php endif; ?>
                         </div>
