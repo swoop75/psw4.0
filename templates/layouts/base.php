@@ -85,6 +85,11 @@
                     </div>
                 <?php else: ?>
                     <!-- Logged-in navigation -->
+                    <a href="<?php echo BASE_URL; ?>/dashboard.php" class="nav-link">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Dashboard
+                    </a>
+                    
                     <div class="nav-item">
                         <a href="javascript:void(0)" class="nav-link nav-dropdown-only">
                             <i class="fas fa-cogs"></i>
@@ -92,7 +97,6 @@
                             <i class="fas fa-chevron-down nav-arrow"></i>
                         </a>
                         <div class="submenu">
-                            <a href="<?php echo BASE_URL; ?>/dashboard.php" class="submenu-link">Dashboard</a>
                             <a href="<?php echo BASE_URL; ?>/dividend_import.php" class="submenu-link">Dividend Import</a>
                             <a href="<?php echo BASE_URL; ?>/masterlist_management.php" class="submenu-link">Masterlist Management</a>
                             <a href="<?php echo BASE_URL; ?>/new_companies_management.php" class="submenu-link">New Companies</a>

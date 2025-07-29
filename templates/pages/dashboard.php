@@ -201,7 +201,7 @@ $dividendStats = $dashboardData['dividend_stats'];
                             <tbody>
                                 <?php foreach ($recentDividends as $dividend): ?>
                                 <tr>
-                                    <td><?php echo date('M j', strtotime($dividend['date'])); ?></td>
+                                    <td><?php echo date('M j, Y', strtotime($dividend['date'])); ?></td>
                                     <td>
                                         <strong><?php echo $dividend['symbol']; ?></strong>
                                         <div class="text-muted small"><?php echo $dividend['company']; ?></div>
@@ -375,50 +375,57 @@ $dividendStats = $dashboardData['dividend_stats'];
             <div class="dashboard-widget">
                 <div class="widget-header">
                     <h2><i class="fas fa-lightbulb"></i> Dividend Insights</h2>
-                    <span class="widget-subtitle">Past 12 months</span>
+                    <span class="widget-subtitle">All time data</span>
                 </div>
                 <div class="widget-content">
-                    <div class="insights-grid">
-                        <div class="insight-item">
-                            <div class="insight-icon">
-                                <i class="fas fa-hand-holding-usd"></i>
+                    <?php if (!empty($dividendStats['insights']) && $dividendStats['insights']['total_payments'] > 0): ?>
+                        <div class="insights-grid">
+                            <div class="insight-item">
+                                <div class="insight-icon">
+                                    <i class="fas fa-hand-holding-usd"></i>
+                                </div>
+                                <div class="insight-content">
+                                    <div class="insight-value"><?php echo number_format($dividendStats['insights']['avg_payment'] ?? 0, 2); ?> SEK</div>
+                                    <div class="insight-label">Average Payment</div>
+                                </div>
                             </div>
-                            <div class="insight-content">
-                                <div class="insight-value"><?php echo number_format($dividendStats['insights']['avg_payment'], 2); ?> SEK</div>
-                                <div class="insight-label">Average Payment</div>
+                            
+                            <div class="insight-item">
+                                <div class="insight-icon">
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <div class="insight-content">
+                                    <div class="insight-value"><?php echo number_format($dividendStats['insights']['largest_payment'] ?? 0, 2); ?> SEK</div>
+                                    <div class="insight-label">Largest Payment</div>
+                                </div>
+                            </div>
+                            
+                            <div class="insight-item">
+                                <div class="insight-icon">
+                                    <i class="fas fa-building"></i>
+                                </div>
+                                <div class="insight-content">
+                                    <div class="insight-value"><?php echo $dividendStats['insights']['total_companies'] ?? 0; ?></div>
+                                    <div class="insight-label">Paying Companies</div>
+                                </div>
+                            </div>
+                            
+                            <div class="insight-item">
+                                <div class="insight-icon">
+                                    <i class="fas fa-calendar-check"></i>
+                                </div>
+                                <div class="insight-content">
+                                    <div class="insight-value"><?php echo $dividendStats['insights']['total_payments'] ?? 0; ?></div>
+                                    <div class="insight-label">Total Payments</div>
+                                </div>
                             </div>
                         </div>
-                        
-                        <div class="insight-item">
-                            <div class="insight-icon">
-                                <i class="fas fa-star"></i>
-                            </div>
-                            <div class="insight-content">
-                                <div class="insight-value"><?php echo number_format($dividendStats['insights']['largest_payment'], 2); ?> SEK</div>
-                                <div class="insight-label">Largest Payment</div>
-                            </div>
+                    <?php else: ?>
+                        <div class="empty-state">
+                            <i class="fas fa-lightbulb"></i>
+                            <p>No dividend data available. <a href="<?php echo BASE_URL; ?>/dividend_import.php">Import dividends</a> to see insights.</p>
                         </div>
-                        
-                        <div class="insight-item">
-                            <div class="insight-icon">
-                                <i class="fas fa-building"></i>
-                            </div>
-                            <div class="insight-content">
-                                <div class="insight-value"><?php echo $dividendStats['insights']['total_companies']; ?></div>
-                                <div class="insight-label">Paying Companies</div>
-                            </div>
-                        </div>
-                        
-                        <div class="insight-item">
-                            <div class="insight-icon">
-                                <i class="fas fa-calendar-check"></i>
-                            </div>
-                            <div class="insight-content">
-                                <div class="insight-value"><?php echo $dividendStats['insights']['total_payments']; ?></div>
-                                <div class="insight-label">Total Payments</div>
-                            </div>
-                        </div>
-                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

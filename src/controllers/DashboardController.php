@@ -221,71 +221,83 @@ class DashboardController {
         try {
             $db = Database::getConnection('portfolio');
             
-            // Get top 5 paying companies (by total dividends received)
+            // Debug: Check if there's any dividend data at all
+            $checkQuery = "SELECT COUNT(*) as total FROM psw_portfolio.log_dividends";
+            $totalCount = $db->query($checkQuery)->fetch(PDO::FETCH_ASSOC);
+            Logger::info('Total dividend records: ' . $totalCount['total']);
+            
+            // Get top 5 paying companies (by total dividends received) - removed date filter to get all data
             $topPayersQuery = "
                 SELECT 
                     ld.isin,
-                    ml.name as company_name,
+                    COALESCE(ml.name, 'Unknown Company') as company_name,
                     COUNT(*) as payment_count,
-                    SUM(ld.net_dividend_sek) as total_dividends,
-                    AVG(ld.net_dividend_sek) as avg_dividend
+                    SUM(COALESCE(ld.net_dividend_sek, 0)) as total_dividends,
+                    AVG(COALESCE(ld.net_dividend_sek, 0)) as avg_dividend
                 FROM psw_portfolio.log_dividends ld
                 LEFT JOIN psw_foundation.masterlist ml ON ld.isin COLLATE utf8mb4_unicode_ci = ml.isin COLLATE utf8mb4_unicode_ci
-                WHERE ld.payment_date >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
                 GROUP BY ld.isin, ml.name
+                HAVING total_dividends > 0
                 ORDER BY total_dividends DESC
                 LIMIT 5
             ";
             
             $topPayers = $db->query($topPayersQuery)->fetchAll(PDO::FETCH_ASSOC);
+            Logger::info('Top payers found: ' . count($topPayers));
             
-            // Get best dividend payment days (by day of week and amount)
+            // Get best dividend payment days (by day of week and amount) - removed date filter
             $bestDaysQuery = "
                 SELECT 
                     DAYNAME(ld.payment_date) as day_name,
                     DAYOFWEEK(ld.payment_date) as day_number,
                     COUNT(*) as payment_count,
-                    SUM(ld.net_dividend_sek) as total_amount,
-                    AVG(ld.net_dividend_sek) as avg_amount
+                    SUM(COALESCE(ld.net_dividend_sek, 0)) as total_amount,
+                    AVG(COALESCE(ld.net_dividend_sek, 0)) as avg_amount
                 FROM psw_portfolio.log_dividends ld
-                WHERE ld.payment_date >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
+                WHERE ld.payment_date IS NOT NULL
                 GROUP BY DAYNAME(ld.payment_date), DAYOFWEEK(ld.payment_date)
+                HAVING total_amount > 0
                 ORDER BY total_amount DESC
                 LIMIT 7
             ";
             
             $bestDays = $db->query($bestDaysQuery)->fetchAll(PDO::FETCH_ASSOC);
+            Logger::info('Best days found: ' . count($bestDays));
             
-            // Get monthly dividend trends for the chart (last 12 months)
+            // Get monthly dividend trends for the chart (last 24 months to ensure we get data)
             $monthlyTrendsQuery = "
                 SELECT 
                     DATE_FORMAT(ld.payment_date, '%Y-%m') as month,
                     DATE_FORMAT(ld.payment_date, '%M %Y') as month_name,
                     COUNT(*) as payment_count,
-                    SUM(ld.net_dividend_sek) as total_amount,
+                    SUM(COALESCE(ld.net_dividend_sek, 0)) as total_amount,
                     COUNT(DISTINCT ld.isin) as unique_companies
                 FROM psw_portfolio.log_dividends ld
-                WHERE ld.payment_date >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
+                WHERE ld.payment_date IS NOT NULL
                 GROUP BY DATE_FORMAT(ld.payment_date, '%Y-%m')
+                HAVING total_amount > 0
                 ORDER BY month ASC
+                LIMIT 24
             ";
             
             $monthlyTrends = $db->query($monthlyTrendsQuery)->fetchAll(PDO::FETCH_ASSOC);
+            Logger::info('Monthly trends found: ' . count($monthlyTrends));
             
-            // Get additional insights
+            // Get additional insights - all time data
             $insightsQuery = "
                 SELECT 
                     COUNT(*) as total_payments,
                     COUNT(DISTINCT ld.isin) as total_companies,
-                    SUM(ld.net_dividend_sek) as total_amount_year,
-                    AVG(ld.net_dividend_sek) as avg_payment,
-                    MAX(ld.net_dividend_sek) as largest_payment,
-                    MIN(ld.net_dividend_sek) as smallest_payment
+                    SUM(COALESCE(ld.net_dividend_sek, 0)) as total_amount_year,
+                    AVG(COALESCE(ld.net_dividend_sek, 0)) as avg_payment,
+                    MAX(COALESCE(ld.net_dividend_sek, 0)) as largest_payment,
+                    MIN(COALESCE(ld.net_dividend_sek, 0)) as smallest_payment
                 FROM psw_portfolio.log_dividends ld
-                WHERE ld.payment_date >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
+                WHERE ld.net_dividend_sek IS NOT NULL AND ld.net_dividend_sek > 0
             ";
             
             $insights = $db->query($insightsQuery)->fetch(PDO::FETCH_ASSOC);
+            Logger::info('Insights total payments: ' . ($insights['total_payments'] ?? 0));
             
             return [
                 'top_paying_companies' => $topPayers,
