@@ -53,6 +53,6 @@ try {
         $content .= '<div class="alert alert-error mt-3"><strong>Debug:</strong> ' . $e->getMessage() . '</div>';
     }
     
-    include __DIR__ . '/templates/layouts/base.php';
+    include __DIR__ . '/templates/layouts/base-redesign.php';
 }
 ?>
