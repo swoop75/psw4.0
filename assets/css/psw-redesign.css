@@ -291,14 +291,19 @@ body {
   opacity: 0;
 }
 
-/* Hide submenus when sidebar is collapsed */
-.psw-sidebar:not(:hover) .psw-nav-submenu {
-  max-height: 0 !important;
-  opacity: 0 !important;
-}
-
 .psw-nav-item.expanded .psw-nav-submenu {
   max-height: 300px;
+  opacity: 1;
+}
+
+/* Only hide submenu text when sidebar is collapsed, but keep expanded state */
+.psw-sidebar:not(:hover) .psw-nav-submenu {
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.psw-sidebar:hover .psw-nav-submenu {
+  opacity: 1;
 }
 
 .psw-nav-submenu-link {
