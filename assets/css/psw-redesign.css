@@ -345,6 +345,15 @@ body {
   margin-left: -15px;
 }
 
+/* Hide submenu text when sidebar is collapsed, show only icons */
+.psw-sidebar:not(:hover) .psw-nav-submenu-link {
+  font-size: 0;
+}
+
+.psw-sidebar:not(:hover) .psw-nav-submenu-link i {
+  font-size: var(--font-size-sm);
+}
+
 .psw-nav-submenu-link.active {
   color: var(--primary-accent);
   font-weight: 600;

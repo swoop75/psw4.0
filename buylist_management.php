@@ -195,13 +195,13 @@ ob_start();
                         <i class="fas fa-sync-alt psw-btn-icon"></i> Refresh
                     </button>
                 </div>
-                <div style="display: flex; flex-wrap: wrap; gap: var(--spacing-3); align-items: end;">
+                <div style="display: flex; flex-wrap: wrap; gap: var(--spacing-3); align-items: end; max-width: 100%; overflow-x: auto;">
                     <!-- General Search -->
                     <div style="min-width: 250px;">
                         <label style="display: block; font-size: var(--font-size-xs); font-weight: 500; color: var(--text-secondary); margin-bottom: var(--spacing-1);">Search</label>
                         <div style="position: relative; display: flex; align-items: center;">
                             <i class="fas fa-search" style="position: absolute; left: var(--spacing-3); color: var(--text-muted);"></i>
-                            <input type="text" id="searchInput" placeholder="Companies, notes..." value="<?= htmlspecialchars($filters['search']) ?>" class="psw-form-input" style="padding-left: var(--spacing-10); width: 250px;">
+                            <input type="text" id="searchInput" placeholder="Companies, notes..." value="<?= htmlspecialchars($filters['search'] ?? '') ?>" class="psw-form-input" style="padding-left: var(--spacing-10); width: 250px;">
                         </div>
                     </div>
                     
@@ -262,8 +262,8 @@ ob_start();
                     </div>
                     
                     <!-- Clear Filters Button -->
-                    <div>
-                        <button type="button" class="psw-btn psw-btn-secondary" onclick="clearBuylistFilters()" style="margin-top: 20px;">
+                    <div style="display: flex; align-items: end;">
+                        <button type="button" class="psw-btn psw-btn-secondary" onclick="clearBuylistFilters()" style="height: 38px;">
                             <i class="fas fa-times" style="margin-right: var(--spacing-2);"></i> Clear
                         </button>
                     </div>
