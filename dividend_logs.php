@@ -435,6 +435,12 @@ $pageTitle = 'Dividend Logs - PSW 4.0';
                     <div class="header-left">
                         <h1><i class="fas fa-chart-bar"></i> Dividend Logs</h1>
                     </div>
+                    <div class="header-right">
+                        <a href="<?php echo BASE_URL; ?>/dividend_import.php" class="btn btn-primary">
+                            <i class="fas fa-upload"></i>
+                            Import Dividends
+                        </a>
+                    </div>
                 </div>
             </div>
 
