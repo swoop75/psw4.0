@@ -25,7 +25,7 @@ function initializeEventListeners() {
         searchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                applyFilters();
+                applyBuylistFilters();
             }
         });
     }
@@ -84,14 +84,21 @@ function initializeSearch() {
  */
 function debounceSearch() {
     clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(applyFilters, 500);
+    searchTimeout = setTimeout(applyBuylistFilters, 500);
 }
 
 /**
  * Apply filters and search
  */
-function applyFilters() {
+/**
+ * Apply buylist filters (new PSW design)
+ */
+function applyBuylistFilters() {
     const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const countryFilter = document.getElementById('countryFilter');
+    const strategyFilter = document.getElementById('strategyFilter');
+    const brokerFilter = document.getElementById('brokerFilter');
     
     const params = new URLSearchParams();
     
@@ -99,25 +106,20 @@ function applyFilters() {
         params.set('search', searchInput.value.trim());
     }
     
-    // Handle all checkbox dropdown filters
-    const statusValues = getDropdownValues('status');
-    if (statusValues.length > 0) {
-        params.set('status_id', statusValues.join(','));
+    if (statusFilter && statusFilter.value) {
+        params.set('status_id', statusFilter.value);
     }
     
-    const countryValues = getDropdownValues('country');
-    if (countryValues.length > 0) {
-        params.set('country', countryValues.join(','));
+    if (countryFilter && countryFilter.value) {
+        params.set('country', countryFilter.value);
     }
     
-    const strategyValues = getDropdownValues('strategy');
-    if (strategyValues.length > 0) {
-        params.set('strategy_group_id', strategyValues.join(','));
+    if (strategyFilter && strategyFilter.value) {
+        params.set('strategy_group_id', strategyFilter.value);
     }
     
-    const brokerValues = getDropdownValues('broker');
-    if (brokerValues.length > 0) {
-        params.set('broker_id', brokerValues.join(','));
+    if (brokerFilter && brokerFilter.value) {
+        params.set('broker_id', brokerFilter.value);
     }
     
     // Reset to page 1 when filtering
@@ -125,6 +127,18 @@ function applyFilters() {
     
     const url = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
     window.location.href = url;
+}
+
+/**
+ * Clear all buylist filters
+ */
+function clearBuylistFilters() {
+    window.location.href = window.location.pathname;
+}
+
+// Legacy function for backward compatibility
+function applyFilters() {
+    applyBuylistFilters();
 }
 
 /**

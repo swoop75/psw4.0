@@ -196,123 +196,77 @@ ob_start();
                         <i class="fas fa-sync-alt psw-btn-icon"></i> Refresh
                     </button>
                 </div>
-                <div style="display: flex; gap: var(--spacing-3); align-items: center;">
-                    <div style="position: relative; display: flex; align-items: center;">
-                        <i class="fas fa-search" style="position: absolute; left: var(--spacing-3); color: var(--text-muted);"></i>
-                        <input type="text" id="searchInput" placeholder="Search companies, notes..." value="<?= htmlspecialchars($filters['search']) ?>" class="psw-form-input" style="padding-left: var(--spacing-10); min-width: 300px;">
-                    </div>
-                    <div class="checkbox-dropdown" data-filter="status">
-                        <button type="button" class="dropdown-button" id="statusFilter">
-                            <span class="dropdown-text">All Statuses</span>
-                            <i class="fas fa-chevron-down arrow"></i>
-                        </button>
-                        <div class="dropdown-content">
-                            <?php 
-                            $selectedStatusIds = !empty($filters['new_companies_status_id']) ? explode(',', $filters['new_companies_status_id']) : [];
-                            
-                            // Add null option first - check if it's in selected values or admin defaults
-                            $isNullSelected = in_array('null', $selectedStatusIds);
-                            ?>
-                                <div class="dropdown-option">
-                                    <input type="checkbox" id="status_null" value="null" <?= $isNullSelected ? 'checked' : '' ?>>
-                                    <label for="status_null">not bought</label>
-                                </div>
-                            <?php
-                            
-                            foreach ($filterOptions['statuses'] ?? [] as $status): 
-                                $isChecked = in_array($status['id'], $selectedStatusIds);
-                            ?>
-                                <div class="dropdown-option">
-                                    <input type="checkbox" id="status_<?= $status['id'] ?>" value="<?= $status['id'] ?>" 
-                                           <?= $isChecked ? 'checked' : '' ?>>
-                                    <label for="status_<?= $status['id'] ?>"><?= htmlspecialchars($status['status']) ?></label>
-                                </div>
-                            <?php endforeach; ?>
+                <div style="display: flex; flex-wrap: wrap; gap: var(--spacing-3); align-items: end;">
+                    <!-- General Search -->
+                    <div style="min-width: 250px;">
+                        <label style="display: block; font-size: var(--font-size-xs); font-weight: 500; color: var(--text-secondary); margin-bottom: var(--spacing-1);">Search</label>
+                        <div style="position: relative; display: flex; align-items: center;">
+                            <i class="fas fa-search" style="position: absolute; left: var(--spacing-3); color: var(--text-muted);"></i>
+                            <input type="text" id="searchInput" placeholder="Companies, notes..." value="<?= htmlspecialchars($filters['search']) ?>" class="psw-form-input" style="padding-left: var(--spacing-10); width: 250px;">
                         </div>
                     </div>
-                    <div class="checkbox-dropdown" data-filter="country">
-                        <button type="button" class="dropdown-button" id="countryFilter">
-                            <span class="dropdown-text">All Countries</span>
-                            <i class="fas fa-chevron-down arrow"></i>
-                        </button>
-                        <div class="dropdown-content">
-                            <?php 
-                            $selectedCountries = !empty($filters['country_name']) ? explode(',', $filters['country_name']) : [];
-                            
-                            // Add null option first - check if it's in admin defaults
-                            $isNullSelected = in_array('null', $selectedCountries);
-                            ?>
-                                <div class="dropdown-option">
-                                    <input type="checkbox" id="country_null" value="null" <?= $isNullSelected ? 'checked' : '' ?>>
-                                    <label for="country_null">No Country (NULL)</label>
-                                </div>
-                            <?php
-                            
-                            foreach ($filterOptions['countries'] ?? [] as $country): 
-                            ?>
-                                <div class="dropdown-option">
-                                    <input type="checkbox" id="country_<?= htmlspecialchars($country) ?>" value="<?= htmlspecialchars($country) ?>" 
-                                           <?= in_array($country, $selectedCountries) ? 'checked' : '' ?>>
-                                    <label for="country_<?= htmlspecialchars($country) ?>"><?= htmlspecialchars($country) ?></label>
-                                </div>
+                    
+                    <!-- Status Filter -->
+                    <div style="min-width: 140px;">
+                        <label style="display: block; font-size: var(--font-size-xs); font-weight: 500; color: var(--text-secondary); margin-bottom: var(--spacing-1);">Status</label>
+                        <select id="statusFilter" class="psw-form-input" style="width: 140px;" onchange="applyBuylistFilters()">
+                            <option value="">All Statuses</option>
+                            <option value="null" <?= (isset($filters['new_companies_status_id']) && $filters['new_companies_status_id'] === 'null') ? 'selected' : '' ?>>Not Bought</option>
+                            <?php foreach ($filterOptions['statuses'] ?? [] as $status): ?>
+                                <option value="<?= $status['id'] ?>" <?= (isset($filters['new_companies_status_id']) && $filters['new_companies_status_id'] == $status['id']) ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($status['status']) ?>
+                                </option>
                             <?php endforeach; ?>
-                        </div>
+                        </select>
                     </div>
-                    <div class="checkbox-dropdown" data-filter="strategy">
-                        <button type="button" class="dropdown-button" id="strategyFilter">
-                            <span class="dropdown-text">All Strategy Groups</span>
-                            <i class="fas fa-chevron-down arrow"></i>
-                        </button>
-                        <div class="dropdown-content">
-                            <?php 
-                            $selectedStrategyIds = !empty($filters['strategy_group_id']) ? explode(',', $filters['strategy_group_id']) : [];
-                            
-                            // Add null option first - check if it's in admin defaults  
-                            $isNullSelected = in_array('null', $selectedStrategyIds);
-                            ?>
-                                <div class="dropdown-option">
-                                    <input type="checkbox" id="strategy_null" value="null" <?= $isNullSelected ? 'checked' : '' ?>>
-                                    <label for="strategy_null">No Strategy Group (NULL)</label>
-                                </div>
-                            <?php
-                            
-                            foreach ($filterOptions['strategies'] ?? [] as $strategy): 
-                            ?>
-                                <div class="dropdown-option">
-                                    <input type="checkbox" id="strategy_<?= $strategy['strategy_group_id'] ?>" value="<?= $strategy['strategy_group_id'] ?>" 
-                                           <?= in_array($strategy['strategy_group_id'], $selectedStrategyIds) ? 'checked' : '' ?>>
-                                    <label for="strategy_<?= $strategy['strategy_group_id'] ?>">Group <?= $strategy['strategy_group_id'] ?>: <?= htmlspecialchars($strategy['strategy_name']) ?></label>
-                                </div>
+                    
+                    <!-- Country Filter -->
+                    <div style="min-width: 130px;">
+                        <label style="display: block; font-size: var(--font-size-xs); font-weight: 500; color: var(--text-secondary); margin-bottom: var(--spacing-1);">Country</label>
+                        <select id="countryFilter" class="psw-form-input" style="width: 130px;" onchange="applyBuylistFilters()">
+                            <option value="">All Countries</option>
+                            <option value="null" <?= (isset($filters['country_name']) && $filters['country_name'] === 'null') ? 'selected' : '' ?>>No Country</option>
+                            <?php foreach ($filterOptions['countries'] ?? [] as $country): ?>
+                                <option value="<?= htmlspecialchars($country) ?>" <?= (isset($filters['country_name']) && $filters['country_name'] === $country) ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($country) ?>
+                                </option>
                             <?php endforeach; ?>
-                        </div>
+                        </select>
                     </div>
-                    <div class="checkbox-dropdown" data-filter="broker">
-                        <button type="button" class="dropdown-button" id="brokerFilter">
-                            <span class="dropdown-text">All Brokers</span>
-                            <i class="fas fa-chevron-down arrow"></i>
-                        </button>
-                        <div class="dropdown-content">
-                            <?php 
-                            $selectedBrokerIds = !empty($filters['broker_id']) ? explode(',', $filters['broker_id']) : [];
-                            
-                            // Add null option first - check if it's in admin defaults
-                            $isNullSelected = in_array('null', $selectedBrokerIds);
-                            ?>
-                                <div class="dropdown-option">
-                                    <input type="checkbox" id="broker_null" value="null" <?= $isNullSelected ? 'checked' : '' ?>>
-                                    <label for="broker_null">No Broker (NULL)</label>
-                                </div>
-                            <?php
-                            
-                            foreach ($filterOptions['brokers'] ?? [] as $broker): 
-                            ?>
-                                <div class="dropdown-option">
-                                    <input type="checkbox" id="broker_<?= $broker['broker_id'] ?>" value="<?= $broker['broker_id'] ?>" 
-                                           <?= in_array($broker['broker_id'], $selectedBrokerIds) ? 'checked' : '' ?>>
-                                    <label for="broker_<?= $broker['broker_id'] ?>"><?= htmlspecialchars($broker['broker_name']) ?></label>
-                                </div>
+                    
+                    <!-- Strategy Filter -->
+                    <div style="min-width: 150px;">
+                        <label style="display: block; font-size: var(--font-size-xs); font-weight: 500; color: var(--text-secondary); margin-bottom: var(--spacing-1);">Strategy</label>
+                        <select id="strategyFilter" class="psw-form-input" style="width: 150px;" onchange="applyBuylistFilters()">
+                            <option value="">All Strategies</option>
+                            <option value="null" <?= (isset($filters['strategy_group_id']) && $filters['strategy_group_id'] === 'null') ? 'selected' : '' ?>>No Strategy</option>
+                            <?php foreach ($filterOptions['strategies'] ?? [] as $strategy): ?>
+                                <option value="<?= $strategy['strategy_group_id'] ?>" <?= (isset($filters['strategy_group_id']) && $filters['strategy_group_id'] == $strategy['strategy_group_id']) ? 'selected' : '' ?>>
+                                    Group <?= $strategy['strategy_group_id'] ?>: <?= htmlspecialchars($strategy['strategy_name']) ?>
+                                </option>
                             <?php endforeach; ?>
-                        </div>
+                        </select>
+                    </div>
+                    
+                    <!-- Broker Filter -->
+                    <div style="min-width: 140px;">
+                        <label style="display: block; font-size: var(--font-size-xs); font-weight: 500; color: var(--text-secondary); margin-bottom: var(--spacing-1);">Broker</label>
+                        <select id="brokerFilter" class="psw-form-input" style="width: 140px;" onchange="applyBuylistFilters()">
+                            <option value="">All Brokers</option>
+                            <option value="null" <?= (isset($filters['broker_id']) && $filters['broker_id'] === 'null') ? 'selected' : '' ?>>No Broker</option>
+                            <?php foreach ($filterOptions['brokers'] ?? [] as $broker): ?>
+                                <option value="<?= $broker['broker_id'] ?>" <?= (isset($filters['broker_id']) && $filters['broker_id'] == $broker['broker_id']) ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($broker['broker_name']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    
+                    <!-- Clear Filters Button -->
+                    <div>
+                        <button type="button" class="psw-btn psw-btn-secondary" onclick="clearBuylistFilters()" style="margin-top: 20px;">
+                            <i class="fas fa-times" style="margin-right: var(--spacing-2);"></i> Clear
+                        </button>
                     </div>
                 </div>
             </div>

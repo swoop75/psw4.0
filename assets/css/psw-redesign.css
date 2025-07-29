@@ -337,6 +337,12 @@ body {
   margin-right: var(--spacing-3);
   width: 16px;
   text-align: center;
+  transition: margin-left var(--transition-base);
+}
+
+/* Move submenu icons 5px to the left when sidebar is collapsed */
+.psw-sidebar:not(:hover) .psw-nav-submenu-link i {
+  margin-left: -5px;
 }
 
 .psw-nav-submenu-link.active {
