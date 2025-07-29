@@ -367,10 +367,16 @@ body {
   transform: translateY(-50%);
   transition: transform var(--transition-fast), opacity var(--transition-fast);
   opacity: 0;
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
 }
 
 .psw-sidebar:hover .psw-nav-expand {
   opacity: 1;
+}
+
+.psw-nav-link:hover .psw-nav-expand {
+  color: var(--primary-accent);
 }
 
 .psw-nav-item.expanded .psw-nav-expand {
@@ -447,6 +453,17 @@ body {
   font-weight: 500;
   color: var(--text-primary);
   margin-right: var(--spacing-2);
+}
+
+/* Dropdown arrow styling for better visibility */
+.psw-user-button .fa-chevron-down {
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+  transition: all var(--transition-fast);
+}
+
+.psw-user-button:hover .fa-chevron-down {
+  color: var(--primary-accent);
 }
 
 .psw-user-dropdown {
@@ -667,6 +684,48 @@ body {
   outline: none;
   border-color: var(--border-focus);
   box-shadow: 0 0 0 3px var(--primary-accent-light);
+}
+
+/* Select dropdown arrow styling */
+.psw-form-input[type="select"],
+select.psw-form-input {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%2364748b' d='M4.5 6.5L8 10l3.5-3.5H4.5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--spacing-3) center;
+  background-size: 12px;
+  padding-right: var(--spacing-8);
+  appearance: none;
+  color: var(--text-muted);
+}
+
+/* Placeholder text styling */
+.psw-form-input::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
+}
+
+.psw-form-input::-webkit-input-placeholder {
+  color: var(--text-muted);
+}
+
+.psw-form-input::-moz-placeholder {
+  color: var(--text-muted);
+  opacity: 1;
+}
+
+.psw-form-input:-ms-input-placeholder {
+  color: var(--text-muted);
+}
+
+/* Make dropdown option text grey */
+select.psw-form-input option {
+  color: var(--text-muted);
+}
+
+/* When focused or has value, make text normal color */
+select.psw-form-input:focus,
+select.psw-form-input:not([value=""]) {
+  color: var(--text-primary);
 }
 
 /* Alert Styles */

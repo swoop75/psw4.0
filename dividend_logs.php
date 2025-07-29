@@ -178,7 +178,7 @@ ob_start();
             <i class="fas fa-coins" style="color: var(--primary-accent); margin-right: 0.75rem;"></i>
             Dividend Logs
         </h1>
-        <p style="color: var(--text-secondary); font-size: 1.125rem;">Track and analyze dividend payments across your portfolio</p>
+        <p style="color: var(--text-secondary); font-size: 1.125rem;">Track and analyze dividend payments across the portfolio</p>
     </div>
 
     <!-- Statistics Cards -->
