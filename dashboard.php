@@ -1,8 +1,8 @@
 <?php
 /**
- * File: public/dashboard.php
- * Path: C:\Users\laoan\Documents\GitHub\psw\psw4.0\public\dashboard.php
- * Description: Main dashboard page for PSW 4.0 - displays portfolio overview and key metrics
+ * File: dashboard-redesign.php
+ * Path: C:\Users\laoan\Documents\GitHub\psw\psw4.0\dashboard-redesign.php
+ * Description: Redesigned main dashboard page for PSW 4.0 using new design system
  */
 
 // Start session and include required files
@@ -29,36 +29,43 @@ try {
     // Set page variables
     $pageTitle = 'Dashboard - ' . APP_NAME;
     $pageDescription = 'Portfolio overview and key metrics';
-    $additionalCSS = [ASSETS_URL . '/css/improved-dashboard.css?v=' . time()];
-    $additionalJS = [ASSETS_URL . '/js/dashboard.js'];
+    $additionalCSS = [ASSETS_URL . '/js/dashboard.js'];
+    $additionalJS = [ASSETS_URL . '/js/dashboard.js']; // For chart functionality
     
     // Prepare content
     ob_start();
-    include __DIR__ . '/templates/pages/dashboard.php';
+    include __DIR__ . '/templates/pages/dashboard-redesign.php';
     $content = ob_get_clean();
     
-    // Include base layout
-    include __DIR__ . '/templates/layouts/base.php';
+    // Include redesigned base layout
+    include __DIR__ . '/templates/layouts/base-redesign.php';
     
     // Log dashboard access
-    Logger::logUserAction('dashboard_viewed', 'User accessed dashboard');
+    Logger::logUserAction('dashboard_viewed', 'User accessed redesigned dashboard');
     
 } catch (Exception $e) {
     Logger::error('Dashboard error: ' . $e->getMessage());
     
     $pageTitle = 'Dashboard Error - ' . APP_NAME;
     $content = '
-        <div class="error-container text-center">
-            <h1>Dashboard Error</h1>
-            <p>We apologize, but there was an error loading your dashboard.</p>
-            <p class="text-muted">Please try refreshing the page or contact support if the problem persists.</p>
+        <div class="psw-card">
+            <div class="psw-card-content" style="text-align: center; padding: var(--spacing-8);">
+                <i class="fas fa-exclamation-triangle" style="font-size: var(--font-size-4xl); color: var(--error-color); margin-bottom: var(--spacing-4);"></i>
+                <h1 style="color: var(--text-primary); margin-bottom: var(--spacing-4);">Dashboard Error</h1>
+                <p style="color: var(--text-secondary); margin-bottom: var(--spacing-2);">We apologize, but there was an error loading your dashboard.</p>
+                <p style="color: var(--text-muted);">Please try refreshing the page or contact support if the problem persists.</p>
+            </div>
         </div>
     ';
     
     if (APP_DEBUG) {
-        $content .= '<div class="alert alert-error mt-3"><strong>Debug:</strong> ' . $e->getMessage() . '</div>';
+        $content .= '
+            <div class="psw-alert psw-alert-error psw-mb-4">
+                <strong>Debug:</strong> ' . htmlspecialchars($e->getMessage()) . '
+            </div>
+        ';
     }
     
-    include __DIR__ . '/templates/layouts/base.php';
+    include __DIR__ . '/templates/layouts/base-redesign.php';
 }
 ?>
