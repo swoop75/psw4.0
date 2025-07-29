@@ -249,9 +249,7 @@ try {
 // Initialize variables for template
 $pageTitle = 'User Management - PSW 4.0';
 $pageDescription = 'User account management and preferences';
-$additionalCSS = [
-    BASE_URL . '/assets/css/improved-user-management.css?v=' . time()
-];
+$additionalCSS = [];
 $additionalJS = [
     BASE_URL . '/assets/js/user-management.js?v=' . time()
 ];
@@ -306,67 +304,83 @@ ob_start();
         <!-- Individual User Page Content -->
         
         <!-- Tab Navigation for Individual User -->
-        <div class="tabs-container">
-            <div class="tab-nav">
-                <button class="tab-button <?php echo $activeTab === 'profile' ? 'active' : ''; ?>" onclick="showUserTab('profile')">
-                    <i class="fas fa-user"></i> Profile Information
-                </button>
-                <button class="tab-button <?php echo $activeTab === 'security' ? 'active' : ''; ?>" onclick="showUserTab('security')">
-                    <i class="fas fa-shield-alt"></i> Security Settings
-                </button>
-                <button class="tab-button <?php echo $activeTab === 'preferences' ? 'active' : ''; ?>" onclick="showUserTab('preferences')">
-                    <i class="fas fa-cog"></i> Preferences
-                </button>
-                <button class="tab-button <?php echo $activeTab === 'activity' ? 'active' : ''; ?>" onclick="showUserTab('activity')">
-                    <i class="fas fa-history"></i> Activity Log
-                </button>
+        <div class="psw-card psw-mb-6">
+            <div class="psw-card-content">
+                <div style="display: flex; gap: var(--spacing-3); flex-wrap: wrap;">
+                    <button class="psw-btn <?php echo $activeTab === 'profile' ? 'psw-btn-primary' : 'psw-btn-secondary'; ?>" onclick="showUserTab('profile')">
+                        <i class="fas fa-user psw-btn-icon"></i> Profile Information
+                    </button>
+                    <button class="psw-btn <?php echo $activeTab === 'security' ? 'psw-btn-primary' : 'psw-btn-secondary'; ?>" onclick="showUserTab('security')">
+                        <i class="fas fa-shield-alt psw-btn-icon"></i> Security Settings
+                    </button>
+                    <button class="psw-btn <?php echo $activeTab === 'preferences' ? 'psw-btn-primary' : 'psw-btn-secondary'; ?>" onclick="showUserTab('preferences')">
+                        <i class="fas fa-cog psw-btn-icon"></i> Preferences
+                    </button>
+                    <button class="psw-btn <?php echo $activeTab === 'activity' ? 'psw-btn-primary' : 'psw-btn-secondary'; ?>" onclick="showUserTab('activity')">
+                        <i class="fas fa-history psw-btn-icon"></i> Activity Log
+                    </button>
+                </div>
             </div>
+        </div>
             
     <?php else: ?>
         <!-- Admin Overview Content -->
         
         <?php if ($view === 'users'): ?>
-            <!-- Statistics for All Users page -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-users"></i></div>
-                    <div class="stat-content">
-                        <div class="stat-number"><?php echo number_format($adminStats['total_users'] ?? count($allUsers)); ?></div>
-                        <div class="stat-label">Total Users</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-chart-bar"></i></div>
-                    <div class="stat-content">
-                        <div class="stat-number"><?php echo htmlspecialchars($adminStats['most_popular_page'] ?? 'N/A'); ?></div>
-                        <div class="stat-label">Most Popular Page</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-user-check"></i></div>
-                    <div class="stat-content">
-                        <div class="stat-number"><?php echo number_format($adminStats['active_users'] ?? 0); ?></div>
-                        <div class="stat-label">Active Users</div>
+            <!-- Statistics Cards -->
+            <div class="psw-card psw-mb-6">
+                <div class="psw-card-content">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--spacing-4);">
+                        <div style="display: flex; align-items: center; padding: var(--spacing-4); background: var(--bg-secondary); border-radius: var(--radius-lg);">
+                            <div style="display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: var(--primary-accent); border-radius: var(--radius-lg); color: var(--text-inverse); margin-right: var(--spacing-4);">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div>
+                                <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--text-primary);"><?php echo number_format($adminStats['total_users'] ?? count($allUsers)); ?></div>
+                                <div style="font-size: var(--font-size-sm); color: var(--text-secondary);">Total Users</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; padding: var(--spacing-4); background: var(--bg-secondary); border-radius: var(--radius-lg);">
+                            <div style="display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: var(--info-color); border-radius: var(--radius-lg); color: var(--text-inverse); margin-right: var(--spacing-4);">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <div>
+                                <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--text-primary);"><?php echo htmlspecialchars($adminStats['most_popular_page'] ?? 'N/A'); ?></div>
+                                <div style="font-size: var(--font-size-sm); color: var(--text-secondary);">Most Popular Page</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; padding: var(--spacing-4); background: var(--bg-secondary); border-radius: var(--radius-lg);">
+                            <div style="display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: var(--success-color); border-radius: var(--radius-lg); color: var(--text-inverse); margin-right: var(--spacing-4);">
+                                <i class="fas fa-user-check"></i>
+                            </div>
+                            <div>
+                                <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--text-primary);"><?php echo number_format($adminStats['active_users'] ?? 0); ?></div>
+                                <div style="font-size: var(--font-size-sm); color: var(--text-secondary);">Active Users</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         <?php endif; ?>
 
         <!-- Main Menu Navigation -->
-        <div class="tabs-container">
-            <div class="tab-nav">
-                <button class="tab-button <?php echo $view === 'users' ? 'active' : ''; ?>" onclick="showView('users')">
-                    <i class="fas fa-users"></i> All Users
-                </button>
-                <?php if ($isAdmin): ?>
-                    <button class="tab-button <?php echo $view === 'activity' ? 'active' : ''; ?>" onclick="showView('activity')">
-                        <i class="fas fa-history"></i> Activity Log
+        <div class="psw-card psw-mb-6">
+            <div class="psw-card-content">
+                <div style="display: flex; gap: var(--spacing-3); flex-wrap: wrap;">
+                    <button class="psw-btn <?php echo $view === 'users' ? 'psw-btn-primary' : 'psw-btn-secondary'; ?>" onclick="showView('users')">
+                        <i class="fas fa-users psw-btn-icon"></i> All Users
                     </button>
-                    <button class="tab-button <?php echo $view === 'statistics' ? 'active' : ''; ?>" onclick="showView('statistics')">
-                        <i class="fas fa-chart-line"></i> Statistics
-                    </button>
-                <?php endif; ?>
+                    <?php if ($isAdmin): ?>
+                        <button class="psw-btn <?php echo $view === 'activity' ? 'psw-btn-primary' : 'psw-btn-secondary'; ?>" onclick="showView('activity')">
+                            <i class="fas fa-history psw-btn-icon"></i> Activity Log
+                        </button>
+                        <button class="psw-btn <?php echo $view === 'statistics' ? 'psw-btn-primary' : 'psw-btn-secondary'; ?>" onclick="showView('statistics')">
+                            <i class="fas fa-chart-line psw-btn-icon"></i> Statistics
+                        </button>
+                    <?php endif; ?>
+                </div>
             </div>
+        </div>
             
     <?php endif; ?>
 
@@ -376,39 +390,45 @@ ob_start();
 
             <!-- Profile Information Tab -->
         <div id="profile-tab" class="tab-content <?php echo $activeTab === 'profile' ? 'active' : ''; ?>">
-            <div class="form-section">
-                <h2>Profile Information</h2>
-                <form method="POST" class="profile-form">
+            <div class="psw-card">
+                <div class="psw-card-header">
+                    <h2 class="psw-card-title">
+                        <i class="fas fa-user psw-card-title-icon"></i>
+                        Profile Information
+                    </h2>
+                </div>
+                <div class="psw-card-content">
+                    <form method="POST">
                     <input type="hidden" name="csrf_token" value="<?php echo Security::generateCsrfToken(); ?>">
                     <input type="hidden" name="action" value="update_profile">
 
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="username">Username</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-4);">
+                        <div class="psw-form-group">
+                            <label class="psw-form-label" for="username">Username</label>
                             <input type="text" id="username" value="<?php echo htmlspecialchars($user['username'] ?? ''); ?>" 
-                                   class="form-control" readonly>
-                            <small class="form-help">Username cannot be changed</small>
+                                   class="psw-form-input" readonly>
+                            <small style="font-size: var(--font-size-xs); color: var(--text-muted); margin-top: var(--spacing-1); display: block;">Username cannot be changed</small>
                         </div>
 
-                        <div class="form-group">
-                            <label for="email">Email Address</label>
+                        <div class="psw-form-group">
+                            <label class="psw-form-label" for="email">Email Address</label>
                             <input type="email" id="email" name="email" 
                                    value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" 
-                                   class="form-control" required>
+                                   class="psw-form-input" required>
                         </div>
 
-                        <div class="form-group">
-                            <label for="full_name">Full Name</label>
+                        <div class="psw-form-group">
+                            <label class="psw-form-label" for="full_name">Full Name</label>
                             <input type="text" id="full_name" name="full_name" 
                                    value="<?php echo htmlspecialchars($user['full_name'] ?? ''); ?>" 
-                                   class="form-control" maxlength="100">
+                                   class="psw-form-input" maxlength="100">
                         </div>
 
-                        <div class="form-group">
-                            <label for="role">Account Role</label>
+                        <div class="psw-form-group">
+                            <label class="psw-form-label" for="role">Account Role</label>
                             <input type="text" id="role" value="<?php echo htmlspecialchars($user['role_name'] ?? 'User'); ?>" 
-                                   class="form-control" readonly>
-                            <small class="form-help">Role is managed by administrators</small>
+                                   class="psw-form-input" readonly>
+                            <small style="font-size: var(--font-size-xs); color: var(--text-muted); margin-top: var(--spacing-1); display: block;">Role is managed by administrators</small>
                         </div>
                     </div>
 
@@ -437,12 +457,13 @@ ob_start();
                         </div>
                     </div>
 
-                    <div class="form-actions">
+                    <div style="padding-top: var(--spacing-4); border-top: 1px solid var(--border-primary); margin-top: var(--spacing-6);">
                         <button type="submit" class="psw-btn psw-btn-primary">
                             <i class="fas fa-save psw-btn-icon"></i> Update Profile
                         </button>
                     </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
 
@@ -676,8 +697,8 @@ ob_start();
                         </button>
                     </div>
                     
-                    <div class="users-table-container">
-                        <table class="users-table">
+                    <div style="overflow-x: auto;">
+                        <table class="psw-table">
                             <thead>
                                 <tr>
                                     <th>User</th>
