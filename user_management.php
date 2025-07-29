@@ -445,14 +445,14 @@ ob_start();
                                 </label>
                                 <small class="form-help">Receive email notifications for important updates</small>
                             </div>
-                            <div class="form-group checkbox-group">
-                                <label class="checkbox-label">
+                            <div class="psw-form-group">
+                                <label style="display: flex; align-items: center; cursor: pointer;">
                                     <input type="checkbox" name="notifications_security" value="1" 
-                                           <?php echo ($preferences['notifications_security'] ?? false) ? 'checked' : ''; ?>>
-                                    <span class="checkmark"></span>
-                                    Security Alerts
+                                           <?php echo ($preferences['notifications_security'] ?? false) ? 'checked' : ''; ?>
+                                           style="width: 16px; height: 16px; margin-right: var(--spacing-2);">
+                                    <span style="font-size: var(--font-size-base); color: var(--text-primary);">Security Alerts</span>
                                 </label>
-                                <small class="form-help">Get notified about login attempts and security events</small>
+                                <small style="font-size: var(--font-size-xs); color: var(--text-muted); margin-top: var(--spacing-1); display: block; margin-left: 24px;">Get notified about login attempts and security events</small>
                             </div>
                         </div>
                     </div>
@@ -469,8 +469,14 @@ ob_start();
 
         <!-- Security Settings Tab -->
         <div id="security-tab" class="tab-content <?php echo $activeTab === 'security' ? 'active' : ''; ?>">
-            <div class="form-section">
-                <h2>Change Password</h2>
+            <div class="psw-card">
+                <div class="psw-card-header">
+                    <h2 class="psw-card-title">
+                        <i class="fas fa-shield-alt psw-card-title-icon"></i>
+                        Change Password
+                    </h2>
+                </div>
+                <div class="psw-card-content">
                 <?php if ($editUserId && $editUserId != Auth::getUserId()): ?>
                     <!-- Admin viewing another user - simplified password change -->
                     <div class="admin-password-change">
@@ -492,25 +498,25 @@ ob_start();
                         <input type="hidden" name="csrf_token" value="<?php echo Security::generateCsrfToken(); ?>">
                         <input type="hidden" name="action" value="change_password">
 
-                        <div class="form-group">
-                            <label for="current_password">Current Password</label>
+                        <div class="psw-form-group">
+                            <label class="psw-form-label" for="current_password">Current Password</label>
                             <input type="password" id="current_password" name="current_password" 
-                                   class="form-control" required>
+                                   class="psw-form-input" required>
                         </div>
 
-                    <div class="form-group">
-                        <label for="new_password">New Password</label>
+                    <div class="psw-form-group">
+                        <label class="psw-form-label" for="new_password">New Password</label>
                         <input type="password" id="new_password" name="new_password" 
-                               class="form-control" required minlength="8">
-                        <small class="form-help">
+                               class="psw-form-input" required minlength="8">
+                        <small style="font-size: var(--font-size-xs); color: var(--text-muted); margin-top: var(--spacing-1); display: block;">
                             Password must be at least 8 characters with uppercase, lowercase, and numbers
                         </small>
                     </div>
 
-                    <div class="form-group">
-                        <label for="confirm_password">Confirm New Password</label>
+                    <div class="psw-form-group">
+                        <label class="psw-form-label" for="confirm_password">Confirm New Password</label>
                         <input type="password" id="confirm_password" name="confirm_password" 
-                               class="form-control" required>
+                               class="psw-form-input" required>
                     </div>
 
                         <div class="form-actions">
@@ -557,51 +563,57 @@ ob_start();
 
         <!-- Preferences Tab -->
         <div id="preferences-tab" class="tab-content <?php echo $activeTab === 'preferences' ? 'active' : ''; ?>">
-            <div class="form-section">
-                <h2>Application Preferences</h2>
-                <form method="POST" class="preferences-form">
+            <div class="psw-card">
+                <div class="psw-card-header">
+                    <h2 class="psw-card-title">
+                        <i class="fas fa-cog psw-card-title-icon"></i>
+                        Application Preferences
+                    </h2>
+                </div>
+                <div class="psw-card-content">
+                    <form method="POST">
                     <input type="hidden" name="csrf_token" value="<?php echo Security::generateCsrfToken(); ?>">
                     <input type="hidden" name="action" value="update_preferences">
 
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="theme">Theme</label>
-                            <select id="theme" name="theme" class="form-control">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-4);">
+                        <div class="psw-form-group">
+                            <label class="psw-form-label" for="theme">Theme</label>
+                            <select id="theme" name="theme" class="psw-form-input">
                                 <option value="light" <?php echo ($preferences['theme'] ?? '') === 'light' ? 'selected' : ''; ?>>Light</option>
                                 <option value="dark" <?php echo ($preferences['theme'] ?? '') === 'dark' ? 'selected' : ''; ?>>Dark</option>
                                 <option value="auto" <?php echo ($preferences['theme'] ?? '') === 'auto' ? 'selected' : ''; ?>>Auto</option>
                             </select>
                         </div>
 
-                        <div class="form-group">
-                            <label for="language">Language</label>
-                            <select id="language" name="language" class="form-control">
+                        <div class="psw-form-group">
+                            <label class="psw-form-label" for="language">Language</label>
+                            <select id="language" name="language" class="psw-form-input">
                                 <option value="en" <?php echo ($preferences['language'] ?? '') === 'en' ? 'selected' : ''; ?>>English</option>
                                 <option value="sv" <?php echo ($preferences['language'] ?? '') === 'sv' ? 'selected' : ''; ?>>Svenska</option>
                             </select>
                         </div>
 
-                        <div class="form-group">
-                            <label for="currency_display">Default Currency Display</label>
-                            <select id="currency_display" name="currency_display" class="form-control">
+                        <div class="psw-form-group">
+                            <label class="psw-form-label" for="currency_display">Default Currency Display</label>
+                            <select id="currency_display" name="currency_display" class="psw-form-input">
                                 <option value="SEK" <?php echo ($preferences['currency_display'] ?? '') === 'SEK' ? 'selected' : ''; ?>>SEK</option>
                                 <option value="USD" <?php echo ($preferences['currency_display'] ?? '') === 'USD' ? 'selected' : ''; ?>>USD</option>
                                 <option value="EUR" <?php echo ($preferences['currency_display'] ?? '') === 'EUR' ? 'selected' : ''; ?>>EUR</option>
                             </select>
                         </div>
 
-                        <div class="form-group">
-                            <label for="date_format">Date Format</label>
-                            <select id="date_format" name="date_format" class="form-control">
+                        <div class="psw-form-group">
+                            <label class="psw-form-label" for="date_format">Date Format</label>
+                            <select id="date_format" name="date_format" class="psw-form-input">
                                 <option value="Y-m-d" <?php echo ($preferences['date_format'] ?? '') === 'Y-m-d' ? 'selected' : ''; ?>>2024-12-31</option>
                                 <option value="d/m/Y" <?php echo ($preferences['date_format'] ?? '') === 'd/m/Y' ? 'selected' : ''; ?>>31/12/2024</option>
                                 <option value="m/d/Y" <?php echo ($preferences['date_format'] ?? '') === 'm/d/Y' ? 'selected' : ''; ?>>12/31/2024</option>
                             </select>
                         </div>
 
-                        <div class="form-group">
-                            <label for="decimal_places">Decimal Places</label>
-                            <select id="decimal_places" name="decimal_places" class="form-control">
+                        <div class="psw-form-group">
+                            <label class="psw-form-label" for="decimal_places">Decimal Places</label>
+                            <select id="decimal_places" name="decimal_places" class="psw-form-input">
                                 <option value="0" <?php echo ($preferences['decimal_places'] ?? '') === 0 ? 'selected' : ''; ?>>0</option>
                                 <option value="1" <?php echo ($preferences['decimal_places'] ?? '') === 1 ? 'selected' : ''; ?>>1</option>
                                 <option value="2" <?php echo ($preferences['decimal_places'] ?? '') === 2 ? 'selected' : ''; ?>>2</option>
@@ -610,9 +622,9 @@ ob_start();
                             </select>
                         </div>
 
-                        <div class="form-group">
-                            <label for="table_page_size">Table Page Size</label>
-                            <select id="table_page_size" name="table_page_size" class="form-control">
+                        <div class="psw-form-group">
+                            <label class="psw-form-label" for="table_page_size">Table Page Size</label>
+                            <select id="table_page_size" name="table_page_size" class="psw-form-input">
                                 <option value="25" <?php echo ($preferences['table_page_size'] ?? '') === 25 ? 'selected' : ''; ?>>25</option>
                                 <option value="50" <?php echo ($preferences['table_page_size'] ?? '') === 50 ? 'selected' : ''; ?>>50</option>
                                 <option value="100" <?php echo ($preferences['table_page_size'] ?? '') === 100 ? 'selected' : ''; ?>>100</option>
@@ -620,9 +632,9 @@ ob_start();
                             </select>
                         </div>
 
-                        <div class="form-group">
-                            <label for="dashboard_refresh">Dashboard Refresh</label>
-                            <select id="dashboard_refresh" name="dashboard_refresh" class="form-control">
+                        <div class="psw-form-group">
+                            <label class="psw-form-label" for="dashboard_refresh">Dashboard Refresh</label>
+                            <select id="dashboard_refresh" name="dashboard_refresh" class="psw-form-input">
                                 <option value="30" <?php echo ($preferences['dashboard_refresh'] ?? '') === 30 ? 'selected' : ''; ?>>30 seconds</option>
                                 <option value="60" <?php echo ($preferences['dashboard_refresh'] ?? '') === 60 ? 'selected' : ''; ?>>1 minute</option>
                                 <option value="300" <?php echo ($preferences['dashboard_refresh'] ?? '') === 300 ? 'selected' : ''; ?>>5 minutes</option>
@@ -631,14 +643,14 @@ ob_start();
                             </select>
                         </div>
 
-                        <div class="form-group checkbox-group">
-                            <label class="checkbox-label">
+                        <div class="psw-form-group" style="grid-column: span 2;">
+                            <label style="display: flex; align-items: center; cursor: pointer;">
                                 <input type="checkbox" name="notifications_email" value="1" 
-                                       <?php echo ($preferences['notifications_email'] ?? false) ? 'checked' : ''; ?>>
-                                <span class="checkmark"></span>
-                                Email Notifications
+                                       <?php echo ($preferences['notifications_email'] ?? false) ? 'checked' : ''; ?>
+                                       style="width: 16px; height: 16px; margin-right: var(--spacing-2);">
+                                <span style="font-size: var(--font-size-base); color: var(--text-primary);">Email Notifications</span>
                             </label>
-                            <small class="form-help">Receive email notifications for important updates</small>
+                            <small style="font-size: var(--font-size-xs); color: var(--text-muted); margin-top: var(--spacing-1); display: block; margin-left: 24px;">Receive email notifications for important updates</small>
                         </div>
                     </div>
 
@@ -647,14 +659,21 @@ ob_start();
                             <i class="fas fa-save psw-btn-icon"></i> Save Preferences
                         </button>
                     </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
 
         <!-- Activity Log Tab -->
         <div id="activity-tab" class="tab-content <?php echo $activeTab === 'activity' ? 'active' : ''; ?>">
-            <div class="activity-section">
-                <h2>Recent Activity</h2>
+            <div class="psw-card">
+                <div class="psw-card-header">
+                    <h2 class="psw-card-title">
+                        <i class="fas fa-history psw-card-title-icon"></i>
+                        Recent Activity
+                    </h2>
+                </div>
+                <div class="psw-card-content">
                 
                 <?php if (empty($activityLog)): ?>
                     <div class="no-activity">
@@ -681,6 +700,7 @@ ob_start();
                         <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
+                </div>
             </div>
         </div>
         
