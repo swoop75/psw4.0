@@ -139,7 +139,6 @@ try {
 $pageTitle = 'New Companies Management - PSW 4.0';
 $pageDescription = 'Manage your watchlist and buy targets';
 $additionalCSS = [
-    BASE_URL . '/assets/css/improved-buylist-management.css?v=' . time(),
     BASE_URL . '/assets/css/tooltip.css?v=' . time()
 ];
 $additionalJS = [

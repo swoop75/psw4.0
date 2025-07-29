@@ -340,9 +340,9 @@ body {
   transition: margin-left var(--transition-base);
 }
 
-/* Move submenu icons 5px to the left when sidebar is collapsed */
+/* Move submenu icons 15px to the left when sidebar is collapsed */
 .psw-sidebar:not(:hover) .psw-nav-submenu-link i {
-  margin-left: -5px;
+  margin-left: -15px;
 }
 
 .psw-nav-submenu-link.active {
