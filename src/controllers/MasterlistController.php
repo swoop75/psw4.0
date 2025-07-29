@@ -54,6 +54,22 @@ class MasterlistController {
                 $params[':search'] = '%' . $filters['search'] . '%';
             }
             
+            // Specific field filters
+            if (!empty($filters['isin'])) {
+                $whereConditions[] = "m.isin LIKE :isin";
+                $params[':isin'] = '%' . $filters['isin'] . '%';
+            }
+            
+            if (!empty($filters['ticker'])) {
+                $whereConditions[] = "m.ticker LIKE :ticker";
+                $params[':ticker'] = '%' . $filters['ticker'] . '%';
+            }
+            
+            if (!empty($filters['company_name'])) {
+                $whereConditions[] = "m.name LIKE :company_name";
+                $params[':company_name'] = '%' . $filters['company_name'] . '%';
+            }
+            
             $whereClause = !empty($whereConditions) ? 'WHERE ' . implode(' AND ', $whereConditions) : '';
             
             // Count total records
