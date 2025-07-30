@@ -177,6 +177,10 @@ $userTheme = $_SESSION['user_theme'] ?? 'light';
                                 <i class="fas fa-user-cog psw-user-dropdown-icon"></i>
                                 User Settings
                             </a>
+                            <a href="<?php echo BASE_URL; ?>/format_preferences.php" class="psw-user-dropdown-item">
+                                <i class="fas fa-globe psw-user-dropdown-icon"></i>
+                                Format Settings
+                            </a>
                             <a href="<?php echo BASE_URL; ?>/theme_settings.php" class="psw-user-dropdown-item">
                                 <i class="fas fa-palette psw-user-dropdown-icon"></i>
                                 Theme Settings
