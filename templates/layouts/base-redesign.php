@@ -171,21 +171,22 @@ $userTheme = $_SESSION['user_theme'] ?? 'light';
                             <span class="psw-user-name"><?php echo Auth::getUsername(); ?></span>
                             <i class="fas fa-chevron-down"></i>
                         </button>
-                    
-                    <div class="psw-user-dropdown">
-                        <a href="<?php echo BASE_URL; ?>/user_settings.php" class="psw-user-dropdown-item">
-                            <i class="fas fa-user-cog psw-user-dropdown-icon"></i>
-                            User Settings
-                        </a>
-                        <a href="<?php echo BASE_URL; ?>/theme_settings.php" class="psw-user-dropdown-item">
-                            <i class="fas fa-palette psw-user-dropdown-icon"></i>
-                            Theme Settings
-                        </a>
-                        <div style="border-top: 1px solid var(--border-primary); margin: var(--spacing-2) 0;"></div>
-                        <a href="<?php echo BASE_URL; ?>/logout.php" class="psw-user-dropdown-item danger">
-                            <i class="fas fa-sign-out-alt psw-user-dropdown-icon"></i>
-                            Logout
-                        </a>
+                        
+                        <div class="psw-user-dropdown">
+                            <a href="<?php echo BASE_URL; ?>/user_settings.php" class="psw-user-dropdown-item">
+                                <i class="fas fa-user-cog psw-user-dropdown-icon"></i>
+                                User Settings
+                            </a>
+                            <a href="<?php echo BASE_URL; ?>/theme_settings.php" class="psw-user-dropdown-item">
+                                <i class="fas fa-palette psw-user-dropdown-icon"></i>
+                                Theme Settings
+                            </a>
+                            <div style="border-top: 1px solid var(--border-primary); margin: var(--spacing-2) 0;"></div>
+                            <a href="<?php echo BASE_URL; ?>/logout.php" class="psw-user-dropdown-item danger">
+                                <i class="fas fa-sign-out-alt psw-user-dropdown-icon"></i>
+                                Logout
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
