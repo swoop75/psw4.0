@@ -157,14 +157,20 @@ $userTheme = $_SESSION['user_theme'] ?? 'light';
 
             <!-- User Menu Area -->
             <div class="psw-user-area">
-                <div class="psw-user-menu" id="userMenu">
-                    <button class="psw-user-button" onclick="toggleUserMenu()">
-                        <div class="psw-user-avatar">
-                            <?php echo strtoupper(substr(Auth::getUsername(), 0, 1)); ?>
-                        </div>
-                        <span class="psw-user-name"><?php echo Auth::getUsername(); ?></span>
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
+                <div style="display: flex; align-items: center; gap: var(--spacing-3);">
+                    <?php if (basename($_SERVER['PHP_SELF']) == 'dividend_logs.php'): ?>
+                        <a href="<?php echo BASE_URL; ?>/dividend_import.php" class="psw-icon-btn" title="Import Dividends">
+                            <i class="fas fa-file-import"></i>
+                        </a>
+                    <?php endif; ?>
+                    <div class="psw-user-menu" id="userMenu">
+                        <button class="psw-user-button" onclick="toggleUserMenu()">
+                            <div class="psw-user-avatar">
+                                <?php echo strtoupper(substr(Auth::getUsername(), 0, 1)); ?>
+                            </div>
+                            <span class="psw-user-name"><?php echo Auth::getUsername(); ?></span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
                     
                     <div class="psw-user-dropdown">
                         <a href="<?php echo BASE_URL; ?>/user_settings.php" class="psw-user-dropdown-item">

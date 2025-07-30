@@ -948,6 +948,31 @@ textarea:not(:empty) {
   text-align: center;
 }
 
+/* Icon Button */
+.psw-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: var(--font-size-base);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-sm);
+}
+
+.psw-icon-btn:hover {
+  background: var(--primary-accent);
+  color: white;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
 /* Theme Toggle Animation */
 .psw-theme-transition {
   transition: background-color var(--transition-base), color var(--transition-base), border-color var(--transition-base);

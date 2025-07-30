@@ -175,19 +175,11 @@ ob_start();
     <!-- Page Header -->
     <div class="psw-card psw-mb-6">
         <div class="psw-card-header">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <h1 class="psw-card-title">
-                        <i class="fas fa-coins psw-card-title-icon"></i>
-                        Dividend Logs
-                    </h1>
-                    <p class="psw-card-subtitle">Track and analyze dividend payments across the portfolio</p>
-                </div>
-                <a href="<?php echo BASE_URL; ?>/dividend_import.php" class="psw-btn psw-btn-primary">
-                    <i class="fas fa-file-import psw-btn-icon"></i>
-                    Import Dividends
-                </a>
-            </div>
+            <h1 class="psw-card-title">
+                <i class="fas fa-coins psw-card-title-icon"></i>
+                Dividend Logs
+            </h1>
+            <p class="psw-card-subtitle">Track and analyze dividend payments across the portfolio</p>
         </div>
     </div>
 
