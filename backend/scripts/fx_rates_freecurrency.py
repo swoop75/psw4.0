@@ -23,7 +23,7 @@ db_config = {
     'port': int(os.getenv('DB_PORT', 3306)),
     'database': os.getenv('DB_MARKETDATA'),  # Using marketdata database for FX rates
     'charset': 'utf8mb4',
-    'cursorclass': mysql.connector.cursors.DictCursor
+    'use_unicode': True
 }
 
 # Table name for FX rates
