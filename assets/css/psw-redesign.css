@@ -140,9 +140,29 @@ body {
   line-height: var(--line-height-normal);
   color: var(--text-primary);
   background-color: var(--bg-primary);
+  transition: color var(--transition-base), background-color var(--transition-base);
+}
+
+/* Dashboard layout - fixed height, no scroll */
+body.psw-dashboard-layout {
   height: 100vh;
   overflow: hidden;
-  transition: color var(--transition-base), background-color var(--transition-base);
+}
+
+/* Landing page layout - allow scrolling */
+body.psw-landing-layout {
+  height: auto;
+  overflow-y: auto;
+}
+
+.psw-landing-layout .psw-app {
+  display: block;
+  height: auto;
+}
+
+.psw-landing {
+  height: auto;
+  min-height: 100vh;
 }
 
 /* Layout Structure */
@@ -263,7 +283,7 @@ body {
   justify-content: center;
   width: 24px;
   height: 24px;
-  margin-right: 0.625rem;
+  margin-right: 0.5rem;
   font-size: var(--font-size-lg);
   flex-shrink: 0;
   transition: margin-left var(--transition-base);

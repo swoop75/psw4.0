@@ -56,7 +56,7 @@ $userTheme = $_SESSION['user_theme'] ?? 'light';
         })();
     </script>
 </head>
-<body class="psw-theme-transition">
+<body class="psw-theme-transition <?php echo Auth::isLoggedIn() ? 'psw-dashboard-layout' : 'psw-landing-layout'; ?>">
     <div class="psw-app">
         <?php if (Auth::isLoggedIn()): ?>
             <!-- Sidebar Navigation -->
