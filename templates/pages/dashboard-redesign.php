@@ -36,12 +36,12 @@ $dividendStats = $dashboardData['dividend_stats'];
                     <i class="fas fa-chart-line" style="color: var(--primary-accent); font-size: var(--font-size-xl);"></i>
                 </div>
                 <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-2);">
-                    <?php echo number_format($metrics['total_value'], 2); ?> SEK
+                    <?php echo Localization::formatCurrency($metrics['total_value'], 2, 'SEK'); ?>
                 </div>
                 <div style="font-size: var(--font-size-sm); color: <?php echo $metrics['daily_change'] >= 0 ? 'var(--success-color)' : 'var(--error-color)'; ?>;">
                     <i class="fas fa-arrow-<?php echo $metrics['daily_change'] >= 0 ? 'up' : 'down'; ?>"></i>
-                    <?php echo number_format($metrics['daily_change'], 2); ?> SEK 
-                    (<?php echo number_format($metrics['daily_change_percent'], 2); ?>%) today
+                    <?php echo Localization::formatCurrency($metrics['daily_change'], 2, 'SEK'); ?> 
+                    (<?php echo Localization::formatNumber($metrics['daily_change_percent'], 2); ?>%) today
                 </div>
             </div>
         </div>
@@ -53,10 +53,10 @@ $dividendStats = $dashboardData['dividend_stats'];
                     <i class="fas fa-coins" style="color: var(--primary-accent); font-size: var(--font-size-xl);"></i>
                 </div>
                 <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-2);">
-                    <?php echo number_format($metrics['total_dividends_ytd'], 2); ?> SEK
+                    <?php echo Localization::formatCurrency($metrics['total_dividends_ytd'], 2, 'SEK'); ?>
                 </div>
                 <div style="font-size: var(--font-size-sm); color: var(--text-muted);">
-                    All-time: <?php echo number_format($metrics['total_dividends_all_time'], 2); ?> SEK
+                    All-time: <?php echo Localization::formatCurrency($metrics['total_dividends_all_time'], 2, 'SEK'); ?>
                 </div>
             </div>
         </div>
@@ -68,10 +68,10 @@ $dividendStats = $dashboardData['dividend_stats'];
                     <i class="fas fa-percentage" style="color: var(--primary-accent); font-size: var(--font-size-xl);"></i>
                 </div>
                 <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-2);">
-                    <?php echo number_format($metrics['current_yield'], 2); ?>%
+                    <?php echo Localization::formatNumber($metrics['current_yield'], 2); ?>%
                 </div>
                 <div style="font-size: var(--font-size-sm); color: var(--text-muted);">
-                    Expected monthly: <?php echo number_format($metrics['expected_monthly_income'], 2); ?> SEK
+                    Expected monthly: <?php echo Localization::formatCurrency($metrics['expected_monthly_income'], 2, 'SEK'); ?>
                 </div>
             </div>
         </div>
@@ -184,14 +184,14 @@ $dividendStats = $dashboardData['dividend_stats'];
                             <tbody>
                                 <?php foreach ($recentDividends as $dividend): ?>
                                 <tr>
-                                    <td><?php echo date('M j, Y', strtotime($dividend['date'])); ?></td>
+                                    <td><?php echo Localization::formatDate($dividend['date']); ?></td>
                                     <td>
                                         <div style="font-weight: 600; color: var(--text-primary);"><?php echo $dividend['symbol']; ?></div>
                                         <div style="font-size: var(--font-size-sm); color: var(--text-muted);"><?php echo $dividend['company']; ?></div>
                                     </td>
-                                    <td><?php echo number_format($dividend['shares']); ?></td>
-                                    <td><?php echo $dividend['currency']; ?> <?php echo number_format($dividend['dividend_per_share'], 2); ?></td>
-                                    <td><strong><?php echo number_format($dividend['sek_amount'], 2); ?></strong></td>
+                                    <td><?php echo Localization::formatNumber($dividend['shares']); ?></td>
+                                    <td><?php echo $dividend['currency']; ?> <?php echo Localization::formatNumber($dividend['dividend_per_share'], 2); ?></td>
+                                    <td><strong><?php echo Localization::formatCurrency($dividend['sek_amount'], 2, 'SEK'); ?></strong></td>
                                 </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -219,7 +219,7 @@ $dividendStats = $dashboardData['dividend_stats'];
                                 <div style="display: flex; align-items: center; justify-content: space-between; padding: var(--spacing-2); background-color: var(--bg-secondary); border-radius: var(--radius-md);">
                                     <div style="font-weight: 600; color: var(--text-primary);"><?php echo $day['day_name']; ?></div>
                                     <div style="text-align: right;">
-                                        <div style="font-weight: 600; color: var(--text-primary);"><?php echo number_format($day['total_amount'], 2); ?> SEK</div>
+                                        <div style="font-weight: 600; color: var(--text-primary);"><?php echo Localization::formatCurrency($day['total_amount'], 2, 'SEK'); ?></div>
                                         <div style="font-size: var(--font-size-sm); color: var(--text-muted);"><?php echo $day['payment_count']; ?> payments</div>
                                     </div>
                                 </div>

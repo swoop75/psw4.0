@@ -15,6 +15,7 @@ require_once __DIR__ . '/src/middleware/Auth.php';
 require_once __DIR__ . '/src/controllers/DashboardController.php';
 require_once __DIR__ . '/src/utils/Security.php';
 require_once __DIR__ . '/src/utils/Logger.php';
+require_once __DIR__ . '/src/utils/Localization.php';
 
 // Require authentication
 Auth::requireAuth();
