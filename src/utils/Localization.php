@@ -34,10 +34,10 @@ class Localization {
             'name' => 'Swedish',
             'number_thousands_separator' => ' ',
             'number_decimal_separator' => ',',
-            'date_format' => 'd M Y',
+            'date_format' => 'Y-m-d',
             'date_format_short' => 'Y-m-d',
             'time_format' => 'H:i',
-            'datetime_format' => 'd M Y H:i',
+            'datetime_format' => 'Y-m-d H:i',
             'currency_symbol' => 'kr',
             'currency_position' => 'after'
         ],
@@ -264,7 +264,7 @@ class Localization {
                 $_SESSION['user_format_preference'] = $formatKey;
                 
                 // Clear cached format
-                self::$userFormat = null;
+                self::clearFormatCache();
                 
                 return true;
             }
@@ -273,6 +273,13 @@ class Localization {
         }
         
         return false;
+    }
+    
+    /**
+     * Clear cached format data
+     */
+    public static function clearFormatCache() {
+        self::$userFormat = null;
     }
     
     /**
