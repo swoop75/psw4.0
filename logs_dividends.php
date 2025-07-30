@@ -1,20 +1,20 @@
 <?php
 /**
- * File: public/logs_dividends.php
- * Path: C:\Users\laoan\Documents\GitHub\psw\psw4.0\public\logs_dividends.php
+ * File: logs_dividends.php
+ * Path: C:\Users\laoan\Documents\GitHub\psw\psw4.0\logs_dividends.php
  * Description: Dividend logs page for PSW 4.0 - shows complete dividend transaction history
  */
 
 // Start session and include required files
 session_start();
 
-require_once __DIR__ . '/../config/config.php';
-require_once __DIR__ . '/../config/constants.php';
-require_once __DIR__ . '/../config/database.php';
-require_once __DIR__ . '/../src/middleware/Auth.php';
-require_once __DIR__ . '/../src/controllers/DividendLogsController.php';
-require_once __DIR__ . '/../src/utils/Security.php';
-require_once __DIR__ . '/../src/utils/Logger.php';
+require_once __DIR__ . '/config/config.php';
+require_once __DIR__ . '/config/constants.php';
+require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/src/middleware/Auth.php';
+require_once __DIR__ . '/src/controllers/DividendLogsController.php';
+require_once __DIR__ . '/src/utils/Security.php';
+require_once __DIR__ . '/src/utils/Logger.php';
 
 // Require authentication
 Auth::requireAuth();
@@ -54,11 +54,11 @@ try {
     
     // Prepare content
     ob_start();
-    include __DIR__ . '/../templates/pages/dividend-logs.php';
+    include __DIR__ . '/templates/pages/dividend-logs.php';
     $content = ob_get_clean();
     
     // Include base layout
-    include __DIR__ . '/../templates/layouts/base.php';
+    include __DIR__ . '/templates/layouts/base.php';
     
     // Log page access
     Logger::logUserAction('dividend_logs_viewed', 'User accessed dividend logs with filters', $filters);
