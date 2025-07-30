@@ -884,9 +884,13 @@ textarea:not(:empty) {
   height: 32px;
   background: linear-gradient(135deg, var(--primary-accent), var(--primary-accent-hover));
   border-radius: 50%;
-  color: var(--text-inverse);
+  color: white;
   font-size: var(--font-size-sm);
   font-weight: 600;
+}
+
+.psw-user-avatar i {
+  color: white;
 }
 
 .psw-user-name {
