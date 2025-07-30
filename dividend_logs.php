@@ -192,7 +192,7 @@ ob_start();
                 </div>
                 <div>
                     <div style="font-size: 1.875rem; font-weight: 700; color: var(--text-primary);">
-                        <?php echo number_format($stats['total_dividends']); ?>
+                        <?php echo number_format($stats['total_dividends'], 0, ',', '.'); ?>
                     </div>
                     <div style="color: var(--text-secondary); font-size: 0.875rem;">Total Dividends</div>
                 </div>
@@ -206,7 +206,7 @@ ob_start();
                 </div>
                 <div>
                     <div style="font-size: 1.875rem; font-weight: 700; color: var(--text-primary);">
-                        <?php echo number_format($stats['total_net_sek'], 0); ?> SEK
+                        <?php echo number_format($stats['total_net_sek'], 0, ',', '.'); ?> SEK
                     </div>
                     <div style="color: var(--text-secondary); font-size: 0.875rem;">Net Income</div>
                 </div>
@@ -220,7 +220,7 @@ ob_start();
                 </div>
                 <div>
                     <div style="font-size: 1.875rem; font-weight: 700; color: var(--text-primary);">
-                        <?php echo number_format($stats['total_tax_sek'], 0); ?> SEK
+                        <?php echo number_format($stats['total_tax_sek'], 0, ',', '.'); ?> SEK
                     </div>
                     <div style="color: var(--text-secondary); font-size: 0.875rem;">Total Tax</div>
                 </div>
@@ -234,7 +234,7 @@ ob_start();
                 </div>
                 <div>
                     <div style="font-size: 1.875rem; font-weight: 700; color: var(--text-primary);">
-                        <?php echo number_format($stats['unique_companies']); ?>
+                        <?php echo number_format($stats['unique_companies'], 0, ',', '.'); ?>
                     </div>
                     <div style="color: var(--text-secondary); font-size: 0.875rem;">Companies</div>
                 </div>
@@ -314,8 +314,8 @@ ob_start();
         <div class="psw-card-content">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div style="color: var(--text-secondary);">
-                    Showing <?php echo number_format(min($limit, $totalRecords - ($page - 1) * $limit)); ?> of 
-                    <?php echo number_format($totalRecords); ?> dividend entries
+                    Showing <?php echo number_format(min($limit, $totalRecords - ($page - 1) * $limit), 0, ',', '.'); ?> of 
+                    <?php echo number_format($totalRecords, 0, ',', '.'); ?> dividend entries
                     <?php if (!empty($filters['search']) || !empty($filters['date_from']) || !empty($filters['date_to']) || !empty($filters['broker_id']) || !empty($filters['account_group_id'])): ?>
                         (filtered)
                     <?php endif; ?>
@@ -391,14 +391,14 @@ ob_start();
                                 <td style="font-family: var(--font-family-mono); font-size: 0.875rem;"><?php echo htmlspecialchars($dividend['ticker'] ?? '-'); ?></td>
                                 <td><?php echo htmlspecialchars($dividend['broker_name'] ?? '-'); ?></td>
                                 <td><?php echo htmlspecialchars($dividend['account_group_name'] ?? '-'); ?></td>
-                                <td style="text-align: right;"><?php echo number_format($dividend['shares_held'], 4); ?></td>
-                                <td style="text-align: right;"><?php echo number_format($dividend['dividend_amount_local'], 4); ?></td>
+                                <td style="text-align: right;"><?php echo number_format($dividend['shares_held'], 4, ',', '.'); ?></td>
+                                <td style="text-align: right;"><?php echo number_format($dividend['dividend_amount_local'], 4, ',', '.'); ?></td>
                                 <td><?php echo htmlspecialchars($dividend['currency_local']); ?></td>
                                 <td style="text-align: right; color: var(--success-color); font-weight: 600;">
-                                    <?php echo number_format($dividend['net_dividend_sek'], 2); ?>
+                                    <?php echo number_format($dividend['net_dividend_sek'], 2, ',', '.'); ?>
                                 </td>
                                 <td style="text-align: right; color: var(--error-color);">
-                                    -<?php echo number_format($dividend['tax_amount_sek'], 2); ?>
+                                    -<?php echo number_format($dividend['tax_amount_sek'], 2, ',', '.'); ?>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -418,7 +418,7 @@ ob_start();
     <?php if ($totalRecords > $limit): ?>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem;">
             <div style="color: var(--text-secondary);">
-                Showing <?php echo ($page - 1) * $limit + 1; ?>-<?php echo min($page * $limit, $totalRecords); ?> of <?php echo number_format($totalRecords); ?> entries
+                Showing <?php echo number_format(($page - 1) * $limit + 1, 0, ',', '.'); ?>-<?php echo number_format(min($page * $limit, $totalRecords), 0, ',', '.'); ?> of <?php echo number_format($totalRecords, 0, ',', '.'); ?> entries
             </div>
             <div style="display: flex; gap: 0.5rem;">
                 <?php
