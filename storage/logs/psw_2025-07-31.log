@@ -11,3 +11,7 @@
 {"timestamp":"2025-07-31 00:44:24","level":"INFO","user_id":1,"ip":"100.91.97.82","message":"Monthly trends found: 6"}
 {"timestamp":"2025-07-31 00:44:24","level":"INFO","user_id":1,"ip":"100.91.97.82","message":"Insights total payments: 11"}
 {"timestamp":"2025-07-31 00:44:24","level":"INFO","user_id":1,"ip":"100.91.97.82","message":"User action: dashboard_viewed","context":{"action":"dashboard_viewed","details":"User accessed redesigned dashboard","user_id":1}}
+{"timestamp":"2025-07-31 01:04:11","level":"ERROR","user_id":1,"ip":"100.91.97.82","message":"Get total count error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'psw_portfolio.masterlist' doesn't exist"}
+{"timestamp":"2025-07-31 01:04:11","level":"ERROR","user_id":1,"ip":"100.91.97.82","message":"Get paginated results error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'psw_portfolio.masterlist' doesn't exist"}
+{"timestamp":"2025-07-31 01:04:11","level":"ERROR","user_id":1,"ip":"100.91.97.82","message":"Get filter options error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'psw_portfolio.masterlist' doesn't exist"}
+{"timestamp":"2025-07-31 01:04:11","level":"ERROR","user_id":1,"ip":"100.91.97.82","message":"Calculate summary stats error: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'psw_portfolio.masterlist' doesn't exist"}
