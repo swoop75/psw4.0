@@ -10,6 +10,7 @@ require_once __DIR__ . '/../models/Dividend.php';
 require_once __DIR__ . '/../models/Company.php';
 require_once __DIR__ . '/../middleware/Auth.php';
 require_once __DIR__ . '/../utils/Logger.php';
+require_once __DIR__ . '/../components/DateRangePicker.php';
 
 class DividendLogsController {
     private $dividendModel;
@@ -124,15 +125,29 @@ class DividendLogsController {
             $params[':amount_max'] = (float) $filters['amount_max'];
         }
         
-        // Date range filters
-        if (!empty($filters['date_from'])) {
+        // Date range filters - Enhanced to handle both old and new format
+        // Handle new DateRangePicker format (date_from, date_to)
+        if (!empty($filters['date_from']) || !empty($filters['date_to'])) {
+            $dateRange = DateRangePicker::processFormData($filters, 'date');
+            if ($dateRange['valid']) {
+                if ($dateRange['from']) {
+                    $where[] = "ld.payment_date >= :date_from";
+                    $params[':date_from'] = $dateRange['from'];
+                }
+                if ($dateRange['to']) {
+                    $where[] = "ld.payment_date <= :date_to";
+                    $params[':date_to'] = $dateRange['to'] . ' 23:59:59';
+                }
+            }
+        }
+        // Handle legacy individual date filters for backward compatibility
+        elseif (!empty($filters['date_from']) && empty($filters['date_to'])) {
             $where[] = "ld.payment_date >= :date_from";
             $params[':date_from'] = $filters['date_from'];
         }
-        
-        if (!empty($filters['date_to'])) {
+        elseif (empty($filters['date_from']) && !empty($filters['date_to'])) {
             $where[] = "ld.payment_date <= :date_to";
-            $params[':date_to'] = $filters['date_to'];
+            $params[':date_to'] = $filters['date_to'] . ' 23:59:59';
         }
         
         // User filter (when multi-user support is implemented)
