@@ -297,15 +297,16 @@ ob_start();
                         <?php endforeach; ?>
                     </select>
                 </div>
-                
-                <div style="display: flex; gap: 0.5rem;">
-                    <button type="button" class="psw-btn psw-btn-primary" onclick="applyFilters()">
-                        <i class="fas fa-filter psw-btn-icon"></i>Apply
-                    </button>
-                    <button type="button" class="psw-btn psw-btn-secondary" onclick="clearFilters()">
-                        <i class="fas fa-times psw-btn-icon"></i>Clear
-                    </button>
-                </div>
+            </div>
+            
+            <!-- Filter Action Buttons - Separate Row -->
+            <div style="display: flex; gap: 0.5rem; justify-content: flex-start; margin-top: 1rem;">
+                <button type="button" class="psw-btn psw-btn-primary" onclick="applyFilters()">
+                    <i class="fas fa-filter psw-btn-icon"></i>Apply
+                </button>
+                <button type="button" class="psw-btn psw-btn-secondary" onclick="clearFilters()">
+                    <i class="fas fa-times psw-btn-icon"></i>Clear
+                </button>
             </div>
         </div>
     </div>
