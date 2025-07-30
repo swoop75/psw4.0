@@ -263,7 +263,7 @@ body {
   justify-content: center;
   width: 24px;
   height: 24px;
-  margin-right: var(--spacing-3);
+  margin-right: 0.625rem;
   font-size: var(--font-size-lg);
   flex-shrink: 0;
   transition: margin-left var(--transition-base);
