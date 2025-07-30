@@ -2,14 +2,28 @@
 /**
  * File: templates/pages/dividend-logs.php
  * Path: C:\Users\laoan\Documents\GitHub\psw\psw4.0\templates\pages\dividend-logs.php
- * Description: Dividend logs template for PSW 4.0
+ * Description: Dividend logs template for PSW 4.0 - Updated with new date range picker
  */
+
+require_once __DIR__ . '/../../src/components/DateRangePicker.php';
 
 $dividends = $logsData['dividends'];
 $pagination = $logsData['pagination'];
 $filters = $logsData['filters'];
 $filterOptions = $logsData['filter_options'];
 $summaryStats = $logsData['summary_stats'];
+
+// Create date range picker instance
+$dateRangePicker = new DateRangePicker('dividend-date-range', 'date', [
+    'defaultMonthsBack' => 3,
+    'required' => false,
+    'class' => 'form-control'
+]);
+
+// Set current values if they exist
+if (!empty($filters['date_from']) || !empty($filters['date_to'])) {
+    $dateRangePicker->setValues($filters['date_from'], $filters['date_to']);
+}
 ?>
 
 <div class="dividend-logs-container">
@@ -92,16 +106,9 @@ $summaryStats = $logsData['summary_stats'];
                            placeholder="Company name or ticker" value="<?php echo htmlspecialchars($filters['company']); ?>">
                 </div>
 
+                <!-- NEW: Central Date Range Picker -->
                 <div class="filter-group">
-                    <label for="date_from">From Date</label>
-                    <input type="date" name="date_from" id="date_from" class="form-control" 
-                           value="<?php echo htmlspecialchars($filters['date_from']); ?>">
-                </div>
-
-                <div class="filter-group">
-                    <label for="date_to">To Date</label>
-                    <input type="date" name="date_to" id="date_to" class="form-control" 
-                           value="<?php echo htmlspecialchars($filters['date_to']); ?>">
+                    <?php echo $dateRangePicker->renderField('Date Range', ['class' => 'filter-group', 'labelClass' => 'form-label']); ?>
                 </div>
 
                 <div class="filter-group">
@@ -285,4 +292,36 @@ window.dividendLogsData = {
     pagination: <?php echo json_encode($pagination); ?>,
     summaryStats: <?php echo json_encode($summaryStats); ?>
 };
+</script>
+
+<!-- Date Range Picker Styles and Scripts -->
+<link rel="stylesheet" href="<?php echo ASSETS_URL ?? '/assets'; ?>/css/date-range-picker.css?v=<?php echo time(); ?>">
+<script src="<?php echo ASSETS_URL ?? '/assets'; ?>/js/date-range-picker.js?v=<?php echo time(); ?>"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize the date range picker
+    const dateRangePicker = new DateRangePicker('dividend-date-range', {
+        defaultMonthsBack: 3,
+        onApply: function(dateRange) {
+            console.log('Date range applied:', dateRange);
+            
+            // Optional: Auto-submit form when date range is applied
+            const form = document.querySelector('.filters-form');
+            if (form) {
+                // The hidden inputs are automatically updated by the DateRangePicker component
+                // Uncomment the next line if you want auto-submit
+                // form.submit();
+            }
+        }
+    });
+    
+    // Set initial values if they exist
+    <?php if (!empty($filters['date_from']) || !empty($filters['date_to'])): ?>
+    dateRangePicker.setDateRange(
+        '<?php echo $filters['date_from'] ?? ''; ?>', 
+        '<?php echo $filters['date_to'] ?? ''; ?>'
+    );
+    <?php endif; ?>
+});
 </script>
