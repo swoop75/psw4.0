@@ -15,7 +15,6 @@ require_once __DIR__ . '/../src/middleware/Auth.php';
 require_once __DIR__ . '/../src/controllers/DividendLogsController.php';
 require_once __DIR__ . '/../src/utils/Security.php';
 require_once __DIR__ . '/../src/utils/Logger.php';
-require_once __DIR__ . '/../src/components/DateRangePicker.php';
 
 // Require authentication
 Auth::requireAuth();
@@ -47,12 +46,10 @@ try {
     $pageTitle = 'Dividend Logs - ' . APP_NAME;
     $pageDescription = 'Complete dividend transaction history and analytics';
     $additionalCSS = [
-        ASSETS_URL . '/css/dividend-logs.css',
-        ASSETS_URL . '/css/date-range-picker.css?v=' . time()
+        ASSETS_URL . '/css/dividend-logs.css'
     ];
     $additionalJS = [
-        ASSETS_URL . '/js/dividend-logs.js',
-        ASSETS_URL . '/js/date-range-picker.js?v=' . time()
+        ASSETS_URL . '/js/dividend-logs.js'
     ];
     
     // Prepare content

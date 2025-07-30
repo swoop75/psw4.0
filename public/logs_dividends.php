@@ -15,7 +15,6 @@ require_once __DIR__ . '/../src/middleware/Auth.php';
 require_once __DIR__ . '/../src/controllers/DividendLogsController.php';
 require_once __DIR__ . '/../src/utils/Security.php';
 require_once __DIR__ . '/../src/utils/Logger.php';
-require_once __DIR__ . '/../src/components/DateRangePicker.php';
 
 // Require authentication
 Auth::requireAuth();

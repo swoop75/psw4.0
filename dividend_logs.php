@@ -11,7 +11,6 @@ require_once __DIR__ . '/config/constants.php';
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/src/middleware/Auth.php';
 require_once __DIR__ . '/src/utils/Localization.php';
-require_once __DIR__ . '/src/components/DateRangePicker.php';
 
 // Require authentication
 Auth::requireAuth();
