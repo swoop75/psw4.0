@@ -5,25 +5,11 @@
  * Description: Dividend logs template for PSW 4.0 - Updated with new date range picker
  */
 
-require_once __DIR__ . '/../../src/components/DateRangePicker.php';
-
 $dividends = $logsData['dividends'];
 $pagination = $logsData['pagination'];
 $filters = $logsData['filters'];
 $filterOptions = $logsData['filter_options'];
 $summaryStats = $logsData['summary_stats'];
-
-// Create date range picker instance
-$dateRangePicker = new DateRangePicker('dividend-date-range', 'date', [
-    'defaultMonthsBack' => 3,
-    'required' => false,
-    'class' => 'form-control'
-]);
-
-// Set current values if they exist
-if (!empty($filters['date_from']) || !empty($filters['date_to'])) {
-    $dateRangePicker->setValues($filters['date_from'], $filters['date_to']);
-}
 ?>
 
 <div class="dividend-logs-container">
@@ -108,7 +94,66 @@ if (!empty($filters['date_from']) || !empty($filters['date_to'])) {
 
                 <!-- NEW: Central Date Range Picker -->
                 <div class="filter-group">
-                    <?php echo $dateRangePicker->renderField('Date Range', ['class' => 'filter-group', 'labelClass' => 'form-label']); ?>
+                    <label>Date Range</label>
+                    <div id="dividend-date-range" class="date-range-picker">
+                        <input type="hidden" name="date_from" value="<?php echo htmlspecialchars($filters['date_from']); ?>">
+                        <input type="hidden" name="date_to" value="<?php echo htmlspecialchars($filters['date_to']); ?>">
+                        
+                        <div class="date-range-display" onclick="toggleDateRangePicker()">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span class="date-range-text" id="dateRangeText">
+                                <?php 
+                                if ($filters['date_from'] && $filters['date_to']) {
+                                    echo $filters['date_from'] . ' - ' . $filters['date_to'];
+                                } else {
+                                    $defaultFrom = date('Y-m-01', strtotime('-3 months'));
+                                    $defaultTo = date('Y-m-t');
+                                    echo $defaultFrom . ' - ' . $defaultTo;
+                                }
+                                ?>
+                            </span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        
+                        <div class="date-range-overlay" id="dateRangeOverlay">
+                            <div class="date-range-header">
+                                <h4>Date Range Selector</h4>
+                                <button type="button" class="close-btn" onclick="closeDateRangePicker()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="date-range-content">
+                                <div class="date-range-panels">
+                                    <div class="date-panel from-panel">
+                                        <h5>From Date</h5>
+                                        <input type="text" class="date-input" id="fromDateInput" placeholder="YYYY-MM-DD">
+                                    </div>
+                                    <div class="date-panel to-panel">
+                                        <h5>To Date</h5>
+                                        <input type="text" class="date-input" id="toDateInput" placeholder="YYYY-MM-DD">
+                                    </div>
+                                    <div class="presets-panel">
+                                        <h5>Quick Presets</h5>
+                                        <div class="presets-grid">
+                                            <button type="button" class="preset-btn" onclick="applyPreset('today')">Today</button>
+                                            <button type="button" class="preset-btn" onclick="applyPreset('yesterday')">Yesterday</button>
+                                            <button type="button" class="preset-btn" onclick="applyPreset('thisWeek')">This Week</button>
+                                            <button type="button" class="preset-btn" onclick="applyPreset('prevWeek')">Previous Week</button>
+                                            <button type="button" class="preset-btn" onclick="applyPreset('thisMonth')">This Month</button>
+                                            <button type="button" class="preset-btn" onclick="applyPreset('prevMonth')">Previous Month</button>
+                                            <button type="button" class="preset-btn" onclick="applyPreset('thisYear')">This Year</button>
+                                            <button type="button" class="preset-btn" onclick="applyPreset('prevYear')">Previous Year</button>
+                                            <button type="button" class="preset-btn" onclick="applyPreset('sinceStart')">Since Start</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="date-range-footer">
+                                <button type="button" class="btn-date-range btn-outline-date" onclick="closeDateRangePicker()">Cancel</button>
+                                <button type="button" class="btn-date-range btn-primary-date" onclick="applyDateRange()">Apply</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="filter-group">
@@ -294,34 +339,363 @@ window.dividendLogsData = {
 };
 </script>
 
-<!-- Date Range Picker Styles and Scripts -->
-<link rel="stylesheet" href="<?php echo ASSETS_URL ?? '/assets'; ?>/css/date-range-picker.css?v=<?php echo time(); ?>">
-<script src="<?php echo ASSETS_URL ?? '/assets'; ?>/js/date-range-picker.js?v=<?php echo time(); ?>"></script>
+<!-- Date Range Picker Styles - Inline for immediate loading -->
+<style>
+/* Date Range Picker Styles */
+.date-range-picker {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    max-width: 300px;
+}
+
+.date-range-display {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 40px;
+}
+
+.date-range-display:hover {
+    border-color: #7c3aed;
+    box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.1);
+}
+
+.date-range-display i.fa-calendar-alt {
+    color: #6c757d;
+    margin-right: 8px;
+}
+
+.date-range-text {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+}
+
+.date-range-display i.fa-chevron-down {
+    color: #6c757d;
+    font-size: 12px;
+    transition: transform 0.2s ease;
+}
+
+.date-range-picker.open .date-range-display i.fa-chevron-down {
+    transform: rotate(180deg);
+}
+
+.date-range-overlay {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    min-width: 900px;
+    margin-top: 4px;
+    display: none;
+}
+
+.date-range-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.date-range-header h4 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 16px;
+    color: #6c757d;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.close-btn:hover {
+    background: #f8f9fa;
+}
+
+.date-range-content {
+    padding: 20px;
+}
+
+.date-range-panels {
+    display: grid;
+    grid-template-columns: 1fr 1fr 300px;
+    gap: 20px;
+}
+
+.date-panel {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.date-panel h5 {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #495057;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.date-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+
+.presets-panel {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.presets-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.preset-btn {
+    padding: 10px 12px;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.preset-btn:hover {
+    background: #7c3aed;
+    color: white;
+    border-color: #7c3aed;
+}
+
+.date-range-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 20px;
+    border-top: 1px solid #eee;
+    background: #f8f9fa;
+}
+
+.btn-date-range {
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.btn-outline-date {
+    background: white;
+    color: #6c757d;
+    border-color: #ced4da;
+}
+
+.btn-primary-date {
+    background: #7c3aed;
+    color: white;
+    border-color: #7c3aed;
+}
+
+.btn-primary-date:hover {
+    background: #6d28d9;
+}
+
+@media (max-width: 1024px) {
+    .date-range-overlay {
+        min-width: 100%;
+    }
+    
+    .date-range-panels {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+}
+</style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize the date range picker
-    const dateRangePicker = new DateRangePicker('dividend-date-range', {
-        defaultMonthsBack: 3,
-        onApply: function(dateRange) {
-            console.log('Date range applied:', dateRange);
-            
-            // Optional: Auto-submit form when date range is applied
-            const form = document.querySelector('.filters-form');
-            if (form) {
-                // The hidden inputs are automatically updated by the DateRangePicker component
-                // Uncomment the next line if you want auto-submit
-                // form.submit();
-            }
-        }
-    });
+// Simple Date Range Picker JavaScript
+let tempFromDate = '';
+let tempToDate = '';
+
+function toggleDateRangePicker() {
+    const overlay = document.getElementById('dateRangeOverlay');
+    const picker = document.getElementById('dividend-date-range');
     
-    // Set initial values if they exist
-    <?php if (!empty($filters['date_from']) || !empty($filters['date_to'])): ?>
-    dateRangePicker.setDateRange(
-        '<?php echo $filters['date_from'] ?? ''; ?>', 
-        '<?php echo $filters['date_to'] ?? ''; ?>'
-    );
-    <?php endif; ?>
+    if (overlay.style.display === 'none' || overlay.style.display === '') {
+        overlay.style.display = 'block';
+        picker.classList.add('open');
+        
+        // Set current values
+        const fromInput = document.querySelector('input[name="date_from"]');
+        const toInput = document.querySelector('input[name="date_to"]');
+        
+        document.getElementById('fromDateInput').value = fromInput.value;
+        document.getElementById('toDateInput').value = toInput.value;
+        
+        tempFromDate = fromInput.value;
+        tempToDate = toInput.value;
+        
+        // Set defaults if empty
+        if (!tempFromDate && !tempToDate) {
+            applyPreset('defaultRange');
+        }
+    } else {
+        closeDateRangePicker();
+    }
+}
+
+function closeDateRangePicker() {
+    const overlay = document.getElementById('dateRangeOverlay');
+    const picker = document.getElementById('dividend-date-range');
+    
+    overlay.style.display = 'none';
+    picker.classList.remove('open');
+}
+
+function applyPreset(preset) {
+    const today = new Date();
+    let fromDate, toDate;
+
+    switch (preset) {
+        case 'today':
+            fromDate = toDate = formatDate(today);
+            break;
+        case 'yesterday':
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1);
+            fromDate = toDate = formatDate(yesterday);
+            break;
+        case 'thisWeek':
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - today.getDay());
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
+            fromDate = formatDate(startOfWeek);
+            toDate = formatDate(endOfWeek);
+            break;
+        case 'prevWeek':
+            const prevWeekEnd = new Date(today);
+            prevWeekEnd.setDate(today.getDate() - today.getDay() - 1);
+            const prevWeekStart = new Date(prevWeekEnd);
+            prevWeekStart.setDate(prevWeekEnd.getDate() - 6);
+            fromDate = formatDate(prevWeekStart);
+            toDate = formatDate(prevWeekEnd);
+            break;
+        case 'thisMonth':
+            fromDate = formatDate(new Date(today.getFullYear(), today.getMonth(), 1));
+            toDate = formatDate(new Date(today.getFullYear(), today.getMonth() + 1, 0));
+            break;
+        case 'prevMonth':
+            fromDate = formatDate(new Date(today.getFullYear(), today.getMonth() - 1, 1));
+            toDate = formatDate(new Date(today.getFullYear(), today.getMonth(), 0));
+            break;
+        case 'thisYear':
+            fromDate = formatDate(new Date(today.getFullYear(), 0, 1));
+            toDate = formatDate(new Date(today.getFullYear(), 11, 31));
+            break;
+        case 'prevYear':
+            fromDate = formatDate(new Date(today.getFullYear() - 1, 0, 1));
+            toDate = formatDate(new Date(today.getFullYear() - 1, 11, 31));
+            break;
+        case 'sinceStart':
+            fromDate = '2020-01-01';
+            toDate = formatDate(today);
+            break;
+        case 'defaultRange':
+        default:
+            // Current month + 3 months back
+            fromDate = formatDate(new Date(today.getFullYear(), today.getMonth() - 3, 1));
+            toDate = formatDate(new Date(today.getFullYear(), today.getMonth() + 1, 0));
+            break;
+    }
+
+    document.getElementById('fromDateInput').value = fromDate;
+    document.getElementById('toDateInput').value = toDate;
+    tempFromDate = fromDate;
+    tempToDate = toDate;
+}
+
+function applyDateRange() {
+    const fromInput = document.getElementById('fromDateInput');
+    const toInput = document.getElementById('toDateInput');
+    
+    tempFromDate = fromInput.value;
+    tempToDate = toInput.value;
+    
+    // Update hidden inputs
+    document.querySelector('input[name="date_from"]').value = tempFromDate;
+    document.querySelector('input[name="date_to"]').value = tempToDate;
+    
+    // Update display
+    document.getElementById('dateRangeText').textContent = tempFromDate + ' - ' + tempToDate;
+    
+    closeDateRangePicker();
+}
+
+function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+// Close on outside click
+document.addEventListener('click', function(e) {
+    const picker = document.getElementById('dividend-date-range');
+    const overlay = document.getElementById('dateRangeOverlay');
+    
+    if (picker && !picker.contains(e.target) && overlay && overlay.style.display === 'block') {
+        closeDateRangePicker();
+    }
+});
+
+// Initialize default date range if empty
+document.addEventListener('DOMContentLoaded', function() {
+    const fromInput = document.querySelector('input[name="date_from"]');
+    const toInput = document.querySelector('input[name="date_to"]');
+    
+    if (fromInput && toInput && !fromInput.value && !toInput.value) {
+        const today = new Date();
+        const defaultFrom = formatDate(new Date(today.getFullYear(), today.getMonth() - 3, 1));
+        const defaultTo = formatDate(new Date(today.getFullYear(), today.getMonth() + 1, 0));
+        
+        fromInput.value = defaultFrom;
+        toInput.value = defaultTo;
+        const dateRangeText = document.getElementById('dateRangeText');
+        if (dateRangeText) {
+            dateRangeText.textContent = defaultFrom + ' - ' + defaultTo;
+        }
+    }
 });
 </script>
