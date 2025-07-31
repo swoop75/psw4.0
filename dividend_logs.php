@@ -151,6 +151,53 @@ try {
     $statsStmt->execute($params);
     $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
     
+    // Handle CSV export
+    if (!empty($_GET['export']) && $_GET['export'] === 'csv') {
+        // Set headers for CSV download
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="dividend_logs_export_' . date('Y-m-d_H-i-s') . '.csv"');
+        header('Cache-Control: no-cache, must-revalidate');
+        header('Expires: 0');
+        
+        // Open output stream
+        $output = fopen('php://output', 'w');
+        
+        // Add CSV headers
+        fputcsv($output, [
+            'Payment Date',
+            'ISIN',
+            'Company',
+            'Ticker',
+            'Broker',
+            'Account Group',
+            'Shares',
+            'Dividend Amount (Local)',
+            'Currency',
+            'Net Dividend (SEK)',
+            'Tax Amount (SEK)'
+        ]);
+        
+        // Add data rows
+        foreach ($dividends as $dividend) {
+            fputcsv($output, [
+                $dividend['payment_date'],
+                $dividend['isin'],
+                $dividend['company_name'] ?? 'Unknown Company',
+                $dividend['ticker'] ?? '-',
+                $dividend['broker_name'] ?? '-',
+                $dividend['account_group_name'] ?? '-',
+                number_format($dividend['shares_held'], 0, '.', ''),
+                number_format($dividend['dividend_amount_local'], 2, '.', ''),
+                $dividend['currency_local'],
+                number_format($dividend['net_dividend_sek'], 2, '.', ''),
+                number_format($dividend['tax_amount_sek'], 2, '.', '')
+            ]);
+        }
+        
+        fclose($output);
+        exit();
+    }
+    
     // Get earliest dividend date for 'since start' preset
     $earliestDateSql = "SELECT MIN(payment_date) as earliest_date FROM psw_portfolio.log_dividends";
     $earliestDateStmt = $portfolioDb->prepare($earliestDateSql);
@@ -199,11 +246,21 @@ ob_start();
     <!-- Page Header -->
     <div class="psw-card psw-mb-6">
         <div class="psw-card-header">
-            <h1 class="psw-card-title">
-                <i class="fas fa-coins psw-card-title-icon"></i>
-                Dividend Logs
-            </h1>
-            <p class="psw-card-subtitle">Track and analyze dividend payments across the portfolio</p>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
+                <div>
+                    <h1 class="psw-card-title">
+                        <i class="fas fa-coins psw-card-title-icon"></i>
+                        Dividend Logs
+                    </h1>
+                    <p class="psw-card-subtitle">Track and analyze dividend payments across the portfolio</p>
+                </div>
+                <div class="header-actions" style="display: flex; gap: 0.5rem; align-items: center;">
+                    <button type="button" class="psw-btn psw-btn-secondary" onclick="exportToCSV()" title="Export filtered data to CSV">
+                        <i class="fas fa-download psw-btn-icon"></i>
+                        Export CSV
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -458,8 +515,8 @@ ob_start();
                                 <td style="font-family: var(--font-family-mono); font-size: 0.875rem;"><?php echo htmlspecialchars($dividend['ticker'] ?? '-'); ?></td>
                                 <td><?php echo htmlspecialchars($dividend['broker_name'] ?? '-'); ?></td>
                                 <td><?php echo htmlspecialchars($dividend['account_group_name'] ?? '-'); ?></td>
-                                <td style="text-align: right;"><?php echo Localization::formatNumber($dividend['shares_held'], 4); ?></td>
-                                <td style="text-align: right;"><?php echo Localization::formatNumber($dividend['dividend_amount_local'], 4); ?></td>
+                                <td style="text-align: right;"><?php echo Localization::formatNumber($dividend['shares_held'], 0); ?></td>
+                                <td style="text-align: right;"><?php echo Localization::formatNumber($dividend['dividend_amount_local'], 2); ?></td>
                                 <td><?php echo htmlspecialchars($dividend['currency_local']); ?></td>
                                 <td style="text-align: right; color: var(--success-color); font-weight: 600;">
                                     <?php echo Localization::formatCurrency($dividend['net_dividend_sek'], 2, 'SEK'); ?>
@@ -1310,6 +1367,44 @@ document.addEventListener('click', function(e) {
 document.getElementById('broker-filter').addEventListener('change', applyFilters);
 document.getElementById('account-group-filter').addEventListener('change', applyFilters);
 
+// CSV Export function
+window.exportToCSV = function() {
+    // Get current filter parameters
+    const params = new URLSearchParams();
+    
+    // Add current filters
+    const search = document.getElementById('search-input').value.trim();
+    if (search) params.set('search', search);
+    
+    // Date range from hidden inputs
+    const dateFrom = document.querySelector('input[name="date_from"]').value;
+    const dateTo = document.querySelector('input[name="date_to"]').value;
+    if (dateFrom) params.set('date_from', dateFrom);
+    if (dateTo) params.set('date_to', dateTo);
+    
+    // Broker filter
+    const brokerSelect = document.getElementById('broker-filter');
+    if (brokerSelect.value) params.set('broker_id', brokerSelect.value);
+    
+    // Account group filter
+    const accountGroupSelect = document.getElementById('account-group-filter');
+    if (accountGroupSelect.value) params.set('account_group_id', accountGroupSelect.value);
+    
+    // Add export flag
+    params.set('export', 'csv');
+    
+    // Create download link
+    const exportUrl = window.location.pathname + '?' + params.toString();
+    
+    // Trigger download
+    const link = document.createElement('a');
+    link.href = exportUrl;
+    link.download = 'dividend_logs_export.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
 // Debug function to check if JavaScript is loaded
 console.log('Date range picker JavaScript loaded');
 console.log('toggleDateRangePicker function available:', typeof window.toggleDateRangePicker);
@@ -1672,6 +1767,23 @@ document.addEventListener('DOMContentLoaded', function() {
     border-color: var(--primary-accent);
     transform: translateY(-1px);
     box-shadow: 0 2px 4px var(--primary-accent-light);
+}
+
+/* Header Actions Styling */
+.header-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.header-actions .psw-btn {
+    white-space: nowrap;
+    font-size: var(--font-size-sm);
+}
+
+.header-actions .psw-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .date-range-footer {
