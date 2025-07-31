@@ -1,7 +1,7 @@
 <?php
 /**
- * File: add_trade.php
- * Description: Add new trade interface for PSW 4.0 - Manual trade entry
+ * File: edit_trade.php
+ * Description: Edit existing trade interface for PSW 4.0
  */
 
 session_start();
@@ -14,6 +14,34 @@ require_once __DIR__ . '/src/utils/Localization.php';
 
 // Require authentication
 Auth::requireAuth();
+
+// Get trade ID from URL
+$tradeId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+
+if (!$tradeId) {
+    header('Location: ' . BASE_URL . '/trade_logs.php');
+    exit();
+}
+
+// Load existing trade data
+$existingTrade = null;
+try {
+    $portfolioDb = Database::getConnection('portfolio');
+    $sql = "SELECT * FROM log_trades WHERE trade_id = :trade_id";
+    $stmt = $portfolioDb->prepare($sql);
+    $stmt->execute([':trade_id' => $tradeId]);
+    $existingTrade = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$existingTrade) {
+        $_SESSION['flash_error'] = 'Trade not found.';
+        header('Location: ' . BASE_URL . '/trade_logs.php');
+        exit();
+    }
+} catch (Exception $e) {
+    $_SESSION['flash_error'] = 'Error loading trade: ' . $e->getMessage();
+    header('Location: ' . BASE_URL . '/trade_logs.php');
+    exit();
+}
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -32,8 +60,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         if (empty($errors)) {
-            // Prepare data for insertion
+            // Prepare data for update
             $tradeData = [
+                'trade_id' => $tradeId,
                 'trade_date' => $_POST['trade_date'],
                 'settlement_date' => !empty($_POST['settlement_date']) ? $_POST['settlement_date'] : null,
                 'trade_type_id' => (int)$_POST['trade_type_id'],
@@ -58,38 +87,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'broker_transaction_id' => !empty($_POST['broker_transaction_id']) ? trim($_POST['broker_transaction_id']) : null,
                 'order_type' => !empty($_POST['order_type']) ? $_POST['order_type'] : null,
                 'execution_status' => $_POST['execution_status'] ?? 'EXECUTED',
-                'data_source' => 'MANUAL',
                 'notes' => !empty($_POST['notes']) ? trim($_POST['notes']) : null
             ];
             
-            // Insert trade
-            $sql = "INSERT INTO log_trades (
-                trade_date, settlement_date, trade_type_id, isin, ticker, shares_traded,
-                price_per_share_local, total_amount_local, currency_local,
-                price_per_share_sek, total_amount_sek, exchange_rate_used,
-                broker_fees_local, broker_fees_sek, tft_tax_local, tft_tax_sek, tft_rate_percent,
-                net_amount_local, net_amount_sek, broker_id, portfolio_account_group_id,
-                broker_transaction_id, order_type, execution_status, data_source, notes
-            ) VALUES (
-                :trade_date, :settlement_date, :trade_type_id, :isin, :ticker, :shares_traded,
-                :price_per_share_local, :total_amount_local, :currency_local,
-                :price_per_share_sek, :total_amount_sek, :exchange_rate_used,
-                :broker_fees_local, :broker_fees_sek, :tft_tax_local, :tft_tax_sek, :tft_rate_percent,
-                :net_amount_local, :net_amount_sek, :broker_id, :portfolio_account_group_id,
-                :broker_transaction_id, :order_type, :execution_status, :data_source, :notes
-            )";
+            // Update trade
+            $sql = "UPDATE log_trades SET 
+                trade_date = :trade_date,
+                settlement_date = :settlement_date, 
+                trade_type_id = :trade_type_id,
+                isin = :isin,
+                ticker = :ticker,
+                shares_traded = :shares_traded,
+                price_per_share_local = :price_per_share_local,
+                total_amount_local = :total_amount_local,
+                currency_local = :currency_local,
+                price_per_share_sek = :price_per_share_sek,
+                total_amount_sek = :total_amount_sek,
+                exchange_rate_used = :exchange_rate_used,
+                broker_fees_local = :broker_fees_local,
+                broker_fees_sek = :broker_fees_sek,
+                tft_tax_local = :tft_tax_local,
+                tft_tax_sek = :tft_tax_sek,
+                tft_rate_percent = :tft_rate_percent,
+                net_amount_local = :net_amount_local,
+                net_amount_sek = :net_amount_sek,
+                broker_id = :broker_id,
+                portfolio_account_group_id = :portfolio_account_group_id,
+                broker_transaction_id = :broker_transaction_id,
+                order_type = :order_type,
+                execution_status = :execution_status,
+                notes = :notes,
+                updated_at = NOW()
+            WHERE trade_id = :trade_id";
             
             $stmt = $portfolioDb->prepare($sql);
             $stmt->execute($tradeData);
             
-            $success = "Trade added successfully!";
+            $success = "Trade updated successfully!";
             
-            // Clear form data after successful submission
-            $_POST = [];
+            // Redirect back to trade logs after successful update
+            $_SESSION['flash_success'] = $success;
+            header('Location: ' . BASE_URL . '/trade_logs.php');
+            exit();
         }
         
     } catch (Exception $e) {
-        $error = "Error adding trade: " . $e->getMessage();
+        $error = "Error updating trade: " . $e->getMessage();
     }
 }
 
@@ -118,9 +161,14 @@ try {
     $dbError = $e->getMessage();
 }
 
+// Helper function to get field value (POST data takes precedence for validation errors)
+function getFieldValue($fieldName, $existingTrade) {
+    return $_POST[$fieldName] ?? $existingTrade[$fieldName] ?? '';
+}
+
 // Initialize variables for template
-$pageTitle = 'Add Trade - PSW 4.0';
-$pageDescription = 'Add new trade execution record';
+$pageTitle = 'Edit Trade - PSW 4.0';
+$pageDescription = 'Edit trade execution record';
 $additionalCSS = [];
 $additionalJS = [];
 
@@ -132,10 +180,10 @@ ob_start();
     <div class="psw-card psw-mb-6">
         <div class="psw-card-header">
             <h1 class="psw-card-title">
-                <i class="fas fa-plus psw-card-title-icon"></i>
-                Add New Trade
+                <i class="fas fa-edit psw-card-title-icon"></i>
+                Edit Trade
             </h1>
-            <p class="psw-card-subtitle">Enter trade execution details manually</p>
+            <p class="psw-card-subtitle">Update trade execution details for <?php echo htmlspecialchars($existingTrade['isin']); ?></p>
         </div>
     </div>
 
@@ -186,7 +234,7 @@ ob_start();
                             Trade Date *
                         </label>
                         <input type="date" id="trade_date" name="trade_date" class="psw-form-input" 
-                               value="<?php echo $_POST['trade_date'] ?? date('Y-m-d'); ?>" required>
+                               value="<?php echo getFieldValue('trade_date', $existingTrade); ?>" required>
                     </div>
                     
                     <div class="psw-form-group">
@@ -195,7 +243,7 @@ ob_start();
                             Settlement Date (T+2 default)
                         </label>
                         <input type="date" id="settlement_date" name="settlement_date" class="psw-form-input" 
-                               value="<?php echo $_POST['settlement_date'] ?? ''; ?>" 
+                               value="<?php echo getFieldValue('settlement_date', $existingTrade); ?>" 
                                placeholder="Auto-calculated as T+2">
                     </div>
                     
@@ -205,7 +253,7 @@ ob_start();
                             <option value="">Select trade type...</option>
                             <?php foreach ($tradeTypes as $type): ?>
                                 <option value="<?php echo $type['trade_type_id']; ?>" 
-                                        <?php echo ($_POST['trade_type_id'] ?? '') == $type['trade_type_id'] ? 'selected' : ''; ?>>
+                                        <?php echo getFieldValue('trade_type_id', $existingTrade) == $type['trade_type_id'] ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars($type['type_name'] . ' (' . $type['type_code'] . ')'); ?>
                                 </option>
                             <?php endforeach; ?>
@@ -223,7 +271,7 @@ ob_start();
                         <div class="autocomplete-container">
                             <input type="text" id="isin" name="isin" class="psw-form-input" 
                                    placeholder="Type ISIN, company name, or ticker..." maxlength="50"
-                                   value="<?php echo htmlspecialchars($_POST['isin'] ?? ''); ?>" 
+                                   value="<?php echo htmlspecialchars(getFieldValue('isin', $existingTrade)); ?>" 
                                    autocomplete="off" required>
                             <div id="isin-suggestions" class="autocomplete-suggestions"></div>
                         </div>
@@ -443,7 +491,7 @@ ob_start();
                         <i class="fas fa-times"></i> Cancel
                     </a>
                     <button type="submit" class="psw-btn psw-btn-primary">
-                        <i class="fas fa-save"></i> Add Trade
+                        <i class="fas fa-save"></i> Update Trade
                     </button>
                 </div>
             </div>

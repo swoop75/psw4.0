@@ -198,6 +198,7 @@ try {
             'Price/Share (SEK)',
             'Total (SEK)',
             'Fees (SEK)',
+            'Fees (%)',
             'Tax (SEK)',
             'Net (SEK)',
             'Broker',
@@ -223,6 +224,7 @@ try {
                 number_format($trade['price_per_share_sek'], 2, '.', ''),
                 number_format($trade['total_amount_sek'], 2, '.', ''),
                 number_format($trade['broker_fees_sek'], 2, '.', ''),
+                number_format($trade['broker_fees_percent'], 2, '.', ''),
                 number_format($trade['tft_tax_sek'], 2, '.', ''),
                 number_format($trade['net_amount_sek'], 2, '.', ''),
                 $trade['broker_name'] ?? '-',
@@ -578,8 +580,10 @@ ob_start();
                                 <th>Currency</th>
                                 <th style="text-align: right;">Price (SEK)</th>
                                 <th style="text-align: right;">Net (SEK)</th>
+                                <th style="text-align: right;">Fees %</th>
                                 <th>Broker</th>
                                 <th>Account</th>
+                                <th style="width: 120px;">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -603,8 +607,26 @@ ob_start();
                                     <td style="text-align: right; color: <?php echo $trade['type_code'] == 'BUY' ? 'var(--error-color)' : 'var(--success-color)'; ?>; font-weight: 600;">
                                         <?php echo Localization::formatCurrency($trade['net_amount_sek'], 2, 'SEK'); ?>
                                     </td>
+                                    <td style="text-align: right; color: var(--warning-color); font-size: 0.875rem;">
+                                        <?php echo Localization::formatNumber($trade['broker_fees_percent'], 2); ?>%
+                                    </td>
                                     <td><?php echo htmlspecialchars($trade['broker_name'] ?? '-'); ?></td>
                                     <td><?php echo htmlspecialchars($trade['account_group_name'] ?? '-'); ?></td>
+                                    <td>
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <a href="<?php echo BASE_URL; ?>/edit_trade.php?id=<?php echo $trade['trade_id']; ?>" 
+                                               class="psw-btn psw-btn-sm psw-btn-secondary" 
+                                               title="Edit trade">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" 
+                                                    class="psw-btn psw-btn-sm psw-btn-danger" 
+                                                    onclick="deleteTrade(<?php echo $trade['trade_id']; ?>, '<?php echo htmlspecialchars($trade['company_name'], ENT_QUOTES); ?>')" 
+                                                    title="Delete trade">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -1091,6 +1113,47 @@ document.addEventListener('DOMContentLoaded', function() {
         currentToMonth = new Date(toInput.value);
     }
 });
+
+// Delete trade function
+window.deleteTrade = function(tradeId, companyName) {
+    if (confirm(`Are you sure you want to delete the trade for ${companyName}?\n\nThis action cannot be undone.`)) {
+        // Show loading indicator
+        const deleteBtn = event.target.closest('button');
+        const originalHTML = deleteBtn.innerHTML;
+        deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        deleteBtn.disabled = true;
+        
+        // Send delete request
+        fetch(`<?php echo BASE_URL; ?>/api/delete_trade.php`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ trade_id: tradeId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success message
+                alert('Trade deleted successfully!');
+                // Reload the page to refresh the trade list
+                window.location.reload();
+            } else {
+                alert('Error deleting trade: ' + (data.message || 'Unknown error'));
+                // Restore button
+                deleteBtn.innerHTML = originalHTML;
+                deleteBtn.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Delete error:', error);
+            alert('Error deleting trade. Please try again.');
+            // Restore button
+            deleteBtn.innerHTML = originalHTML;
+            deleteBtn.disabled = false;
+        });
+    }
+};
 </script>
 
 <!-- Date Range Picker Styles - Same as dividend_logs.php -->

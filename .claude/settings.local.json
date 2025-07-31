@@ -28,7 +28,8 @@
       "Bash(del debug_user_tables.php)",
       "WebFetch(domain:app.scrab.com)",
       "WebFetch(domain:scrab.com)",
-      "Bash(del \"C:\\Users\\laoan\\Documents\\GitHub\\psw\\psw4.0\\test_api.php\")"
+      "Bash(del \"C:\\Users\\laoan\\Documents\\GitHub\\psw\\psw4.0\\test_api.php\")",
+      "Bash(del debug_trades.php)"
     ],
     "deny": []
   }
