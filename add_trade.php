@@ -181,15 +181,31 @@ ob_start();
                 <!-- Basic Trade Information -->
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
                     <div class="psw-form-group">
-                        <label class="psw-form-label" for="trade_date">Trade Date *</label>
-                        <input type="date" id="trade_date" name="trade_date" class="psw-form-input" 
-                               value="<?php echo $_POST['trade_date'] ?? date('Y-m-d'); ?>" required>
+                        <label class="psw-form-label" for="trade_date">
+                            <i class="fas fa-calendar-alt"></i>
+                            Trade Date *
+                        </label>
+                        <div class="psw-date-input-wrapper">
+                            <input type="date" id="trade_date" name="trade_date" class="psw-form-input psw-date-input" 
+                                   value="<?php echo $_POST['trade_date'] ?? date('Y-m-d'); ?>" required>
+                            <button type="button" class="psw-date-btn" onclick="setToday('trade_date')" title="Set to today">
+                                <i class="fas fa-calendar-day"></i>
+                            </button>
+                        </div>
                     </div>
                     
                     <div class="psw-form-group">
-                        <label class="psw-form-label" for="settlement_date">Settlement Date</label>
-                        <input type="date" id="settlement_date" name="settlement_date" class="psw-form-input" 
-                               value="<?php echo $_POST['settlement_date'] ?? ''; ?>">
+                        <label class="psw-form-label" for="settlement_date">
+                            <i class="fas fa-calendar-check"></i>
+                            Settlement Date
+                        </label>
+                        <div class="psw-date-input-wrapper">
+                            <input type="date" id="settlement_date" name="settlement_date" class="psw-form-input psw-date-input" 
+                                   value="<?php echo $_POST['settlement_date'] ?? ''; ?>">
+                            <button type="button" class="psw-date-btn" onclick="calculateSettlement()" title="Auto-calculate T+2">
+                                <i class="fas fa-calculator"></i>
+                            </button>
+                        </div>
                     </div>
                     
                     <div class="psw-form-group">
@@ -880,13 +896,52 @@ document.addEventListener('DOMContentLoaded', function() {
     tradeDate.addEventListener('change', function() {
         if (this.value && !settlementDate.value) {
             const date = new Date(this.value);
-            date.setDate(date.getDate() + 2);
-            // Skip weekends
-            if (date.getDay() === 6) date.setDate(date.getDate() + 2); // Saturday
-            if (date.getDay() === 0) date.setDate(date.getDate() + 1); // Sunday
-            settlementDate.value = date.toISOString().split('T')[0];
+            const settlement = calculateSettlementDate(date, 2);
+            settlementDate.value = formatDate(settlement);
         }
     });
+    
+    // Date selector helper functions
+    window.setToday = function(inputId) {
+        const input = document.getElementById(inputId);
+        const today = new Date();
+        input.value = formatDate(today);
+        
+        // Trigger change event to update settlement date if trade date was changed
+        if (inputId === 'trade_date') {
+            input.dispatchEvent(new Event('change'));
+        }
+        
+        // Show success feedback
+        input.style.borderColor = 'var(--success-color)';
+        setTimeout(() => {
+            input.style.borderColor = '';
+        }, 1000);
+    };
+    
+    window.calculateSettlement = function() {
+        const tradeDateInput = document.getElementById('trade_date');
+        const settlementDateInput = document.getElementById('settlement_date');
+        
+        if (!tradeDateInput.value) {
+            alert('Please select a trade date first');
+            tradeDateInput.focus();
+            return;
+        }
+        
+        const tradeDate = new Date(tradeDateInput.value);
+        const settlement = calculateSettlementDate(tradeDate, 2);
+        settlementDateInput.value = formatDate(settlement);
+        
+        // Show success feedback
+        settlementDateInput.style.borderColor = 'var(--success-color)';
+        setTimeout(() => {
+            settlementDateInput.style.borderColor = '';
+        }, 1000);
+        
+        // Show brief message
+        showSuccessMessage(`Settlement date set to ${formatDate(settlement)} (T+2 business days)`);
+    };
 });
 </script>
 
