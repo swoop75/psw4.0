@@ -346,7 +346,7 @@ ob_start();
                 </div>
                 
                 <!-- Filter Action Buttons - Same Row -->
-                <div class="psw-form-group" style="display: flex; gap: 0.5rem; align-items: end;">
+                <div class="psw-form-group" style="display: flex; gap: 0.5rem; align-items: end; justify-content: flex-end;">
                     <button type="button" class="psw-btn psw-btn-primary" onclick="applyFilters()">
                         <i class="fas fa-filter psw-btn-icon"></i>Apply
                     </button>
@@ -567,15 +567,16 @@ document.getElementById('search-input').addEventListener('input', function() {
 });
 
 // Enhanced Date Range Picker JavaScript with Calendar
-let tempFromDate = '';
-let tempToDate = '';
-let currentFromMonth = new Date();
-let currentToMonth = new Date();
+var tempFromDate = '';
+var tempToDate = '';
+var currentFromMonth = new Date();
+var currentToMonth = new Date();
 
-function toggleDateRangePicker() {
+// Make function global
+window.toggleDateRangePicker = function() {
     console.log('toggleDateRangePicker called');
-    const overlay = document.getElementById('dateRangeOverlay');
-    const picker = document.getElementById('dividend-date-range');
+    var overlay = document.getElementById('dateRangeOverlay');
+    var picker = document.getElementById('dividend-date-range');
     console.log('Overlay element:', overlay);
     console.log('Picker element:', picker);
     
@@ -612,17 +613,17 @@ function toggleDateRangePicker() {
     }
 }
 
-function closeDateRangePicker() {
-    const overlay = document.getElementById('dateRangeOverlay');
-    const picker = document.getElementById('dividend-date-range');
+window.closeDateRangePicker = function() {
+    var overlay = document.getElementById('dateRangeOverlay');
+    var picker = document.getElementById('dividend-date-range');
     
     overlay.style.display = 'none';
     picker.classList.remove('open');
 }
 
-function applyPreset(preset) {
-    const today = new Date();
-    let fromDate, toDate;
+window.applyPreset = function(preset) {
+    var today = new Date();
+    var fromDate, toDate;
 
     switch (preset) {
         case 'today':
@@ -692,9 +693,9 @@ function applyPreset(preset) {
     renderCalendar('to', currentToMonth);
 }
 
-function applyDateRange() {
-    const fromInput = document.getElementById('fromDateInput');
-    const toInput = document.getElementById('toDateInput');
+window.applyDateRange = function() {
+    var fromInput = document.getElementById('fromDateInput');
+    var toInput = document.getElementById('toDateInput');
     
     tempFromDate = fromInput.value;
     tempToDate = toInput.value;
@@ -709,12 +710,12 @@ function applyDateRange() {
     closeDateRangePicker();
 }
 
-function updateCalendar(type) {
-    const input = document.getElementById(type + 'DateInput');
-    const dateValue = input.value;
+window.updateCalendar = function(type) {
+    var input = document.getElementById(type + 'DateInput');
+    var dateValue = input.value;
     
     if (isValidDate(dateValue)) {
-        const newDate = new Date(dateValue);
+        var newDate = new Date(dateValue);
         if (type === 'from') {
             currentFromMonth = newDate;
             tempFromDate = dateValue;
@@ -726,7 +727,7 @@ function updateCalendar(type) {
     }
 }
 
-function renderCalendar(type, date) {
+window.renderCalendar = function(type, date) {
     const calendarContainer = document.getElementById(type + 'Calendar');
     const year = date.getFullYear();
     const month = date.getMonth();
@@ -805,7 +806,7 @@ function renderCalendar(type, date) {
     calendarContainer.innerHTML = html;
 }
 
-function navigateMonth(type, direction) {
+window.navigateMonth = function(type, direction) {
     if (type === 'from') {
         currentFromMonth.setMonth(currentFromMonth.getMonth() + direction);
         renderCalendar('from', currentFromMonth);
@@ -815,7 +816,7 @@ function navigateMonth(type, direction) {
     }
 }
 
-function selectCalendarDate(type, dateStr) {
+window.selectCalendarDate = function(type, dateStr) {
     const input = document.getElementById(type + 'DateInput');
     input.value = dateStr;
     
@@ -829,14 +830,14 @@ function selectCalendarDate(type, dateStr) {
     renderCalendar(type, type === 'from' ? currentFromMonth : currentToMonth);
 }
 
-function formatDate(date) {
+window.formatDate = function(date) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
 }
 
-function isValidDate(dateStr) {
+window.isValidDate = function(dateStr) {
     const date = new Date(dateStr);
     return date instanceof Date && !isNaN(date) && dateStr.match(/^\d{4}-\d{2}-\d{2}$/);
 }
@@ -855,6 +856,7 @@ document.getElementById('account-group-filter').addEventListener('change', apply
 
 // Debug function to check if JavaScript is loaded
 console.log('Date range picker JavaScript loaded');
+console.log('toggleDateRangePicker function available:', typeof window.toggleDateRangePicker);
 
 // Initialize calendars when overlay opens
 document.addEventListener('DOMContentLoaded', function() {
