@@ -148,6 +148,13 @@ try {
     $statsStmt->execute($params);
     $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
     
+    // Get earliest dividend date for 'since start' preset
+    $earliestDateSql = "SELECT MIN(payment_date) as earliest_date FROM psw_portfolio.log_dividends";
+    $earliestDateStmt = $portfolioDb->prepare($earliestDateSql);
+    $earliestDateStmt->execute();
+    $earliestDateResult = $earliestDateStmt->fetch(PDO::FETCH_ASSOC);
+    $earliestDate = $earliestDateResult['earliest_date'] ?? '2020-01-01'; // Fallback if no data
+    
 } catch (Exception $e) {
     $dividends = [];
     $totalRecords = 0;
@@ -160,6 +167,7 @@ try {
         'total_net_sek' => 0,
         'unique_companies' => 0
     ];
+    $earliestDate = '2020-01-01'; // Fallback date
     $errorMessage = $e->getMessage();
 }
 
@@ -838,7 +846,7 @@ window.applyPreset = function(preset) {
             toDate = new Date(today.getFullYear() - 1, 11, 31);
             break;
         case 'sinceStart':
-            fromDate = new Date(2020, 0, 1);
+            fromDate = new Date('<?php echo $earliestDate; ?>');
             toDate = new Date(today);
             break;
         case 'defaultRange':
