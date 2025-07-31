@@ -244,18 +244,25 @@ ob_start();
 ?>
 <div class="psw-content">
     <!-- Page Header -->
-    <div class="psw-card psw-mb-6">
-        <div class="psw-card-header">
-            <h1 class="psw-card-title">
-                <i class="fas fa-coins psw-card-title-icon"></i>
-                Dividend Logs
-            </h1>
-            <p class="psw-card-subtitle">Track and analyze dividend payments across the portfolio</p>
+    <div class="psw-card psw-mb-4">
+        <div class="psw-card-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <h1 class="psw-card-title">
+                    <i class="fas fa-coins psw-card-title-icon"></i>
+                    Dividend Logs
+                </h1>
+                <p class="psw-card-subtitle">Track and analyze dividend payments across the portfolio</p>
+            </div>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <a href="<?php echo BASE_URL; ?>/add_dividend.php" class="psw-btn psw-btn-success">
+                    <i class="fas fa-plus psw-btn-icon"></i>Add Dividend
+                </a>
+            </div>
         </div>
     </div>
 
     <!-- Statistics Cards -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 1rem;">
         <div class="psw-card">
             <div class="psw-card-content" style="display: flex; align-items: center; gap: 1rem;">
                 <div style="width: 48px; height: 48px; background: linear-gradient(135deg, var(--primary-accent), var(--primary-accent-hover)); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center;">
@@ -322,7 +329,7 @@ ob_start();
             </div>
         </div>
         <div class="psw-card-content">
-            <div style="display: grid; grid-template-columns: 1fr 250px 150px 150px 1fr; gap: 1rem; align-items: end;">
+            <div style="display: grid; grid-template-columns: 1fr 250px 155px 155px 1fr; gap: 1rem; align-items: end;">
                 <div class="psw-form-group">
                     <label class="psw-form-label">Search</label>
                     <input type="text" id="search-input" class="psw-form-input" 
@@ -412,9 +419,6 @@ ob_start();
                 
                 <!-- Filter Action Buttons - Same Row -->
                 <div class="psw-form-group" style="display: flex; gap: 0.5rem; align-items: end; justify-content: flex-end;">
-                    <a href="<?php echo BASE_URL; ?>/add_dividend.php" class="psw-btn psw-btn-success">
-                        <i class="fas fa-plus psw-btn-icon"></i>Add
-                    </a>
                     <button type="button" class="psw-btn psw-btn-primary" onclick="applyFilters()">
                         <i class="fas fa-filter psw-btn-icon"></i>Apply
                     </button>

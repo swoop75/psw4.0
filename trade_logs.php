@@ -286,7 +286,7 @@ ob_start();
 ?>
 <div class="psw-content">
     <!-- Page Header -->
-    <div class="psw-card psw-mb-6">
+    <div class="psw-card psw-mb-4">
         <div class="psw-card-header">
             <h1 class="psw-card-title">
                 <i class="fas fa-exchange-alt psw-card-title-icon"></i>
@@ -297,7 +297,7 @@ ob_start();
     </div>
 
     <!-- Statistics Cards -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 1rem;">
         <div class="psw-card">
             <div class="psw-card-content" style="display: flex; align-items: center; gap: 1rem;">
                 <div style="width: 48px; height: 48px; background: linear-gradient(135deg, var(--primary-accent), var(--primary-accent-hover)); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center;">
@@ -378,7 +378,7 @@ ob_start();
             </div>
         </div>
         <div class="psw-card-content">
-            <div style="display: grid; grid-template-columns: 1fr 250px 140px 140px 140px 120px 1fr; gap: 1rem; align-items: end;">
+            <div style="display: grid; grid-template-columns: 1fr 250px 145px 145px 145px 125px 1fr; gap: 1rem; align-items: end;">
                 <div class="psw-form-group">
                     <label class="psw-form-label">Search</label>
                     <input type="text" id="search-input" class="psw-form-input" 
