@@ -588,9 +588,10 @@ window.toggleDateRangePicker = function() {
         if (overlay.style.display === 'none' || overlay.style.display === '') {
             // Show the overlay with proper positioning
             overlay.style.display = 'block';
-            overlay.style.position = 'fixed';
-            overlay.style.top = '100px';
-            overlay.style.left = '50px';
+            overlay.style.position = 'absolute';
+            overlay.style.top = '100%';
+            overlay.style.left = '0';
+            overlay.style.right = 'auto';
             overlay.style.zIndex = '999999';
             overlay.style.minHeight = '400px';
             overlay.style.backgroundColor = 'white';
@@ -599,6 +600,9 @@ window.toggleDateRangePicker = function() {
             overlay.style.borderRadius = '8px';
             overlay.style.minWidth = '800px';
             picker.classList.add('open');
+            
+            // Ensure the picker container has relative positioning
+            picker.style.position = 'relative';
             
             // Debug: Check if content exists
             console.log('Overlay content:', overlay.innerHTML);
