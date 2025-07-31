@@ -267,7 +267,7 @@ ob_start();
                         <input type="hidden" name="date_from" value="<?php echo htmlspecialchars($filters['date_from']); ?>">
                         <input type="hidden" name="date_to" value="<?php echo htmlspecialchars($filters['date_to']); ?>">
                         
-                        <div class="date-range-display" onclick="alert('BASIC ONCLICK WORKS'); testFunction();" style="cursor: pointer;">
+                        <div class="date-range-display" onclick="alert('BASIC ONCLICK WORKS'); testFunction(); window.toggleDateRangePicker();" style="cursor: pointer;">
                             <i class="fas fa-calendar-alt"></i>
                             <span class="date-range-text" id="dateRangeText">
                                 <?php 
@@ -579,92 +579,10 @@ var tempToDate = '';
 var currentFromMonth = new Date();
 var currentToMonth = new Date();
 
-// Make function global
+// Make function global - simplified
 window.toggleDateRangePicker = function() {
-    console.log('toggleDateRangePicker called');
-    
-    // Wait a moment for DOM to be ready if needed
-    setTimeout(function() {
-        var overlay = document.getElementById('dateRangeOverlay');
-        var picker = document.getElementById('dividend-date-range');
-        
-        console.log('Looking for overlay element with ID: dateRangeOverlay');
-        console.log('Looking for picker element with ID: dividend-date-range');
-        console.log('Overlay element found:', overlay);
-        console.log('Picker element found:', picker);
-        
-        if (!overlay) {
-            alert('Overlay element dateRangeOverlay not found!');
-            // Try to find it by class instead
-            overlay = document.querySelector('.date-range-overlay');
-            alert('Found by class: ' + (overlay ? 'YES' : 'NO'));
-            
-            // List all elements with date-range in their class or id
-            var allElements = document.querySelectorAll('*[class*="date-range"], *[id*="date-range"], *[id*="dateRange"]');
-            alert('Found ' + allElements.length + ' elements with date-range in class/id');
-            for(var i = 0; i < allElements.length; i++) {
-                console.log('Element ' + i + ':', allElements[i]);
-            }
-            return;
-        }
-        if (!picker) {
-            alert('Picker element dividend-date-range not found!');
-            // Try to find it by class instead  
-            picker = document.querySelector('.date-range-picker');
-            alert('Found by class: ' + (picker ? 'YES' : 'NO'));
-            return;
-        }
-        
-        console.log('Both elements found, showing overlay');
-        
-        // Force the overlay to be visible with extreme measures
-        overlay.style.display = 'block';
-        overlay.style.visibility = 'visible';
-        overlay.style.opacity = '1';
-        overlay.style.position = 'fixed';
-        overlay.style.top = '100px';
-        overlay.style.left = '100px';
-        overlay.style.width = '600px';
-        overlay.style.height = '400px';
-        overlay.style.backgroundColor = 'red';
-        overlay.style.border = '10px solid blue';
-        overlay.style.zIndex = '999999';
-        overlay.innerHTML = '<div style="color: white; font-size: 30px; padding: 20px;">DATE PICKER OVERLAY IS VISIBLE!</div>';
-        
-        picker.classList.add('open');
-        console.log('Overlay display set to:', overlay.style.display);
-        console.log('Overlay computed style:', window.getComputedStyle(overlay));
-        alert('Extreme styling applied - you should see a red box with blue border!');
-        
-        // Set current values
-        var fromInput = document.querySelector('input[name="date_from"]');
-        var toInput = document.querySelector('input[name="date_to"]');
-        
-        document.getElementById('fromDateInput').value = fromInput.value;
-        document.getElementById('toDateInput').value = toInput.value;
-        
-        tempFromDate = fromInput.value;
-        tempToDate = toInput.value;
-        
-        // Set defaults if empty
-        if (!tempFromDate && !tempToDate) {
-            applyPreset('defaultRange');
-        } else {
-            // Update calendars to show selected dates
-            if (tempFromDate) {
-                currentFromMonth = new Date(tempFromDate);
-                renderCalendar('from', currentFromMonth);
-            }
-            if (tempToDate) {
-                currentToMonth = new Date(tempToDate);
-                renderCalendar('to', currentToMonth);
-            }
-        }
-    } else {
-        closeDateRangePicker();
-    }
-    }, 100); // End setTimeout
-}
+    alert('toggleDateRangePicker called - simplified version');
+};
 
 window.closeDateRangePicker = function() {
     var overlay = document.getElementById('dateRangeOverlay');
