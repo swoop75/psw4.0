@@ -267,7 +267,7 @@ ob_start();
                         <input type="hidden" name="date_from" value="<?php echo htmlspecialchars($filters['date_from']); ?>">
                         <input type="hidden" name="date_to" value="<?php echo htmlspecialchars($filters['date_to']); ?>">
                         
-                        <div class="date-range-display" onclick="alert('BASIC ONCLICK WORKS'); testFunction(); window.toggleDateRangePicker();" style="cursor: pointer;">
+                        <div class="date-range-display" onclick="window.toggleDateRangePicker();" style="cursor: pointer;">
                             <i class="fas fa-calendar-alt"></i>
                             <span class="date-range-text" id="dateRangeText">
                                 <?php 
@@ -579,9 +579,28 @@ var tempToDate = '';
 var currentFromMonth = new Date();
 var currentToMonth = new Date();
 
-// Make function global - simplified
+// Make function global - step by step rebuild
 window.toggleDateRangePicker = function() {
-    alert('toggleDateRangePicker called - simplified version');
+    var overlay = document.getElementById('dateRangeOverlay');
+    var picker = document.getElementById('dividend-date-range');
+    
+    if (overlay && picker) {
+        // Force show with extreme styling
+        overlay.style.display = 'block';
+        overlay.style.position = 'fixed';
+        overlay.style.top = '100px';
+        overlay.style.left = '100px';
+        overlay.style.width = '600px';
+        overlay.style.height = '400px';
+        overlay.style.backgroundColor = 'red';
+        overlay.style.border = '10px solid blue';
+        overlay.style.zIndex = '999999';
+        overlay.innerHTML = '<div style="color: white; font-size: 30px; padding: 20px;">DATE PICKER IS NOW VISIBLE!</div>';
+        
+        alert('Overlay should now be visible as red box!');
+    } else {
+        alert('Elements not found - overlay: ' + (overlay ? 'YES' : 'NO') + ', picker: ' + (picker ? 'YES' : 'NO'));
+    }
 };
 
 window.closeDateRangePicker = function() {
