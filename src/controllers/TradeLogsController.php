@@ -455,7 +455,7 @@ class TradeLogsController {
             $csv = "Trade Date,Settlement Date,ISIN,Company,Ticker,Trade Type,Shares,Price/Share (Local),Total (Local),Currency,Price/Share (SEK),Total (SEK),Fees (SEK),Tax (SEK),Net (SEK),Broker,Account Group,Transaction ID,Order Type,Status,Data Source,Notes\n";
             
             foreach ($trades as $trade) {
-                $csv .= sprintf("%s,%s,%s,%s,%s,%s,%.4f,%.6f,%.2f,%s,%.6f,%.2f,%.2f,%.2f,%.2f,%s,%s,%s,%s,%s,%s,%s\n",
+                $csv .= sprintf("%s,%s,%s,%s,%s,%s,%.0f,%.2f,%.2f,%s,%.2f,%.2f,%.2f,%.2f,%.2f,%s,%s,%s,%s,%s,%s,%s\n",
                     $trade['trade_date'],
                     $trade['settlement_date'] ?? '',
                     $trade['isin'],
