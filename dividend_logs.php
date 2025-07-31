@@ -600,6 +600,8 @@ window.toggleDateRangePicker = function() {
             overlay.style.setProperty('box-shadow', 'var(--shadow-xl)', 'important');
             overlay.style.setProperty('width', '800px', 'important');
             overlay.style.setProperty('height', '510px', 'important');
+            overlay.style.setProperty('min-width', '800px', 'important');
+            overlay.style.setProperty('max-width', '800px', 'important');
             picker.classList.add('open');
             
             // Ensure the picker container has relative positioning
@@ -617,14 +619,12 @@ window.toggleDateRangePicker = function() {
             var panelsGrid = overlay.querySelector('.date-range-panels');
             if (panelsGrid) {
                 panelsGrid.style.setProperty('display', 'grid', 'important');
-                // Calculate with 5px padding: 800px total - 10px padding - 80px gaps = 710px for content
-                // 40px gap between TO/FROM, 25px gap to presets = 65px total gaps
-                // Distribute remaining: (800-10-65)/3 = ~240px each for TO/FROM, 150px for presets
                 panelsGrid.style.setProperty('grid-template-columns', '240px 240px 150px', 'important');
                 panelsGrid.style.setProperty('gap', '40px 25px', 'important'); // 40px between TO/FROM, 25px to presets
-                panelsGrid.style.setProperty('height', 'calc(100% - 10px)', 'important'); // Account for 5px top/bottom
+                panelsGrid.style.setProperty('height', 'calc(100% - 10px)', 'important');
                 panelsGrid.style.setProperty('margin', '0', 'important');
                 panelsGrid.style.setProperty('justify-content', 'space-between', 'important');
+                panelsGrid.style.setProperty('align-items', 'start', 'important'); // Align all panels to start
             }
             
             // Style the date panels with aligned calendar positioning
@@ -650,28 +650,28 @@ window.toggleDateRangePicker = function() {
             var presetsGrid = overlay.querySelector('.presets-grid');
             
             if (presetsGrid) {
+                // Get the height of date input + header to calculate offset
+                var firstDateInput = overlay.querySelector('.date-input');
+                var firstHeader = overlay.querySelector('.date-panel h5');
+                var inputHeight = firstDateInput ? firstDateInput.offsetHeight : 32;
+                var headerHeight = firstHeader ? firstHeader.offsetHeight : 20;
+                var spacingHeight = 16; // spacing between input and calendar
+                var totalInputArea = headerHeight + inputHeight + spacingHeight;
+                
                 calendarContainers.forEach(function(container) {
-                    // Remove the calendar from its current position in the date panel
                     var datePanel = container.closest('.date-panel');
                     
-                    // Set the date panel to use flexbox with space-between to separate input and calendar
-                    datePanel.style.setProperty('display', 'flex', 'important');
-                    datePanel.style.setProperty('flex-direction', 'column', 'important');
-                    datePanel.style.setProperty('justify-content', 'flex-start', 'important');
+                    // Set date panel to grid layout to control positioning precisely
+                    datePanel.style.setProperty('display', 'grid', 'important');
+                    datePanel.style.setProperty('grid-template-rows', totalInputArea + 'px 1fr', 'important');
+                    datePanel.style.setProperty('align-items', 'start', 'important');
                     
-                    // Position calendar to align with preset buttons top and match input width
-                    container.style.setProperty('margin-top', '0px', 'important');
-                    container.style.setProperty('width', '240px', 'important'); // Exact same width as TO/FROM boxes
-                    container.style.setProperty('flex-grow', '0', 'important');
+                    // Position calendar in second grid row, aligned to top
+                    container.style.setProperty('grid-row', '2', 'important');
+                    container.style.setProperty('align-self', 'start', 'important');
+                    container.style.setProperty('width', '240px', 'important');
                     container.style.setProperty('max-width', '240px', 'important');
-                    
-                    // Create wrapper to control calendar positioning
-                    var calendarWrapper = document.createElement('div');
-                    calendarWrapper.style.setProperty('margin-top', 'auto', 'important');
-                    calendarWrapper.style.setProperty('align-self', 'flex-start', 'important');
-                    
-                    container.parentNode.insertBefore(calendarWrapper, container);
-                    calendarWrapper.appendChild(container);
+                    container.style.setProperty('margin-top', '0', 'important');
                 });
             }
             
