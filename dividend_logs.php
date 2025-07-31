@@ -581,30 +581,18 @@ var currentToMonth = new Date();
 
 // Make function global - proper implementation
 window.toggleDateRangePicker = function() {
-    alert('Function called - checking elements...');
     var overlay = document.getElementById('dateRangeOverlay');
     var picker = document.getElementById('dividend-date-range');
     
-    alert('Elements found - overlay: ' + (overlay ? 'YES' : 'NO') + ', picker: ' + (picker ? 'YES' : 'NO'));
-    
     if (overlay && picker) {
-        alert('Current overlay display: ' + overlay.style.display);
         if (overlay.style.display === 'none' || overlay.style.display === '') {
-            // Show the overlay with forced CSS
-            alert('Setting overlay to block...');
+            // Show the overlay with proper positioning
             overlay.style.display = 'block';
-            overlay.style.position = 'fixed';
-            overlay.style.top = '50px';
-            overlay.style.left = '50px';
-            overlay.style.width = '800px';
-            overlay.style.height = '500px';
-            overlay.style.backgroundColor = 'white';
-            overlay.style.border = '3px solid red';
-            overlay.style.zIndex = '999999';
-            overlay.style.visibility = 'visible';
-            overlay.style.opacity = '1';
+            overlay.style.position = 'absolute';
+            overlay.style.top = '100%';
+            overlay.style.left = '0';
+            overlay.style.zIndex = '9999';
             picker.classList.add('open');
-            alert('Overlay should now be visible - display is: ' + overlay.style.display);
             
             // Set current values in inputs
             var fromInput = document.querySelector('input[name="date_from"]');
