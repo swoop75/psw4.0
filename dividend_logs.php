@@ -599,23 +599,24 @@ window.toggleDateRangePicker = function() {
             overlay.style.setProperty('border-radius', 'var(--border-radius-lg)', 'important');
             overlay.style.setProperty('box-shadow', 'var(--shadow-xl)', 'important');
             // Calculate optimal width: content (710px) + left/right padding (20px) = 730px
+            // Height: content + top/bottom padding (10px each) = reduced height
             overlay.style.setProperty('width', '730px', 'important');
-            overlay.style.setProperty('height', '450px', 'important');
+            overlay.style.setProperty('height', '420px', 'important');
             overlay.style.setProperty('min-width', '730px', 'important');
             overlay.style.setProperty('max-width', '730px', 'important');
-            overlay.style.setProperty('min-height', '450px', 'important');
-            overlay.style.setProperty('max-height', '450px', 'important');
+            overlay.style.setProperty('min-height', '420px', 'important');
+            overlay.style.setProperty('max-height', '420px', 'important');
             picker.classList.add('open');
             
             // Ensure the picker container has relative positioning
             picker.style.position = 'relative';
             
-            // Ensure all content is properly styled with 10px left/right padding, 5px top/bottom
+            // Ensure all content is properly styled with 10px padding on all sides
             var overlayContent = overlay.querySelector('.date-range-content');
             if (overlayContent) {
                 overlayContent.style.setProperty('display', 'block', 'important');
                 overlayContent.style.setProperty('visibility', 'visible', 'important');
-                overlayContent.style.setProperty('padding', '5px 10px', 'important'); // 5px top/bottom, 10px left/right
+                overlayContent.style.setProperty('padding', '10px', 'important'); // 10px on all sides
             }
             
             // Style the panels grid with 5px padding and 40px gap between TO/FROM
@@ -728,10 +729,10 @@ window.toggleDateRangePicker = function() {
                 header.style.setProperty('letter-spacing', '0.5px', 'important');
             });
             
-            // Style the footer with 5px spacing
+            // Style the footer with 10px spacing
             var footer = overlay.querySelector('.date-range-footer');
             if (footer) {
-                footer.style.setProperty('padding', '5px', 'important'); // 5px on all sides
+                footer.style.setProperty('padding', '10px', 'important'); // 10px on all sides
                 footer.style.setProperty('margin-top', 'auto', 'important');
                 footer.style.setProperty('margin-bottom', '0', 'important');
             }
