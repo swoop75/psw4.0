@@ -216,11 +216,11 @@ try {
                 $trade['company_name'] ?? 'Unknown Company',
                 $trade['ticker'] ?? '-',
                 $trade['trade_type_name'],
-                number_format($trade['shares_traded'], 4, '.', ''),
-                number_format($trade['price_per_share_local'], 6, '.', ''),
+                number_format($trade['shares_traded'], 0, '.', ''),
+                number_format($trade['price_per_share_local'], 2, '.', ''),
                 number_format($trade['total_amount_local'], 2, '.', ''),
                 $trade['currency_local'],
-                number_format($trade['price_per_share_sek'], 6, '.', ''),
+                number_format($trade['price_per_share_sek'], 2, '.', ''),
                 number_format($trade['total_amount_sek'], 2, '.', ''),
                 number_format($trade['broker_fees_sek'], 2, '.', ''),
                 number_format($trade['tft_tax_sek'], 2, '.', ''),
@@ -599,10 +599,10 @@ ob_start();
                                             <?php echo htmlspecialchars($trade['type_code']); ?>
                                         </span>
                                     </td>
-                                    <td style="text-align: right;"><?php echo Localization::formatNumber($trade['shares_traded'], 4); ?></td>
-                                    <td style="text-align: right;"><?php echo Localization::formatNumber($trade['price_per_share_local'], 6); ?></td>
+                                    <td style="text-align: right;"><?php echo Localization::formatNumber($trade['shares_traded'], 0); ?></td>
+                                    <td style="text-align: right;"><?php echo Localization::formatNumber($trade['price_per_share_local'], 2); ?></td>
                                     <td><?php echo htmlspecialchars($trade['currency_local']); ?></td>
-                                    <td style="text-align: right;"><?php echo Localization::formatNumber($trade['price_per_share_sek'], 6); ?></td>
+                                    <td style="text-align: right;"><?php echo Localization::formatNumber($trade['price_per_share_sek'], 2); ?></td>
                                     <td style="text-align: right; color: <?php echo $trade['type_code'] == 'BUY' ? 'var(--error-color)' : 'var(--success-color)'; ?>; font-weight: 600;">
                                         <?php echo Localization::formatCurrency($trade['net_amount_sek'], 2, 'SEK'); ?>
                                     </td>
