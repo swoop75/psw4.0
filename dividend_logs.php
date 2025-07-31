@@ -621,11 +621,16 @@ window.toggleDateRangePicker = function() {
             var panelsGrid = overlay.querySelector('.date-range-panels');
             if (panelsGrid) {
                 panelsGrid.style.setProperty('display', 'grid', 'important');
+                // Calculate exact spacing: 800px - 10px padding = 790px available
+                // FROM (240px) + gap (40px) + TO (240px) + gap (25px) + PRESETS (150px) = 695px
+                // Remaining: 95px, distribute as margins: ~47px each side
                 panelsGrid.style.setProperty('grid-template-columns', '240px 240px 150px', 'important');
-                panelsGrid.style.setProperty('gap', '40px 25px', 'important'); // 40px between TO/FROM, 25px to presets
+                panelsGrid.style.setProperty('column-gap', '40px', 'important'); // Exact 40px between FROM and TO
+                panelsGrid.style.setProperty('row-gap', '0px', 'important');
                 panelsGrid.style.setProperty('height', 'calc(100% - 10px)', 'important');
                 panelsGrid.style.setProperty('margin', '0', 'important');
-                panelsGrid.style.setProperty('justify-content', 'space-between', 'important');
+                panelsGrid.style.setProperty('justify-content', 'center', 'important'); // Center the entire grid
+                panelsGrid.style.setProperty('gap', '0 40px', 'important'); // Ensure exactly 40px between columns
                 panelsGrid.style.setProperty('align-items', 'start', 'important'); // Align all panels to start
             }
             
