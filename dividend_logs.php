@@ -344,16 +344,16 @@ ob_start();
                         <?php endforeach; ?>
                     </select>
                 </div>
-            </div>
-            
-            <!-- Filter Action Buttons - Separate Row -->
-            <div style="display: flex; gap: 0.5rem; justify-content: flex-start; margin-top: 1rem;">
-                <button type="button" class="psw-btn psw-btn-primary" onclick="applyFilters()">
-                    <i class="fas fa-filter psw-btn-icon"></i>Apply
-                </button>
-                <button type="button" class="psw-btn psw-btn-secondary" onclick="clearFilters()">
-                    <i class="fas fa-times psw-btn-icon"></i>Clear
-                </button>
+                
+                <!-- Filter Action Buttons - Same Row -->
+                <div class="psw-form-group" style="display: flex; gap: 0.5rem; align-items: end;">
+                    <button type="button" class="psw-btn psw-btn-primary" onclick="applyFilters()">
+                        <i class="fas fa-filter psw-btn-icon"></i>Apply
+                    </button>
+                    <button type="button" class="psw-btn psw-btn-secondary" onclick="clearFilters()">
+                        <i class="fas fa-times psw-btn-icon"></i>Clear
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -938,7 +938,7 @@ document.addEventListener('DOMContentLoaded', function() {
     border: 1px solid var(--border-primary);
     border-radius: var(--border-radius-lg);
     box-shadow: var(--shadow-xl);
-    z-index: 1000;
+    z-index: 9999;
     min-width: 900px;
     margin-top: var(--spacing-1);
     display: none;
