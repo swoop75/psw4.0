@@ -460,6 +460,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const isinInput = document.getElementById('isin');
         const suggestionsDiv = document.getElementById('isin-suggestions');
         
+        if (!isinInput || !suggestionsDiv) {
+            console.error('ISIN input or suggestions div not found!');
+            return;
+        }
+        
         isinInput.addEventListener('input', function() {
             const query = this.value.trim();
             
@@ -512,13 +517,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     async function searchIsin(query) {
         try {
-            const response = await fetch(`<?php echo BASE_URL; ?>/api/search_isin.php?q=${encodeURIComponent(query)}`);
+            const url = `<?php echo BASE_URL; ?>/api/search_isin.php?q=${encodeURIComponent(query)}`;
+            const response = await fetch(url);
             const results = await response.json();
             
             if (response.ok) {
                 showSuggestions(results);
             } else {
-                console.error('Search error:', results.error);
+                console.error('Search error:', results.error || results);
                 hideSuggestions();
             }
         } catch (error) {

@@ -36,10 +36,9 @@ try {
     $sql = "SELECT 
                 isin, 
                 name as company_name, 
-                ticker_symbol as ticker,
+                ticker,
                 country,
-                currency,
-                market_sector,
+                market as market_sector,
                 share_type_id
             FROM masterlist 
             WHERE (isin LIKE :query OR name LIKE :query_name) 
@@ -72,9 +71,9 @@ try {
         $formatted[] = [
             'isin' => $row['isin'],
             'company_name' => $row['company_name'],
-            'ticker' => $row['ticker_symbol'] ?? $row['ticker'],
+            'ticker' => $row['ticker'],
             'country' => $row['country'],
-            'currency' => $row['currency'],
+            'currency' => 'SEK', // Default since most securities are Swedish
             'market_sector' => $row['market_sector'],
             'share_type_id' => $row['share_type_id'],
             'display_text' => $row['isin'] . ' - ' . $row['company_name'],
