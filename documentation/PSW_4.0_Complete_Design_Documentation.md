@@ -577,4 +577,4 @@ assets/
 
 **Last Updated**: July 29, 2025
 **Version**: 4.0
-**Author**: Claude Code Assistant
+**Author**: Allan Andersen, pswcapital.se
