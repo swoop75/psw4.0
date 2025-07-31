@@ -130,6 +130,9 @@ $userTheme = $_SESSION['user_theme'] ?? 'light';
                                     <a href="<?php echo BASE_URL; ?>/dividend_logs.php" class="psw-nav-submenu-link <?php echo (basename($_SERVER['PHP_SELF']) == 'dividend_logs.php') ? 'active' : ''; ?>">
                                         <i class="fas fa-coins"></i> Dividends
                                     </a>
+                                    <a href="<?php echo BASE_URL; ?>/trade_logs.php" class="psw-nav-submenu-link <?php echo (basename($_SERVER['PHP_SELF']) == 'trade_logs.php') ? 'active' : ''; ?>">
+                                        <i class="fas fa-exchange-alt"></i> Trades
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -165,6 +168,10 @@ $userTheme = $_SESSION['user_theme'] ?? 'light';
                         <a href="<?php echo BASE_URL; ?>/dividend_import.php" class="psw-icon-btn" title="Import Dividends">
                             <i class="fas fa-file-import"></i>
                         </a>
+                    <?php elseif (basename($_SERVER['PHP_SELF']) == 'trade_logs.php'): ?>
+                        <button type="button" class="psw-icon-btn" onclick="exportToCSV()" title="Export filtered trade data to CSV">
+                            <i class="fas fa-download"></i>
+                        </button>
                     <?php endif; ?>
                     <div class="psw-user-menu" id="userMenu">
                         <button class="psw-user-button" onclick="toggleUserMenu()">
