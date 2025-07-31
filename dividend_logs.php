@@ -586,13 +586,13 @@ window.toggleDateRangePicker = function() {
     
     if (overlay && picker) {
         if (overlay.style.display === 'none' || overlay.style.display === '') {
-            // Show the overlay with proper positioning
+            // Show the overlay with calculated fixed positioning
+            var pickerRect = picker.getBoundingClientRect();
             overlay.style.setProperty('display', 'block', 'important');
-            overlay.style.setProperty('position', 'absolute', 'important');
-            overlay.style.top = '100%';
-            overlay.style.left = '0';
-            overlay.style.right = 'auto';
-            overlay.style.setProperty('z-index', '9999999', 'important');
+            overlay.style.setProperty('position', 'fixed', 'important');
+            overlay.style.setProperty('top', (pickerRect.bottom + 5) + 'px', 'important');
+            overlay.style.setProperty('left', pickerRect.left + 'px', 'important');
+            overlay.style.setProperty('z-index', '2147483647', 'important'); // Maximum z-index value
             overlay.style.minHeight = '400px';
             overlay.style.backgroundColor = 'white';
             overlay.style.border = '1px solid #ccc';
