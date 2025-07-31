@@ -32,7 +32,7 @@ try {
     
     $foundationDb = Database::getConnection('foundation');
     
-    // Search by ISIN or company name
+    // Search by ISIN, company name, or ticker
     $sql = "SELECT 
                 isin, 
                 name as company_name, 
@@ -41,25 +41,28 @@ try {
                 market as market_sector,
                 share_type_id
             FROM masterlist 
-            WHERE (isin LIKE :query OR name LIKE :query_name) 
+            WHERE (isin LIKE :query OR name LIKE :query_name OR ticker LIKE :query_ticker) 
             AND isin IS NOT NULL 
             AND isin != ''
             ORDER BY 
                 CASE 
                     WHEN isin LIKE :exact_query THEN 1
                     WHEN isin LIKE :starts_query THEN 2
-                    WHEN name LIKE :starts_name THEN 3
-                    ELSE 4
+                    WHEN ticker LIKE :starts_ticker THEN 3
+                    WHEN name LIKE :starts_name THEN 4
+                    ELSE 5
                 END,
                 name
-            LIMIT 10";
+            LIMIT 15";
     
     $stmt = $foundationDb->prepare($sql);
     $stmt->execute([
         ':query' => '%' . $query . '%',
         ':query_name' => '%' . $query . '%',
+        ':query_ticker' => '%' . $query . '%',
         ':exact_query' => $query . '%',
         ':starts_query' => $query . '%',
+        ':starts_ticker' => $query . '%',
         ':starts_name' => $query . '%'
     ]);
     
