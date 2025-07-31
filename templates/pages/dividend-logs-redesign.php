@@ -149,12 +149,6 @@ if (!empty($filters['date_from']) || !empty($filters['date_to'])) {
                             </div>
                             
                             <div class="date-range-overlay" id="dateRangeOverlay">
-                                <div class="date-range-header">
-                                    <h4>Date Range Selector</h4>
-                                    <button type="button" class="close-btn" onclick="closeDateRangePicker()">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
                                 <div class="date-range-content">
                                     <div class="date-range-panels">
                                         <div class="date-panel from-panel">
@@ -882,7 +876,7 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .date-panel h5 {
-    margin: 0 0 var(--spacing-3) 0;
+    margin: 0 0 calc(var(--spacing-3) / 2) 0;
     font-size: var(--font-size-sm);
     font-weight: 600;
     color: var(--text-secondary);
@@ -946,7 +940,7 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .calendar-grid {
-    padding: var(--spacing-2);
+    padding: var(--spacing-2) var(--spacing-2) calc(var(--spacing-2) / 2) var(--spacing-2);
 }
 
 .calendar-weekdays {
@@ -1009,7 +1003,7 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .presets-panel {
-    background: var(--bg-secondary);
+    background: var(--bg-tertiary);
     border-radius: var(--border-radius);
     padding: var(--spacing-4);
     min-width: 150px;
@@ -1018,7 +1012,7 @@ document.addEventListener('DOMContentLoaded', function() {
 .presets-grid {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-1);
+    gap: calc(var(--spacing-1) + 2px);
 }
 
 .preset-btn {
