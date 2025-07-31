@@ -590,9 +590,19 @@ window.toggleDateRangePicker = function() {
     if (overlay && picker) {
         alert('Current overlay display: ' + overlay.style.display);
         if (overlay.style.display === 'none' || overlay.style.display === '') {
-            // Show the overlay
+            // Show the overlay with forced CSS
             alert('Setting overlay to block...');
             overlay.style.display = 'block';
+            overlay.style.position = 'fixed';
+            overlay.style.top = '50px';
+            overlay.style.left = '50px';
+            overlay.style.width = '800px';
+            overlay.style.height = '500px';
+            overlay.style.backgroundColor = 'white';
+            overlay.style.border = '3px solid red';
+            overlay.style.zIndex = '999999';
+            overlay.style.visibility = 'visible';
+            overlay.style.opacity = '1';
             picker.classList.add('open');
             alert('Overlay should now be visible - display is: ' + overlay.style.display);
             
