@@ -668,31 +668,30 @@ window.toggleDateRangePicker = function() {
                     var dateInput = datePanel.querySelector('.date-input');
                     var panelHeader = datePanel.querySelector('h5');
                     
-                    // Ensure date input is visible and in first grid row
+                    // Ensure date input is visible and properly ordered
                     if (dateInput) {
                         dateInput.style.setProperty('display', 'block', 'important');
                         dateInput.style.setProperty('visibility', 'visible', 'important');
-                        dateInput.style.setProperty('grid-row', '1', 'important');
+                        dateInput.style.setProperty('order', '2', 'important'); // After header
                         dateInput.style.setProperty('z-index', '1000', 'important');
                         dateInput.style.setProperty('position', 'relative', 'important');
                     }
                     
-                    // Ensure header is visible and positioned
+                    // Ensure header is visible and positioned first
                     if (panelHeader) {
                         panelHeader.style.setProperty('display', 'block', 'important');
                         panelHeader.style.setProperty('visibility', 'visible', 'important');
-                        panelHeader.style.setProperty('grid-row', '1', 'important');
+                        panelHeader.style.setProperty('order', '1', 'important'); // First item
                         panelHeader.style.setProperty('z-index', '1001', 'important');
                     }
                     
-                    // Set date panel to grid layout to control positioning precisely
-                    datePanel.style.setProperty('display', 'grid', 'important');
-                    datePanel.style.setProperty('grid-template-rows', 'auto auto 1fr', 'important'); // header, input, calendar
-                    datePanel.style.setProperty('align-items', 'start', 'important');
-                    datePanel.style.setProperty('grid-gap', '8px', 'important');
+                    // Set date panel to flexbox layout for proper sequential positioning
+                    datePanel.style.setProperty('display', 'flex', 'important');
+                    datePanel.style.setProperty('flex-direction', 'column', 'important');
+                    datePanel.style.setProperty('gap', '8px', 'important');
                     
-                    // Position calendar in third grid row
-                    container.style.setProperty('grid-row', '3', 'important');
+                    // Position calendar as third item in flex layout
+                    container.style.setProperty('order', '3', 'important'); // After header and input
                     container.style.setProperty('align-self', 'start', 'important');
                     container.style.setProperty('width', '240px', 'important');
                     container.style.setProperty('max-width', '240px', 'important');
