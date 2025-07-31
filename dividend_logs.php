@@ -267,7 +267,7 @@ ob_start();
                         <input type="hidden" name="date_from" value="<?php echo htmlspecialchars($filters['date_from']); ?>">
                         <input type="hidden" name="date_to" value="<?php echo htmlspecialchars($filters['date_to']); ?>">
                         
-                        <div class="date-range-display" onclick="alert('Date picker clicked!'); console.log('Direct onclick test'); if(window.toggleDateRangePicker) { window.toggleDateRangePicker(); } else { alert('Function not available'); }" style="cursor: pointer;">
+                        <div class="date-range-display" onclick="alert('CLICKED!')" style="cursor: pointer; background: red !important; border: 5px solid blue !important;">
                             <i class="fas fa-calendar-alt"></i>
                             <span class="date-range-text" id="dateRangeText">
                                 <?php 
@@ -924,6 +924,12 @@ document.addEventListener('DOMContentLoaded', function() {
     min-height: 44px;
     font-family: var(--font-family-primary);
     color: var(--text-primary);
+    /* Debug styling */
+    background: #ff0000 !important;
+    border: 3px solid #00ff00 !important;
+    position: relative;
+    z-index: 999;
+    pointer-events: auto;
 }
 
 .date-range-display:hover {
