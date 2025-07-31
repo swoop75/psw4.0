@@ -447,6 +447,7 @@ let selectedSecurity = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     setupIsinAutocomplete();
+    setupSekAutoCopy(); // Set up SEK auto-copy functionality immediately
     
     // Auto-calculate functionality
     const sharesInput = document.getElementById('shares_traded');
@@ -630,15 +631,16 @@ document.addEventListener('DOMContentLoaded', function() {
             orderTypeSelect.value = 'MARKET';
         }
         
-        // If currency is SEK, set exchange rate to 1.0 and copy local prices to SEK fields
+        // If currency is SEK, set exchange rate to 1.0 and trigger auto-copy
         if (security.currency === 'SEK') {
             const exchangeRateInput = document.getElementById('exchange_rate_used');
             if (!exchangeRateInput.value) {
                 exchangeRateInput.value = '1.000000';
             }
             
-            // Add event listener to copy SEK values when local values change
-            setupSekAutoCopy();
+            // Trigger the currency change event to activate SEK auto-copy
+            const currencySelect = document.getElementById('currency_local');
+            currencySelect.dispatchEvent(new Event('change'));
         }
         
         hideSuggestions();
@@ -699,45 +701,90 @@ document.addEventListener('DOMContentLoaded', function() {
         const feesSekInput = document.getElementById('broker_fees_sek');
         const taxSekInput = document.getElementById('tft_tax_sek');
         const netSekInput = document.getElementById('net_amount_sek');
-        
-        // Copy values when local currency fields change (only if SEK)
         const currencySelect = document.getElementById('currency_local');
+        
+        // Function to check if currency is SEK and copy values accordingly
+        function handleSekAutoCopy() {
+            if (currencySelect.value === 'SEK') {
+                // Copy price per share
+                if (priceLocalInput.value && priceLocalInput.value !== priceSekInput.value) {
+                    priceSekInput.value = priceLocalInput.value;
+                }
+                
+                // Copy total amount
+                if (totalLocalInput.value && totalLocalInput.value !== totalSekInput.value) {
+                    totalSekInput.value = totalLocalInput.value;
+                }
+                
+                // Copy broker fees
+                if (feesLocalInput.value && feesLocalInput.value !== feesSekInput.value) {
+                    feesSekInput.value = feesLocalInput.value;
+                }
+                
+                // Copy transaction tax
+                if (taxLocalInput.value && taxLocalInput.value !== taxSekInput.value) {
+                    taxSekInput.value = taxLocalInput.value;
+                }
+                
+                // Copy net amount
+                if (netLocalInput.value && netLocalInput.value !== netSekInput.value) {
+                    netSekInput.value = netLocalInput.value;
+                }
+                
+                // Set exchange rate to 1.0 for SEK
+                const exchangeRateInput = document.getElementById('exchange_rate_used');
+                if (!exchangeRateInput.value || exchangeRateInput.value === '0') {
+                    exchangeRateInput.value = '1.000000';
+                }
+            }
+        }
+        
+        // Add event listeners for real-time copying when currency is SEK
+        priceLocalInput.addEventListener('input', function() {
+            if (currencySelect.value === 'SEK' && this.value) {
+                priceSekInput.value = this.value;
+                calculateTotals();
+            }
+        });
+        
+        totalLocalInput.addEventListener('input', function() {
+            if (currencySelect.value === 'SEK' && this.value) {
+                totalSekInput.value = this.value;
+                calculateNetAmounts();
+            }
+        });
+        
+        feesLocalInput.addEventListener('input', function() {
+            if (currencySelect.value === 'SEK' && this.value) {
+                feesSekInput.value = this.value;
+                calculateNetAmounts();
+            }
+        });
+        
+        taxLocalInput.addEventListener('input', function() {
+            if (currencySelect.value === 'SEK' && this.value) {
+                taxSekInput.value = this.value;
+                calculateNetAmounts();
+            }
+        });
+        
+        netLocalInput.addEventListener('input', function() {
+            if (currencySelect.value === 'SEK' && this.value) {
+                netSekInput.value = this.value;
+            }
+        });
+        
+        // Handle currency change - if changed to SEK, copy all existing values
+        currencySelect.addEventListener('change', function() {
+            if (this.value === 'SEK') {
+                handleSekAutoCopy();
+                calculateTotals();
+            }
+        });
+        
+        // Initial copy if currency is already SEK
         if (currencySelect.value === 'SEK') {
-            if (priceLocalInput && !priceSekInput.value) {
-                priceLocalInput.addEventListener('input', function() {
-                    if (currencySelect.value === 'SEK' && this.value) {
-                        priceSekInput.value = this.value;
-                        calculateTotals();
-                    }
-                });
-            }
-            
-            if (totalLocalInput && !totalSekInput.value) {
-                totalLocalInput.addEventListener('input', function() {
-                    if (currencySelect.value === 'SEK' && this.value) {
-                        totalSekInput.value = this.value;
-                        calculateNetAmounts();
-                    }
-                });
-            }
-            
-            if (feesLocalInput && !feesSekInput.value) {
-                feesLocalInput.addEventListener('input', function() {
-                    if (currencySelect.value === 'SEK' && this.value) {
-                        feesSekInput.value = this.value;
-                        calculateNetAmounts();
-                    }
-                });
-            }
-            
-            if (taxLocalInput && !taxSekInput.value) {
-                taxLocalInput.addEventListener('input', function() {
-                    if (currencySelect.value === 'SEK' && this.value) {
-                        taxSekInput.value = this.value;
-                        calculateNetAmounts();
-                    }
-                });
-            }
+            handleSekAutoCopy();
         }
     }
     
