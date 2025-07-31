@@ -1016,8 +1016,8 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .presets-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    flex-direction: column;
     gap: var(--spacing-1);
 }
 
@@ -1032,6 +1032,8 @@ document.addEventListener('DOMContentLoaded', function() {
     transition: all 0.2s ease;
     text-align: center;
     color: var(--text-primary);
+    white-space: nowrap;
+    width: 100%;
 }
 
 .preset-btn:hover {
@@ -1071,7 +1073,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     .presets-grid {
-        grid-template-columns: 1fr;
+        gap: var(--spacing-1);
     }
 }
 
