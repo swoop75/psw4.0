@@ -591,6 +591,13 @@ window.toggleDateRangePicker = function() {
             // Try to find it by class instead
             overlay = document.querySelector('.date-range-overlay');
             alert('Found by class: ' + (overlay ? 'YES' : 'NO'));
+            
+            // List all elements with date-range in their class or id
+            var allElements = document.querySelectorAll('*[class*="date-range"], *[id*="date-range"], *[id*="dateRange"]');
+            alert('Found ' + allElements.length + ' elements with date-range in class/id');
+            for(var i = 0; i < allElements.length; i++) {
+                console.log('Element ' + i + ':', allElements[i]);
+            }
             return;
         }
         if (!picker) {
