@@ -54,11 +54,11 @@ try {
     
     // Prepare content
     ob_start();
-    include __DIR__ . '/templates/pages/dividend-logs.php';
+    include __DIR__ . '/templates/pages/dividend-logs-redesign.php';
     $content = ob_get_clean();
     
-    // Include base layout
-    include __DIR__ . '/templates/layouts/base.php';
+    // Include beautiful redesign layout
+    include __DIR__ . '/templates/layouts/base-redesign.php';
     
     // Log page access
     Logger::logUserAction('dividend_logs_viewed', 'User accessed dividend logs with filters', $filters);
