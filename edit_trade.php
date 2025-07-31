@@ -90,6 +90,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'notes' => !empty($_POST['notes']) ? trim($_POST['notes']) : null
             ];
             
+            // Calculate broker fees percentage
+            $totalAmountSek = $tradeData['total_amount_sek'];
+            $brokerFeesSek = $tradeData['broker_fees_sek'];
+            $tradeData['broker_fees_percent'] = 0;
+            
+            if ($totalAmountSek > 0) {
+                $tradeData['broker_fees_percent'] = ($brokerFeesSek / $totalAmountSek) * 100;
+            }
+            
             // Update trade
             $sql = "UPDATE log_trades SET 
                 trade_date = :trade_date,
@@ -106,6 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exchange_rate_used = :exchange_rate_used,
                 broker_fees_local = :broker_fees_local,
                 broker_fees_sek = :broker_fees_sek,
+                broker_fees_percent = :broker_fees_percent,
                 tft_tax_local = :tft_tax_local,
                 tft_tax_sek = :tft_tax_sek,
                 tft_rate_percent = :tft_rate_percent,

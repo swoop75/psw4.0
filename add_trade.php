@@ -62,19 +62,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'notes' => !empty($_POST['notes']) ? trim($_POST['notes']) : null
             ];
             
+            // Calculate broker fees percentage
+            $totalAmountSek = $tradeData['total_amount_sek'];
+            $brokerFeesSek = $tradeData['broker_fees_sek'];
+            $tradeData['broker_fees_percent'] = 0;
+            
+            if ($totalAmountSek > 0) {
+                $tradeData['broker_fees_percent'] = ($brokerFeesSek / $totalAmountSek) * 100;
+            }
+            
             // Insert trade
             $sql = "INSERT INTO log_trades (
                 trade_date, settlement_date, trade_type_id, isin, ticker, shares_traded,
                 price_per_share_local, total_amount_local, currency_local,
                 price_per_share_sek, total_amount_sek, exchange_rate_used,
-                broker_fees_local, broker_fees_sek, tft_tax_local, tft_tax_sek, tft_rate_percent,
+                broker_fees_local, broker_fees_sek, broker_fees_percent, tft_tax_local, tft_tax_sek, tft_rate_percent,
                 net_amount_local, net_amount_sek, broker_id, portfolio_account_group_id,
                 broker_transaction_id, order_type, execution_status, data_source, notes
             ) VALUES (
                 :trade_date, :settlement_date, :trade_type_id, :isin, :ticker, :shares_traded,
                 :price_per_share_local, :total_amount_local, :currency_local,
                 :price_per_share_sek, :total_amount_sek, :exchange_rate_used,
-                :broker_fees_local, :broker_fees_sek, :tft_tax_local, :tft_tax_sek, :tft_rate_percent,
+                :broker_fees_local, :broker_fees_sek, :broker_fees_percent, :tft_tax_local, :tft_tax_sek, :tft_rate_percent,
                 :net_amount_local, :net_amount_sek, :broker_id, :portfolio_account_group_id,
                 :broker_transaction_id, :order_type, :execution_status, :data_source, :notes
             )";

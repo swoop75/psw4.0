@@ -267,15 +267,6 @@ class TradeLogsController {
             // Process results
             $trades = [];
             foreach ($results as $result) {
-                // Calculate broker fees percentage
-                $totalAmountSek = (float) $result['total_amount_sek'];
-                $brokerFeesSek = (float) $result['broker_fees_sek'];
-                $brokerFeesPercent = 0;
-                
-                if ($totalAmountSek > 0) {
-                    $brokerFeesPercent = ($brokerFeesSek / $totalAmountSek) * 100;
-                }
-                
                 $trades[] = [
                     'trade_id' => (int) $result['trade_id'],
                     'trade_date' => $result['trade_date'],
@@ -288,11 +279,11 @@ class TradeLogsController {
                     'total_amount_local' => (float) $result['total_amount_local'],
                     'currency_local' => $result['currency_local'],
                     'price_per_share_sek' => (float) $result['price_per_share_sek'],
-                    'total_amount_sek' => $totalAmountSek,
+                    'total_amount_sek' => (float) $result['total_amount_sek'],
                     'exchange_rate_used' => (float) $result['exchange_rate_used'],
                     'broker_fees_local' => (float) $result['broker_fees_local'],
-                    'broker_fees_sek' => $brokerFeesSek,
-                    'broker_fees_percent' => $brokerFeesPercent,
+                    'broker_fees_sek' => (float) $result['broker_fees_sek'],
+                    'broker_fees_percent' => (float) $result['broker_fees_percent'],
                     'tft_tax_local' => (float) $result['tft_tax_local'],
                     'tft_tax_sek' => (float) $result['tft_tax_sek'],
                     'tft_rate_percent' => (float) $result['tft_rate_percent'],
