@@ -15,10 +15,14 @@ require_once __DIR__ . '/src/utils/Localization.php';
 // Require authentication
 Auth::requireAuth();
 
+// Set the user-friendly default date range
+$displayDefaultFrom = date('Y-m-01', strtotime('-3 months'));
+$displayDefaultTo = date('Y-m-t');
+
 $filters = [
     'search' => $_GET['search'] ?? '',
-    'date_from' => $_GET['date_from'] ?? '',
-    'date_to' => $_GET['date_to'] ?? '',
+    'date_from' => $_GET['date_from'] ?? $displayDefaultFrom,
+    'date_to' => $_GET['date_to'] ?? $displayDefaultTo,
     'broker_id' => $_GET['broker_id'] ?? '',
     'account_group_id' => $_GET['account_group_id'] ?? '',
     'sort_by' => $_GET['sort_by'] ?? 'payment_date',
@@ -154,12 +158,7 @@ try {
     $earliestDateResult = $earliestDateStmt->fetch(PDO::FETCH_ASSOC);
     $earliestDate = $earliestDateResult['earliest_date'] ?? '2020-01-01'; // Fallback if no data
     
-    // Keep the original user-friendly default date range for display
-    $displayDefaultFrom = date('Y-m-01', strtotime('-3 months'));
-    $displayDefaultTo = date('Y-m-t');
-    
-    // Don't automatically set filters - let users see the intended default range
-    // but allow them to choose whether to apply it or use "Since Start" preset
+    // Default date range is now applied to filters and will be used in database query
     
 } catch (Exception $e) {
     $dividends = [];
@@ -278,19 +277,15 @@ ob_start();
                 <div class="psw-form-group">
                     <label class="psw-form-label">Date Range</label>
                     <div id="dividend-date-range" class="date-range-picker">
-                        <input type="hidden" name="date_from" value="<?php echo htmlspecialchars($filters['date_from'] ?: $displayDefaultFrom); ?>">
-                        <input type="hidden" name="date_to" value="<?php echo htmlspecialchars($filters['date_to'] ?: $displayDefaultTo); ?>">
+                        <input type="hidden" name="date_from" value="<?php echo htmlspecialchars($filters['date_from']); ?>">
+                        <input type="hidden" name="date_to" value="<?php echo htmlspecialchars($filters['date_to']); ?>">
                         
                         <div class="date-range-display" onclick="window.toggleDateRangePicker();" style="cursor: pointer;">
                             <i class="fas fa-calendar-alt"></i>
                             <span class="date-range-text" id="dateRangeText">
                                 <?php 
-                                // Show applied filters or user-friendly default range
-                                if ($filters['date_from'] && $filters['date_to']) {
-                                    echo $filters['date_from'] . ' - ' . $filters['date_to'];
-                                } else {
-                                    echo $displayDefaultFrom . ' - ' . $displayDefaultTo;
-                                }
+                                // Display the current date range (now always has values)
+                                echo $filters['date_from'] . ' - ' . $filters['date_to'];
                                 ?>
                             </span>
                             <i class="fas fa-chevron-down"></i>
