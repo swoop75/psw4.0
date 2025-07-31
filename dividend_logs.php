@@ -412,6 +412,9 @@ ob_start();
                 
                 <!-- Filter Action Buttons - Same Row -->
                 <div class="psw-form-group" style="display: flex; gap: 0.5rem; align-items: end; justify-content: flex-end;">
+                    <a href="<?php echo BASE_URL; ?>/add_dividend.php" class="psw-btn psw-btn-success">
+                        <i class="fas fa-plus psw-btn-icon"></i>Add
+                    </a>
                     <button type="button" class="psw-btn psw-btn-primary" onclick="applyFilters()">
                         <i class="fas fa-filter psw-btn-icon"></i>Apply
                     </button>
@@ -501,7 +504,7 @@ ob_start();
                                 <td><?php echo Localization::formatDate($dividend['payment_date']); ?></td>
                                 <td style="font-family: var(--font-family-mono); font-size: 0.875rem;"><?php echo htmlspecialchars($dividend['isin']); ?></td>
                                 <td>
-                                    <strong><?php echo htmlspecialchars($dividend['company_name'] ?? 'Unknown Company'); ?></strong>
+                                    <?php echo htmlspecialchars($dividend['company_name'] ?? 'Unknown Company'); ?>
                                 </td>
                                 <td style="font-family: var(--font-family-mono); font-size: 0.875rem;"><?php echo htmlspecialchars($dividend['ticker'] ?? '-'); ?></td>
                                 <td><?php echo htmlspecialchars($dividend['broker_name'] ?? '-'); ?></td>
@@ -1834,6 +1837,16 @@ function deleteDividend(dividendId, companyName) {
     .presets-grid {
         gap: var(--spacing-1);
     }
+}
+
+/* Filter width adjustments */
+#broker-filter,
+#account-group-filter {
+    max-width: calc(100% - 2px);
+}
+
+.date-range-picker {
+    max-width: calc(300px + 2px);
 }
 </style>
 <?php

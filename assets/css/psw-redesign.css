@@ -698,6 +698,17 @@ body.psw-landing-layout {
   box-shadow: var(--shadow-lg);
 }
 
+.psw-btn-success {
+  background-color: var(--success-color);
+  color: var(--text-inverse);
+}
+
+.psw-btn-success:hover {
+  background-color: #059669;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
 /* Form Styles */
 .psw-form-group {
   margin-bottom: var(--spacing-4);

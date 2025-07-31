@@ -591,7 +591,7 @@ ob_start();
                                     <td><?php echo Localization::formatDate($trade['trade_date']); ?></td>
                                     <td style="font-family: var(--font-family-mono); font-size: 0.875rem;"><?php echo htmlspecialchars($trade['isin']); ?></td>
                                     <td>
-                                        <strong><?php echo htmlspecialchars($trade['company_name'] ?? 'Unknown Company'); ?></strong>
+                                        <?php echo htmlspecialchars($trade['company_name'] ?? 'Unknown Company'); ?>
                                     </td>
                                     <td style="font-family: var(--font-family-mono); font-size: 0.875rem;"><?php echo htmlspecialchars($trade['ticker'] ?? '-'); ?></td>
                                     <td>
@@ -1339,6 +1339,18 @@ window.deleteTrade = function(tradeId, companyName) {
     .presets-grid {
         gap: var(--spacing-1);
     }
+}
+
+/* Filter width adjustments */
+#trade-type-filter,
+#broker-filter,
+#account-group-filter,
+#currency-filter {
+    max-width: calc(100% - 2px);
+}
+
+.date-range-picker {
+    max-width: calc(300px + 2px);
 }
 </style>
 <?php
