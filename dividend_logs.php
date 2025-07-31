@@ -267,7 +267,7 @@ ob_start();
                         <input type="hidden" name="date_from" value="<?php echo htmlspecialchars($filters['date_from']); ?>">
                         <input type="hidden" name="date_to" value="<?php echo htmlspecialchars($filters['date_to']); ?>">
                         
-                        <div class="date-range-display" onclick="window.toggleDateRangePicker()" style="cursor: pointer;">
+                        <div class="date-range-display" onclick="alert('Function exists: ' + (typeof window.toggleDateRangePicker)); if(window.toggleDateRangePicker) { window.toggleDateRangePicker(); } else { alert('Function not found!'); }" style="cursor: pointer;">
                             <i class="fas fa-calendar-alt"></i>
                             <span class="date-range-text" id="dateRangeText">
                                 <?php 
