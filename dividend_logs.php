@@ -15,7 +15,6 @@ require_once __DIR__ . '/src/utils/Localization.php';
 // Require authentication
 Auth::requireAuth();
 
-// Get filter parameters
 $filters = [
     'search' => $_GET['search'] ?? '',
     'date_from' => $_GET['date_from'] ?? '',
@@ -155,6 +154,12 @@ try {
     $earliestDateResult = $earliestDateStmt->fetch(PDO::FETCH_ASSOC);
     $earliestDate = $earliestDateResult['earliest_date'] ?? '2020-01-01'; // Fallback if no data
     
+    // Set intelligent default date range - use earliest date to today if no filters applied
+    if (empty($filters['date_from']) && empty($filters['date_to'])) {
+        $filters['date_from'] = $earliestDate; // Use earliest date from database
+        $filters['date_to'] = date('Y-m-d'); // Today's date
+    }
+    
 } catch (Exception $e) {
     $dividends = [];
     $totalRecords = 0;
@@ -272,22 +277,15 @@ ob_start();
                 <div class="psw-form-group">
                     <label class="psw-form-label">Date Range</label>
                     <div id="dividend-date-range" class="date-range-picker">
-                        <input type="hidden" name="date_from" value="<?php echo htmlspecialchars($filters['date_from'] ?: $defaultFrom); ?>">
-                        <input type="hidden" name="date_to" value="<?php echo htmlspecialchars($filters['date_to'] ?: $defaultTo); ?>">
+                        <input type="hidden" name="date_from" value="<?php echo htmlspecialchars($filters['date_from']); ?>">
+                        <input type="hidden" name="date_to" value="<?php echo htmlspecialchars($filters['date_to']); ?>">
                         
                         <div class="date-range-display" onclick="window.toggleDateRangePicker();" style="cursor: pointer;">
                             <i class="fas fa-calendar-alt"></i>
                             <span class="date-range-text" id="dateRangeText">
                                 <?php 
-                                // Set default date range: current month + 3 months back
-                                $defaultFrom = date('Y-m-01', strtotime('-3 months'));
-                                $defaultTo = date('Y-m-t');
-                                
-                                if ($filters['date_from'] && $filters['date_to']) {
-                                    echo $filters['date_from'] . ' - ' . $filters['date_to'];
-                                } else {
-                                    echo $defaultFrom . ' - ' . $defaultTo;
-                                }
+                                // Display the current date range (which now includes smart defaults)
+                                echo $filters['date_from'] . ' - ' . $filters['date_to'];
                                 ?>
                             </span>
                             <i class="fas fa-chevron-down"></i>
@@ -786,15 +784,11 @@ window.toggleDateRangePicker = function() {
             renderCalendar('from', currentFromMonth);
             renderCalendar('to', currentToMonth);
             
-            // Set defaults if empty
+            // Set defaults if empty - use PHP-provided intelligent defaults
             if ((!fromInput || !fromInput.value) && (!toInput || !toInput.value)) {
-                // Set default range: current month + 3 months back
-                var today = new Date();
-                var defaultFrom = new Date(today.getFullYear(), today.getMonth() - 3, 1);
-                var defaultTo = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-                
-                var defaultFromStr = formatDate(defaultFrom);
-                var defaultToStr = formatDate(defaultTo);
+                // Use the intelligent defaults set by PHP (earliest date to today)
+                var defaultFromStr = '<?php echo $earliestDate; ?>';
+                var defaultToStr = '<?php echo date("Y-m-d"); ?>';
                 
                 if (fromInput) fromInput.value = defaultFromStr;
                 if (toInput) toInput.value = defaultToStr;
@@ -1092,9 +1086,9 @@ document.addEventListener('DOMContentLoaded', function() {
     var toInput = document.querySelector('input[name="date_to"]');
     
     if (fromInput && toInput && !fromInput.value && !toInput.value) {
-        var today = new Date();
-        var defaultFrom = formatDate(new Date(today.getFullYear(), today.getMonth() - 3, 1));
-        var defaultTo = formatDate(new Date(today.getFullYear(), today.getMonth() + 1, 0));
+        // Use the intelligent defaults from PHP (earliest date to today)
+        var defaultFrom = '<?php echo $earliestDate; ?>';
+        var defaultTo = '<?php echo date("Y-m-d"); ?>';
         
         fromInput.value = defaultFrom;
         toInput.value = defaultTo;
