@@ -492,6 +492,7 @@ ob_start();
                             <th>Currency</th>
                             <th style="text-align: right;">Net (SEK)</th>
                             <th style="text-align: right;">Tax (SEK)</th>
+                            <th style="text-align: center; width: 120px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -513,6 +514,21 @@ ob_start();
                                 </td>
                                 <td style="text-align: right; color: var(--error-color);">
                                     -<?php echo Localization::formatCurrency($dividend['tax_amount_sek'], 2, 'SEK'); ?>
+                                </td>
+                                <td style="text-align: center;">
+                                    <div style="display: flex; gap: 0.25rem; justify-content: center;">
+                                        <a href="<?php echo BASE_URL; ?>/edit_dividend.php?id=<?php echo $dividend['log_id']; ?>" 
+                                           class="psw-btn psw-btn-sm psw-btn-secondary" 
+                                           title="Edit dividend">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" 
+                                                class="psw-btn psw-btn-sm psw-btn-danger"
+                                                onclick="deleteDividend(<?php echo $dividend['log_id']; ?>, '<?php echo htmlspecialchars($dividend['company_name'], ENT_QUOTES); ?>')" 
+                                                title="Delete dividend">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -1429,6 +1445,34 @@ document.addEventListener('DOMContentLoaded', function() {
         currentToMonth = new Date(toInput.value);
     }
 });
+
+// Delete dividend function
+function deleteDividend(dividendId, companyName) {
+    if (confirm(`Are you sure you want to delete the dividend record for ${companyName}?`)) {
+        fetch(`<?php echo BASE_URL; ?>/api/delete_dividend.php`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                log_id: dividendId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Dividend record deleted successfully!');
+                location.reload();
+            } else {
+                alert('Error deleting dividend: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error deleting dividend: ' + error.message);
+        });
+    }
+}
 </script>
 
 <!-- Date Range Picker Styles -->

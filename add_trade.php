@@ -188,7 +188,7 @@ ob_start();
             </div>
             <div class="psw-card-content">
                 <!-- Basic Trade Information -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 0.75rem; margin-bottom: 1rem;">
                     <div class="psw-form-group">
                         <label class="psw-form-label" for="trade_date">
                             <i class="fas fa-calendar-alt"></i>
@@ -223,7 +223,7 @@ ob_start();
                 </div>
 
                 <!-- Security Information -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 0.75rem; margin-bottom: 1rem;">
                     <div class="psw-form-group">
                         <label class="psw-form-label" for="isin">
                             <i class="fas fa-search"></i>
@@ -249,15 +249,15 @@ ob_start();
                     <div class="psw-form-group">
                         <label class="psw-form-label" for="shares_traded">Shares *</label>
                         <input type="number" id="shares_traded" name="shares_traded" class="psw-form-input" 
-                               step="0.0001" min="0.0001" placeholder="100"
+                               step="1" min="1" placeholder="100"
                                value="<?php echo $_POST['shares_traded'] ?? ''; ?>" required>
                     </div>
                 </div>
 
                 <!-- Pricing - Local Currency -->
-                <fieldset style="border: 1px solid var(--border-primary); border-radius: var(--border-radius); padding: 1.5rem; margin-bottom: 2rem;">
+                <fieldset style="border: 1px solid var(--border-primary); border-radius: var(--border-radius); padding: 0.75rem; margin-bottom: 1rem;">
                     <legend style="padding: 0 0.5rem; color: var(--primary-accent); font-weight: 600;">Local Currency Pricing</legend>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem;">
                         <div class="psw-form-group">
                             <label class="psw-form-label" for="currency_local">Currency *</label>
                             <select id="currency_local" name="currency_local" class="psw-form-input" required>
@@ -288,9 +288,9 @@ ob_start();
                 </fieldset>
 
                 <!-- Pricing - SEK -->
-                <fieldset style="border: 1px solid var(--border-primary); border-radius: var(--border-radius); padding: 1.5rem; margin-bottom: 2rem;">
+                <fieldset style="border: 1px solid var(--border-primary); border-radius: var(--border-radius); padding: 0.75rem; margin-bottom: 1rem;">
                     <legend style="padding: 0 0.5rem; color: var(--primary-accent); font-weight: 600;">SEK Pricing *</legend>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem;">
                         <div class="psw-form-group">
                             <label class="psw-form-label" for="price_per_share_sek">Price per Share (SEK) *</label>
                             <input type="number" id="price_per_share_sek" name="price_per_share_sek" class="psw-form-input" 
@@ -315,9 +315,9 @@ ob_start();
                 </fieldset>
 
                 <!-- Fees and Taxes -->
-                <fieldset style="border: 1px solid var(--border-primary); border-radius: var(--border-radius); padding: 1.5rem; margin-bottom: 2rem;">
+                <fieldset style="border: 1px solid var(--border-primary); border-radius: var(--border-radius); padding: 0.75rem; margin-bottom: 1rem;">
                     <legend style="padding: 0 0.5rem; color: var(--primary-accent); font-weight: 600;">Fees & Taxes</legend>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem;">
                         <div class="psw-form-group">
                             <label class="psw-form-label" for="broker_fees_local">Broker Fees (Local)</label>
                             <input type="number" id="broker_fees_local" name="broker_fees_local" class="psw-form-input" 
@@ -356,9 +356,9 @@ ob_start();
                 </fieldset>
 
                 <!-- Net Amounts -->
-                <fieldset style="border: 1px solid var(--border-primary); border-radius: var(--border-radius); padding: 1.5rem; margin-bottom: 2rem;">
+                <fieldset style="border: 1px solid var(--border-primary); border-radius: var(--border-radius); padding: 0.75rem; margin-bottom: 1rem;">
                     <legend style="padding: 0 0.5rem; color: var(--primary-accent); font-weight: 600;">Net Amounts</legend>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 0.75rem;">
                         <div class="psw-form-group">
                             <label class="psw-form-label" for="net_amount_local">Net Amount (Local)</label>
                             <input type="number" id="net_amount_local" name="net_amount_local" class="psw-form-input" 
@@ -376,9 +376,9 @@ ob_start();
                 </fieldset>
 
                 <!-- Account Information -->
-                <fieldset style="border: 1px solid var(--border-primary); border-radius: var(--border-radius); padding: 1.5rem; margin-bottom: 2rem;">
+                <fieldset style="border: 1px solid var(--border-primary); border-radius: var(--border-radius); padding: 0.75rem; margin-bottom: 1rem;">
                     <legend style="padding: 0 0.5rem; color: var(--primary-accent); font-weight: 600;">Account Information</legend>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 0.75rem;">
                         <div class="psw-form-group">
                             <label class="psw-form-label" for="broker_id">Broker</label>
                             <select id="broker_id" name="broker_id" class="psw-form-input">
@@ -408,7 +408,7 @@ ob_start();
                 </fieldset>
 
                 <!-- Additional Details -->
-                <fieldset style="border: 1px solid var(--border-primary); border-radius: var(--border-radius); padding: 1.5rem; margin-bottom: 2rem;">
+                <fieldset style="border: 1px solid var(--border-primary); border-radius: var(--border-radius); padding: 0.75rem; margin-bottom: 1rem;">
                     <legend style="padding: 0 0.5rem; color: var(--primary-accent); font-weight: 600;">Additional Details</legend>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
                         <div class="psw-form-group">

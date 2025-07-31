@@ -605,7 +605,7 @@ body.psw-landing-layout {
 }
 
 .psw-table th {
-  padding: var(--spacing-3);
+  padding: var(--spacing-2);
   text-align: left;
   font-weight: 600;
   color: var(--text-primary);
@@ -616,7 +616,7 @@ body.psw-landing-layout {
 }
 
 .psw-table td {
-  padding: var(--spacing-3);
+  padding: var(--spacing-2);
   border-bottom: 1px solid var(--border-primary);
   color: var(--text-secondary);
   font-size: var(--font-size-base);
@@ -674,6 +674,28 @@ body.psw-landing-layout {
 
 .psw-btn-icon {
   margin-right: var(--spacing-2);
+}
+
+/* Button Size Variants */
+.psw-btn-sm {
+  padding: var(--spacing-2) var(--spacing-3);
+  font-size: var(--font-size-sm);
+}
+
+.psw-btn-sm i {
+  font-size: var(--font-size-xs);
+}
+
+/* Button Color Variants */
+.psw-btn-danger {
+  background-color: var(--error-color);
+  color: var(--text-inverse);
+}
+
+.psw-btn-danger:hover {
+  background-color: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
 }
 
 /* Form Styles */
