@@ -267,7 +267,7 @@ ob_start();
                         <input type="hidden" name="date_from" value="<?php echo htmlspecialchars($filters['date_from']); ?>">
                         <input type="hidden" name="date_to" value="<?php echo htmlspecialchars($filters['date_to']); ?>">
                         
-                        <div class="date-range-display" onclick="toggleDateRangePicker()">
+                        <div class="date-range-display" onclick="toggleDateRangePicker()" style="cursor: pointer;">
                             <i class="fas fa-calendar-alt"></i>
                             <span class="date-range-text" id="dateRangeText">
                                 <?php 
@@ -573,8 +573,11 @@ let currentFromMonth = new Date();
 let currentToMonth = new Date();
 
 function toggleDateRangePicker() {
+    console.log('toggleDateRangePicker called');
     const overlay = document.getElementById('dateRangeOverlay');
     const picker = document.getElementById('dividend-date-range');
+    console.log('Overlay element:', overlay);
+    console.log('Picker element:', picker);
     
     if (overlay.style.display === 'none' || overlay.style.display === '') {
         overlay.style.display = 'block';
@@ -850,8 +853,27 @@ document.addEventListener('click', function(e) {
 document.getElementById('broker-filter').addEventListener('change', applyFilters);
 document.getElementById('account-group-filter').addEventListener('change', applyFilters);
 
+// Debug function to check if JavaScript is loaded
+console.log('Date range picker JavaScript loaded');
+
 // Initialize calendars when overlay opens
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, setting up date range picker');
+    
+    // Add click event listener to date range display
+    const dateRangeDisplay = document.querySelector('.date-range-display');
+    if (dateRangeDisplay) {
+        console.log('Found date range display, adding click listener');
+        dateRangeDisplay.addEventListener('click', function(e) {
+            console.log('Date range display clicked');
+            e.preventDefault();
+            e.stopPropagation();
+            toggleDateRangePicker();
+        });
+    } else {
+        console.log('Date range display not found');
+    }
+    
     const fromInput = document.querySelector('input[name="date_from"]');
     const toInput = document.querySelector('input[name="date_to"]');
     
