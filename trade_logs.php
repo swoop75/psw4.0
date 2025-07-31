@@ -287,12 +287,25 @@ ob_start();
 <div class="psw-content">
     <!-- Page Header -->
     <div class="psw-card psw-mb-4">
-        <div class="psw-card-header">
-            <h1 class="psw-card-title">
-                <i class="fas fa-exchange-alt psw-card-title-icon"></i>
-                Trade Logs
-            </h1>
-            <p class="psw-card-subtitle">Track and analyze trade executions across the portfolio</p>
+        <div class="psw-card-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <h1 class="psw-card-title">
+                    <i class="fas fa-exchange-alt psw-card-title-icon"></i>
+                    Trade Logs
+                </h1>
+                <p class="psw-card-subtitle">Track and analyze trade executions across the portfolio</p>
+            </div>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <a href="<?php echo BASE_URL; ?>/add_trade.php" class="psw-btn psw-btn-success">
+                    <i class="fas fa-plus psw-btn-icon"></i>Add
+                </a>
+                <a href="<?php echo BASE_URL; ?>/import_trades.php" class="psw-btn psw-btn-secondary">
+                    <i class="fas fa-upload psw-btn-icon"></i>Import
+                </a>
+                <button type="button" class="psw-btn psw-btn-secondary" onclick="exportToCSV()">
+                    <i class="fas fa-download psw-btn-icon"></i>Export
+                </button>
+            </div>
         </div>
     </div>
 
@@ -493,10 +506,10 @@ ob_start();
                 
                 <!-- Filter Action Buttons -->
                 <div class="psw-form-group" style="display: flex; gap: 0.5rem; align-items: end; justify-content: flex-end;">
-                    <button type="button" class="psw-btn psw-btn-primary" onclick="applyFilters()">
+                    <button type="button" class="psw-btn psw-btn-sm psw-btn-primary" onclick="applyFilters()">
                         <i class="fas fa-filter psw-btn-icon"></i>Apply
                     </button>
-                    <button type="button" class="psw-btn psw-btn-secondary" onclick="clearFilters()">
+                    <button type="button" class="psw-btn psw-btn-sm psw-btn-secondary" onclick="clearFilters()">
                         <i class="fas fa-times psw-btn-icon"></i>Clear
                     </button>
                 </div>

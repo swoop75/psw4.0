@@ -255,8 +255,14 @@ ob_start();
             </div>
             <div style="display: flex; gap: 0.5rem; align-items: center;">
                 <a href="<?php echo BASE_URL; ?>/add_dividend.php" class="psw-btn psw-btn-success">
-                    <i class="fas fa-plus psw-btn-icon"></i>Add Dividend
+                    <i class="fas fa-plus psw-btn-icon"></i>Add
                 </a>
+                <a href="<?php echo BASE_URL; ?>/import_dividends.php" class="psw-btn psw-btn-secondary">
+                    <i class="fas fa-upload psw-btn-icon"></i>Import
+                </a>
+                <button type="button" class="psw-btn psw-btn-secondary" onclick="exportToCSV()">
+                    <i class="fas fa-download psw-btn-icon"></i>Export
+                </button>
             </div>
         </div>
     </div>
@@ -419,10 +425,10 @@ ob_start();
                 
                 <!-- Filter Action Buttons - Same Row -->
                 <div class="psw-form-group" style="display: flex; gap: 0.5rem; align-items: end; justify-content: flex-end;">
-                    <button type="button" class="psw-btn psw-btn-primary" onclick="applyFilters()">
+                    <button type="button" class="psw-btn psw-btn-sm psw-btn-primary" onclick="applyFilters()">
                         <i class="fas fa-filter psw-btn-icon"></i>Apply
                     </button>
-                    <button type="button" class="psw-btn psw-btn-secondary" onclick="clearFilters()">
+                    <button type="button" class="psw-btn psw-btn-sm psw-btn-secondary" onclick="clearFilters()">
                         <i class="fas fa-times psw-btn-icon"></i>Clear
                     </button>
                 </div>
@@ -1452,6 +1458,37 @@ document.addEventListener('DOMContentLoaded', function() {
         currentToMonth = new Date(toInput.value);
     }
 });
+
+// Export to CSV function
+function exportToCSV() {
+    // Get current filter parameters
+    const params = new URLSearchParams();
+    
+    // Add current filters
+    const search = document.getElementById('search-input').value.trim();
+    if (search) params.set('search', search);
+    
+    // Date range from hidden inputs
+    const dateFrom = document.querySelector('input[name="date_from"]').value;
+    const dateTo = document.querySelector('input[name="date_to"]').value;
+    if (dateFrom) params.set('date_from', dateFrom);
+    if (dateTo) params.set('date_to', dateTo);
+    
+    // Broker filter
+    const brokerSelect = document.getElementById('broker-filter');
+    if (brokerSelect.value) params.set('broker_id', brokerSelect.value);
+    
+    // Account group filter
+    const accountGroupSelect = document.getElementById('account-group-filter');
+    if (accountGroupSelect.value) params.set('account_group_id', accountGroupSelect.value);
+    
+    // Add export flag
+    params.set('export', 'csv');
+    
+    // Create download link
+    const exportUrl = window.location.pathname + '?' + params.toString();
+    window.location.href = exportUrl;
+}
 
 // Delete dividend function
 function deleteDividend(dividendId, companyName) {

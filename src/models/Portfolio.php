@@ -27,49 +27,59 @@ class Portfolio {
      */
     public function getPortfolioSummary($userId, $isAdmin) {
         try {
-            // Since holdings tables aren't implemented yet, we'll use dividend data for metrics
-            $dividendModel = new Dividend();
-            $dividendStats = $dividendModel->getDividendStatistics($userId, $isAdmin);
+            // Get portfolio summary from the new portfolio table
+            $sql = "SELECT 
+                        COUNT(*) as total_positions,
+                        SUM(CASE WHEN is_active = 1 AND shares_held > 0 THEN 1 ELSE 0 END) as active_positions,
+                        SUM(CASE WHEN is_active = 1 THEN COALESCE(current_value_sek, 0) ELSE 0 END) as total_value,
+                        SUM(CASE WHEN is_active = 1 THEN COALESCE(total_cost_sek, 0) ELSE 0 END) as total_cost,
+                        SUM(CASE WHEN is_active = 1 THEN COALESCE(unrealized_gain_loss_sek, 0) ELSE 0 END) as total_unrealized_pnl,
+                        AVG(CASE WHEN is_active = 1 AND unrealized_gain_loss_percent IS NOT NULL 
+                            THEN unrealized_gain_loss_percent ELSE NULL END) as avg_return_percent
+                    FROM psw_portfolio.portfolio";
             
-            // Get company count from dividend data
-            $companyCountSql = "SELECT COUNT(DISTINCT isin) as unique_companies
-                               FROM log_dividends 
-                               WHERE dividend_amount_sek > 0";
-            
-            $stmt = $this->portfolioDb->prepare($companyCountSql);
+            $stmt = $this->portfolioDb->prepare($sql);
             $stmt->execute();
-            $companyResult = $stmt->fetch();
-            $uniqueCompanies = (int) ($companyResult['unique_companies'] ?? 0);
+            $portfolioSummary = $stmt->fetch(PDO::FETCH_ASSOC);
             
-            // Calculate estimated portfolio value based on dividend yield assumptions
-            // This is a rough estimate until holdings data is available
-            $estimatedYield = 4.5; // Assume 4.5% average yield
-            $estimatedPortfolioValue = $dividendStats['current_annual_run_rate'] > 0 
-                ? ($dividendStats['current_annual_run_rate'] / $estimatedYield) * 100 
-                : 0;
+            // Calculate daily change (placeholder - would need historical data)
+            $dailyChange = 0;
+            $dailyChangePercent = 0;
             
-            // Mock daily change for now (would come from portfolio value tracking)
-            $dailyChangePercent = (rand(-150, 150) / 100); // -1.5% to +1.5%
-            $dailyChange = $estimatedPortfolioValue * ($dailyChangePercent / 100);
+            // Get dividend stats for additional metrics
+            $dividendStatsModel = $this->portfolioDb->prepare("
+                SELECT 
+                    SUM(dividend_amount_sek) as total_dividends_all_time,
+                    SUM(CASE WHEN YEAR(payment_date) = YEAR(CURDATE()) THEN dividend_amount_sek ELSE 0 END) as total_dividends_ytd,
+                    COUNT(DISTINCT isin) as dividend_companies
+                FROM psw_portfolio.log_dividends
+            ");
+            $dividendStatsModel->execute();
+            $dividendStats = $dividendStatsModel->fetch(PDO::FETCH_ASSOC);
             
-            // Calculate expected monthly income from annual run rate
-            $expectedMonthlyIncome = $dividendStats['current_annual_run_rate'] / 12;
+            // Use actual portfolio data
+            $totalValue = (float) ($portfolioSummary['total_value'] ?? 0);
+            $totalCost = (float) ($portfolioSummary['total_cost'] ?? 0);
+            $totalUnrealizedPnl = (float) ($portfolioSummary['total_unrealized_pnl'] ?? 0);
+            $activePositions = (int) ($portfolioSummary['active_positions'] ?? 0);
             
-            // Estimate current yield
-            $currentYield = $estimatedPortfolioValue > 0 
-                ? ($dividendStats['current_annual_run_rate'] / $estimatedPortfolioValue) * 100 
+            // Calculate current yield from dividends
+            $currentYield = $totalValue > 0 && $dividendStats['total_dividends_ytd'] > 0
+                ? (($dividendStats['total_dividends_ytd'] * 1.0) / $totalValue) * 100
                 : 0;
             
             $result = [
-                'total_value' => $estimatedPortfolioValue,
+                'total_value' => $totalValue,
                 'daily_change' => $dailyChange,
                 'daily_change_percent' => $dailyChangePercent,
-                'total_dividends_ytd' => $dividendStats['ytd_total'],
-                'total_dividends_all_time' => $dividendStats['all_time_total'],
+                'total_dividends_ytd' => $dividendStats['total_dividends_ytd'] ?? 0,
+                'total_dividends_all_time' => $dividendStats['total_dividends_all_time'] ?? 0,
                 'current_yield' => $currentYield,
-                'expected_monthly_income' => $expectedMonthlyIncome,
-                'total_holdings' => $dividendStats['ytd_count'], // Use YTD dividend count as proxy
-                'total_companies' => $uniqueCompanies,
+                'expected_monthly_income' => ($dividendStats['total_dividends_ytd'] ?? 0) / 12,
+                'total_holdings' => $activePositions,
+                'total_companies' => $dividendStats['dividend_companies'] ?? 0,
+                'total_cost' => $totalCost,
+                'total_unrealized_pnl' => $totalUnrealizedPnl,
                 'dividend_payments_ytd' => $dividendStats['ytd_count'],
                 'dividend_payments_all_time' => $dividendStats['all_time_count']
             ];

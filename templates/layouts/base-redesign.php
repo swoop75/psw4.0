@@ -137,6 +137,24 @@ $userTheme = $_SESSION['user_theme'] ?? 'light';
                             </div>
                         </div>
                         
+                        <!-- Portfolio -->
+                        <div class="psw-nav-section">
+                            <div class="psw-nav-item" id="nav-portfolio">
+                                <a href="javascript:void(0)" class="psw-nav-link">
+                                    <div class="psw-nav-icon">
+                                        <i class="fas fa-chart-pie"></i>
+                                    </div>
+                                    <span class="psw-nav-text">Portfolio</span>
+                                    <i class="fas fa-chevron-down psw-nav-expand"></i>
+                                </a>
+                                <div class="psw-nav-submenu">
+                                    <a href="<?php echo BASE_URL; ?>/portfolio_overview.php" class="psw-nav-submenu-link <?php echo (basename($_SERVER['PHP_SELF']) == 'portfolio_overview.php') ? 'active' : ''; ?>">
+                                        <i class="fas fa-eye"></i> Overview
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <!-- Rules -->
                         <div class="psw-nav-section">
                             <div class="psw-nav-item" id="nav-rules">
