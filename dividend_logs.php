@@ -605,25 +605,26 @@ window.toggleDateRangePicker = function() {
             // Ensure the picker container has relative positioning
             picker.style.position = 'relative';
             
-            // Ensure all content is properly styled and visible with 15px padding on all sides
+            // Ensure all content is properly styled with 5px padding on all sides
             var overlayContent = overlay.querySelector('.date-range-content');
             if (overlayContent) {
                 overlayContent.style.setProperty('display', 'block', 'important');
                 overlayContent.style.setProperty('visibility', 'visible', 'important');
-                overlayContent.style.setProperty('padding', '15px', 'important'); // 15px on all sides
+                overlayContent.style.setProperty('padding', '5px', 'important'); // 5px on all sides
             }
             
-            // Style the panels grid with 15px padding adjustment
+            // Style the panels grid with 5px padding and 40px gap between TO/FROM
             var panelsGrid = overlay.querySelector('.date-range-panels');
             if (panelsGrid) {
                 panelsGrid.style.setProperty('display', 'grid', 'important');
-                // Calculate with 15px padding: 800px total - 30px padding - 50px gaps = 720px for content
-                // Left calendar: 285px, Right calendar: 285px, Presets: 150px = 720px total
-                panelsGrid.style.setProperty('grid-template-columns', '285px 285px 150px', 'important');
-                panelsGrid.style.setProperty('gap', '25px', 'important');
-                panelsGrid.style.setProperty('height', 'calc(100% - 30px)', 'important'); // Account for 15px top/bottom
+                // Calculate with 5px padding: 800px total - 10px padding - 80px gaps = 710px for content
+                // 40px gap between TO/FROM, 25px gap to presets = 65px total gaps
+                // Distribute remaining: (800-10-65)/3 = ~240px each for TO/FROM, 150px for presets
+                panelsGrid.style.setProperty('grid-template-columns', '240px 240px 150px', 'important');
+                panelsGrid.style.setProperty('gap', '40px 25px', 'important'); // 40px between TO/FROM, 25px to presets
+                panelsGrid.style.setProperty('height', 'calc(100% - 10px)', 'important'); // Account for 5px top/bottom
                 panelsGrid.style.setProperty('margin', '0', 'important');
-                panelsGrid.style.setProperty('justify-content', 'center', 'important');
+                panelsGrid.style.setProperty('justify-content', 'space-between', 'important');
             }
             
             // Style the date panels with aligned calendar positioning
@@ -658,10 +659,11 @@ window.toggleDateRangePicker = function() {
                     datePanel.style.setProperty('flex-direction', 'column', 'important');
                     datePanel.style.setProperty('justify-content', 'flex-start', 'important');
                     
-                    // Position calendar to align with preset buttons top
+                    // Position calendar to align with preset buttons top and match input width
                     container.style.setProperty('margin-top', '0px', 'important');
-                    container.style.setProperty('width', '100%', 'important');
+                    container.style.setProperty('width', '240px', 'important'); // Exact same width as TO/FROM boxes
                     container.style.setProperty('flex-grow', '0', 'important');
+                    container.style.setProperty('max-width', '240px', 'important');
                     
                     // Create wrapper to control calendar positioning
                     var calendarWrapper = document.createElement('div');
@@ -681,11 +683,12 @@ window.toggleDateRangePicker = function() {
                 input.style.setProperty('box-sizing', 'border-box', 'important');
             });
             
-            // Style the footer with consistent 15px spacing
+            // Style the footer with 5px spacing
             var footer = overlay.querySelector('.date-range-footer');
             if (footer) {
-                footer.style.setProperty('padding', '15px', 'important'); // Consistent 15px on all sides
+                footer.style.setProperty('padding', '5px', 'important'); // 5px on all sides
                 footer.style.setProperty('margin-top', 'auto', 'important');
+                footer.style.setProperty('margin-bottom', '0', 'important');
             }
             
             // Set current values in inputs
