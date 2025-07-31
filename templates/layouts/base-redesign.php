@@ -159,6 +159,9 @@ $userTheme = $_SESSION['user_theme'] ?? 'light';
             <div class="psw-user-area">
                 <div style="display: flex; align-items: center; gap: var(--spacing-3);">
                     <?php if (basename($_SERVER['PHP_SELF']) == 'dividend_logs.php'): ?>
+                        <button type="button" class="psw-icon-btn" onclick="exportToCSV()" title="Export filtered data to CSV">
+                            <i class="fas fa-download"></i>
+                        </button>
                         <a href="<?php echo BASE_URL; ?>/dividend_import.php" class="psw-icon-btn" title="Import Dividends">
                             <i class="fas fa-file-import"></i>
                         </a>

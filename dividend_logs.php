@@ -246,20 +246,11 @@ ob_start();
     <!-- Page Header -->
     <div class="psw-card psw-mb-6">
         <div class="psw-card-header">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
-                <div>
-                    <h1 class="psw-card-title">
-                        <i class="fas fa-coins psw-card-title-icon"></i>
-                        Dividend Logs
-                    </h1>
-                    <p class="psw-card-subtitle">Track and analyze dividend payments across the portfolio</p>
-                </div>
-                <div class="header-actions" style="display: flex; gap: 0.5rem; align-items: center;">
-                    <button type="button" class="psw-btn psw-btn-secondary" onclick="exportToCSV()" title="Export filtered data to CSV" style="padding: 0.5rem; min-width: auto;">
-                        <i class="fas fa-download"></i>
-                    </button>
-                </div>
-            </div>
+            <h1 class="psw-card-title">
+                <i class="fas fa-coins psw-card-title-icon"></i>
+                Dividend Logs
+            </h1>
+            <p class="psw-card-subtitle">Track and analyze dividend payments across the portfolio</p>
         </div>
     </div>
 
@@ -1766,23 +1757,6 @@ document.addEventListener('DOMContentLoaded', function() {
     border-color: var(--primary-accent);
     transform: translateY(-1px);
     box-shadow: 0 2px 4px var(--primary-accent-light);
-}
-
-/* Header Actions Styling */
-.header-actions {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-}
-
-.header-actions .psw-btn {
-    white-space: nowrap;
-    font-size: var(--font-size-sm);
-}
-
-.header-actions .psw-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .date-range-footer {
