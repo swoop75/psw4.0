@@ -574,31 +574,42 @@ var currentToMonth = new Date();
 
 // Make function global
 window.toggleDateRangePicker = function() {
-    alert('toggleDateRangePicker function called!');
     console.log('toggleDateRangePicker called');
-    var overlay = document.getElementById('dateRangeOverlay');
-    var picker = document.getElementById('dividend-date-range');
-    console.log('Overlay element:', overlay);
-    console.log('Picker element:', picker);
     
-    if (!overlay) {
-        alert('Overlay element not found!');
-        return;
-    }
-    if (!picker) {
-        alert('Picker element not found!');
-        return;
-    }
-    
-    alert('About to show overlay');
-    if (overlay.style.display === 'none' || overlay.style.display === '') {
+    // Wait a moment for DOM to be ready if needed
+    setTimeout(function() {
+        var overlay = document.getElementById('dateRangeOverlay');
+        var picker = document.getElementById('dividend-date-range');
+        
+        console.log('Looking for overlay element with ID: dateRangeOverlay');
+        console.log('Looking for picker element with ID: dividend-date-range');
+        console.log('Overlay element found:', overlay);
+        console.log('Picker element found:', picker);
+        
+        if (!overlay) {
+            alert('Overlay element dateRangeOverlay not found!');
+            // Try to find it by class instead
+            overlay = document.querySelector('.date-range-overlay');
+            alert('Found by class: ' + (overlay ? 'YES' : 'NO'));
+            return;
+        }
+        if (!picker) {
+            alert('Picker element dividend-date-range not found!');
+            // Try to find it by class instead  
+            picker = document.querySelector('.date-range-picker');
+            alert('Found by class: ' + (picker ? 'YES' : 'NO'));
+            return;
+        }
+        
+        console.log('Both elements found, showing overlay');
         overlay.style.display = 'block';
         picker.classList.add('open');
-        alert('Overlay should now be visible');
+        console.log('Overlay display set to:', overlay.style.display);
+        alert('Overlay should now be visible - check if you can see it!');
         
         // Set current values
-        const fromInput = document.querySelector('input[name="date_from"]');
-        const toInput = document.querySelector('input[name="date_to"]');
+        var fromInput = document.querySelector('input[name="date_from"]');
+        var toInput = document.querySelector('input[name="date_to"]');
         
         document.getElementById('fromDateInput').value = fromInput.value;
         document.getElementById('toDateInput').value = toInput.value;
@@ -623,6 +634,7 @@ window.toggleDateRangePicker = function() {
     } else {
         closeDateRangePicker();
     }
+    }, 100); // End setTimeout
 }
 
 window.closeDateRangePicker = function() {
@@ -968,17 +980,17 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .date-range-overlay {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: var(--bg-card);
-    border: 1px solid var(--border-primary);
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-xl);
-    z-index: 9999;
-    min-width: 900px;
-    margin-top: var(--spacing-1);
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    background: #ffffff !important;
+    border: 5px solid #ff0000 !important;
+    border-radius: 10px !important;
+    box-shadow: 0 0 50px rgba(0,0,0,0.5) !important;
+    z-index: 99999 !important;
+    min-width: 800px !important;
+    min-height: 400px !important;
     display: none;
 }
 
