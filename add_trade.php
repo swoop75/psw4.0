@@ -464,6 +464,7 @@ ob_start();
 // ISIN Autocomplete functionality
 let searchTimeout;
 let selectedSecurity = null;
+let currentSearchResults = [];
 
 document.addEventListener('DOMContentLoaded', function() {
     setupIsinAutocomplete();
@@ -528,7 +529,8 @@ document.addEventListener('DOMContentLoaded', function() {
             } else if (e.key === 'Enter') {
                 e.preventDefault();
                 if (activeSuggestion) {
-                    selectSecurity(JSON.parse(activeSuggestion.dataset.security));
+                    const index = parseInt(activeSuggestion.dataset.index);
+                    selectSecurityByIndex(index);
                 }
             } else if (e.key === 'Escape') {
                 hideSuggestions();
@@ -562,8 +564,11 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        const html = results.map(security => `
-            <div class="suggestion-item" data-security='${JSON.stringify(security)}' onclick="selectSecurity(${JSON.stringify(security).replace(/'/g, '&apos;')})">
+        // Store results globally for selection
+        currentSearchResults = results;
+        
+        const html = results.map((security, index) => `
+            <div class="suggestion-item" data-index="${index}" onclick="selectSecurityByIndex(${index})">
                 <div class="suggestion-main">
                     <strong>${security.isin}</strong> - ${security.company_name}
                 </div>
@@ -583,6 +588,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const suggestionsDiv = document.getElementById('isin-suggestions');
         suggestionsDiv.style.display = 'none';
         suggestionsDiv.innerHTML = '';
+    }
+    
+    window.selectSecurityByIndex = function(index) {
+        if (currentSearchResults && currentSearchResults[index]) {
+            selectSecurity(currentSearchResults[index]);
+        }
     }
     
     window.selectSecurity = function(security) {

@@ -513,6 +513,7 @@ ob_start();
 // ISIN Autocomplete functionality
 let searchTimeout;
 let selectedSecurity = null;
+let currentSearchResults = [];
 
 document.addEventListener('DOMContentLoaded', function() {
     setupIsinAutocomplete();
