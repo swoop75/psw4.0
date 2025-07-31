@@ -581,8 +581,11 @@ var currentToMonth = new Date();
 
 // Make function global - proper implementation
 window.toggleDateRangePicker = function() {
+    alert('Function called - checking elements...');
     var overlay = document.getElementById('dateRangeOverlay');
     var picker = document.getElementById('dividend-date-range');
+    
+    alert('Elements found - overlay: ' + (overlay ? 'YES' : 'NO') + ', picker: ' + (picker ? 'YES' : 'NO'));
     
     if (overlay && picker) {
         if (overlay.style.display === 'none' || overlay.style.display === '') {
@@ -599,7 +602,22 @@ window.toggleDateRangePicker = function() {
             
             // Set defaults if empty
             if ((!fromInput || !fromInput.value) && (!toInput || !toInput.value)) {
-                applyPreset('defaultRange');
+                // Set default range: current month + 3 months back
+                var today = new Date();
+                var defaultFrom = new Date(today.getFullYear(), today.getMonth() - 3, 1);
+                var defaultTo = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                
+                var defaultFromStr = formatDate(defaultFrom);
+                var defaultToStr = formatDate(defaultTo);
+                
+                if (fromInput) fromInput.value = defaultFromStr;
+                if (toInput) toInput.value = defaultToStr;
+                
+                document.getElementById('fromDateInput').value = defaultFromStr;
+                document.getElementById('toDateInput').value = defaultToStr;
+                
+                // Update display
+                document.getElementById('dateRangeText').textContent = defaultFromStr + ' - ' + defaultToStr;
             }
         } else {
             // Hide the overlay
