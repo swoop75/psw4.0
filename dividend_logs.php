@@ -593,22 +593,40 @@ window.toggleDateRangePicker = function() {
             overlay.style.setProperty('top', (pickerRect.bottom + 5) + 'px', 'important');
             overlay.style.setProperty('left', pickerRect.left + 'px', 'important');
             overlay.style.setProperty('z-index', '2147483647', 'important'); // Maximum z-index value
-            overlay.style.minHeight = '400px';
-            overlay.style.backgroundColor = 'white';
-            overlay.style.border = '1px solid #ccc';
-            overlay.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
-            overlay.style.borderRadius = '8px';
-            overlay.style.minWidth = '800px';
+            // Apply beautiful PSW 4.0 styling
+            overlay.style.setProperty('background', 'var(--bg-card)', 'important');
+            overlay.style.setProperty('border', '1px solid var(--border-primary)', 'important');
+            overlay.style.setProperty('border-radius', 'var(--border-radius-lg)', 'important');
+            overlay.style.setProperty('box-shadow', 'var(--shadow-xl)', 'important');
+            overlay.style.setProperty('min-width', '900px', 'important');
+            overlay.style.setProperty('max-width', '1200px', 'important');
             picker.classList.add('open');
             
             // Ensure the picker container has relative positioning
             picker.style.position = 'relative';
             
-            // Ensure content is visible
+            // Ensure all content is properly styled and visible
             var overlayContent = overlay.querySelector('.date-range-content');
             if (overlayContent) {
-                overlayContent.style.display = 'block';
-                overlayContent.style.visibility = 'visible';
+                overlayContent.style.setProperty('display', 'block', 'important');
+                overlayContent.style.setProperty('visibility', 'visible', 'important');
+                overlayContent.style.setProperty('padding', 'var(--spacing-5)', 'important');
+            }
+            
+            // Style the panels
+            var panels = overlay.querySelectorAll('.date-panel');
+            panels.forEach(function(panel) {
+                panel.style.setProperty('background', 'var(--bg-secondary)', 'important');
+                panel.style.setProperty('border-radius', 'var(--border-radius)', 'important');
+                panel.style.setProperty('padding', 'var(--spacing-4)', 'important');
+            });
+            
+            // Style the presets panel
+            var presetsPanel = overlay.querySelector('.presets-panel');
+            if (presetsPanel) {
+                presetsPanel.style.setProperty('background', 'var(--bg-tertiary)', 'important');
+                presetsPanel.style.setProperty('border-radius', 'var(--border-radius)', 'important');
+                presetsPanel.style.setProperty('padding', 'var(--spacing-4)', 'important');
             }
             
             // Set current values in inputs
