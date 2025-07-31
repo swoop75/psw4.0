@@ -172,6 +172,9 @@ $userTheme = $_SESSION['user_theme'] ?? 'light';
                         <button type="button" class="psw-icon-btn" onclick="exportToCSV()" title="Export filtered trade data to CSV">
                             <i class="fas fa-download"></i>
                         </button>
+                        <a href="<?php echo BASE_URL; ?>/import_trades.php" class="psw-icon-btn" title="Import Trades">
+                            <i class="fas fa-file-import"></i>
+                        </a>
                     <?php endif; ?>
                     <div class="psw-user-menu" id="userMenu">
                         <button class="psw-user-button" onclick="toggleUserMenu()">
