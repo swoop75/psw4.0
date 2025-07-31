@@ -579,27 +579,32 @@ var tempToDate = '';
 var currentFromMonth = new Date();
 var currentToMonth = new Date();
 
-// Make function global - step by step rebuild
+// Make function global - proper implementation
 window.toggleDateRangePicker = function() {
     var overlay = document.getElementById('dateRangeOverlay');
     var picker = document.getElementById('dividend-date-range');
     
     if (overlay && picker) {
-        // Force show with extreme styling
-        overlay.style.display = 'block';
-        overlay.style.position = 'fixed';
-        overlay.style.top = '100px';
-        overlay.style.left = '100px';
-        overlay.style.width = '600px';
-        overlay.style.height = '400px';
-        overlay.style.backgroundColor = 'red';
-        overlay.style.border = '10px solid blue';
-        overlay.style.zIndex = '999999';
-        overlay.innerHTML = '<div style="color: white; font-size: 30px; padding: 20px;">DATE PICKER IS NOW VISIBLE!</div>';
-        
-        alert('Overlay should now be visible as red box!');
-    } else {
-        alert('Elements not found - overlay: ' + (overlay ? 'YES' : 'NO') + ', picker: ' + (picker ? 'YES' : 'NO'));
+        if (overlay.style.display === 'none' || overlay.style.display === '') {
+            // Show the overlay
+            overlay.style.display = 'block';
+            picker.classList.add('open');
+            
+            // Set current values in inputs
+            var fromInput = document.querySelector('input[name="date_from"]');
+            var toInput = document.querySelector('input[name="date_to"]');
+            
+            if (fromInput) document.getElementById('fromDateInput').value = fromInput.value;
+            if (toInput) document.getElementById('toDateInput').value = toInput.value;
+            
+            // Set defaults if empty
+            if ((!fromInput || !fromInput.value) && (!toInput || !toInput.value)) {
+                applyPreset('defaultRange');
+            }
+        } else {
+            // Hide the overlay
+            closeDateRangePicker();
+        }
     }
 };
 
@@ -946,17 +951,17 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .date-range-overlay {
-    position: fixed !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    background: #ffffff !important;
-    border: 5px solid #ff0000 !important;
-    border-radius: 10px !important;
-    box-shadow: 0 0 50px rgba(0,0,0,0.5) !important;
-    z-index: 99999 !important;
-    min-width: 800px !important;
-    min-height: 400px !important;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-xl);
+    z-index: 9999;
+    min-width: 900px;
+    margin-top: var(--spacing-1);
     display: none;
 }
 
