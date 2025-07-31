@@ -592,7 +592,19 @@ window.toggleDateRangePicker = function() {
             overlay.style.top = '100%';
             overlay.style.left = '0';
             overlay.style.zIndex = '9999';
+            overlay.style.minHeight = '400px';
+            overlay.style.backgroundColor = 'white';
+            overlay.style.border = '1px solid #ccc';
+            overlay.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+            overlay.style.borderRadius = '8px';
+            overlay.style.minWidth = '800px';
             picker.classList.add('open');
+            
+            // Debug: Check if content exists
+            console.log('Overlay content:', overlay.innerHTML);
+            if (!overlay.innerHTML.trim()) {
+                overlay.innerHTML = '<div style="padding: 20px; color: black;">DATE PICKER CONTENT LOADING...</div>';
+            }
             
             // Set current values in inputs
             var fromInput = document.querySelector('input[name="date_from"]');
