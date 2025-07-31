@@ -497,9 +497,6 @@ ob_start();
                     <button type="button" class="psw-btn psw-btn-secondary" onclick="clearFilters()">
                         <i class="fas fa-times psw-btn-icon"></i>Clear
                     </button>
-                    <button type="button" class="psw-btn psw-btn-accent" onclick="exportToCSV()">
-                        <i class="fas fa-download psw-btn-icon"></i>Export
-                    </button>
                 </div>
             </div>
         </div>
