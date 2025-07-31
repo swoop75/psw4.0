@@ -588,10 +588,13 @@ window.toggleDateRangePicker = function() {
     alert('Elements found - overlay: ' + (overlay ? 'YES' : 'NO') + ', picker: ' + (picker ? 'YES' : 'NO'));
     
     if (overlay && picker) {
+        alert('Current overlay display: ' + overlay.style.display);
         if (overlay.style.display === 'none' || overlay.style.display === '') {
             // Show the overlay
+            alert('Setting overlay to block...');
             overlay.style.display = 'block';
             picker.classList.add('open');
+            alert('Overlay should now be visible - display is: ' + overlay.style.display);
             
             // Set current values in inputs
             var fromInput = document.querySelector('input[name="date_from"]');
@@ -875,31 +878,19 @@ console.log('toggleDateRangePicker function available:', typeof window.toggleDat
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded, setting up date range picker');
     
-    // Add click event listener to date range display
-    const dateRangeDisplay = document.querySelector('.date-range-display');
-    if (dateRangeDisplay) {
-        console.log('Found date range display, adding click listener');
-        dateRangeDisplay.addEventListener('click', function(e) {
-            console.log('Date range display clicked');
-            e.preventDefault();
-            e.stopPropagation();
-            toggleDateRangePicker();
-        });
-    } else {
-        console.log('Date range display not found');
-    }
+    // Skip adding event listener since we're using onclick attribute
     
-    const fromInput = document.querySelector('input[name="date_from"]');
-    const toInput = document.querySelector('input[name="date_to"]');
+    var fromInput = document.querySelector('input[name="date_from"]');
+    var toInput = document.querySelector('input[name="date_to"]');
     
     if (fromInput && toInput && !fromInput.value && !toInput.value) {
-        const today = new Date();
-        const defaultFrom = formatDate(new Date(today.getFullYear(), today.getMonth() - 3, 1));
-        const defaultTo = formatDate(new Date(today.getFullYear(), today.getMonth() + 1, 0));
+        var today = new Date();
+        var defaultFrom = formatDate(new Date(today.getFullYear(), today.getMonth() - 3, 1));
+        var defaultTo = formatDate(new Date(today.getFullYear(), today.getMonth() + 1, 0));
         
         fromInput.value = defaultFrom;
         toInput.value = defaultTo;
-        const dateRangeText = document.getElementById('dateRangeText');
+        var dateRangeText = document.getElementById('dateRangeText');
         if (dateRangeText) {
             dateRangeText.textContent = defaultFrom + ' - ' + defaultTo;
         }
