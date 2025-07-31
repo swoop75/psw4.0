@@ -210,9 +210,13 @@ ob_start();
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
                     <div class="psw-form-group">
                         <label class="psw-form-label" for="isin">ISIN *</label>
-                        <input type="text" id="isin" name="isin" class="psw-form-input" 
-                               placeholder="e.g., US0378331005" maxlength="20"
-                               value="<?php echo htmlspecialchars($_POST['isin'] ?? ''); ?>" required>
+                        <div class="autocomplete-container">
+                            <input type="text" id="isin" name="isin" class="psw-form-input" 
+                                   placeholder="Type ISIN or company name..." maxlength="20"
+                                   value="<?php echo htmlspecialchars($_POST['isin'] ?? ''); ?>" 
+                                   autocomplete="off" required>
+                            <div id="isin-suggestions" class="autocomplete-suggestions"></div>
+                        </div>
                     </div>
                     
                     <div class="psw-form-group">
@@ -437,15 +441,156 @@ ob_start();
 </div>
 
 <script>
-// Auto-calculate functionality
+// ISIN Autocomplete functionality
+let searchTimeout;
+let selectedSecurity = null;
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Auto-calculate total amounts when shares and price change
+    setupIsinAutocomplete();
+    
+    // Auto-calculate functionality
     const sharesInput = document.getElementById('shares_traded');
     const priceLocalInput = document.getElementById('price_per_share_local');
     const totalLocalInput = document.getElementById('total_amount_local');
     const priceSekInput = document.getElementById('price_per_share_sek');
     const totalSekInput = document.getElementById('total_amount_sek');
     const exchangeRateInput = document.getElementById('exchange_rate_used');
+    
+    function setupIsinAutocomplete() {
+        const isinInput = document.getElementById('isin');
+        const suggestionsDiv = document.getElementById('isin-suggestions');
+        
+        isinInput.addEventListener('input', function() {
+            const query = this.value.trim();
+            
+            if (query.length < 2) {
+                hideSuggestions();
+                return;
+            }
+            
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                searchIsin(query);
+            }, 300);
+        });
+        
+        isinInput.addEventListener('blur', function() {
+            // Delay hiding to allow for click on suggestion
+            setTimeout(() => {
+                hideSuggestions();
+            }, 200);
+        });
+        
+        isinInput.addEventListener('keydown', function(e) {
+            const suggestions = suggestionsDiv.querySelectorAll('.suggestion-item');
+            const activeSuggestion = suggestionsDiv.querySelector('.suggestion-item.active');
+            
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                let nextItem = activeSuggestion ? activeSuggestion.nextElementSibling : suggestions[0];
+                if (nextItem) {
+                    if (activeSuggestion) activeSuggestion.classList.remove('active');
+                    nextItem.classList.add('active');
+                }
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                let prevItem = activeSuggestion ? activeSuggestion.previousElementSibling : suggestions[suggestions.length - 1];
+                if (prevItem) {
+                    if (activeSuggestion) activeSuggestion.classList.remove('active');
+                    prevItem.classList.add('active');
+                }
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (activeSuggestion) {
+                    selectSecurity(JSON.parse(activeSuggestion.dataset.security));
+                }
+            } else if (e.key === 'Escape') {
+                hideSuggestions();
+            }
+        });
+    }
+    
+    async function searchIsin(query) {
+        try {
+            const response = await fetch(`<?php echo BASE_URL; ?>/api/search_isin.php?q=${encodeURIComponent(query)}`);
+            const results = await response.json();
+            
+            if (response.ok) {
+                showSuggestions(results);
+            } else {
+                console.error('Search error:', results.error);
+                hideSuggestions();
+            }
+        } catch (error) {
+            console.error('Search error:', error);
+            hideSuggestions();
+        }
+    }
+    
+    function showSuggestions(results) {
+        const suggestionsDiv = document.getElementById('isin-suggestions');
+        
+        if (results.length === 0) {
+            hideSuggestions();
+            return;
+        }
+        
+        const html = results.map(security => `
+            <div class="suggestion-item" data-security='${JSON.stringify(security)}' onclick="selectSecurity(${JSON.stringify(security).replace(/'/g, '&apos;')})">
+                <div class="suggestion-main">
+                    <strong>${security.isin}</strong> - ${security.company_name}
+                </div>
+                <div class="suggestion-details">
+                    ${security.ticker ? `Ticker: ${security.ticker} | ` : ''}
+                    ${security.country ? `Country: ${security.country} | ` : ''}
+                    ${security.currency ? `Currency: ${security.currency}` : ''}
+                </div>
+            </div>
+        `).join('');
+        
+        suggestionsDiv.innerHTML = html;
+        suggestionsDiv.style.display = 'block';
+    }
+    
+    function hideSuggestions() {
+        const suggestionsDiv = document.getElementById('isin-suggestions');
+        suggestionsDiv.style.display = 'none';
+        suggestionsDiv.innerHTML = '';
+    }
+    
+    window.selectSecurity = function(security) {
+        selectedSecurity = security;
+        
+        // Populate form fields
+        document.getElementById('isin').value = security.isin;
+        if (security.ticker) {
+            document.getElementById('ticker').value = security.ticker;
+        }
+        if (security.currency) {
+            const currencySelect = document.getElementById('currency_local');
+            for (let option of currencySelect.options) {
+                if (option.value === security.currency) {
+                    option.selected = true;
+                    break;
+                }
+            }
+        }
+        
+        hideSuggestions();
+        
+        // Show success indicator
+        const isinInput = document.getElementById('isin');
+        isinInput.style.borderColor = 'var(--success-color)';
+        isinInput.style.boxShadow = '0 0 0 2px var(--success-color-light)';
+        
+        setTimeout(() => {
+            isinInput.style.borderColor = '';
+            isinInput.style.boxShadow = '';
+        }, 2000);
+        
+        // Focus next field
+        document.getElementById('shares_traded').focus();
+    }
     
     function calculateTotals() {
         const shares = parseFloat(sharesInput.value) || 0;
@@ -557,6 +702,72 @@ legend {
 .psw-form-group textarea {
     resize: vertical;
     min-height: 80px;
+}
+
+/* ISIN Autocomplete Styles */
+.autocomplete-container {
+    position: relative;
+}
+
+.autocomplete-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border-primary);
+    border-top: none;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    box-shadow: var(--shadow-lg);
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+}
+
+.suggestion-item {
+    padding: var(--spacing-3);
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-secondary);
+    transition: background-color 0.2s ease;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-item:hover,
+.suggestion-item.active {
+    background: var(--primary-accent-light);
+}
+
+.suggestion-main {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.suggestion-details {
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+}
+
+.autocomplete-suggestions::-webkit-scrollbar {
+    width: 6px;
+}
+
+.autocomplete-suggestions::-webkit-scrollbar-track {
+    background: var(--bg-tertiary);
+}
+
+.autocomplete-suggestions::-webkit-scrollbar-thumb {
+    background: var(--border-primary);
+    border-radius: 3px;
+}
+
+.autocomplete-suggestions::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
 }
 </style>
 <?php
