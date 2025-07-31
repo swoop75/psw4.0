@@ -636,6 +636,19 @@ window.toggleDateRangePicker = function() {
             if (fromInput) document.getElementById('fromDateInput').value = fromInput.value;
             if (toInput) document.getElementById('toDateInput').value = toInput.value;
             
+            // Always render calendars immediately
+            var fromDate = fromInput && fromInput.value ? new Date(fromInput.value) : new Date();
+            var toDate = toInput && toInput.value ? new Date(toInput.value) : new Date();
+            
+            currentFromMonth = fromDate;
+            currentToMonth = toDate;
+            tempFromDate = fromInput ? fromInput.value : '';
+            tempToDate = toInput ? toInput.value : '';
+            
+            // Render both calendars
+            renderCalendar('from', currentFromMonth);
+            renderCalendar('to', currentToMonth);
+            
             // Set defaults if empty
             if ((!fromInput || !fromInput.value) && (!toInput || !toInput.value)) {
                 // Set default range: current month + 3 months back
