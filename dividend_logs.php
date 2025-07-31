@@ -602,10 +602,25 @@ window.toggleDateRangePicker = function() {
         }
         
         console.log('Both elements found, showing overlay');
+        
+        // Force the overlay to be visible with extreme measures
         overlay.style.display = 'block';
+        overlay.style.visibility = 'visible';
+        overlay.style.opacity = '1';
+        overlay.style.position = 'fixed';
+        overlay.style.top = '100px';
+        overlay.style.left = '100px';
+        overlay.style.width = '600px';
+        overlay.style.height = '400px';
+        overlay.style.backgroundColor = 'red';
+        overlay.style.border = '10px solid blue';
+        overlay.style.zIndex = '999999';
+        overlay.innerHTML = '<div style="color: white; font-size: 30px; padding: 20px;">DATE PICKER OVERLAY IS VISIBLE!</div>';
+        
         picker.classList.add('open');
         console.log('Overlay display set to:', overlay.style.display);
-        alert('Overlay should now be visible - check if you can see it!');
+        console.log('Overlay computed style:', window.getComputedStyle(overlay));
+        alert('Extreme styling applied - you should see a red box with blue border!');
         
         // Set current values
         var fromInput = document.querySelector('input[name="date_from"]');
