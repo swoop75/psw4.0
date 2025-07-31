@@ -145,6 +145,18 @@ try {
     $dataStmt->execute($params);
     $trades = $dataStmt->fetchAll(PDO::FETCH_ASSOC);
     
+    // Calculate broker fees percentage for each trade
+    foreach ($trades as &$trade) {
+        $totalAmountSek = (float) $trade['total_amount_sek'];
+        $brokerFeesSek = (float) $trade['broker_fees_sek'];
+        $trade['broker_fees_percent'] = 0;
+        
+        if ($totalAmountSek > 0) {
+            $trade['broker_fees_percent'] = ($brokerFeesSek / $totalAmountSek) * 100;
+        }
+    }
+    unset($trade); // Break the reference
+    
     // Get filter options
     $tradeTypes = $foundationDb->query("SELECT trade_type_id, type_code, type_name FROM trade_types WHERE is_active = 1 ORDER BY type_name")->fetchAll(PDO::FETCH_ASSOC);
     $brokers = $foundationDb->query("SELECT broker_id, broker_name FROM brokers ORDER BY broker_name")->fetchAll(PDO::FETCH_ASSOC);
