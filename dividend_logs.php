@@ -267,7 +267,7 @@ ob_start();
                         <input type="hidden" name="date_from" value="<?php echo htmlspecialchars($filters['date_from']); ?>">
                         <input type="hidden" name="date_to" value="<?php echo htmlspecialchars($filters['date_to']); ?>">
                         
-                        <div class="date-range-display" onclick="window.toggleDateRangePicker()" style="cursor: pointer;">
+                        <div class="date-range-display" onclick="alert('BASIC ONCLICK WORKS'); testFunction();" style="cursor: pointer;">
                             <i class="fas fa-calendar-alt"></i>
                             <span class="date-range-text" id="dateRangeText">
                                 <?php 
@@ -565,6 +565,13 @@ document.getElementById('search-input').addEventListener('input', function() {
         applyFilters();
     }, 500);
 });
+
+// Simple test function
+window.testFunction = function() {
+    alert('Test function called successfully!');
+    var overlay = document.getElementById('dateRangeOverlay');
+    alert('Overlay found: ' + (overlay ? 'YES' : 'NO'));
+};
 
 // Enhanced Date Range Picker JavaScript with Calendar
 var tempFromDate = '';
