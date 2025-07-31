@@ -605,7 +605,7 @@ body.psw-landing-layout {
 }
 
 .psw-table th {
-  padding: var(--spacing-4);
+  padding: var(--spacing-3);
   text-align: left;
   font-weight: 600;
   color: var(--text-primary);
@@ -616,7 +616,7 @@ body.psw-landing-layout {
 }
 
 .psw-table td {
-  padding: var(--spacing-4);
+  padding: var(--spacing-3);
   border-bottom: 1px solid var(--border-primary);
   color: var(--text-secondary);
   font-size: var(--font-size-base);
