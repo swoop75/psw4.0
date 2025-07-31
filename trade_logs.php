@@ -543,8 +543,7 @@ ob_start();
     <div class="psw-card">
         <div class="psw-card-content" style="padding: 0;">
             <?php if (!empty($trades)): ?>
-                <div style="overflow-x: auto;">
-                    <table class="psw-table">
+                <table class="psw-table">
                         <thead>
                             <tr>
                                 <th style="cursor: pointer;" onclick="sortBy('trade_date')">
@@ -642,8 +641,7 @@ ob_start();
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
-                    </table>
-                </div>
+                </table>
             <?php else: ?>
                 <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
                     <i class="fas fa-exchange-alt" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
