@@ -306,22 +306,22 @@ ob_start();
                                     </div>
                                     <div class="presets-panel">
                                         <div class="presets-grid">
-                                            <button type="button" class="preset-btn" onclick="applyPreset('today')">Today</button>
-                                            <button type="button" class="preset-btn" onclick="applyPreset('yesterday')">Yesterday</button>
-                                            <button type="button" class="preset-btn" onclick="applyPreset('thisWeek')">This Week</button>
-                                            <button type="button" class="preset-btn" onclick="applyPreset('prevWeek')">Previous Week</button>
-                                            <button type="button" class="preset-btn" onclick="applyPreset('thisMonth')">This Month</button>
-                                            <button type="button" class="preset-btn" onclick="applyPreset('prevMonth')">Previous Month</button>
-                                            <button type="button" class="preset-btn" onclick="applyPreset('thisYear')">This Year</button>
-                                            <button type="button" class="preset-btn" onclick="applyPreset('prevYear')">Previous Year</button>
-                                            <button type="button" class="preset-btn" onclick="applyPreset('sinceStart')">Since Start</button>
+                                            <button type="button" class="preset-btn" onclick="applyPreset('today', event)">Today</button>
+                                            <button type="button" class="preset-btn" onclick="applyPreset('yesterday', event)">Yesterday</button>
+                                            <button type="button" class="preset-btn" onclick="applyPreset('thisWeek', event)">This Week</button>
+                                            <button type="button" class="preset-btn" onclick="applyPreset('prevWeek', event)">Previous Week</button>
+                                            <button type="button" class="preset-btn" onclick="applyPreset('thisMonth', event)">This Month</button>
+                                            <button type="button" class="preset-btn" onclick="applyPreset('prevMonth', event)">Previous Month</button>
+                                            <button type="button" class="preset-btn" onclick="applyPreset('thisYear', event)">This Year</button>
+                                            <button type="button" class="preset-btn" onclick="applyPreset('prevYear', event)">Previous Year</button>
+                                            <button type="button" class="preset-btn" onclick="applyPreset('sinceStart', event)">Since Start</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="date-range-footer">
-                                <button type="button" class="psw-btn psw-btn-secondary" onclick="closeDateRangePicker()">Cancel</button>
-                                <button type="button" class="psw-btn psw-btn-primary" onclick="applyDateRange()">Apply</button>
+                                <button type="button" class="psw-btn psw-btn-secondary" onclick="closeDateRangePicker(event)">Cancel</button>
+                                <button type="button" class="psw-btn psw-btn-primary" onclick="applyDateRange(event)">Apply</button>
                             </div>
                         </div>
                     </div>
@@ -806,7 +806,13 @@ window.toggleDateRangePicker = function() {
     }
 };
 
-window.closeDateRangePicker = function() {
+window.closeDateRangePicker = function(event) {
+    // Prevent event bubbling if called from a button click
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+    
     var overlay = document.getElementById('dateRangeOverlay');
     var picker = document.getElementById('dividend-date-range');
     
@@ -814,7 +820,13 @@ window.closeDateRangePicker = function() {
     picker.classList.remove('open');
 }
 
-window.applyPreset = function(preset) {
+window.applyPreset = function(preset, event) {
+    // Prevent event bubbling to avoid closing the date picker
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+    
     var today = new Date();
     var fromDate, toDate;
 
@@ -889,7 +901,13 @@ window.applyPreset = function(preset) {
     updateDateRangeDisplay();
 }
 
-window.applyDateRange = function() {
+window.applyDateRange = function(event) {
+    // Prevent event bubbling if called from a button click
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+    
     var fromInput = document.getElementById('fromDateInput');
     var toInput = document.getElementById('toDateInput');
     
@@ -939,11 +957,11 @@ window.renderCalendar = function(type, date) {
     
     let html = `
         <div class="calendar-header">
-            <button type="button" class="calendar-nav" onclick="navigateMonth('${type}', -1)">
+            <button type="button" class="calendar-nav" onclick="navigateMonth('${type}', -1, event)">
                 <i class="fas fa-chevron-left"></i>
             </button>
             <div class="calendar-month-year">${monthNames[month]} ${year}</div>
-            <button type="button" class="calendar-nav" onclick="navigateMonth('${type}', 1)">
+            <button type="button" class="calendar-nav" onclick="navigateMonth('${type}', 1, event)">
                 <i class="fas fa-chevron-right"></i>
             </button>
         </div>
@@ -988,7 +1006,7 @@ window.renderCalendar = function(type, date) {
         if (isToday) classes += ' today';
         if (isSelected) classes += ' selected';
         
-        html += `<div class="${classes}" onclick="selectCalendarDate('${type}', '${dateStr}')">${day}</div>`;
+        html += `<div class="${classes}" onclick="selectCalendarDate('${type}', '${dateStr}', event)">${day}</div>`;
     }
     
     // Next month's leading days
@@ -1005,7 +1023,13 @@ window.renderCalendar = function(type, date) {
     calendarContainer.innerHTML = html;
 }
 
-window.navigateMonth = function(type, direction) {
+window.navigateMonth = function(type, direction, event) {
+    // Prevent event bubbling to avoid closing the date picker
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+    
     if (type === 'from') {
         currentFromMonth.setMonth(currentFromMonth.getMonth() + direction);
         renderCalendar('from', currentFromMonth);
@@ -1015,7 +1039,13 @@ window.navigateMonth = function(type, direction) {
     }
 }
 
-window.selectCalendarDate = function(type, dateStr) {
+window.selectCalendarDate = function(type, dateStr, event) {
+    // Prevent event bubbling to avoid closing the date picker
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+    
     const input = document.getElementById(type + 'DateInput');
     input.value = dateStr;
     
