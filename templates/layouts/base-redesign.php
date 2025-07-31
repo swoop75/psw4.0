@@ -169,6 +169,9 @@ $userTheme = $_SESSION['user_theme'] ?? 'light';
                             <i class="fas fa-file-import"></i>
                         </a>
                     <?php elseif (basename($_SERVER['PHP_SELF']) == 'trade_logs.php'): ?>
+                        <a href="<?php echo BASE_URL; ?>/add_trade.php" class="psw-icon-btn" title="Add New Trade">
+                            <i class="fas fa-plus"></i>
+                        </a>
                         <button type="button" class="psw-icon-btn" onclick="exportToCSV()" title="Export filtered trade data to CSV">
                             <i class="fas fa-download"></i>
                         </button>
