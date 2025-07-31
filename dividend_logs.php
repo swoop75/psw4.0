@@ -613,13 +613,15 @@ window.toggleDateRangePicker = function() {
                 overlayContent.style.setProperty('padding', '20px', 'important');
             }
             
-            // Style the panels grid with exact spacing
+            // Style the panels grid with exact spacing and equal margins
             var panelsGrid = overlay.querySelector('.date-range-panels');
             if (panelsGrid) {
                 panelsGrid.style.setProperty('display', 'grid', 'important');
+                // Adjust grid to ensure equal spacing: 20px margin + equal column widths + 20px margin
                 panelsGrid.style.setProperty('grid-template-columns', '1fr 1fr 150px', 'important');
                 panelsGrid.style.setProperty('gap', '25px', 'important');
-                panelsGrid.style.setProperty('height', '100%', 'important');
+                panelsGrid.style.setProperty('height', 'calc(100% - 40px)', 'important'); // Account for footer
+                panelsGrid.style.setProperty('margin', '0', 'important');
             }
             
             // Style the date panels with aligned calendar positioning
@@ -640,17 +642,30 @@ window.toggleDateRangePicker = function() {
                 presetsPanel.style.setProperty('padding', '16px', 'important');
             }
             
-            // Align calendar containers with preset spacing
+            // Align calendar containers to same height as first preset button
             var calendarContainers = overlay.querySelectorAll('.calendar-container');
-            calendarContainers.forEach(function(container) {
-                container.style.setProperty('margin-top', '16px', 'important'); // Same as preset buttons spacing
-            });
+            var firstPresetBtn = overlay.querySelector('.preset-btn:first-child');
+            if (firstPresetBtn) {
+                // Calculate the position to align calendar with first preset button
+                calendarContainers.forEach(function(container) {
+                    // Position calendar to align with first preset button height
+                    container.style.setProperty('margin-top', '0px', 'important');
+                    container.parentElement.style.setProperty('align-items', 'flex-start', 'important');
+                });
+            }
             
-            // Style date input fields
+            // Style date input fields with reduced bottom margin
             var dateInputs = overlay.querySelectorAll('.date-input');
             dateInputs.forEach(function(input) {
-                input.style.setProperty('margin-bottom', '16px', 'important');
+                input.style.setProperty('margin-bottom', '8px', 'important'); // Half spacing
             });
+            
+            // Style the footer with consistent bottom spacing
+            var footer = overlay.querySelector('.date-range-footer');
+            if (footer) {
+                footer.style.setProperty('padding', '16px 20px', 'important'); // Same 16px top spacing as preset buttons
+                footer.style.setProperty('margin-top', 'auto', 'important');
+            }
             
             // Set current values in inputs
             var fromInput = document.querySelector('input[name="date_from"]');
