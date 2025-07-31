@@ -288,12 +288,12 @@ ob_start();
                                 <div class="date-range-panels">
                                     <div class="date-panel from-panel">
                                         <h5>From Date</h5>
-                                        <input type="text" class="date-input" id="fromDateInput" placeholder="YYYY-MM-DD" onchange="updateCalendar('from')">
+                                        <input type="text" class="date-input" id="fromDateInput" placeholder="YYYY-MM-DD" onchange="updateCalendar('from')" />
                                         <div class="calendar-container" id="fromCalendar"></div>
                                     </div>
                                     <div class="date-panel to-panel">
                                         <h5>To Date</h5>
-                                        <input type="text" class="date-input" id="toDateInput" placeholder="YYYY-MM-DD" onchange="updateCalendar('to')">
+                                        <input type="text" class="date-input" id="toDateInput" placeholder="YYYY-MM-DD" onchange="updateCalendar('to')" />
                                         <div class="calendar-container" id="toCalendar"></div>
                                     </div>
                                     <div class="presets-panel">
@@ -665,14 +665,34 @@ window.toggleDateRangePicker = function() {
                 
                 calendarContainers.forEach(function(container) {
                     var datePanel = container.closest('.date-panel');
+                    var dateInput = datePanel.querySelector('.date-input');
+                    var panelHeader = datePanel.querySelector('h5');
+                    
+                    // Ensure date input is visible and in first grid row
+                    if (dateInput) {
+                        dateInput.style.setProperty('display', 'block', 'important');
+                        dateInput.style.setProperty('visibility', 'visible', 'important');
+                        dateInput.style.setProperty('grid-row', '1', 'important');
+                        dateInput.style.setProperty('z-index', '1000', 'important');
+                        dateInput.style.setProperty('position', 'relative', 'important');
+                    }
+                    
+                    // Ensure header is visible and positioned
+                    if (panelHeader) {
+                        panelHeader.style.setProperty('display', 'block', 'important');
+                        panelHeader.style.setProperty('visibility', 'visible', 'important');
+                        panelHeader.style.setProperty('grid-row', '1', 'important');
+                        panelHeader.style.setProperty('z-index', '1001', 'important');
+                    }
                     
                     // Set date panel to grid layout to control positioning precisely
                     datePanel.style.setProperty('display', 'grid', 'important');
-                    datePanel.style.setProperty('grid-template-rows', totalInputArea + 'px 1fr', 'important');
+                    datePanel.style.setProperty('grid-template-rows', 'auto auto 1fr', 'important'); // header, input, calendar
                     datePanel.style.setProperty('align-items', 'start', 'important');
+                    datePanel.style.setProperty('grid-gap', '8px', 'important');
                     
-                    // Position calendar in second grid row, aligned to top
-                    container.style.setProperty('grid-row', '2', 'important');
+                    // Position calendar in third grid row
+                    container.style.setProperty('grid-row', '3', 'important');
                     container.style.setProperty('align-self', 'start', 'important');
                     container.style.setProperty('width', '240px', 'important');
                     container.style.setProperty('max-width', '240px', 'important');
