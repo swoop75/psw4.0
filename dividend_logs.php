@@ -158,6 +158,14 @@ try {
     $earliestDateResult = $earliestDateStmt->fetch(PDO::FETCH_ASSOC);
     $earliestDate = $earliestDateResult['earliest_date'] ?? '2020-01-01'; // Fallback if no data
     
+    // Get full year range for enhanced calendar navigation
+    $yearRangeSql = "SELECT MIN(YEAR(payment_date)) as min_year, MAX(YEAR(payment_date)) as max_year FROM psw_portfolio.log_dividends";
+    $yearRangeStmt = $portfolioDb->prepare($yearRangeSql);
+    $yearRangeStmt->execute();
+    $yearRangeResult = $yearRangeStmt->fetch(PDO::FETCH_ASSOC);
+    $minYear = $yearRangeResult['min_year'] ?? date('Y') - 10;
+    $maxYear = $yearRangeResult['max_year'] ?? date('Y');
+    
     // Default date range is now applied to filters and will be used in database query
     
 } catch (Exception $e) {
@@ -173,6 +181,8 @@ try {
         'unique_companies' => 0
     ];
     $earliestDate = '2020-01-01'; // Fallback date
+    $minYear = date('Y') - 10; // Fallback min year
+    $maxYear = date('Y'); // Fallback max year
     $errorMessage = $e->getMessage();
 }
 
@@ -587,6 +597,26 @@ var tempToDate = '';
 var currentFromMonth = new Date();
 var currentToMonth = new Date();
 
+// Calendar view states and pagination
+var calendarViews = {
+    from: 'calendar', // 'calendar', 'months', 'years'
+    to: 'calendar'
+};
+var yearPageFrom = 0; // For year pagination
+var yearPageTo = 0;
+var yearsPerPage = 12; // 3x4 grid
+var availableYears = []; // Will be populated from PHP data
+
+// Initialize available years from PHP
+function initializeAvailableYears() {
+    var minYear = <?php echo $minYear; ?>;
+    var maxYear = <?php echo $maxYear; ?>;
+    availableYears = [];
+    for (var year = minYear; year <= maxYear; year++) {
+        availableYears.push(year);
+    }
+}
+
 // Make function global - proper implementation
 window.toggleDateRangePicker = function() {
     var overlay = document.getElementById('dateRangeOverlay');
@@ -771,6 +801,13 @@ window.toggleDateRangePicker = function() {
                 });
             }
             
+            // Initialize available years and reset calendar views
+            initializeAvailableYears();
+            calendarViews.from = 'calendar';
+            calendarViews.to = 'calendar';
+            yearPageFrom = 0;
+            yearPageTo = 0;
+            
             // Always render calendars immediately
             var fromDate = fromInput && fromInput.value ? new Date(fromInput.value) : new Date();
             var toDate = toInput && toInput.value ? new Date(toInput.value) : new Date();
@@ -948,8 +985,26 @@ window.renderCalendar = function(type, date) {
     const calendarContainer = document.getElementById(type + 'Calendar');
     const year = date.getFullYear();
     const month = date.getMonth();
+    const currentView = calendarViews[type];
     
-    // Calendar header
+    let html = '';
+    
+    if (currentView === 'calendar') {
+        html = renderCalendarView(type, date);
+    } else if (currentView === 'months') {
+        html = renderMonthsView(type, year);
+    } else if (currentView === 'years') {
+        html = renderYearsView(type);
+    }
+    
+    calendarContainer.innerHTML = html;
+}
+
+// Render normal calendar view
+function renderCalendarView(type, date) {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    
     const monthNames = [
         'January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'
@@ -957,12 +1012,19 @@ window.renderCalendar = function(type, date) {
     
     let html = `
         <div class="calendar-header">
+            <button type="button" class="calendar-nav" onclick="navigateYear('${type}', -1, event)">
+                <i class="fas fa-angle-double-left"></i>
+            </button>
             <button type="button" class="calendar-nav" onclick="navigateMonth('${type}', -1, event)">
                 <i class="fas fa-chevron-left"></i>
             </button>
-            <div class="calendar-month-year">${monthNames[month]} ${year}</div>
+            <button type="button" class="calendar-month-btn" onclick="showMonthsView('${type}', event)">${monthNames[month]}</button>
+            <button type="button" class="calendar-year-btn" onclick="showYearsView('${type}', event)">${year}</button>
             <button type="button" class="calendar-nav" onclick="navigateMonth('${type}', 1, event)">
                 <i class="fas fa-chevron-right"></i>
+            </button>
+            <button type="button" class="calendar-nav" onclick="navigateYear('${type}', 1, event)">
+                <i class="fas fa-angle-double-right"></i>
             </button>
         </div>
         <div class="calendar-grid">
@@ -1020,11 +1082,65 @@ window.renderCalendar = function(type, date) {
         </div>
     `;
     
-    calendarContainer.innerHTML = html;
+    return html;
 }
 
+// Render months selection view
+function renderMonthsView(type, year) {
+    const monthNames = [
+        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    
+    let html = `
+        <div class="calendar-header">
+            <button type="button" class="calendar-back-btn" onclick="backToCalendarView('${type}', event)">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="calendar-view-title">Select Month ${year}</div>
+        </div>
+        <div class="calendar-selection-grid">
+    `;
+    
+    monthNames.forEach((monthName, index) => {
+        html += `<button type="button" class="calendar-selection-btn" onclick="selectMonth('${type}', ${index}, event)">${monthName}</button>`;
+    });
+    
+    html += `</div>`;
+    return html;
+}
+
+// Render years selection view
+function renderYearsView(type) {
+    const currentPage = type === 'from' ? yearPageFrom : yearPageTo;
+    const startIndex = currentPage * yearsPerPage;
+    const endIndex = Math.min(startIndex + yearsPerPage, availableYears.length);
+    const hasNextPage = endIndex < availableYears.length;
+    const hasPrevPage = currentPage > 0;
+    
+    let html = `
+        <div class="calendar-header">
+            <button type="button" class="calendar-back-btn" onclick="backToCalendarView('${type}', event)">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="calendar-view-title">Select Year</div>
+            ${hasPrevPage ? `<button type="button" class="calendar-nav" onclick="navigateYearPage('${type}', -1, event)"><i class="fas fa-chevron-left"></i></button>` : '<span></span>'}
+            ${hasNextPage ? `<button type="button" class="calendar-nav" onclick="navigateYearPage('${type}', 1, event)"><i class="fas fa-chevron-right"></i></button>` : '<span></span>'}
+        </div>
+        <div class="calendar-selection-grid">
+    `;
+    
+    for (let i = startIndex; i < endIndex; i++) {
+        const year = availableYears[i];
+        html += `<button type="button" class="calendar-selection-btn" onclick="selectYear('${type}', ${year}, event)">${year}</button>`;
+    }
+    
+    html += `</div>`;
+    return html;
+}
+
+// Enhanced navigation functions
 window.navigateMonth = function(type, direction, event) {
-    // Prevent event bubbling to avoid closing the date picker
     if (event) {
         event.stopPropagation();
         event.preventDefault();
@@ -1037,6 +1153,98 @@ window.navigateMonth = function(type, direction, event) {
         currentToMonth.setMonth(currentToMonth.getMonth() + direction);
         renderCalendar('to', currentToMonth);
     }
+}
+
+window.navigateYear = function(type, direction, event) {
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+    
+    if (type === 'from') {
+        currentFromMonth.setFullYear(currentFromMonth.getFullYear() + direction);
+        renderCalendar('from', currentFromMonth);
+    } else {
+        currentToMonth.setFullYear(currentToMonth.getFullYear() + direction);
+        renderCalendar('to', currentToMonth);
+    }
+}
+
+window.showMonthsView = function(type, event) {
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+    
+    calendarViews[type] = 'months';
+    renderCalendar(type, type === 'from' ? currentFromMonth : currentToMonth);
+}
+
+window.showYearsView = function(type, event) {
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+    
+    calendarViews[type] = 'years';
+    renderCalendar(type, type === 'from' ? currentFromMonth : currentToMonth);
+}
+
+window.backToCalendarView = function(type, event) {
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+    
+    calendarViews[type] = 'calendar';
+    renderCalendar(type, type === 'from' ? currentFromMonth : currentToMonth);
+}
+
+window.selectMonth = function(type, monthIndex, event) {
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+    
+    if (type === 'from') {
+        currentFromMonth.setMonth(monthIndex);
+    } else {
+        currentToMonth.setMonth(monthIndex);
+    }
+    
+    calendarViews[type] = 'calendar';
+    renderCalendar(type, type === 'from' ? currentFromMonth : currentToMonth);
+}
+
+window.selectYear = function(type, year, event) {
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+    
+    if (type === 'from') {
+        currentFromMonth.setFullYear(year);
+    } else {
+        currentToMonth.setFullYear(year);
+    }
+    
+    calendarViews[type] = 'calendar';
+    renderCalendar(type, type === 'from' ? currentFromMonth : currentToMonth);
+}
+
+window.navigateYearPage = function(type, direction, event) {
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+    
+    if (type === 'from') {
+        yearPageFrom = Math.max(0, Math.min(yearPageFrom + direction, Math.ceil(availableYears.length / yearsPerPage) - 1));
+    } else {
+        yearPageTo = Math.max(0, Math.min(yearPageTo + direction, Math.ceil(availableYears.length / yearsPerPage) - 1));
+    }
+    
+    renderCalendar(type, type === 'from' ? currentFromMonth : currentToMonth);
 }
 
 window.selectCalendarDate = function(type, dateStr, event) {
@@ -1347,6 +1555,87 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .calendar-day.today.selected {
     background: var(--primary-accent);
+}
+
+/* Enhanced Calendar Navigation Styles */
+.calendar-month-btn,
+.calendar-year-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-1) var(--spacing-2);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin: 0 2px;
+}
+
+.calendar-month-btn:hover,
+.calendar-year-btn:hover {
+    background: var(--primary-accent);
+    color: white;
+    border-color: var(--primary-accent);
+}
+
+.calendar-back-btn {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-1);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.calendar-back-btn:hover {
+    background: var(--primary-accent-light);
+    color: var(--primary-accent);
+    border-color: var(--primary-accent);
+}
+
+.calendar-view-title {
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+    text-align: center;
+    flex: 1;
+}
+
+.calendar-selection-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: var(--spacing-1);
+    padding: var(--spacing-2);
+    min-height: 200px;
+}
+
+.calendar-selection-btn {
+    padding: var(--spacing-2) var(--spacing-1);
+    background: var(--bg-card);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    color: var(--text-primary);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+}
+
+.calendar-selection-btn:hover {
+    background: var(--primary-accent);
+    color: white;
+    border-color: var(--primary-accent);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px var(--primary-accent-light);
 }
 
 .presets-panel {
