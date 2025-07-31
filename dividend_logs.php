@@ -155,7 +155,7 @@ try {
     if (!empty($_GET['export']) && $_GET['export'] === 'csv') {
         // Set headers for CSV download
         header('Content-Type: text/csv; charset=utf-8');
-        header('Content-Disposition: attachment; filename="dividend_logs_export_' . date('Y-m-d_H-i-s') . '.csv"');
+        header('Content-Disposition: attachment; filename="psw_dividend_logs_export_' . date('Y-m-d_H-i-s') . '.csv"');
         header('Cache-Control: no-cache, must-revalidate');
         header('Expires: 0');
         
@@ -255,9 +255,8 @@ ob_start();
                     <p class="psw-card-subtitle">Track and analyze dividend payments across the portfolio</p>
                 </div>
                 <div class="header-actions" style="display: flex; gap: 0.5rem; align-items: center;">
-                    <button type="button" class="psw-btn psw-btn-secondary" onclick="exportToCSV()" title="Export filtered data to CSV">
-                        <i class="fas fa-download psw-btn-icon"></i>
-                        Export CSV
+                    <button type="button" class="psw-btn psw-btn-secondary" onclick="exportToCSV()" title="Export filtered data to CSV" style="padding: 0.5rem; min-width: auto;">
+                        <i class="fas fa-download"></i>
                     </button>
                 </div>
             </div>
@@ -1399,7 +1398,7 @@ window.exportToCSV = function() {
     // Trigger download
     const link = document.createElement('a');
     link.href = exportUrl;
-    link.download = 'dividend_logs_export.csv';
+    link.download = 'psw_dividend_logs_export.csv';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
