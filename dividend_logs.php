@@ -272,18 +272,20 @@ ob_start();
                 <div class="psw-form-group">
                     <label class="psw-form-label">Date Range</label>
                     <div id="dividend-date-range" class="date-range-picker">
-                        <input type="hidden" name="date_from" value="<?php echo htmlspecialchars($filters['date_from']); ?>">
-                        <input type="hidden" name="date_to" value="<?php echo htmlspecialchars($filters['date_to']); ?>">
+                        <input type="hidden" name="date_from" value="<?php echo htmlspecialchars($filters['date_from'] ?: $defaultFrom); ?>">
+                        <input type="hidden" name="date_to" value="<?php echo htmlspecialchars($filters['date_to'] ?: $defaultTo); ?>">
                         
                         <div class="date-range-display" onclick="window.toggleDateRangePicker();" style="cursor: pointer;">
                             <i class="fas fa-calendar-alt"></i>
                             <span class="date-range-text" id="dateRangeText">
                                 <?php 
+                                // Set default date range: current month + 3 months back
+                                $defaultFrom = date('Y-m-01', strtotime('-3 months'));
+                                $defaultTo = date('Y-m-t');
+                                
                                 if ($filters['date_from'] && $filters['date_to']) {
                                     echo $filters['date_from'] . ' - ' . $filters['date_to'];
                                 } else {
-                                    $defaultFrom = date('Y-m-01', strtotime('-3 months'));
-                                    $defaultTo = date('Y-m-t');
                                     echo $defaultFrom . ' - ' . $defaultTo;
                                 }
                                 ?>
@@ -753,6 +755,24 @@ window.toggleDateRangePicker = function() {
             if (fromInput) document.getElementById('fromDateInput').value = fromInput.value;
             if (toInput) document.getElementById('toDateInput').value = toInput.value;
             
+            // Add event listeners for real-time display updates
+            var fromDateInput = document.getElementById('fromDateInput');
+            var toDateInput = document.getElementById('toDateInput');
+            
+            if (fromDateInput) {
+                fromDateInput.addEventListener('input', function() {
+                    tempFromDate = this.value;
+                    updateDateRangeDisplay();
+                });
+            }
+            
+            if (toDateInput) {
+                toDateInput.addEventListener('input', function() {
+                    tempToDate = this.value;
+                    updateDateRangeDisplay();
+                });
+            }
+            
             // Always render calendars immediately
             var fromDate = fromInput && fromInput.value ? new Date(fromInput.value) : new Date();
             var toDate = toInput && toInput.value ? new Date(toInput.value) : new Date();
@@ -870,6 +890,9 @@ window.applyPreset = function(preset) {
     currentToMonth = new Date(toDate);
     renderCalendar('from', currentFromMonth);
     renderCalendar('to', currentToMonth);
+    
+    // Update the display immediately when using presets
+    updateDateRangeDisplay();
 }
 
 window.applyDateRange = function() {
@@ -903,6 +926,9 @@ window.updateCalendar = function(type) {
             tempToDate = dateValue;
         }
         renderCalendar(type, type === 'from' ? currentFromMonth : currentToMonth);
+        
+        // Update the display immediately when manually typing
+        updateDateRangeDisplay();
     }
 }
 
@@ -1007,6 +1033,9 @@ window.selectCalendarDate = function(type, dateStr) {
     
     // Re-render calendar to show selection
     renderCalendar(type, type === 'from' ? currentFromMonth : currentToMonth);
+    
+    // Update the display immediately when clicking calendar
+    updateDateRangeDisplay();
 }
 
 window.formatDate = function(date) {
@@ -1019,6 +1048,22 @@ window.formatDate = function(date) {
 window.isValidDate = function(dateStr) {
     const date = new Date(dateStr);
     return date instanceof Date && !isNaN(date) && dateStr.match(/^\d{4}-\d{2}-\d{2}$/);
+}
+
+// Update the main date range display text
+window.updateDateRangeDisplay = function() {
+    var fromInput = document.getElementById('fromDateInput');
+    var toInput = document.getElementById('toDateInput');
+    var displayElement = document.getElementById('dateRangeText');
+    
+    if (fromInput && toInput && displayElement) {
+        var fromDate = fromInput.value || tempFromDate;
+        var toDate = toInput.value || tempToDate;
+        
+        if (fromDate && toDate) {
+            displayElement.textContent = fromDate + ' - ' + toDate;
+        }
+    }
 }
 
 // Close on outside click
