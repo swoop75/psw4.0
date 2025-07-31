@@ -599,9 +599,11 @@ window.toggleDateRangePicker = function() {
             overlay.style.setProperty('border-radius', 'var(--border-radius-lg)', 'important');
             overlay.style.setProperty('box-shadow', 'var(--shadow-xl)', 'important');
             overlay.style.setProperty('width', '800px', 'important');
-            overlay.style.setProperty('height', '510px', 'important');
+            overlay.style.setProperty('height', '450px', 'important');
             overlay.style.setProperty('min-width', '800px', 'important');
             overlay.style.setProperty('max-width', '800px', 'important');
+            overlay.style.setProperty('min-height', '450px', 'important');
+            overlay.style.setProperty('max-height', '450px', 'important');
             picker.classList.add('open');
             
             // Ensure the picker container has relative positioning
