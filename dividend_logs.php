@@ -322,7 +322,7 @@ ob_start();
             </div>
         </div>
         <div class="psw-card-content">
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end;">
+            <div style="display: grid; grid-template-columns: 1fr 250px 150px 150px 1fr; gap: 1rem; align-items: end;">
                 <div class="psw-form-group">
                     <label class="psw-form-label">Search</label>
                     <input type="text" id="search-input" class="psw-form-input" 
@@ -1839,15 +1839,7 @@ function deleteDividend(dividendId, companyName) {
     }
 }
 
-/* Filter width adjustments */
-#broker-filter,
-#account-group-filter {
-    max-width: calc(100% - 2px);
-}
-
-.date-range-picker {
-    max-width: calc(300px + 2px);
-}
+/* Filter width adjustments - using explicit grid layout instead */
 </style>
 <?php
 $content = ob_get_clean();
