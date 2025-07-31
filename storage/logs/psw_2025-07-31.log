@@ -104,3 +104,16 @@
 {"timestamp":"2025-07-31 14:46:21","level":"INFO","user_id":1,"ip":"100.91.97.82","message":"Monthly trends found: 6"}
 {"timestamp":"2025-07-31 14:46:21","level":"INFO","user_id":1,"ip":"100.91.97.82","message":"Insights total payments: 11"}
 {"timestamp":"2025-07-31 14:46:21","level":"INFO","user_id":1,"ip":"100.91.97.82","message":"User action: dashboard_viewed","context":{"action":"dashboard_viewed","details":"User accessed redesigned dashboard","user_id":1}}
+{"timestamp":"2025-07-31 15:53:24","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"User session destroyed","context":{"user_id":1,"username":"swoop"}}
+{"timestamp":"2025-07-31 15:53:31","level":"INFO","user_id":"anonymous","ip":"100.120.9.63","message":"Successful login for user: swoop","context":{"username":"swoop","success":true,"reason":"","user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/138.0.0.0 Safari\/537.36"}}
+{"timestamp":"2025-07-31 15:53:31","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"User session created","context":{"user_id":1,"username":"swoop"}}
+{"timestamp":"2025-07-31 15:53:31","level":"DEBUG","user_id":1,"ip":"100.120.9.63","message":"Calculated dividend statistics","context":{"ytd_total":0,"ytd_count":0,"all_time_total":12502.47,"monthly_records":0}}
+{"timestamp":"2025-07-31 15:53:31","level":"DEBUG","user_id":1,"ip":"100.120.9.63","message":"Calculated portfolio summary from dividend data","context":{"estimated_value":0,"ytd_dividends":0,"unique_companies":10}}
+{"timestamp":"2025-07-31 15:53:31","level":"DEBUG","user_id":1,"ip":"100.120.9.63","message":"Retrieved recent dividends from database","context":{"count":10,"limit":10,"user_id":1,"is_admin":true}}
+{"timestamp":"2025-07-31 15:53:31","level":"DEBUG","user_id":1,"ip":"100.120.9.63","message":"Calculated country allocation from dividend data","context":{"countries":0,"total_dividends":0}}
+{"timestamp":"2025-07-31 15:53:31","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"Total dividend records: 11"}
+{"timestamp":"2025-07-31 15:53:31","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"Top payers found: 5"}
+{"timestamp":"2025-07-31 15:53:31","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"Best days found: 5"}
+{"timestamp":"2025-07-31 15:53:31","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"Monthly trends found: 6"}
+{"timestamp":"2025-07-31 15:53:31","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"Insights total payments: 11"}
+{"timestamp":"2025-07-31 15:53:31","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"User action: dashboard_viewed","context":{"action":"dashboard_viewed","details":"User accessed redesigned dashboard","user_id":1}}
