@@ -680,12 +680,33 @@ window.toggleDateRangePicker = function() {
                 });
             }
             
-            // Style date input fields with reduced bottom margin and full width
+            // Style date input fields to be visible and properly positioned
             var dateInputs = overlay.querySelectorAll('.date-input');
             dateInputs.forEach(function(input) {
-                input.style.setProperty('margin-bottom', '8px', 'important'); // Half spacing
-                input.style.setProperty('width', '100%', 'important'); // Full width to match calendar
+                input.style.setProperty('display', 'block', 'important');
+                input.style.setProperty('visibility', 'visible', 'important');  
+                input.style.setProperty('margin-bottom', '8px', 'important');
+                input.style.setProperty('width', '100%', 'important');
                 input.style.setProperty('box-sizing', 'border-box', 'important');
+                input.style.setProperty('padding', '8px 12px', 'important');
+                input.style.setProperty('border', '1px solid var(--border-primary)', 'important');
+                input.style.setProperty('border-radius', 'var(--border-radius)', 'important');
+                input.style.setProperty('font-size', 'var(--font-size-sm)', 'important');
+                input.style.setProperty('background', 'var(--bg-card)', 'important');
+                input.style.setProperty('color', 'var(--text-primary)', 'important');
+            });
+            
+            // Style the date panel headers (FROM DATE / TO DATE)
+            var datePanelHeaders = overlay.querySelectorAll('.date-panel h5');
+            datePanelHeaders.forEach(function(header) {
+                header.style.setProperty('display', 'block', 'important');
+                header.style.setProperty('visibility', 'visible', 'important');
+                header.style.setProperty('margin', '0 0 8px 0', 'important');
+                header.style.setProperty('font-size', 'var(--font-size-sm)', 'important');
+                header.style.setProperty('font-weight', '600', 'important');
+                header.style.setProperty('color', 'var(--text-secondary)', 'important');
+                header.style.setProperty('text-transform', 'uppercase', 'important');
+                header.style.setProperty('letter-spacing', '0.5px', 'important');
             });
             
             // Style the footer with 5px spacing
