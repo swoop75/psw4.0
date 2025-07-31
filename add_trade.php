@@ -567,11 +567,14 @@ document.addEventListener('DOMContentLoaded', function() {
     window.selectSecurity = function(security) {
         selectedSecurity = security;
         
-        // Populate form fields
+        // Populate basic security fields
         document.getElementById('isin').value = security.isin;
+        
         if (security.ticker) {
             document.getElementById('ticker').value = security.ticker;
         }
+        
+        // Set currency
         if (security.currency) {
             const currencySelect = document.getElementById('currency_local');
             for (let option of currencySelect.options) {
@@ -582,12 +585,71 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
+        // Auto-set settlement date (T+2 business days from today if trade_date is today)
+        const tradeDateInput = document.getElementById('trade_date');
+        const settlementDateInput = document.getElementById('settlement_date');
+        
+        if (tradeDateInput.value === getCurrentDate() && !settlementDateInput.value) {
+            const settlementDate = calculateSettlementDate(new Date(), 2);
+            settlementDateInput.value = formatDate(settlementDate);
+        }
+        
+        // Set execution status to EXECUTED (most common)
+        const executionStatusSelect = document.getElementById('execution_status');
+        if (!executionStatusSelect.value) {
+            executionStatusSelect.value = 'EXECUTED';
+        }
+        
+        // Auto-set some defaults based on security type/country
+        if (security.country) {
+            // For Swedish securities, pre-fill some common values
+            if (security.country === 'Sweden' || security.country === 'SE' || security.currency === 'SEK') {
+                // Swedish securities often have no transaction tax
+                if (!document.getElementById('tft_tax_local').value) {
+                    document.getElementById('tft_tax_local').value = '0.00';
+                }
+                if (!document.getElementById('tft_tax_sek').value) {
+                    document.getElementById('tft_tax_sek').value = '0.00';
+                }
+                if (!document.getElementById('tft_rate_percent').value) {
+                    document.getElementById('tft_rate_percent').value = '0.00';
+                }
+            }
+            
+            // For UK securities, set stamp duty rate
+            if (security.country === 'United Kingdom' || security.country === 'UK' || security.country === 'GB') {
+                if (!document.getElementById('tft_rate_percent').value) {
+                    document.getElementById('tft_rate_percent').value = '0.50'; // UK stamp duty
+                }
+            }
+        }
+        
+        // Set order type to MARKET as default (most common)
+        const orderTypeSelect = document.getElementById('order_type');
+        if (!orderTypeSelect.value) {
+            orderTypeSelect.value = 'MARKET';
+        }
+        
+        // If currency is SEK, set exchange rate to 1.0 and copy local prices to SEK fields
+        if (security.currency === 'SEK') {
+            const exchangeRateInput = document.getElementById('exchange_rate_used');
+            if (!exchangeRateInput.value) {
+                exchangeRateInput.value = '1.000000';
+            }
+            
+            // Add event listener to copy SEK values when local values change
+            setupSekAutoCopy();
+        }
+        
         hideSuggestions();
         
-        // Show success indicator
+        // Show success indicator with more details
         const isinInput = document.getElementById('isin');
         isinInput.style.borderColor = 'var(--success-color)';
         isinInput.style.boxShadow = '0 0 0 2px var(--success-color-light)';
+        
+        // Show a brief success message
+        showSuccessMessage(`Security selected: ${security.company_name}${security.ticker ? ' (' + security.ticker + ')' : ''}`);
         
         setTimeout(() => {
             isinInput.style.borderColor = '';
@@ -596,6 +658,116 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Focus next field
         document.getElementById('shares_traded').focus();
+    }
+    
+    function getCurrentDate() {
+        const today = new Date();
+        return formatDate(today);
+    }
+    
+    function calculateSettlementDate(tradeDate, businessDays) {
+        const settlement = new Date(tradeDate);
+        let daysAdded = 0;
+        
+        while (daysAdded < businessDays) {
+            settlement.setDate(settlement.getDate() + 1);
+            // Skip weekends (Saturday = 6, Sunday = 0)
+            if (settlement.getDay() !== 0 && settlement.getDay() !== 6) {
+                daysAdded++;
+            }
+        }
+        
+        return settlement;
+    }
+    
+    function formatDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+    
+    function setupSekAutoCopy() {
+        const priceLocalInput = document.getElementById('price_per_share_local');
+        const totalLocalInput = document.getElementById('total_amount_local');
+        const feesLocalInput = document.getElementById('broker_fees_local');
+        const taxLocalInput = document.getElementById('tft_tax_local');
+        const netLocalInput = document.getElementById('net_amount_local');
+        
+        const priceSekInput = document.getElementById('price_per_share_sek');
+        const totalSekInput = document.getElementById('total_amount_sek');
+        const feesSekInput = document.getElementById('broker_fees_sek');
+        const taxSekInput = document.getElementById('tft_tax_sek');
+        const netSekInput = document.getElementById('net_amount_sek');
+        
+        // Copy values when local currency fields change (only if SEK)
+        const currencySelect = document.getElementById('currency_local');
+        if (currencySelect.value === 'SEK') {
+            if (priceLocalInput && !priceSekInput.value) {
+                priceLocalInput.addEventListener('input', function() {
+                    if (currencySelect.value === 'SEK' && this.value) {
+                        priceSekInput.value = this.value;
+                        calculateTotals();
+                    }
+                });
+            }
+            
+            if (totalLocalInput && !totalSekInput.value) {
+                totalLocalInput.addEventListener('input', function() {
+                    if (currencySelect.value === 'SEK' && this.value) {
+                        totalSekInput.value = this.value;
+                        calculateNetAmounts();
+                    }
+                });
+            }
+            
+            if (feesLocalInput && !feesSekInput.value) {
+                feesLocalInput.addEventListener('input', function() {
+                    if (currencySelect.value === 'SEK' && this.value) {
+                        feesSekInput.value = this.value;
+                        calculateNetAmounts();
+                    }
+                });
+            }
+            
+            if (taxLocalInput && !taxSekInput.value) {
+                taxLocalInput.addEventListener('input', function() {
+                    if (currencySelect.value === 'SEK' && this.value) {
+                        taxSekInput.value = this.value;
+                        calculateNetAmounts();
+                    }
+                });
+            }
+        }
+    }
+    
+    function showSuccessMessage(message) {
+        // Create success message element
+        const successDiv = document.createElement('div');
+        successDiv.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success-color);
+            color: white;
+            padding: 12px 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            z-index: 10000;
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            max-width: 300px;
+        `;
+        successDiv.innerHTML = `<i class="fas fa-check-circle" style="margin-right: 8px;"></i>${message}`;
+        
+        document.body.appendChild(successDiv);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            if (successDiv.parentNode) {
+                successDiv.parentNode.removeChild(successDiv);
+            }
+        }, 3000);
     }
     
     function calculateTotals() {
