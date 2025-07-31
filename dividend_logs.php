@@ -267,7 +267,7 @@ ob_start();
                         <input type="hidden" name="date_from" value="<?php echo htmlspecialchars($filters['date_from']); ?>">
                         <input type="hidden" name="date_to" value="<?php echo htmlspecialchars($filters['date_to']); ?>">
                         
-                        <div class="date-range-display" onclick="alert('Function exists: ' + (typeof window.toggleDateRangePicker)); if(window.toggleDateRangePicker) { window.toggleDateRangePicker(); } else { alert('Function not found!'); }" style="cursor: pointer;">
+                        <div class="date-range-display" onclick="window.toggleDateRangePicker()" style="cursor: pointer;">
                             <i class="fas fa-calendar-alt"></i>
                             <span class="date-range-text" id="dateRangeText">
                                 <?php 
@@ -574,15 +574,27 @@ var currentToMonth = new Date();
 
 // Make function global
 window.toggleDateRangePicker = function() {
+    alert('toggleDateRangePicker function called!');
     console.log('toggleDateRangePicker called');
     var overlay = document.getElementById('dateRangeOverlay');
     var picker = document.getElementById('dividend-date-range');
     console.log('Overlay element:', overlay);
     console.log('Picker element:', picker);
     
+    if (!overlay) {
+        alert('Overlay element not found!');
+        return;
+    }
+    if (!picker) {
+        alert('Picker element not found!');
+        return;
+    }
+    
+    alert('About to show overlay');
     if (overlay.style.display === 'none' || overlay.style.display === '') {
         overlay.style.display = 'block';
         picker.classList.add('open');
+        alert('Overlay should now be visible');
         
         // Set current values
         const fromInput = document.querySelector('input[name="date_from"]');
