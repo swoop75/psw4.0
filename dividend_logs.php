@@ -587,12 +587,12 @@ window.toggleDateRangePicker = function() {
     if (overlay && picker) {
         if (overlay.style.display === 'none' || overlay.style.display === '') {
             // Show the overlay with proper positioning
-            overlay.style.display = 'block';
-            overlay.style.position = 'absolute';
+            overlay.style.setProperty('display', 'block', 'important');
+            overlay.style.setProperty('position', 'absolute', 'important');
             overlay.style.top = '100%';
             overlay.style.left = '0';
             overlay.style.right = 'auto';
-            overlay.style.zIndex = '999999';
+            overlay.style.setProperty('z-index', '9999999', 'important');
             overlay.style.minHeight = '400px';
             overlay.style.backgroundColor = 'white';
             overlay.style.border = '1px solid #ccc';
@@ -604,10 +604,11 @@ window.toggleDateRangePicker = function() {
             // Ensure the picker container has relative positioning
             picker.style.position = 'relative';
             
-            // Debug: Check if content exists
-            console.log('Overlay content:', overlay.innerHTML);
-            if (!overlay.innerHTML.trim()) {
-                overlay.innerHTML = '<div style="padding: 20px; color: black;">DATE PICKER CONTENT LOADING...</div>';
+            // Ensure content is visible
+            var overlayContent = overlay.querySelector('.date-range-content');
+            if (overlayContent) {
+                overlayContent.style.display = 'block';
+                overlayContent.style.visibility = 'visible';
             }
             
             // Set current values in inputs
