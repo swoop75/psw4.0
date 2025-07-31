@@ -593,32 +593,43 @@ window.toggleDateRangePicker = function() {
             overlay.style.setProperty('top', (pickerRect.bottom + 5) + 'px', 'important');
             overlay.style.setProperty('left', pickerRect.left + 'px', 'important');
             overlay.style.setProperty('z-index', '2147483647', 'important'); // Maximum z-index value
-            // Apply beautiful PSW 4.0 styling
+            // Apply beautiful PSW 4.0 styling with exact dimensions
             overlay.style.setProperty('background', 'var(--bg-card)', 'important');
             overlay.style.setProperty('border', '1px solid var(--border-primary)', 'important');
             overlay.style.setProperty('border-radius', 'var(--border-radius-lg)', 'important');
             overlay.style.setProperty('box-shadow', 'var(--shadow-xl)', 'important');
-            overlay.style.setProperty('min-width', '900px', 'important');
-            overlay.style.setProperty('max-width', '1200px', 'important');
+            overlay.style.setProperty('width', '800px', 'important');
+            overlay.style.setProperty('height', '510px', 'important');
             picker.classList.add('open');
             
             // Ensure the picker container has relative positioning
             picker.style.position = 'relative';
             
-            // Ensure all content is properly styled and visible
+            // Ensure all content is properly styled and visible with exact spacing
             var overlayContent = overlay.querySelector('.date-range-content');
             if (overlayContent) {
                 overlayContent.style.setProperty('display', 'block', 'important');
                 overlayContent.style.setProperty('visibility', 'visible', 'important');
-                overlayContent.style.setProperty('padding', 'var(--spacing-5)', 'important');
+                overlayContent.style.setProperty('padding', '20px', 'important');
             }
             
-            // Style the panels
+            // Style the panels grid with exact spacing
+            var panelsGrid = overlay.querySelector('.date-range-panels');
+            if (panelsGrid) {
+                panelsGrid.style.setProperty('display', 'grid', 'important');
+                panelsGrid.style.setProperty('grid-template-columns', '1fr 1fr 150px', 'important');
+                panelsGrid.style.setProperty('gap', '25px', 'important');
+                panelsGrid.style.setProperty('height', '100%', 'important');
+            }
+            
+            // Style the date panels with aligned calendar positioning
             var panels = overlay.querySelectorAll('.date-panel');
             panels.forEach(function(panel) {
                 panel.style.setProperty('background', 'var(--bg-secondary)', 'important');
                 panel.style.setProperty('border-radius', 'var(--border-radius)', 'important');
-                panel.style.setProperty('padding', 'var(--spacing-4)', 'important');
+                panel.style.setProperty('padding', '16px', 'important');
+                panel.style.setProperty('display', 'flex', 'important');
+                panel.style.setProperty('flex-direction', 'column', 'important');
             });
             
             // Style the presets panel
@@ -626,8 +637,20 @@ window.toggleDateRangePicker = function() {
             if (presetsPanel) {
                 presetsPanel.style.setProperty('background', 'var(--bg-tertiary)', 'important');
                 presetsPanel.style.setProperty('border-radius', 'var(--border-radius)', 'important');
-                presetsPanel.style.setProperty('padding', 'var(--spacing-4)', 'important');
+                presetsPanel.style.setProperty('padding', '16px', 'important');
             }
+            
+            // Align calendar containers with preset spacing
+            var calendarContainers = overlay.querySelectorAll('.calendar-container');
+            calendarContainers.forEach(function(container) {
+                container.style.setProperty('margin-top', '16px', 'important'); // Same as preset buttons spacing
+            });
+            
+            // Style date input fields
+            var dateInputs = overlay.querySelectorAll('.date-input');
+            dateInputs.forEach(function(input) {
+                input.style.setProperty('margin-bottom', '16px', 'important');
+            });
             
             // Set current values in inputs
             var fromInput = document.querySelector('input[name="date_from"]');
