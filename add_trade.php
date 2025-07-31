@@ -984,6 +984,52 @@ legend {
     min-height: 80px;
 }
 
+/* Date Input Styles */
+.psw-date-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.psw-date-input {
+    flex: 1;
+    padding-right: 3rem;
+}
+
+.psw-date-btn {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--primary-accent);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.75rem;
+    transition: all 0.2s ease;
+    z-index: 2;
+}
+
+.psw-date-btn:hover {
+    background: var(--primary-accent-dark);
+    transform: translateY(-50%) scale(1.05);
+}
+
+.psw-date-btn:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+.psw-form-label i {
+    margin-right: 0.5rem;
+    color: var(--primary-accent);
+}
+
 /* ISIN Autocomplete Styles */
 .autocomplete-container {
     position: relative;
