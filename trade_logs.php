@@ -378,7 +378,7 @@ ob_start();
             </div>
         </div>
         <div class="psw-card-content">
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end;">
+            <div style="display: grid; grid-template-columns: 1fr 250px 140px 140px 140px 120px 1fr; gap: 1rem; align-items: end;">
                 <div class="psw-form-group">
                     <label class="psw-form-label">Search</label>
                     <input type="text" id="search-input" class="psw-form-input" 
@@ -1341,17 +1341,7 @@ window.deleteTrade = function(tradeId, companyName) {
     }
 }
 
-/* Filter width adjustments */
-#trade-type-filter,
-#broker-filter,
-#account-group-filter,
-#currency-filter {
-    max-width: calc(100% - 2px);
-}
-
-.date-range-picker {
-    max-width: calc(300px + 2px);
-}
+/* Filter width adjustments - using explicit grid layout instead */
 </style>
 <?php
 $content = ob_get_clean();
