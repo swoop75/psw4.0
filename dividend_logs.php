@@ -598,10 +598,11 @@ window.toggleDateRangePicker = function() {
             overlay.style.setProperty('border', '1px solid var(--border-primary)', 'important');
             overlay.style.setProperty('border-radius', 'var(--border-radius-lg)', 'important');
             overlay.style.setProperty('box-shadow', 'var(--shadow-xl)', 'important');
-            overlay.style.setProperty('width', '800px', 'important');
+            // Calculate optimal width: content (710px) + left/right padding (20px) = 730px
+            overlay.style.setProperty('width', '730px', 'important');
             overlay.style.setProperty('height', '450px', 'important');
-            overlay.style.setProperty('min-width', '800px', 'important');
-            overlay.style.setProperty('max-width', '800px', 'important');
+            overlay.style.setProperty('min-width', '730px', 'important');
+            overlay.style.setProperty('max-width', '730px', 'important');
             overlay.style.setProperty('min-height', '450px', 'important');
             overlay.style.setProperty('max-height', '450px', 'important');
             picker.classList.add('open');
@@ -609,28 +610,25 @@ window.toggleDateRangePicker = function() {
             // Ensure the picker container has relative positioning
             picker.style.position = 'relative';
             
-            // Ensure all content is properly styled with 5px padding on all sides
+            // Ensure all content is properly styled with 10px left/right padding, 5px top/bottom
             var overlayContent = overlay.querySelector('.date-range-content');
             if (overlayContent) {
                 overlayContent.style.setProperty('display', 'block', 'important');
                 overlayContent.style.setProperty('visibility', 'visible', 'important');
-                overlayContent.style.setProperty('padding', '5px', 'important'); // 5px on all sides
+                overlayContent.style.setProperty('padding', '5px 10px', 'important'); // 5px top/bottom, 10px left/right
             }
             
             // Style the panels grid with 5px padding and 40px gap between TO/FROM
             var panelsGrid = overlay.querySelector('.date-range-panels');
             if (panelsGrid) {
                 panelsGrid.style.setProperty('display', 'grid', 'important');
-                // Calculate exact spacing: 800px - 10px padding = 790px available
-                // FROM (240px) + gap (40px) + TO (240px) + gap (25px) + PRESETS (150px) = 695px
-                // Remaining: 95px, distribute as margins: ~47px each side
+                // Calculate exact spacing: 730px - 20px padding = 710px available
+                // FROM (240px) + gap (40px) + TO (240px) + gap (40px) + PRESETS (150px) = 710px exactly
                 panelsGrid.style.setProperty('grid-template-columns', '240px 240px 150px', 'important');
-                panelsGrid.style.setProperty('column-gap', '40px', 'important'); // Exact 40px between FROM and TO
-                panelsGrid.style.setProperty('row-gap', '0px', 'important');
+                panelsGrid.style.setProperty('gap', '0 40px', 'important'); // Exactly 40px between all columns
                 panelsGrid.style.setProperty('height', 'calc(100% - 10px)', 'important');
                 panelsGrid.style.setProperty('margin', '0', 'important');
-                panelsGrid.style.setProperty('justify-content', 'center', 'important'); // Center the entire grid
-                panelsGrid.style.setProperty('gap', '0 40px', 'important'); // Ensure exactly 40px between columns
+                panelsGrid.style.setProperty('justify-content', 'start', 'important'); // No centering needed, perfect fit
                 panelsGrid.style.setProperty('align-items', 'start', 'important'); // Align all panels to start
             }
             
