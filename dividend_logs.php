@@ -700,13 +700,14 @@ window.toggleDateRangePicker = function() {
                 });
             }
             
-            // Style date input fields to be visible and properly positioned
+            // Style date input fields to be visible and properly positioned with 240px width
             var dateInputs = overlay.querySelectorAll('.date-input');
             dateInputs.forEach(function(input) {
                 input.style.setProperty('display', 'block', 'important');
                 input.style.setProperty('visibility', 'visible', 'important');  
                 input.style.setProperty('margin-bottom', '8px', 'important');
-                input.style.setProperty('width', '100%', 'important');
+                input.style.setProperty('width', '240px', 'important'); // Match calendar width exactly
+                input.style.setProperty('max-width', '240px', 'important');
                 input.style.setProperty('box-sizing', 'border-box', 'important');
                 input.style.setProperty('padding', '8px 12px', 'important');
                 input.style.setProperty('border', '1px solid var(--border-primary)', 'important');
