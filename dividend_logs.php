@@ -260,16 +260,63 @@ ob_start();
                            value="<?php echo htmlspecialchars($filters['search']); ?>">
                 </div>
                 
+                <!-- Date Range Picker - New Central Component -->
                 <div class="psw-form-group">
-                    <label class="psw-form-label">From Date</label>
-                    <input type="date" id="date-from" class="psw-form-input" 
-                           value="<?php echo htmlspecialchars($filters['date_from']); ?>">
-                </div>
-                
-                <div class="psw-form-group">
-                    <label class="psw-form-label">To Date</label>
-                    <input type="date" id="date-to" class="psw-form-input" 
-                           value="<?php echo htmlspecialchars($filters['date_to']); ?>">
+                    <label class="psw-form-label">Date Range</label>
+                    <div id="dividend-date-range" class="date-range-picker">
+                        <input type="hidden" name="date_from" value="<?php echo htmlspecialchars($filters['date_from']); ?>">
+                        <input type="hidden" name="date_to" value="<?php echo htmlspecialchars($filters['date_to']); ?>">
+                        
+                        <div class="date-range-display" onclick="toggleDateRangePicker()">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span class="date-range-text" id="dateRangeText">
+                                <?php 
+                                if ($filters['date_from'] && $filters['date_to']) {
+                                    echo $filters['date_from'] . ' - ' . $filters['date_to'];
+                                } else {
+                                    $defaultFrom = date('Y-m-01', strtotime('-3 months'));
+                                    $defaultTo = date('Y-m-t');
+                                    echo $defaultFrom . ' - ' . $defaultTo;
+                                }
+                                ?>
+                            </span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        
+                        <div class="date-range-overlay" id="dateRangeOverlay">
+                            <div class="date-range-content">
+                                <div class="date-range-panels">
+                                    <div class="date-panel from-panel">
+                                        <h5>From Date</h5>
+                                        <input type="text" class="date-input" id="fromDateInput" placeholder="YYYY-MM-DD" onchange="updateCalendar('from')">
+                                        <div class="calendar-container" id="fromCalendar"></div>
+                                    </div>
+                                    <div class="date-panel to-panel">
+                                        <h5>To Date</h5>
+                                        <input type="text" class="date-input" id="toDateInput" placeholder="YYYY-MM-DD" onchange="updateCalendar('to')">
+                                        <div class="calendar-container" id="toCalendar"></div>
+                                    </div>
+                                    <div class="presets-panel">
+                                        <div class="presets-grid">
+                                            <button type="button" class="preset-btn" onclick="applyPreset('today')">Today</button>
+                                            <button type="button" class="preset-btn" onclick="applyPreset('yesterday')">Yesterday</button>
+                                            <button type="button" class="preset-btn" onclick="applyPreset('thisWeek')">This Week</button>
+                                            <button type="button" class="preset-btn" onclick="applyPreset('prevWeek')">Previous Week</button>
+                                            <button type="button" class="preset-btn" onclick="applyPreset('thisMonth')">This Month</button>
+                                            <button type="button" class="preset-btn" onclick="applyPreset('prevMonth')">Previous Month</button>
+                                            <button type="button" class="preset-btn" onclick="applyPreset('thisYear')">This Year</button>
+                                            <button type="button" class="preset-btn" onclick="applyPreset('prevYear')">Previous Year</button>
+                                            <button type="button" class="preset-btn" onclick="applyPreset('sinceStart')">Since Start</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="date-range-footer">
+                                <button type="button" class="psw-btn psw-btn-secondary" onclick="closeDateRangePicker()">Cancel</button>
+                                <button type="button" class="psw-btn psw-btn-primary" onclick="applyDateRange()">Apply</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="psw-form-group">
@@ -453,9 +500,9 @@ function applyFilters() {
     const search = document.getElementById('search-input').value.trim();
     if (search) params.set('search', search);
     
-    // Date range
-    const dateFrom = document.getElementById('date-from').value;
-    const dateTo = document.getElementById('date-to').value;
+    // Date range from hidden inputs
+    const dateFrom = document.querySelector('input[name="date_from"]').value;
+    const dateTo = document.querySelector('input[name="date_to"]').value;
     if (dateFrom) params.set('date_from', dateFrom);
     if (dateTo) params.set('date_to', dateTo);
     
@@ -519,12 +566,596 @@ document.getElementById('search-input').addEventListener('input', function() {
     }, 500);
 });
 
-// Date range change handlers
-document.getElementById('date-from').addEventListener('change', applyFilters);
-document.getElementById('date-to').addEventListener('change', applyFilters);
+// Enhanced Date Range Picker JavaScript with Calendar
+let tempFromDate = '';
+let tempToDate = '';
+let currentFromMonth = new Date();
+let currentToMonth = new Date();
+
+function toggleDateRangePicker() {
+    const overlay = document.getElementById('dateRangeOverlay');
+    const picker = document.getElementById('dividend-date-range');
+    
+    if (overlay.style.display === 'none' || overlay.style.display === '') {
+        overlay.style.display = 'block';
+        picker.classList.add('open');
+        
+        // Set current values
+        const fromInput = document.querySelector('input[name="date_from"]');
+        const toInput = document.querySelector('input[name="date_to"]');
+        
+        document.getElementById('fromDateInput').value = fromInput.value;
+        document.getElementById('toDateInput').value = toInput.value;
+        
+        tempFromDate = fromInput.value;
+        tempToDate = toInput.value;
+        
+        // Set defaults if empty
+        if (!tempFromDate && !tempToDate) {
+            applyPreset('defaultRange');
+        } else {
+            // Update calendars to show selected dates
+            if (tempFromDate) {
+                currentFromMonth = new Date(tempFromDate);
+                renderCalendar('from', currentFromMonth);
+            }
+            if (tempToDate) {
+                currentToMonth = new Date(tempToDate);
+                renderCalendar('to', currentToMonth);
+            }
+        }
+    } else {
+        closeDateRangePicker();
+    }
+}
+
+function closeDateRangePicker() {
+    const overlay = document.getElementById('dateRangeOverlay');
+    const picker = document.getElementById('dividend-date-range');
+    
+    overlay.style.display = 'none';
+    picker.classList.remove('open');
+}
+
+function applyPreset(preset) {
+    const today = new Date();
+    let fromDate, toDate;
+
+    switch (preset) {
+        case 'today':
+            fromDate = toDate = new Date(today);
+            break;
+        case 'yesterday':
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1);
+            fromDate = toDate = new Date(yesterday);
+            break;
+        case 'thisWeek':
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - today.getDay());
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
+            fromDate = new Date(startOfWeek);
+            toDate = new Date(endOfWeek);
+            break;
+        case 'prevWeek':
+            const prevWeekEnd = new Date(today);
+            prevWeekEnd.setDate(today.getDate() - today.getDay() - 1);
+            const prevWeekStart = new Date(prevWeekEnd);
+            prevWeekStart.setDate(prevWeekEnd.getDate() - 6);
+            fromDate = new Date(prevWeekStart);
+            toDate = new Date(prevWeekEnd);
+            break;
+        case 'thisMonth':
+            fromDate = new Date(today.getFullYear(), today.getMonth(), 1);
+            toDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            break;
+        case 'prevMonth':
+            fromDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+            toDate = new Date(today.getFullYear(), today.getMonth(), 0);
+            break;
+        case 'thisYear':
+            fromDate = new Date(today.getFullYear(), 0, 1);
+            toDate = new Date(today.getFullYear(), 11, 31);
+            break;
+        case 'prevYear':
+            fromDate = new Date(today.getFullYear() - 1, 0, 1);
+            toDate = new Date(today.getFullYear() - 1, 11, 31);
+            break;
+        case 'sinceStart':
+            fromDate = new Date(2020, 0, 1);
+            toDate = new Date(today);
+            break;
+        case 'defaultRange':
+        default:
+            // Current month + 3 months back
+            fromDate = new Date(today.getFullYear(), today.getMonth() - 3, 1);
+            toDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            break;
+    }
+
+    const fromDateStr = formatDate(fromDate);
+    const toDateStr = formatDate(toDate);
+
+    document.getElementById('fromDateInput').value = fromDateStr;
+    document.getElementById('toDateInput').value = toDateStr;
+    tempFromDate = fromDateStr;
+    tempToDate = toDateStr;
+    
+    // Update calendars
+    currentFromMonth = new Date(fromDate);
+    currentToMonth = new Date(toDate);
+    renderCalendar('from', currentFromMonth);
+    renderCalendar('to', currentToMonth);
+}
+
+function applyDateRange() {
+    const fromInput = document.getElementById('fromDateInput');
+    const toInput = document.getElementById('toDateInput');
+    
+    tempFromDate = fromInput.value;
+    tempToDate = toInput.value;
+    
+    // Update hidden inputs
+    document.querySelector('input[name="date_from"]').value = tempFromDate;
+    document.querySelector('input[name="date_to"]').value = tempToDate;
+    
+    // Update display
+    document.getElementById('dateRangeText').textContent = tempFromDate + ' - ' + tempToDate;
+    
+    closeDateRangePicker();
+}
+
+function updateCalendar(type) {
+    const input = document.getElementById(type + 'DateInput');
+    const dateValue = input.value;
+    
+    if (isValidDate(dateValue)) {
+        const newDate = new Date(dateValue);
+        if (type === 'from') {
+            currentFromMonth = newDate;
+            tempFromDate = dateValue;
+        } else {
+            currentToMonth = newDate;
+            tempToDate = dateValue;
+        }
+        renderCalendar(type, type === 'from' ? currentFromMonth : currentToMonth);
+    }
+}
+
+function renderCalendar(type, date) {
+    const calendarContainer = document.getElementById(type + 'Calendar');
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    
+    // Calendar header
+    const monthNames = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    
+    let html = `
+        <div class="calendar-header">
+            <button type="button" class="calendar-nav" onclick="navigateMonth('${type}', -1)">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="calendar-month-year">${monthNames[month]} ${year}</div>
+            <button type="button" class="calendar-nav" onclick="navigateMonth('${type}', 1)">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        <div class="calendar-grid">
+            <div class="calendar-weekdays">
+                <div class="calendar-weekday">Su</div>
+                <div class="calendar-weekday">Mo</div>
+                <div class="calendar-weekday">Tu</div>
+                <div class="calendar-weekday">We</div>
+                <div class="calendar-weekday">Th</div>
+                <div class="calendar-weekday">Fr</div>
+                <div class="calendar-weekday">Sa</div>
+            </div>
+            <div class="calendar-days">
+    `;
+    
+    // Get first day of month and days in month
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+    
+    // Previous month's trailing days
+    const prevMonth = new Date(year, month - 1, 0);
+    const prevMonthDays = prevMonth.getDate();
+    
+    for (let i = prevMonthDays - startingDayOfWeek + 1; i <= prevMonthDays; i++) {
+        html += `<div class="calendar-day other-month">${i}</div>`;
+    }
+    
+    // Current month days
+    const today = new Date();
+    const selectedDate = type === 'from' ? tempFromDate : tempToDate;
+    
+    for (let day = 1; day <= daysInMonth; day++) {
+        const currentDate = new Date(year, month, day);
+        const dateStr = formatDate(currentDate);
+        const isToday = dateStr === formatDate(today);
+        const isSelected = dateStr === selectedDate;
+        
+        let classes = 'calendar-day';
+        if (isToday) classes += ' today';
+        if (isSelected) classes += ' selected';
+        
+        html += `<div class="${classes}" onclick="selectCalendarDate('${type}', '${dateStr}')">${day}</div>`;
+    }
+    
+    // Next month's leading days
+    const remainingCells = 42 - (startingDayOfWeek + daysInMonth);
+    for (let day = 1; day <= remainingCells && remainingCells < 7; day++) {
+        html += `<div class="calendar-day other-month">${day}</div>`;
+    }
+    
+    html += `
+            </div>
+        </div>
+    `;
+    
+    calendarContainer.innerHTML = html;
+}
+
+function navigateMonth(type, direction) {
+    if (type === 'from') {
+        currentFromMonth.setMonth(currentFromMonth.getMonth() + direction);
+        renderCalendar('from', currentFromMonth);
+    } else {
+        currentToMonth.setMonth(currentToMonth.getMonth() + direction);
+        renderCalendar('to', currentToMonth);
+    }
+}
+
+function selectCalendarDate(type, dateStr) {
+    const input = document.getElementById(type + 'DateInput');
+    input.value = dateStr;
+    
+    if (type === 'from') {
+        tempFromDate = dateStr;
+    } else {
+        tempToDate = dateStr;
+    }
+    
+    // Re-render calendar to show selection
+    renderCalendar(type, type === 'from' ? currentFromMonth : currentToMonth);
+}
+
+function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function isValidDate(dateStr) {
+    const date = new Date(dateStr);
+    return date instanceof Date && !isNaN(date) && dateStr.match(/^\d{4}-\d{2}-\d{2}$/);
+}
+
+// Close on outside click
+document.addEventListener('click', function(e) {
+    const picker = document.getElementById('dividend-date-range');
+    const overlay = document.getElementById('dateRangeOverlay');
+    
+    if (picker && !picker.contains(e.target) && overlay && overlay.style.display === 'block') {
+        closeDateRangePicker();
+    }
+});
 document.getElementById('broker-filter').addEventListener('change', applyFilters);
 document.getElementById('account-group-filter').addEventListener('change', applyFilters);
+
+// Initialize calendars when overlay opens
+document.addEventListener('DOMContentLoaded', function() {
+    const fromInput = document.querySelector('input[name="date_from"]');
+    const toInput = document.querySelector('input[name="date_to"]');
+    
+    if (fromInput && toInput && !fromInput.value && !toInput.value) {
+        const today = new Date();
+        const defaultFrom = formatDate(new Date(today.getFullYear(), today.getMonth() - 3, 1));
+        const defaultTo = formatDate(new Date(today.getFullYear(), today.getMonth() + 1, 0));
+        
+        fromInput.value = defaultFrom;
+        toInput.value = defaultTo;
+        const dateRangeText = document.getElementById('dateRangeText');
+        if (dateRangeText) {
+            dateRangeText.textContent = defaultFrom + ' - ' + defaultTo;
+        }
+    }
+    
+    // Initialize calendar months
+    if (fromInput && fromInput.value) {
+        currentFromMonth = new Date(fromInput.value);
+    }
+    if (toInput && toInput.value) {
+        currentToMonth = new Date(toInput.value);
+    }
+});
 </script>
+
+<!-- Date Range Picker Styles -->
+<style>
+/* Enhanced Date Range Picker Styles */
+.date-range-picker {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    max-width: 300px;
+}
+
+.date-range-display {
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-3) var(--spacing-4);
+    background: var(--bg-card);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 44px;
+    font-family: var(--font-family-primary);
+    color: var(--text-primary);
+}
+
+.date-range-display:hover {
+    border-color: var(--primary-accent);
+    box-shadow: 0 0 0 2px var(--primary-accent-light);
+}
+
+.date-range-display i.fa-calendar-alt {
+    color: var(--text-secondary);
+    margin-right: var(--spacing-2);
+}
+
+.date-range-text {
+    flex: 1;
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.date-range-display i.fa-chevron-down {
+    color: var(--text-secondary);
+    font-size: var(--font-size-xs);
+    transition: transform 0.2s ease;
+}
+
+.date-range-picker.open .date-range-display i.fa-chevron-down {
+    transform: rotate(180deg);
+}
+
+.date-range-overlay {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-xl);
+    z-index: 1000;
+    min-width: 900px;
+    margin-top: var(--spacing-1);
+    display: none;
+}
+
+.date-range-content {
+    padding: var(--spacing-5);
+}
+
+.date-range-panels {
+    display: grid;
+    grid-template-columns: 1fr 1fr 150px;
+    gap: var(--spacing-5);
+}
+
+.date-panel {
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-4);
+}
+
+.date-panel h5 {
+    margin: 0 0 calc(var(--spacing-3) / 2) 0;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.date-input {
+    width: 100%;
+    padding: var(--spacing-2) var(--spacing-3);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-3);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    transition: border-color 0.2s ease;
+}
+
+.date-input:focus {
+    outline: none;
+    border-color: var(--primary-accent);
+    box-shadow: 0 0 0 2px var(--primary-accent-light);
+}
+
+.calendar-container {
+    background: var(--bg-card);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-2) var(--spacing-3);
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.calendar-nav {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: var(--spacing-1);
+    border-radius: var(--border-radius);
+    transition: all 0.2s ease;
+}
+
+.calendar-nav:hover {
+    background: var(--primary-accent-light);
+    color: var(--primary-accent);
+}
+
+.calendar-month-year {
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+}
+
+.calendar-grid {
+    padding: var(--spacing-2) var(--spacing-2) calc(var(--spacing-2) / 2) var(--spacing-2);
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    margin-bottom: var(--spacing-1);
+}
+
+.calendar-weekday {
+    text-align: center;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--text-secondary);
+    padding: var(--spacing-1);
+}
+
+.calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+}
+
+.calendar-day {
+    text-align: center;
+    padding: var(--spacing-1);
+    cursor: pointer;
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-xs);
+    transition: all 0.2s ease;
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.calendar-day:hover {
+    background: var(--primary-accent-light);
+    color: var(--primary-accent);
+}
+
+.calendar-day.selected {
+    background: var(--primary-accent);
+    color: white;
+    font-weight: 600;
+}
+
+.calendar-day.other-month {
+    color: var(--text-muted);
+}
+
+.calendar-day.today {
+    background: var(--info-color);
+    color: white;
+    font-weight: 600;
+}
+
+.calendar-day.today.selected {
+    background: var(--primary-accent);
+}
+
+.presets-panel {
+    background: var(--bg-tertiary);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-4);
+    min-width: 150px;
+}
+
+.presets-grid {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing-1) + 2px);
+}
+
+.preset-btn {
+    padding: var(--spacing-1) var(--spacing-2);
+    background: var(--bg-card);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    color: var(--text-primary);
+    white-space: nowrap;
+    width: 100%;
+}
+
+.preset-btn:hover {
+    background: var(--primary-accent);
+    color: white;
+    border-color: var(--primary-accent);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px var(--primary-accent-light);
+}
+
+.date-range-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-3);
+    padding: var(--spacing-4) var(--spacing-5);
+    border-top: 1px solid var(--border-primary);
+    background: var(--bg-secondary);
+}
+
+@media (max-width: 1024px) {
+    .date-range-overlay {
+        min-width: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: 0;
+        border-radius: 0;
+        height: 100vh;
+        overflow-y: auto;
+    }
+    
+    .date-range-panels {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-4);
+    }
+    
+    .presets-grid {
+        gap: var(--spacing-1);
+    }
+}
+</style>
 <?php
 $content = ob_get_clean();
 
