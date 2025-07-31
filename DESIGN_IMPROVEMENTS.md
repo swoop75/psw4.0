@@ -163,6 +163,133 @@ Uses a consistent 8px-based spacing scale:
 - Better visual separation
 - Professional color usage
 
+### 6. Central Date Range Picker Component
+
+**Overview:**
+A world-class, Avanza-inspired date range picker that provides an elegant solution for date filtering across the application. This component combines beautiful design with powerful functionality.
+
+**Features:**
+- **Single Combined Display:** Shows date range as "2025-04-01 - 2025-07-31" format
+- **3-Panel Overlay Layout:** FROM date, TO date, and Quick Presets in separate panels
+- **Interactive Calendars:** Full calendar navigation for both FROM and TO dates
+- **Manual Date Entry:** Text inputs for precise date entry with validation
+- **Smart Presets:** 9 predefined ranges including dynamic "Since Start" 
+- **Dynamic Data Integration:** "Since Start" automatically uses earliest database date
+- **Perfect Alignment:** 730px × 420px overlay with precise 10px spacing
+
+**Design Specifications:**
+- **Overlay Dimensions:** 730px wide × 420px high
+- **Panel Layout:** FROM (240px) + TO (240px) + Presets (150px) with 40px gaps
+- **Uniform Spacing:** 10px padding on all sides (top, bottom, left, right)
+- **Input Box Alignment:** 240px width matching calendar containers exactly
+- **Professional Styling:** PSW 4.0 design system with beautiful shadows and borders
+
+**Technical Implementation:**
+```php
+// Database Integration - Dynamic earliest date
+$earliestDateSql = "SELECT MIN(payment_date) as earliest_date FROM psw_portfolio.log_dividends";
+$earliestDateStmt = $portfolioDb->prepare($earliestDateSql);
+$earliestDateStmt->execute();
+$earliestDateResult = $earliestDateStmt->fetch(PDO::FETCH_ASSOC);
+$earliestDate = $earliestDateResult['earliest_date'] ?? '2020-01-01';
+```
+
+**HTML Structure:**
+```html
+<div id="dividend-date-range" class="date-range-picker">
+    <input type="hidden" name="date_from" value="<?php echo htmlspecialchars($filters['date_from']); ?>">
+    <input type="hidden" name="date_to" value="<?php echo htmlspecialchars($filters['date_to']); ?>">
+    
+    <div class="date-range-display" onclick="window.toggleDateRangePicker();" style="cursor: pointer;">
+        <i class="fas fa-calendar-alt"></i>
+        <span class="date-range-text" id="dateRangeText">2025-04-01 - 2025-07-31</span>
+        <i class="fas fa-chevron-down"></i>
+    </div>
+    
+    <div class="date-range-overlay" id="dateRangeOverlay">
+        <div class="date-range-content">
+            <div class="date-range-panels">
+                <div class="date-panel from-panel">
+                    <h5>From Date</h5>
+                    <input type="text" class="date-input" id="fromDateInput" placeholder="YYYY-MM-DD" />
+                    <div class="calendar-container" id="fromCalendar"></div>
+                </div>
+                <div class="date-panel to-panel">
+                    <h5>To Date</h5>
+                    <input type="text" class="date-input" id="toDateInput" placeholder="YYYY-MM-DD" />
+                    <div class="calendar-container" id="toCalendar"></div>
+                </div>
+                <div class="presets-panel">
+                    <div class="presets-grid">
+                        <button type="button" class="preset-btn" onclick="applyPreset('today')">Today</button>
+                        <button type="button" class="preset-btn" onclick="applyPreset('yesterday')">Yesterday</button>
+                        <button type="button" class="preset-btn" onclick="applyPreset('thisWeek')">This Week</button>
+                        <button type="button" class="preset-btn" onclick="applyPreset('prevWeek')">Previous Week</button>
+                        <button type="button" class="preset-btn" onclick="applyPreset('thisMonth')">This Month</button>
+                        <button type="button" class="preset-btn" onclick="applyPreset('prevMonth')">Previous Month</button>
+                        <button type="button" class="preset-btn" onclick="applyPreset('thisYear')">This Year</button>
+                        <button type="button" class="preset-btn" onclick="applyPreset('prevYear')">Previous Year</button>
+                        <button type="button" class="preset-btn" onclick="applyPreset('sinceStart')">Since Start</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="date-range-footer">
+            <button type="button" class="psw-btn psw-btn-secondary" onclick="closeDateRangePicker()">Cancel</button>
+            <button type="button" class="psw-btn psw-btn-primary" onclick="applyDateRange()">Apply</button>
+        </div>
+    </div>
+</div>
+```
+
+**JavaScript Functions:**
+- `window.toggleDateRangePicker()` - Opens/closes overlay with perfect positioning
+- `window.applyPreset(preset)` - Applies predefined date ranges
+- `window.renderCalendar(type, date)` - Renders interactive calendars
+- `window.applyDateRange()` - Applies selected dates and closes overlay
+- `window.selectCalendarDate(type, dateStr)` - Handles calendar date selection
+
+**Quick Presets Available:**
+1. **Today** - Current date only
+2. **Yesterday** - Previous day
+3. **This Week** - Current week (Sunday to Saturday)
+4. **Previous Week** - Last week
+5. **This Month** - Current month (1st to last day)
+6. **Previous Month** - Last month
+7. **This Year** - Current year (Jan 1 to Dec 31)
+8. **Previous Year** - Last year
+9. **Since Start** - Dynamic earliest database date to today
+
+**Implementation Example (Dividend Logs):**
+```php
+// In dividend_logs.php, the component is integrated as:
+<div class="psw-form-group">
+    <label class="psw-form-label">Date Range</label>
+    <!-- Full date picker component HTML here -->
+</div>
+
+// JavaScript handles form integration:
+function applyFilters() {
+    const dateFrom = document.querySelector('input[name="date_from"]').value;
+    const dateTo = document.querySelector('input[name="date_to"]').value;
+    if (dateFrom) params.set('date_from', dateFrom);
+    if (dateTo) params.set('date_to', dateTo);
+    // Apply filters...
+}
+```
+
+**Responsive Design:**
+- Mobile: Full-screen overlay for better usability
+- Tablet: Stacked panels in single column
+- Desktop: Full 3-panel layout with perfect alignment
+
+**Integration Benefits:**
+- **Reusable:** Self-contained component for easy integration
+- **Consistent UX:** Same beautiful interface across all pages
+- **Performance:** Optimized with proper event handling and DOM manipulation
+- **Accessible:** Keyboard navigation and screen reader friendly
+- **Professional:** Matches Avanza/modern fintech application standards
+
 ## JavaScript Enhancements
 
 ### 1. Smooth Animations
@@ -268,6 +395,20 @@ Uses a consistent 8px-based spacing scale:
 3. Chart.js integration with theme colors
 4. Progressive Web App features
 5. Advanced accessibility features
+
+### Central Date Range Picker Expansion:
+**Target Pages for Integration:**
+- **Transaction Logs:** Filter buy/sell transactions by date range
+- **Performance Analytics:** Select periods for portfolio performance analysis  
+- **Reports Dashboard:** Date-based financial report generation
+- **Holdings History:** Track holding changes over time periods
+- **Tax Reports:** Generate tax documents for specific date ranges
+
+**Customization Options:**
+- **Table-Specific Presets:** Custom presets per use case (e.g., "Tax Year", "Quarter")
+- **Multi-Database Support:** Adapt earliest date queries for different data sources
+- **Localization:** Support for different date formats and languages
+- **Advanced Features:** Time ranges, recurring periods, comparison modes
 
 ### Theme System:
 - CSS Custom Properties allow easy theming
