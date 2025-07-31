@@ -292,14 +292,14 @@ ob_start();
                         <label class="psw-form-label" for="ticker">Ticker</label>
                         <input type="text" id="ticker" name="ticker" class="psw-form-input" 
                                placeholder="e.g., AAPL" maxlength="20"
-                               value="<?php echo htmlspecialchars($_POST['ticker'] ?? ''); ?>">
+                               value="<?php echo htmlspecialchars(getFieldValue('ticker', $existingTrade)); ?>">
                     </div>
                     
                     <div class="psw-form-group">
                         <label class="psw-form-label" for="shares_traded">Shares *</label>
                         <input type="number" id="shares_traded" name="shares_traded" class="psw-form-input" 
                                step="0.0001" min="0.0001" placeholder="100"
-                               value="<?php echo $_POST['shares_traded'] ?? ''; ?>" required>
+                               value="<?php echo getFieldValue('shares_traded', $existingTrade); ?>" required>
                     </div>
                 </div>
 
@@ -313,7 +313,7 @@ ob_start();
                                 <option value="">Select currency...</option>
                                 <?php foreach ($currencies as $currency): ?>
                                     <option value="<?php echo $currency; ?>" 
-                                            <?php echo ($_POST['currency_local'] ?? '') == $currency ? 'selected' : ''; ?>>
+                                            <?php echo getFieldValue('currency_local', $existingTrade) == $currency ? 'selected' : ''; ?>>
                                         <?php echo htmlspecialchars($currency); ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -324,14 +324,14 @@ ob_start();
                             <label class="psw-form-label" for="price_per_share_local">Price per Share</label>
                             <input type="number" id="price_per_share_local" name="price_per_share_local" class="psw-form-input" 
                                    step="0.01" min="0" placeholder="227.50"
-                                   value="<?php echo $_POST['price_per_share_local'] ?? ''; ?>">
+                                   value="<?php echo getFieldValue('price_per_share_local', $existingTrade); ?>">
                         </div>
                         
                         <div class="psw-form-group">
                             <label class="psw-form-label" for="total_amount_local">Total Amount</label>
                             <input type="number" id="total_amount_local" name="total_amount_local" class="psw-form-input" 
                                    step="0.01" min="0" placeholder="22750.00"
-                                   value="<?php echo $_POST['total_amount_local'] ?? ''; ?>">
+                                   value="<?php echo getFieldValue('total_amount_local', $existingTrade); ?>">
                         </div>
                     </div>
                 </fieldset>
@@ -344,21 +344,21 @@ ob_start();
                             <label class="psw-form-label" for="price_per_share_sek">Price per Share (SEK) *</label>
                             <input type="number" id="price_per_share_sek" name="price_per_share_sek" class="psw-form-input" 
                                    step="0.01" min="0" placeholder="2475.00"
-                                   value="<?php echo $_POST['price_per_share_sek'] ?? ''; ?>" required>
+                                   value="<?php echo getFieldValue('price_per_share_sek', $existingTrade); ?>" required>
                         </div>
                         
                         <div class="psw-form-group">
                             <label class="psw-form-label" for="total_amount_sek">Total Amount (SEK) *</label>
                             <input type="number" id="total_amount_sek" name="total_amount_sek" class="psw-form-input" 
                                    step="0.01" min="0" placeholder="247500.00"
-                                   value="<?php echo $_POST['total_amount_sek'] ?? ''; ?>" required>
+                                   value="<?php echo getFieldValue('total_amount_sek', $existingTrade); ?>" required>
                         </div>
                         
                         <div class="psw-form-group">
                             <label class="psw-form-label" for="exchange_rate_used">Exchange Rate</label>
                             <input type="number" id="exchange_rate_used" name="exchange_rate_used" class="psw-form-input" 
                                    step="0.000001" min="0" placeholder="10.8830"
-                                   value="<?php echo $_POST['exchange_rate_used'] ?? ''; ?>">
+                                   value="<?php echo getFieldValue('exchange_rate_used', $existingTrade); ?>">
                         </div>
                     </div>
                 </fieldset>
@@ -371,35 +371,35 @@ ob_start();
                             <label class="psw-form-label" for="broker_fees_local">Broker Fees (Local)</label>
                             <input type="number" id="broker_fees_local" name="broker_fees_local" class="psw-form-input" 
                                    step="0.01" min="0" placeholder="14.95"
-                                   value="<?php echo $_POST['broker_fees_local'] ?? '0'; ?>">
+                                   value="<?php echo getFieldValue('broker_fees_local', $existingTrade) ?: '0'; ?>">
                         </div>
                         
                         <div class="psw-form-group">
                             <label class="psw-form-label" for="broker_fees_sek">Broker Fees (SEK)</label>
                             <input type="number" id="broker_fees_sek" name="broker_fees_sek" class="psw-form-input" 
                                    step="0.01" min="0" placeholder="162.74"
-                                   value="<?php echo $_POST['broker_fees_sek'] ?? '0'; ?>">
+                                   value="<?php echo getFieldValue('broker_fees_sek', $existingTrade) ?: '0'; ?>">
                         </div>
                         
                         <div class="psw-form-group">
                             <label class="psw-form-label" for="tft_tax_local">Transaction Tax (Local)</label>
                             <input type="number" id="tft_tax_local" name="tft_tax_local" class="psw-form-input" 
                                    step="0.01" min="0" placeholder="0.00"
-                                   value="<?php echo $_POST['tft_tax_local'] ?? '0'; ?>">
+                                   value="<?php echo getFieldValue('tft_tax_local', $existingTrade) ?: '0'; ?>">
                         </div>
                         
                         <div class="psw-form-group">
                             <label class="psw-form-label" for="tft_tax_sek">Transaction Tax (SEK)</label>
                             <input type="number" id="tft_tax_sek" name="tft_tax_sek" class="psw-form-input" 
                                    step="0.01" min="0" placeholder="0.00"
-                                   value="<?php echo $_POST['tft_tax_sek'] ?? '0'; ?>">
+                                   value="<?php echo getFieldValue('tft_tax_sek', $existingTrade) ?: '0'; ?>">
                         </div>
                         
                         <div class="psw-form-group">
                             <label class="psw-form-label" for="tft_rate_percent">Tax Rate (%)</label>
                             <input type="number" id="tft_rate_percent" name="tft_rate_percent" class="psw-form-input" 
                                    step="0.01" min="0" max="100" placeholder="0.50"
-                                   value="<?php echo $_POST['tft_rate_percent'] ?? ''; ?>">
+                                   value="<?php echo getFieldValue('tft_rate_percent', $existingTrade); ?>">
                         </div>
                     </div>
                 </fieldset>
@@ -412,14 +412,14 @@ ob_start();
                             <label class="psw-form-label" for="net_amount_local">Net Amount (Local)</label>
                             <input type="number" id="net_amount_local" name="net_amount_local" class="psw-form-input" 
                                    step="0.01" placeholder="22735.05"
-                                   value="<?php echo $_POST['net_amount_local'] ?? ''; ?>">
+                                   value="<?php echo getFieldValue('net_amount_local', $existingTrade); ?>">
                         </div>
                         
                         <div class="psw-form-group">
                             <label class="psw-form-label" for="net_amount_sek">Net Amount (SEK) *</label>
                             <input type="number" id="net_amount_sek" name="net_amount_sek" class="psw-form-input" 
                                    step="0.01" min="0" placeholder="247337.26"
-                                   value="<?php echo $_POST['net_amount_sek'] ?? ''; ?>" required>
+                                   value="<?php echo getFieldValue('net_amount_sek', $existingTrade); ?>" required>
                         </div>
                     </div>
                 </fieldset>
@@ -434,7 +434,7 @@ ob_start();
                                 <option value="">Select broker...</option>
                                 <?php foreach ($brokers as $broker): ?>
                                     <option value="<?php echo $broker['broker_id']; ?>" 
-                                            <?php echo ($_POST['broker_id'] ?? '') == $broker['broker_id'] ? 'selected' : ''; ?>>
+                                            <?php echo getFieldValue('broker_id', $existingTrade) == $broker['broker_id'] ? 'selected' : ''; ?>>
                                         <?php echo htmlspecialchars($broker['broker_name']); ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -447,7 +447,7 @@ ob_start();
                                 <option value="">Select account group...</option>
                                 <?php foreach ($accountGroups as $group): ?>
                                     <option value="<?php echo $group['portfolio_account_group_id']; ?>" 
-                                            <?php echo ($_POST['portfolio_account_group_id'] ?? '') == $group['portfolio_account_group_id'] ? 'selected' : ''; ?>>
+                                            <?php echo getFieldValue('portfolio_account_group_id', $existingTrade) == $group['portfolio_account_group_id'] ? 'selected' : ''; ?>>
                                         <?php echo htmlspecialchars($group['portfolio_group_name']); ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -464,26 +464,26 @@ ob_start();
                             <label class="psw-form-label" for="broker_transaction_id">Transaction ID</label>
                             <input type="text" id="broker_transaction_id" name="broker_transaction_id" class="psw-form-input" 
                                    placeholder="TXN123456" maxlength="100"
-                                   value="<?php echo htmlspecialchars($_POST['broker_transaction_id'] ?? ''); ?>">
+                                   value="<?php echo htmlspecialchars(getFieldValue('broker_transaction_id', $existingTrade)); ?>">
                         </div>
                         
                         <div class="psw-form-group">
                             <label class="psw-form-label" for="order_type">Order Type</label>
                             <select id="order_type" name="order_type" class="psw-form-input">
                                 <option value="">Select order type...</option>
-                                <option value="MARKET" <?php echo ($_POST['order_type'] ?? '') == 'MARKET' ? 'selected' : ''; ?>>Market</option>
-                                <option value="LIMIT" <?php echo ($_POST['order_type'] ?? '') == 'LIMIT' ? 'selected' : ''; ?>>Limit</option>
-                                <option value="STOP" <?php echo ($_POST['order_type'] ?? '') == 'STOP' ? 'selected' : ''; ?>>Stop</option>
-                                <option value="OTHER" <?php echo ($_POST['order_type'] ?? '') == 'OTHER' ? 'selected' : ''; ?>>Other</option>
+                                <option value="MARKET" <?php echo getFieldValue('order_type', $existingTrade) == 'MARKET' ? 'selected' : ''; ?>>Market</option>
+                                <option value="LIMIT" <?php echo getFieldValue('order_type', $existingTrade) == 'LIMIT' ? 'selected' : ''; ?>>Limit</option>
+                                <option value="STOP" <?php echo getFieldValue('order_type', $existingTrade) == 'STOP' ? 'selected' : ''; ?>>Stop</option>
+                                <option value="OTHER" <?php echo getFieldValue('order_type', $existingTrade) == 'OTHER' ? 'selected' : ''; ?>>Other</option>
                             </select>
                         </div>
                         
                         <div class="psw-form-group">
                             <label class="psw-form-label" for="execution_status">Status</label>
                             <select id="execution_status" name="execution_status" class="psw-form-input">
-                                <option value="EXECUTED" <?php echo ($_POST['execution_status'] ?? 'EXECUTED') == 'EXECUTED' ? 'selected' : ''; ?>>Executed</option>
-                                <option value="PARTIAL" <?php echo ($_POST['execution_status'] ?? '') == 'PARTIAL' ? 'selected' : ''; ?>>Partial</option>
-                                <option value="CANCELLED" <?php echo ($_POST['execution_status'] ?? '') == 'CANCELLED' ? 'selected' : ''; ?>>Cancelled</option>
+                                <option value="EXECUTED" <?php echo (getFieldValue('execution_status', $existingTrade) ?: 'EXECUTED') == 'EXECUTED' ? 'selected' : ''; ?>>Executed</option>
+                                <option value="PARTIAL" <?php echo getFieldValue('execution_status', $existingTrade) == 'PARTIAL' ? 'selected' : ''; ?>>Partial</option>
+                                <option value="CANCELLED" <?php echo getFieldValue('execution_status', $existingTrade) == 'CANCELLED' ? 'selected' : ''; ?>>Cancelled</option>
                             </select>
                         </div>
                     </div>
@@ -491,7 +491,7 @@ ob_start();
                     <div class="psw-form-group">
                         <label class="psw-form-label" for="notes">Notes</label>
                         <textarea id="notes" name="notes" class="psw-form-input" rows="3" 
-                                  placeholder="Optional notes about this trade..."><?php echo htmlspecialchars($_POST['notes'] ?? ''); ?></textarea>
+                                  placeholder="Optional notes about this trade..."><?php echo htmlspecialchars(getFieldValue('notes', $existingTrade)); ?></textarea>
                     </div>
                 </fieldset>
 
