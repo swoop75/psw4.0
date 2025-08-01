@@ -47,11 +47,10 @@ try {
     $stmt->execute();
     $holdings = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Debug: Print what we got from database
-    error_log("=== PORTFOLIO DEBUG ===");
-    error_log("Raw count from DB: " . count($holdings));
+    // Debug: Print what we got from database (visible on page)
+    echo "<!-- DEBUG: Raw count from DB: " . count($holdings) . " -->\n";
     foreach ($holdings as $i => $holding) {
-        error_log("[$i] ID: {$holding['portfolio_id']}, ISIN: {$holding['isin']}, Ticker: {$holding['ticker']}, Company: {$holding['company_name']}");
+        echo "<!-- DEBUG [$i]: ID={$holding['portfolio_id']}, ISIN={$holding['isin']}, Ticker={$holding['ticker']}, Company={$holding['company_name']} -->\n";
     }
     
     // Remove the deduplication for now to see raw data
