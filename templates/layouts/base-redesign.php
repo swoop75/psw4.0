@@ -154,6 +154,9 @@ $userTheme = $_SESSION['user_theme'] ?? 'light';
                                     <a href="<?php echo BASE_URL; ?>/portfolio_overview.php" class="psw-nav-submenu-link <?php echo (basename($_SERVER['PHP_SELF']) == 'portfolio_overview.php') ? 'active' : ''; ?>">
                                         <i class="fas fa-eye"></i> Overview
                                     </a>
+                                    <a href="<?php echo BASE_URL; ?>/allocation.php" class="psw-nav-submenu-link <?php echo (basename($_SERVER['PHP_SELF']) == 'allocation.php') ? 'active' : ''; ?>">
+                                        <i class="fas fa-globe-americas"></i> Allocation
+                                    </a>
                                 </div>
                             </div>
                         </div>

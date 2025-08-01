@@ -1,0 +1,591 @@
+<?php
+/**
+ * File: allocation.php
+ * Description: Portfolio allocation analysis with geographic, sector, and other breakdowns for PSW 4.0
+ */
+
+session_start();
+
+require_once __DIR__ . '/config/config.php';
+require_once __DIR__ . '/config/constants.php';
+require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/src/middleware/Auth.php';
+require_once __DIR__ . '/src/utils/Localization.php';
+
+// Require authentication
+Auth::requireAuth();
+
+try {
+    $portfolioDb = Database::getConnection('portfolio');
+    $foundationDb = Database::getConnection('foundation');
+    $marketDb = Database::getConnection('marketdata');
+    
+    // Get geographic allocation (by country/region)
+    $geographicSql = "SELECT 
+                        CASE 
+                            WHEN LEFT(p.isin, 2) = 'SE' THEN 'Sweden'
+                            WHEN LEFT(p.isin, 2) = 'US' THEN 'United States'
+                            WHEN LEFT(p.isin, 2) = 'DK' THEN 'Denmark'
+                            WHEN LEFT(p.isin, 2) = 'NO' THEN 'Norway'
+                            WHEN LEFT(p.isin, 2) = 'FI' THEN 'Finland'
+                            WHEN LEFT(p.isin, 2) = 'DE' THEN 'Germany'
+                            WHEN LEFT(p.isin, 2) = 'FR' THEN 'France'
+                            WHEN LEFT(p.isin, 2) = 'GB' THEN 'United Kingdom'
+                            WHEN LEFT(p.isin, 2) = 'NL' THEN 'Netherlands'
+                            WHEN LEFT(p.isin, 2) = 'CH' THEN 'Switzerland'
+                            WHEN LEFT(p.isin, 2) = 'CA' THEN 'Canada'
+                            WHEN LEFT(p.isin, 2) = 'AU' THEN 'Australia'
+                            WHEN LEFT(p.isin, 2) = 'JP' THEN 'Japan'
+                            WHEN LEFT(p.isin, 2) = 'HK' THEN 'Hong Kong'
+                            WHEN LEFT(p.isin, 2) = 'SG' THEN 'Singapore'
+                            ELSE 'Other'
+                        END as country,
+                        CASE 
+                            WHEN LEFT(p.isin, 2) IN ('SE', 'DK', 'NO', 'FI') THEN 'Nordic'
+                            WHEN LEFT(p.isin, 2) IN ('DE', 'FR', 'GB', 'NL', 'CH') THEN 'Europe'
+                            WHEN LEFT(p.isin, 2) IN ('US', 'CA') THEN 'North America'
+                            WHEN LEFT(p.isin, 2) IN ('AU', 'JP', 'HK', 'SG') THEN 'Asia-Pacific'
+                            ELSE 'Other'
+                        END as region,
+                        COUNT(*) as positions,
+                        SUM(COALESCE(p.current_value_sek, 0)) as value_sek,
+                        (SUM(COALESCE(p.current_value_sek, 0)) / NULLIF((SELECT SUM(current_value_sek) FROM psw_portfolio.portfolio WHERE is_active = 1 AND shares_held > 0), 0)) * 100 as weight_percent
+                      FROM psw_portfolio.portfolio p
+                      WHERE p.is_active = 1 AND p.shares_held > 0
+                      GROUP BY country, region
+                      ORDER BY value_sek DESC";
+    
+    $geographicStmt = $portfolioDb->prepare($geographicSql);
+    $geographicStmt->execute();
+    $geographicAllocation = $geographicStmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Get sector allocation
+    $sectorSql = "SELECT 
+                    COALESCE(s1.nameEn, s2.nameEn, 'Unknown') as sector,
+                    COUNT(*) as positions,
+                    SUM(COALESCE(p.current_value_sek, 0)) as value_sek,
+                    (SUM(COALESCE(p.current_value_sek, 0)) / NULLIF((SELECT SUM(current_value_sek) FROM psw_portfolio.portfolio WHERE is_active = 1 AND shares_held > 0), 0)) * 100 as weight_percent
+                  FROM psw_portfolio.portfolio p
+                  LEFT JOIN psw_marketdata.nordic_instruments ni ON p.isin COLLATE utf8mb4_unicode_ci = ni.isin COLLATE utf8mb4_unicode_ci
+                  LEFT JOIN psw_marketdata.global_instruments gi ON p.isin COLLATE utf8mb4_unicode_ci = gi.isin COLLATE utf8mb4_unicode_ci
+                  LEFT JOIN psw_marketdata.sectors s1 ON ni.sectorID = s1.id
+                  LEFT JOIN psw_marketdata.sectors s2 ON gi.sectorId = s2.id
+                  WHERE p.is_active = 1 AND p.shares_held > 0
+                  GROUP BY COALESCE(s1.nameEn, s2.nameEn, 'Unknown')
+                  ORDER BY value_sek DESC";
+    
+    $sectorStmt = $portfolioDb->prepare($sectorSql);
+    $sectorStmt->execute();
+    $sectorAllocation = $sectorStmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Get currency allocation
+    $currencySql = "SELECT 
+                        COALESCE(p.currency_local, 'SEK') as currency,
+                        COUNT(*) as positions,
+                        SUM(COALESCE(p.current_value_sek, 0)) as value_sek,
+                        (SUM(COALESCE(p.current_value_sek, 0)) / NULLIF((SELECT SUM(current_value_sek) FROM psw_portfolio.portfolio WHERE is_active = 1 AND shares_held > 0), 0)) * 100 as weight_percent
+                    FROM psw_portfolio.portfolio p
+                    WHERE p.is_active = 1 AND p.shares_held > 0
+                    GROUP BY COALESCE(p.currency_local, 'SEK')
+                    ORDER BY value_sek DESC";
+    
+    $currencyStmt = $portfolioDb->prepare($currencySql);
+    $currencyStmt->execute();
+    $currencyAllocation = $currencyStmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Get position size allocation (Small, Medium, Large positions)
+    $positionSizeSql = "SELECT 
+                            CASE 
+                                WHEN p.current_value_sek < 50000 THEN 'Small (< 50k SEK)'
+                                WHEN p.current_value_sek < 150000 THEN 'Medium (50k-150k SEK)'
+                                WHEN p.current_value_sek < 300000 THEN 'Large (150k-300k SEK)'
+                                ELSE 'Extra Large (> 300k SEK)'
+                            END as position_size,
+                            COUNT(*) as positions,
+                            SUM(COALESCE(p.current_value_sek, 0)) as value_sek,
+                            (SUM(COALESCE(p.current_value_sek, 0)) / NULLIF((SELECT SUM(current_value_sek) FROM psw_portfolio.portfolio WHERE is_active = 1 AND shares_held > 0), 0)) * 100 as weight_percent
+                        FROM psw_portfolio.portfolio p
+                        WHERE p.is_active = 1 AND p.shares_held > 0
+                        GROUP BY 
+                            CASE 
+                                WHEN p.current_value_sek < 50000 THEN 'Small (< 50k SEK)'
+                                WHEN p.current_value_sek < 150000 THEN 'Medium (50k-150k SEK)'
+                                WHEN p.current_value_sek < 300000 THEN 'Large (150k-300k SEK)'
+                                ELSE 'Extra Large (> 300k SEK)'
+                            END
+                        ORDER BY 
+                            CASE 
+                                WHEN CASE 
+                                    WHEN p.current_value_sek < 50000 THEN 'Small (< 50k SEK)'
+                                    WHEN p.current_value_sek < 150000 THEN 'Medium (50k-150k SEK)'
+                                    WHEN p.current_value_sek < 300000 THEN 'Large (150k-300k SEK)'
+                                    ELSE 'Extra Large (> 300k SEK)'
+                                END = 'Small (< 50k SEK)' THEN 1
+                                WHEN CASE 
+                                    WHEN p.current_value_sek < 50000 THEN 'Small (< 50k SEK)'
+                                    WHEN p.current_value_sek < 150000 THEN 'Medium (50k-150k SEK)'
+                                    WHEN p.current_value_sek < 300000 THEN 'Large (150k-300k SEK)'
+                                    ELSE 'Extra Large (> 300k SEK)'
+                                END = 'Medium (50k-150k SEK)' THEN 2
+                                WHEN CASE 
+                                    WHEN p.current_value_sek < 50000 THEN 'Small (< 50k SEK)'
+                                    WHEN p.current_value_sek < 150000 THEN 'Medium (50k-150k SEK)'
+                                    WHEN p.current_value_sek < 300000 THEN 'Large (150k-300k SEK)'
+                                    ELSE 'Extra Large (> 300k SEK)'
+                                END = 'Large (150k-300k SEK)' THEN 3
+                                ELSE 4
+                            END";
+    
+    $positionSizeStmt = $portfolioDb->prepare($positionSizeSql);
+    $positionSizeStmt->execute();
+    $positionSizeAllocation = $positionSizeStmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Get regional aggregation for world map
+    $regionalSql = "SELECT 
+                        CASE 
+                            WHEN LEFT(p.isin, 2) IN ('SE', 'DK', 'NO', 'FI') THEN 'Nordic'
+                            WHEN LEFT(p.isin, 2) IN ('DE', 'FR', 'GB', 'NL', 'CH', 'IT', 'ES') THEN 'Europe'
+                            WHEN LEFT(p.isin, 2) IN ('US', 'CA') THEN 'North America'
+                            WHEN LEFT(p.isin, 2) IN ('AU', 'JP', 'HK', 'SG', 'KR', 'CN', 'IN') THEN 'Asia-Pacific'
+                            WHEN LEFT(p.isin, 2) IN ('BR', 'MX', 'AR', 'CL') THEN 'Latin America'
+                            WHEN LEFT(p.isin, 2) IN ('ZA', 'NG', 'EG') THEN 'Africa'
+                            ELSE 'Other'
+                        END as region,
+                        COUNT(*) as positions,
+                        SUM(COALESCE(p.current_value_sek, 0)) as value_sek,
+                        (SUM(COALESCE(p.current_value_sek, 0)) / NULLIF((SELECT SUM(current_value_sek) FROM psw_portfolio.portfolio WHERE is_active = 1 AND shares_held > 0), 0)) * 100 as weight_percent
+                    FROM psw_portfolio.portfolio p
+                    WHERE p.is_active = 1 AND p.shares_held > 0
+                    GROUP BY 
+                        CASE 
+                            WHEN LEFT(p.isin, 2) IN ('SE', 'DK', 'NO', 'FI') THEN 'Nordic'
+                            WHEN LEFT(p.isin, 2) IN ('DE', 'FR', 'GB', 'NL', 'CH', 'IT', 'ES') THEN 'Europe'
+                            WHEN LEFT(p.isin, 2) IN ('US', 'CA') THEN 'North America'
+                            WHEN LEFT(p.isin, 2) IN ('AU', 'JP', 'HK', 'SG', 'KR', 'CN', 'IN') THEN 'Asia-Pacific'
+                            WHEN LEFT(p.isin, 2) IN ('BR', 'MX', 'AR', 'CL') THEN 'Latin America'
+                            WHEN LEFT(p.isin, 2) IN ('ZA', 'NG', 'EG') THEN 'Africa'
+                            ELSE 'Other'
+                        END
+                    ORDER BY value_sek DESC";
+    
+    $regionalStmt = $portfolioDb->prepare($regionalSql);
+    $regionalStmt->execute();
+    $regionalAllocation = $regionalStmt->fetchAll(PDO::FETCH_ASSOC);
+    
+} catch (Exception $e) {
+    $error = "Error loading allocation data: " . $e->getMessage();
+    $geographicAllocation = [];
+    $sectorAllocation = [];
+    $currencyAllocation = [];
+    $positionSizeAllocation = [];
+    $regionalAllocation = [];
+}
+
+// Initialize variables for template
+$pageTitle = 'Portfolio Allocation - PSW 4.0';
+$pageDescription = 'Geographic, sector, and allocation analysis of your portfolio';
+$additionalCSS = [];
+$additionalJS = ['https://cdn.jsdelivr.net/npm/chart.js'];
+
+// Prepare content
+ob_start();
+?>
+<div class="psw-content">
+    <!-- Page Header -->
+    <div class="psw-card psw-mb-4">
+        <div class="psw-card-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <h1 class="psw-card-title">
+                    <i class="fas fa-globe-americas psw-card-title-icon"></i>
+                    Portfolio Allocation
+                </h1>
+                <p class="psw-card-subtitle">Geographic, sector, and diversification analysis of your investments</p>
+            </div>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <button type="button" class="psw-btn psw-btn-secondary" onclick="refreshAllocation()">
+                    <i class="fas fa-sync psw-btn-icon"></i>Refresh
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <?php if (isset($error)): ?>
+        <div class="psw-alert psw-alert-error psw-mb-4">
+            <i class="fas fa-exclamation-triangle"></i>
+            <?php echo htmlspecialchars($error); ?>
+        </div>
+    <?php endif; ?>
+
+    <!-- World Map & Regional Allocation -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+        <div class="psw-card">
+            <div class="psw-card-header">
+                <div class="psw-card-title">
+                    <i class="fas fa-globe psw-card-title-icon"></i>
+                    World Map Visualization
+                </div>
+            </div>
+            <div class="psw-card-content">
+                <div id="worldMapContainer" style="position: relative; height: 400px; background: var(--bg-secondary); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; border: 2px dashed var(--border-primary);">
+                    <div style="text-align: center; color: var(--text-muted);">
+                        <i class="fas fa-globe" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                        <h3 style="margin-bottom: 0.5rem;">Interactive World Map</h3>
+                        <p>Future enhancement: Interactive world map showing geographic allocation</p>
+                        <p style="font-size: 0.875rem; margin-top: 1rem;">
+                            Integration possibilities: Leaflet.js, D3.js, or Google Maps API
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="psw-card">
+            <div class="psw-card-header">
+                <div class="psw-card-title">
+                    <i class="fas fa-map-marked-alt psw-card-title-icon"></i>
+                    Regional Allocation
+                </div>
+            </div>
+            <div class="psw-card-content">
+                <?php if (!empty($regionalAllocation)): ?>
+                    <canvas id="regionalChart" width="300" height="300"></canvas>
+                <?php else: ?>
+                    <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                        <i class="fas fa-map-marked-alt" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                        <p>No regional data available</p>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- Geographic & Sector Allocation -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+        <div class="psw-card">
+            <div class="psw-card-header">
+                <div class="psw-card-title">
+                    <i class="fas fa-flag psw-card-title-icon"></i>
+                    Geographic Allocation
+                </div>
+            </div>
+            <div class="psw-card-content" style="padding: 0;">
+                <?php if (!empty($geographicAllocation)): ?>
+                    <table class="psw-table">
+                        <thead>
+                            <tr>
+                                <th>Country/Region</th>
+                                <th style="text-align: center;">Positions</th>
+                                <th style="text-align: right;">Value (SEK)</th>
+                                <th style="text-align: right;">Weight %</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($geographicAllocation as $allocation): ?>
+                                <tr>
+                                    <td style="font-weight: 600;">
+                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <div style="width: 12px; height: 8px; background: var(--primary-accent); border-radius: 2px;"></div>
+                                            <?php echo htmlspecialchars($allocation['country']); ?>
+                                        </div>
+                                        <div style="color: var(--text-muted); font-size: 0.75rem; margin-left: 1.75rem;">
+                                            <?php echo htmlspecialchars($allocation['region']); ?>
+                                        </div>
+                                    </td>
+                                    <td style="text-align: center;"><?php echo $allocation['positions']; ?></td>
+                                    <td style="text-align: right; font-weight: 600;">
+                                        <?php echo Localization::formatCurrency($allocation['value_sek'], 0, 'SEK'); ?>
+                                    </td>
+                                    <td style="text-align: right;">
+                                        <div style="display: flex; align-items: center; justify-content: flex-end; gap: 0.5rem;">
+                                            <div style="width: 40px; height: 4px; background: var(--bg-secondary); border-radius: 2px; overflow: hidden;">
+                                                <div style="width: <?php echo min(100, $allocation['weight_percent']); ?>%; height: 100%; background: var(--primary-accent);"></div>
+                                            </div>
+                                            <?php echo number_format($allocation['weight_percent'], 1); ?>%
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php else: ?>
+                    <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                        <i class="fas fa-flag" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                        <h3 style="margin-bottom: 0.5rem;">No Geographic Data</h3>
+                        <p>No geographic allocation data available.</p>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <div class="psw-card">
+            <div class="psw-card-header">
+                <div class="psw-card-title">
+                    <i class="fas fa-industry psw-card-title-icon"></i>
+                    Sector Allocation
+                </div>
+            </div>
+            <div class="psw-card-content">
+                <?php if (!empty($sectorAllocation)): ?>
+                    <canvas id="sectorChart" width="400" height="300"></canvas>
+                <?php else: ?>
+                    <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                        <i class="fas fa-industry" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                        <p>No sector data available</p>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- Currency & Position Size Allocation -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+        <div class="psw-card">
+            <div class="psw-card-header">
+                <div class="psw-card-title">
+                    <i class="fas fa-coins psw-card-title-icon"></i>
+                    Currency Allocation
+                </div>
+            </div>
+            <div class="psw-card-content">
+                <?php if (!empty($currencyAllocation)): ?>
+                    <canvas id="currencyChart" width="400" height="300"></canvas>
+                <?php else: ?>
+                    <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                        <i class="fas fa-coins" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                        <p>No currency data available</p>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <div class="psw-card">
+            <div class="psw-card-header">
+                <div class="psw-card-title">
+                    <i class="fas fa-chart-bar psw-card-title-icon"></i>
+                    Position Size Distribution
+                </div>
+            </div>
+            <div class="psw-card-content">
+                <?php if (!empty($positionSizeAllocation)): ?>
+                    <canvas id="positionSizeChart" width="400" height="300"></canvas>
+                <?php else: ?>
+                    <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                        <i class="fas fa-chart-bar" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                        <p>No position size data available</p>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Regional allocation chart
+<?php if (!empty($regionalAllocation)): ?>
+const regionalCtx = document.getElementById('regionalChart').getContext('2d');
+const regionalChart = new Chart(regionalCtx, {
+    type: 'doughnut',
+    data: {
+        labels: [
+            <?php foreach ($regionalAllocation as $region): ?>
+                '<?php echo addslashes($region['region']); ?>',
+            <?php endforeach; ?>
+        ],
+        datasets: [{
+            data: [
+                <?php foreach ($regionalAllocation as $region): ?>
+                    <?php echo $region['weight_percent']; ?>,
+                <?php endforeach; ?>
+            ],
+            backgroundColor: [
+                '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4'
+            ],
+            borderWidth: 2,
+            borderColor: '#ffffff'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    padding: 15,
+                    usePointStyle: true,
+                    font: { size: 11 }
+                }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return context.label + ': ' + context.parsed.toFixed(1) + '%';
+                    }
+                }
+            }
+        }
+    }
+});
+<?php endif; ?>
+
+// Sector allocation chart
+<?php if (!empty($sectorAllocation)): ?>
+const sectorCtx = document.getElementById('sectorChart').getContext('2d');
+const sectorChart = new Chart(sectorCtx, {
+    type: 'doughnut',
+    data: {
+        labels: [
+            <?php foreach ($sectorAllocation as $sector): ?>
+                '<?php echo addslashes($sector['sector']); ?>',
+            <?php endforeach; ?>
+        ],
+        datasets: [{
+            data: [
+                <?php foreach ($sectorAllocation as $sector): ?>
+                    <?php echo $sector['weight_percent']; ?>,
+                <?php endforeach; ?>
+            ],
+            backgroundColor: [
+                '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', 
+                '#06B6D4', '#84CC16', '#F97316', '#EC4899', '#6B7280'
+            ],
+            borderWidth: 2,
+            borderColor: '#ffffff'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    padding: 15,
+                    usePointStyle: true,
+                    font: { size: 11 }
+                }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return context.label + ': ' + context.parsed.toFixed(1) + '%';
+                    }
+                }
+            }
+        }
+    }
+});
+<?php endif; ?>
+
+// Currency allocation chart
+<?php if (!empty($currencyAllocation)): ?>
+const currencyCtx = document.getElementById('currencyChart').getContext('2d');
+const currencyChart = new Chart(currencyCtx, {
+    type: 'pie',
+    data: {
+        labels: [
+            <?php foreach ($currencyAllocation as $currency): ?>
+                '<?php echo addslashes($currency['currency']); ?>',
+            <?php endforeach; ?>
+        ],
+        datasets: [{
+            data: [
+                <?php foreach ($currencyAllocation as $currency): ?>
+                    <?php echo $currency['weight_percent']; ?>,
+                <?php endforeach; ?>
+            ],
+            backgroundColor: [
+                '#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4'
+            ],
+            borderWidth: 2,
+            borderColor: '#ffffff'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    padding: 15,
+                    usePointStyle: true,
+                    font: { size: 12 }
+                }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return context.label + ': ' + context.parsed.toFixed(1) + '%';
+                    }
+                }
+            }
+        }
+    }
+});
+<?php endif; ?>
+
+// Position size distribution chart
+<?php if (!empty($positionSizeAllocation)): ?>
+const positionSizeCtx = document.getElementById('positionSizeChart').getContext('2d');
+const positionSizeChart = new Chart(positionSizeCtx, {
+    type: 'bar',
+    data: {
+        labels: [
+            <?php foreach ($positionSizeAllocation as $size): ?>
+                '<?php echo addslashes($size['position_size']); ?>',
+            <?php endforeach; ?>
+        ],
+        datasets: [{
+            label: 'Portfolio Weight %',
+            data: [
+                <?php foreach ($positionSizeAllocation as $size): ?>
+                    <?php echo $size['weight_percent']; ?>,
+                <?php endforeach; ?>
+            ],
+            backgroundColor: '#3B82F6',
+            borderColor: '#2563EB',
+            borderWidth: 1,
+            borderRadius: 4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return context.parsed.y.toFixed(1) + '% of portfolio';
+                    }
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return value + '%';
+                    }
+                }
+            }
+        }
+    }
+});
+<?php endif; ?>
+
+function refreshAllocation() {
+    location.reload();
+}
+</script>
+
+<?php
+$content = ob_get_clean();
+
+// Include base layout
+include __DIR__ . '/templates/layouts/base-redesign.php';
+?>
