@@ -75,24 +75,50 @@ try {
     $sectorStmt->execute();
     $sectorAllocations = $sectorStmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Get recent dividend activity (last 30 days)
-    $recentDividendsSql = "SELECT 
-                            ld.isin,
-                            COALESCE(p.company_name, 'Unknown Company') as company_name,
-                            ld.payment_date,
-                            ld.dividend_amount_local,
-                            ld.currency,
-                            ld.dividend_amount_sek,
-                            ld.shares_held
-                           FROM psw_portfolio.log_dividends ld
-                           LEFT JOIN psw_portfolio.portfolio p ON ld.isin = p.isin
-                           WHERE ld.payment_date >= DATE_SUB(CURRENT_DATE, INTERVAL 30 DAY)
-                           ORDER BY ld.payment_date DESC
-                           LIMIT 10";
-    
-    $recentDividendsStmt = $portfolioDb->prepare($recentDividendsSql);
-    $recentDividendsStmt->execute();
-    $recentDividends = $recentDividendsStmt->fetchAll(PDO::FETCH_ASSOC);
+    // Get recent dividend activity (last 30 days) - use safe columns
+    try {
+        $recentDividendsSql = "SELECT 
+                                ld.isin,
+                                COALESCE(p.company_name, 'Unknown Company') as company_name,
+                                ld.payment_date,
+                                ld.dividend_amount_local,
+                                COALESCE(ld.currency_local, p.currency_local, 'SEK') as currency,
+                                ld.dividend_amount_sek,
+                                ld.shares_held
+                               FROM psw_portfolio.log_dividends ld
+                               LEFT JOIN psw_portfolio.portfolio p ON ld.isin = p.isin
+                               WHERE ld.payment_date >= DATE_SUB(CURRENT_DATE, INTERVAL 30 DAY)
+                               ORDER BY ld.payment_date DESC
+                               LIMIT 10";
+        
+        $recentDividendsStmt = $portfolioDb->prepare($recentDividendsSql);
+        $recentDividendsStmt->execute();
+        $recentDividends = $recentDividendsStmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $dividendError) {
+        // If dividend query fails, use simpler version or skip
+        try {
+            $recentDividendsSql = "SELECT 
+                                    ld.isin,
+                                    COALESCE(p.company_name, 'Unknown Company') as company_name,
+                                    ld.payment_date,
+                                    ld.dividend_amount_local,
+                                    'SEK' as currency,
+                                    ld.dividend_amount_sek,
+                                    ld.shares_held
+                                   FROM psw_portfolio.log_dividends ld
+                                   LEFT JOIN psw_portfolio.portfolio p ON ld.isin = p.isin
+                                   WHERE ld.payment_date >= DATE_SUB(CURRENT_DATE, INTERVAL 30 DAY)
+                                   ORDER BY ld.payment_date DESC
+                                   LIMIT 10";
+            
+            $recentDividendsStmt = $portfolioDb->prepare($recentDividendsSql);
+            $recentDividendsStmt->execute();
+            $recentDividends = $recentDividendsStmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e2) {
+            // If all else fails, just show empty dividends
+            $recentDividends = [];
+        }
+    }
     
     // Calculate percentage returns
     $totalUnrealizedPercent = $summary['total_cost_sek'] > 0 ? 
