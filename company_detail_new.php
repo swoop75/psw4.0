@@ -100,7 +100,6 @@ try {
                     " . ($hasStrategyColumn ? "p.strategy_group_id," : "NULL as strategy_group_id,") . "
                     p.updated_at as price_updated,
                     COALESCE(s1.nameEn, s2.nameEn, 'Unknown') as sector,
-                    COALESCE(s1.nameSv, s2.nameSv) as sector_sv,
                     'Sweden' as country
                    FROM psw_portfolio.portfolio p
                    LEFT JOIN psw_marketdata.nordic_instruments ni ON p.isin COLLATE utf8mb4_unicode_ci = ni.isin COLLATE utf8mb4_unicode_ci
