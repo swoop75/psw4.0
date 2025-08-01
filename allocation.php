@@ -441,8 +441,11 @@ ob_start();
 </div>
 
 <script>
+console.log('Allocation page loaded');
+
 // Regional allocation chart
 <?php if (!empty($regionalAllocation)): ?>
+console.log('Creating regional chart with data:', <?php echo json_encode($regionalAllocation); ?>);
 const regionalCtx = document.getElementById('regionalChart').getContext('2d');
 const regionalChart = new Chart(regionalCtx, {
     type: 'doughnut',
@@ -491,6 +494,7 @@ const regionalChart = new Chart(regionalCtx, {
 
 // Sector allocation chart
 <?php if (!empty($sectorAllocation)): ?>
+console.log('Creating sector chart with data:', <?php echo json_encode($sectorAllocation); ?>);
 const sectorCtx = document.getElementById('sectorChart').getContext('2d');
 const sectorChart = new Chart(sectorCtx, {
     type: 'doughnut',
@@ -540,6 +544,7 @@ const sectorChart = new Chart(sectorCtx, {
 
 // Currency allocation chart
 <?php if (!empty($currencyAllocation)): ?>
+console.log('Creating currency chart with data:', <?php echo json_encode($currencyAllocation); ?>);
 const currencyCtx = document.getElementById('currencyChart').getContext('2d');
 const currencyChart = new Chart(currencyCtx, {
     type: 'pie',
@@ -588,6 +593,7 @@ const currencyChart = new Chart(currencyCtx, {
 
 // Position size distribution chart
 <?php if (!empty($positionSizeAllocation)): ?>
+console.log('Creating position size chart with data:', <?php echo json_encode($positionSizeAllocation); ?>);
 const positionSizeCtx = document.getElementById('positionSizeChart').getContext('2d');
 const positionSizeChart = new Chart(positionSizeCtx, {
     type: 'bar',
