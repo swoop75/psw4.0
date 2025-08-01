@@ -78,7 +78,7 @@ try {
                             WHEN LEFT(p.isin, 2) IN ('AU', 'JP', 'HK', 'SG') THEN 'Asia-Pacific'
                             ELSE 'Other'
                         END
-                      ORDER BY value_sek DESC";
+                      ORDER BY SUM(COALESCE(p.current_value_sek, 0)) DESC";
     
     $geographicStmt = $portfolioDb->prepare($geographicSql);
     $geographicStmt->execute();
@@ -97,7 +97,7 @@ try {
                   LEFT JOIN psw_marketdata.sectors s2 ON gi.sectorId = s2.id
                   WHERE p.is_active = 1 AND p.shares_held > 0
                   GROUP BY COALESCE(s1.nameEn, s2.nameEn, 'Unknown')
-                  ORDER BY value_sek DESC";
+                  ORDER BY SUM(COALESCE(p.current_value_sek, 0)) DESC";
     
     $sectorStmt = $portfolioDb->prepare($sectorSql);
     $sectorStmt->execute();
@@ -112,7 +112,7 @@ try {
                     FROM psw_portfolio.portfolio p
                     WHERE p.is_active = 1 AND p.shares_held > 0
                     GROUP BY COALESCE(p.currency_local, 'SEK')
-                    ORDER BY value_sek DESC";
+                    ORDER BY SUM(COALESCE(p.current_value_sek, 0)) DESC";
     
     $currencyStmt = $portfolioDb->prepare($currencySql);
     $currencyStmt->execute();
@@ -191,7 +191,7 @@ try {
                             WHEN LEFT(p.isin, 2) IN ('ZA', 'NG', 'EG') THEN 'Africa'
                             ELSE 'Other'
                         END
-                    ORDER BY value_sek DESC";
+                    ORDER BY SUM(COALESCE(p.current_value_sek, 0)) DESC";
     
     $regionalStmt = $portfolioDb->prepare($regionalSql);
     $regionalStmt->execute();
