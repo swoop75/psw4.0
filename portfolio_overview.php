@@ -42,12 +42,12 @@ try {
                 p.current_value_sek as calculated_value_sek
                 
             FROM psw_portfolio.portfolio p
-            LEFT JOIN psw_foundation.masterlist ml ON p.isin = ml.isin
-            LEFT JOIN psw_marketdata.nordic_instruments ni ON p.isin = ni.isin
-            LEFT JOIN psw_marketdata.global_instruments gi ON p.isin = gi.isin
+            LEFT JOIN psw_foundation.masterlist ml ON p.isin COLLATE utf8mb4_unicode_ci = ml.isin COLLATE utf8mb4_unicode_ci
+            LEFT JOIN psw_marketdata.nordic_instruments ni ON p.isin COLLATE utf8mb4_unicode_ci = ni.isin COLLATE utf8mb4_unicode_ci
+            LEFT JOIN psw_marketdata.global_instruments gi ON p.isin COLLATE utf8mb4_unicode_ci = gi.isin COLLATE utf8mb4_unicode_ci
             LEFT JOIN psw_marketdata.sectors s1 ON ni.sectorID = s1.sectorId
             LEFT JOIN psw_marketdata.sectors s2 ON gi.sectorId = s2.sectorId
-            LEFT JOIN psw_marketdata.fx_rates_freecurrency fx ON p.currency_local = fx.base_currency AND fx.target_currency = 'SEK'
+            LEFT JOIN psw_marketdata.fx_rates_freecurrency fx ON p.currency_local COLLATE utf8mb4_unicode_ci = fx.base_currency COLLATE utf8mb4_unicode_ci AND fx.target_currency = 'SEK'
             WHERE p.is_active = 1 AND p.shares_held > 0
             ORDER BY p.current_value_sek DESC";
     
