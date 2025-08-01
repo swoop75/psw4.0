@@ -20,10 +20,10 @@ try {
     $foundationDb = Database::getConnection('foundation');
     $marketDb = Database::getConnection('marketdata');
     
-    // Get portfolio holdings with current market data (simplified to avoid duplicates)
+    // Get portfolio holdings with current market data (fixed GROUP BY)
     $sql = "SELECT 
                 p.*,
-                ml.name as company_name,
+                COALESCE(ml.name, p.company_name) as company_name,
                 ml.country,
                 'Unknown' as sector,
                 p.currency_local as base_currency,
@@ -44,7 +44,6 @@ try {
             FROM psw_portfolio.portfolio p
             LEFT JOIN psw_foundation.masterlist ml ON p.isin COLLATE utf8mb4_unicode_ci = ml.isin COLLATE utf8mb4_unicode_ci
             WHERE p.is_active = 1 AND p.shares_held > 0
-            GROUP BY p.portfolio_id
             ORDER BY p.current_value_sek DESC";
     
     $stmt = $portfolioDb->prepare($sql);
