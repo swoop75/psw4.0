@@ -33,6 +33,9 @@ try {
     $summaryStmt->execute();
     $summary = $summaryStmt->fetch(PDO::FETCH_ASSOC);
     
+    // Debug output (remove this after debugging)
+    error_log("Dashboard summary query result: " . print_r($summary, true));
+    
     // Get top 10 holdings
     $topHoldingsSql = "SELECT 
                         p.isin,
@@ -104,6 +107,9 @@ try {
     $sectorAllocations = [];
     $recentDividends = [];
     $totalUnrealizedPercent = 0;
+    
+    // Debug output (remove this after debugging)
+    error_log("Dashboard error: " . $e->getMessage());
 }
 
 // Initialize variables for template
@@ -133,6 +139,13 @@ ob_start();
             </div>
         </div>
     </div>
+
+    <?php if (isset($error)): ?>
+        <div class="psw-alert psw-alert-error psw-mb-4">
+            <i class="fas fa-exclamation-triangle"></i>
+            <?php echo htmlspecialchars($error); ?>
+        </div>
+    <?php endif; ?>
 
     <!-- Portfolio Summary Cards -->
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
