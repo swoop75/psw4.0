@@ -256,6 +256,27 @@ ob_start();
         </div>
     <?php endif; ?>
 
+    <!-- Debug Information (remove after fixing) -->
+    <div class="psw-card psw-mb-4" style="background: var(--bg-warning); border-left: 4px solid var(--warning-color);">
+        <div class="psw-card-content">
+            <h4 style="margin-bottom: 1rem;">Debug Information:</h4>
+            <p><strong>Geographic Allocation:</strong> <?php echo count($geographicAllocation); ?> items</p>
+            <p><strong>Sector Allocation:</strong> <?php echo count($sectorAllocation); ?> items</p>
+            <p><strong>Currency Allocation:</strong> <?php echo count($currencyAllocation); ?> items</p>
+            <p><strong>Position Size Allocation:</strong> <?php echo count($positionSizeAllocation); ?> items</p>
+            <p><strong>Regional Allocation:</strong> <?php echo count($regionalAllocation); ?> items</p>
+            
+            <?php if (!empty($sectorAllocation)): ?>
+                <details style="margin-top: 1rem;">
+                    <summary>Sample Sector Data</summary>
+                    <pre style="background: var(--bg-secondary); padding: 1rem; border-radius: 4px; overflow-x: auto;">
+<?php echo htmlspecialchars(print_r(array_slice($sectorAllocation, 0, 2), true)); ?>
+                    </pre>
+                </details>
+            <?php endif; ?>
+        </div>
+    </div>
+
     <!-- World Map & Regional Allocation -->
     <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-bottom: 2rem;">
         <div class="psw-card">
