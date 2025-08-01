@@ -50,13 +50,22 @@ try {
     $holdings = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     // Debug: Check for duplicates in PHP array
+    $debug = [];
     $uniqueHoldings = [];
     foreach ($holdings as $holding) {
         $key = $holding['isin'] . '_' . $holding['portfolio_id'];
+        $debug[] = "ISIN: {$holding['isin']}, ID: {$holding['portfolio_id']}, Key: $key";
         if (!isset($uniqueHoldings[$key])) {
             $uniqueHoldings[$key] = $holding;
         }
     }
+    
+    // Temporary debug output (remove after fixing)
+    if (count($holdings) !== count($uniqueHoldings)) {
+        error_log("DUPLICATE DEBUG: Original count: " . count($holdings) . ", Unique count: " . count($uniqueHoldings));
+        error_log("DUPLICATE DEBUG: " . implode(" | ", $debug));
+    }
+    
     $holdings = array_values($uniqueHoldings);
     
     // Calculate portfolio totals
