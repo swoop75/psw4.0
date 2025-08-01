@@ -25,7 +25,7 @@ try {
                 p.*,
                 ml.name as company_name,
                 ml.country,
-                ml.sector,
+                COALESCE(ni.sector, gi.sector, 'Unknown') as sector,
                 ml.currency as base_currency,
                 
                 -- Try to get latest price from global prices first, then nordic
@@ -54,6 +54,8 @@ try {
                 
             FROM psw_portfolio.portfolio p
             LEFT JOIN psw_foundation.masterlist ml ON p.isin = ml.isin
+            LEFT JOIN psw_marketdata.nordic_instruments ni ON p.isin = ni.isin
+            LEFT JOIN psw_marketdata.global_instruments gi ON p.isin = gi.isin
             LEFT JOIN psw_marketdata.global_latest_prices glp ON p.isin = glp.isin
             LEFT JOIN psw_marketdata.nordic_latest_prices nlp ON p.ticker = nlp.ticker
             LEFT JOIN psw_marketdata.fx_rates_freecurrency fx ON p.currency_local = fx.from_currency AND fx.to_currency = 'SEK'
@@ -92,13 +94,15 @@ try {
     
     // Get sector allocation
     $sectorSql = "SELECT 
-                    COALESCE(ml.sector, 'Unknown') as sector,
+                    COALESCE(ni.sector, gi.sector, 'Unknown') as sector,
                     COUNT(*) as positions,
                     SUM(COALESCE(p.current_value_sek, 0)) as sector_value_sek
                   FROM psw_portfolio.portfolio p
                   LEFT JOIN psw_foundation.masterlist ml ON p.isin = ml.isin
+                  LEFT JOIN psw_marketdata.nordic_instruments ni ON p.isin = ni.isin
+                  LEFT JOIN psw_marketdata.global_instruments gi ON p.isin = gi.isin
                   WHERE p.is_active = 1 AND p.shares_held > 0
-                  GROUP BY COALESCE(ml.sector, 'Unknown')
+                  GROUP BY COALESCE(ni.sector, gi.sector, 'Unknown')
                   ORDER BY sector_value_sek DESC";
     
     $sectorStmt = $portfolioDb->prepare($sectorSql);
