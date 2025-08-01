@@ -20,53 +20,42 @@ try {
     $foundationDb = Database::getConnection('foundation');
     $marketDb = Database::getConnection('marketdata');
     
-    // Get portfolio holdings (no JOIN to avoid duplicates)
+    // Use exact same query that worked in MySQL directly
     $sql = "SELECT 
-                p.*,
-                p.company_name,
-                'Sweden' as country,
-                'Unknown' as sector,
-                p.currency_local as base_currency,
-                
-                -- Use portfolio data with correct column names
-                p.latest_price_local as latest_price,
-                p.currency_local as price_currency,
-                p.updated_at as price_updated,
-                
-                -- FX rate placeholder (will be NULL for now)
+                portfolio_id,
+                isin, 
+                ticker,
+                company_name,
+                shares_held,
+                average_cost_price_sek,
+                total_cost_sek,
+                latest_price_local as latest_price,
+                currency_local as price_currency,
+                updated_at as price_updated,
                 NULL as fx_rate,
                 NULL as fx_updated,
-                
-                -- Use existing calculated values from portfolio table
-                p.current_value_local as calculated_value_local,
-                p.current_value_sek as calculated_value_sek
-                
-            FROM psw_portfolio.portfolio p
-            WHERE p.is_active = 1 AND p.shares_held > 0
-            ORDER BY p.current_value_sek DESC";
+                current_value_local as calculated_value_local,
+                current_value_sek as calculated_value_sek,
+                currency_local as base_currency,
+                'Sweden' as country,
+                'Unknown' as sector
+            FROM psw_portfolio.portfolio 
+            WHERE is_active = 1 AND shares_held > 0
+            ORDER BY isin, portfolio_id";
     
     $stmt = $portfolioDb->prepare($sql);
     $stmt->execute();
     $holdings = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Debug: Check for duplicates in PHP array
-    $debug = [];
-    $uniqueHoldings = [];
-    foreach ($holdings as $holding) {
-        $key = $holding['isin'] . '_' . $holding['portfolio_id'];
-        $debug[] = "ISIN: {$holding['isin']}, ID: {$holding['portfolio_id']}, Key: $key";
-        if (!isset($uniqueHoldings[$key])) {
-            $uniqueHoldings[$key] = $holding;
-        }
+    // Debug: Print what we got from database
+    error_log("=== PORTFOLIO DEBUG ===");
+    error_log("Raw count from DB: " . count($holdings));
+    foreach ($holdings as $i => $holding) {
+        error_log("[$i] ID: {$holding['portfolio_id']}, ISIN: {$holding['isin']}, Ticker: {$holding['ticker']}, Company: {$holding['company_name']}");
     }
     
-    // Temporary debug output (remove after fixing)
-    if (count($holdings) !== count($uniqueHoldings)) {
-        error_log("DUPLICATE DEBUG: Original count: " . count($holdings) . ", Unique count: " . count($uniqueHoldings));
-        error_log("DUPLICATE DEBUG: " . implode(" | ", $debug));
-    }
-    
-    $holdings = array_values($uniqueHoldings);
+    // Remove the deduplication for now to see raw data
+    // $holdings = array_values($uniqueHoldings);
     
     // Calculate portfolio totals
     $totalValueSek = 0;
