@@ -227,7 +227,11 @@ ob_start();
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($holdings as $holding): ?>
+                        <?php 
+                        echo "<!-- TABLE DEBUG: About to render " . count($holdings) . " holdings -->\n";
+                        foreach ($holdings as $i => $holding): 
+                        echo "<!-- TABLE ROW [$i]: {$holding['isin']} - {$holding['ticker']} -->\n";
+                        ?>
                             <tr>
                                 <td style="font-family: var(--font-family-mono); font-size: 0.875rem;">
                                     <?php echo htmlspecialchars($holding['isin']); ?>
