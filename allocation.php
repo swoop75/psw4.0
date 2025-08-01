@@ -138,28 +138,7 @@ try {
                                 WHEN p.current_value_sek < 300000 THEN 'Large (150k-300k SEK)'
                                 ELSE 'Extra Large (> 300k SEK)'
                             END
-                        ORDER BY 
-                            CASE 
-                                WHEN CASE 
-                                    WHEN p.current_value_sek < 50000 THEN 'Small (< 50k SEK)'
-                                    WHEN p.current_value_sek < 150000 THEN 'Medium (50k-150k SEK)'
-                                    WHEN p.current_value_sek < 300000 THEN 'Large (150k-300k SEK)'
-                                    ELSE 'Extra Large (> 300k SEK)'
-                                END = 'Small (< 50k SEK)' THEN 1
-                                WHEN CASE 
-                                    WHEN p.current_value_sek < 50000 THEN 'Small (< 50k SEK)'
-                                    WHEN p.current_value_sek < 150000 THEN 'Medium (50k-150k SEK)'
-                                    WHEN p.current_value_sek < 300000 THEN 'Large (150k-300k SEK)'
-                                    ELSE 'Extra Large (> 300k SEK)'
-                                END = 'Medium (50k-150k SEK)' THEN 2
-                                WHEN CASE 
-                                    WHEN p.current_value_sek < 50000 THEN 'Small (< 50k SEK)'
-                                    WHEN p.current_value_sek < 150000 THEN 'Medium (50k-150k SEK)'
-                                    WHEN p.current_value_sek < 300000 THEN 'Large (150k-300k SEK)'
-                                    ELSE 'Extra Large (> 300k SEK)'
-                                END = 'Large (150k-300k SEK)' THEN 3
-                                ELSE 4
-                            END";
+                        ORDER BY SUM(COALESCE(p.current_value_sek, 0)) DESC";
     
     $positionSizeStmt = $portfolioDb->prepare($positionSizeSql);
     $positionSizeStmt->execute();
