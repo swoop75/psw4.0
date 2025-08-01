@@ -29,9 +29,9 @@ try {
                 COALESCE(ni.stockPriceCurrency, gi.stockPriceCurrency, p.currency_local) as base_currency,
                 
                 -- Try to get latest price from global prices first, then nordic  
-                COALESCE(glp.close_price, nlp.price) as latest_price,
+                COALESCE(glp.price, nlp.price) as latest_price,
                 COALESCE(glp.currency, nlp.currency, p.currency_local) as price_currency,
-                COALESCE(glp.updated_at, nlp.last_updated) as price_updated,
+                COALESCE(glp.last_updated, nlp.last_updated) as price_updated,
                 
                 -- FX rate for conversion to SEK
                 fx.rate as fx_rate,
@@ -39,16 +39,16 @@ try {
                 
                 -- Calculate current values
                 CASE 
-                    WHEN COALESCE(glp.close_price, nlp.price) IS NOT NULL THEN
-                        p.shares_held * COALESCE(glp.close_price, nlp.price)
+                    WHEN COALESCE(glp.price, nlp.price) IS NOT NULL THEN
+                        p.shares_held * COALESCE(glp.price, nlp.price)
                     ELSE p.current_value_local
                 END as calculated_value_local,
                 
                 CASE 
-                    WHEN COALESCE(glp.close_price, nlp.price) IS NOT NULL AND fx.rate IS NOT NULL THEN
-                        p.shares_held * COALESCE(glp.close_price, nlp.price) * fx.rate
-                    WHEN COALESCE(glp.close_price, nlp.price) IS NOT NULL AND p.currency_local = 'SEK' THEN
-                        p.shares_held * COALESCE(glp.close_price, nlp.price)
+                    WHEN COALESCE(glp.price, nlp.price) IS NOT NULL AND fx.rate IS NOT NULL THEN
+                        p.shares_held * COALESCE(glp.price, nlp.price) * fx.rate
+                    WHEN COALESCE(glp.price, nlp.price) IS NOT NULL AND p.currency_local = 'SEK' THEN
+                        p.shares_held * COALESCE(glp.price, nlp.price)
                     ELSE p.current_value_sek
                 END as calculated_value_sek
                 
