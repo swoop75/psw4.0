@@ -33,9 +33,9 @@ try {
                 p.currency_local as price_currency,
                 p.updated_at as price_updated,
                 
-                -- FX rate for conversion to SEK
-                fx.rate as fx_rate,
-                fx.last_updated as fx_updated,
+                -- FX rate for conversion to SEK (using correct column names)
+                fx.exchange_rate as fx_rate,
+                fx.updated_at as fx_updated,
                 
                 -- Use existing calculated values from portfolio table
                 p.current_value_local as calculated_value_local,
@@ -47,7 +47,7 @@ try {
             LEFT JOIN psw_marketdata.global_instruments gi ON p.isin = gi.isin
             LEFT JOIN psw_marketdata.sectors s1 ON ni.sectorID = s1.sectorId
             LEFT JOIN psw_marketdata.sectors s2 ON gi.sectorId = s2.sectorId
-            LEFT JOIN psw_marketdata.fx_rates_freecurrency fx ON p.currency_local = fx.from_currency AND fx.to_currency = 'SEK'
+            LEFT JOIN psw_marketdata.fx_rates_freecurrency fx ON p.currency_local = fx.base_currency AND fx.target_currency = 'SEK'
             WHERE p.is_active = 1 AND p.shares_held > 0
             ORDER BY p.current_value_sek DESC";
     
