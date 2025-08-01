@@ -61,7 +61,9 @@ try {
     $totalCostSek = 0;
     $totalPositions = count($holdings);
     
-    foreach ($holdings as &$holding) {
+    echo "<!-- CALC DEBUG: Before calculation loop, count: " . count($holdings) . " -->\n";
+    foreach ($holdings as $i => &$holding) {
+        echo "<!-- CALC [$i]: Processing {$holding['isin']} - {$holding['ticker']} -->\n";
         $currentValueSek = $holding['calculated_value_sek'] ?: $holding['current_value_sek'] ?: 0;
         $costSek = $holding['total_cost_sek'] ?: 0;
         
@@ -75,7 +77,9 @@ try {
     }
     
     // Calculate portfolio weight percentages
-    foreach ($holdings as &$holding) {
+    echo "<!-- WEIGHT DEBUG: Before weight loop, count: " . count($holdings) . " -->\n";
+    foreach ($holdings as $i => &$holding) {
+        echo "<!-- WEIGHT [$i]: Processing {$holding['isin']} - {$holding['ticker']} -->\n";
         $holding['portfolio_weight_percent'] = $totalValueSek > 0 ? ($holding['display_value_sek'] / $totalValueSek) * 100 : 0;
     }
     
