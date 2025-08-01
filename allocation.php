@@ -256,26 +256,6 @@ ob_start();
         </div>
     <?php endif; ?>
 
-    <!-- Debug Information (remove after fixing) -->
-    <div class="psw-card psw-mb-4" style="background: var(--bg-warning); border-left: 4px solid var(--warning-color);">
-        <div class="psw-card-content">
-            <h4 style="margin-bottom: 1rem;">Debug Information:</h4>
-            <p><strong>Geographic Allocation:</strong> <?php echo count($geographicAllocation); ?> items</p>
-            <p><strong>Sector Allocation:</strong> <?php echo count($sectorAllocation); ?> items</p>
-            <p><strong>Currency Allocation:</strong> <?php echo count($currencyAllocation); ?> items</p>
-            <p><strong>Position Size Allocation:</strong> <?php echo count($positionSizeAllocation); ?> items</p>
-            <p><strong>Regional Allocation:</strong> <?php echo count($regionalAllocation); ?> items</p>
-            
-            <?php if (!empty($sectorAllocation)): ?>
-                <details style="margin-top: 1rem;">
-                    <summary>Sample Sector Data</summary>
-                    <pre style="background: var(--bg-secondary); padding: 1rem; border-radius: 4px; overflow-x: auto;">
-<?php echo htmlspecialchars(print_r(array_slice($sectorAllocation, 0, 2), true)); ?>
-                    </pre>
-                </details>
-            <?php endif; ?>
-        </div>
-    </div>
 
     <!-- World Map & Regional Allocation -->
     <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-bottom: 2rem;">
@@ -459,47 +439,48 @@ document.addEventListener('DOMContentLoaded', function() {
     const regionalCtx = document.getElementById('regionalChart');
     if (regionalCtx) {
         const regionalChart = new Chart(regionalCtx.getContext('2d'), {
-    type: 'doughnut',
-    data: {
-        labels: [
-            <?php foreach ($regionalAllocation as $region): ?>
-                '<?php echo addslashes($region['region']); ?>',
-            <?php endforeach; ?>
-        ],
-        datasets: [{
-            data: [
-                <?php foreach ($regionalAllocation as $region): ?>
-                    <?php echo $region['weight_percent']; ?>,
-                <?php endforeach; ?>
-            ],
-            backgroundColor: [
-                '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4'
-            ],
-            borderWidth: 2,
-            borderColor: '#ffffff'
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                position: 'bottom',
-                labels: {
-                    padding: 15,
-                    usePointStyle: true,
-                    font: { size: 11 }
-                }
+            type: 'doughnut',
+            data: {
+                labels: [
+                    <?php foreach ($regionalAllocation as $region): ?>
+                        '<?php echo addslashes($region['region']); ?>',
+                    <?php endforeach; ?>
+                ],
+                datasets: [{
+                    data: [
+                        <?php foreach ($regionalAllocation as $region): ?>
+                            <?php echo $region['weight_percent']; ?>,
+                        <?php endforeach; ?>
+                    ],
+                    backgroundColor: [
+                        '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
             },
-            tooltip: {
-                callbacks: {
-                    label: function(context) {
-                        return context.label + ': ' + context.parsed.toFixed(1) + '%';
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            usePointStyle: true,
+                            font: { size: 11 }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + context.parsed.toFixed(1) + '%';
+                            }
+                        }
                     }
                 }
             }
-        }
-    });
+        });
     }
     <?php endif; ?>
 
@@ -509,48 +490,49 @@ document.addEventListener('DOMContentLoaded', function() {
     const sectorCtx = document.getElementById('sectorChart');
     if (sectorCtx) {
         const sectorChart = new Chart(sectorCtx.getContext('2d'), {
-    type: 'doughnut',
-    data: {
-        labels: [
-            <?php foreach ($sectorAllocation as $sector): ?>
-                '<?php echo addslashes($sector['sector']); ?>',
-            <?php endforeach; ?>
-        ],
-        datasets: [{
-            data: [
-                <?php foreach ($sectorAllocation as $sector): ?>
-                    <?php echo $sector['weight_percent']; ?>,
-                <?php endforeach; ?>
-            ],
-            backgroundColor: [
-                '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', 
-                '#06B6D4', '#84CC16', '#F97316', '#EC4899', '#6B7280'
-            ],
-            borderWidth: 2,
-            borderColor: '#ffffff'
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                position: 'bottom',
-                labels: {
-                    padding: 15,
-                    usePointStyle: true,
-                    font: { size: 11 }
-                }
+            type: 'doughnut',
+            data: {
+                labels: [
+                    <?php foreach ($sectorAllocation as $sector): ?>
+                        '<?php echo addslashes($sector['sector']); ?>',
+                    <?php endforeach; ?>
+                ],
+                datasets: [{
+                    data: [
+                        <?php foreach ($sectorAllocation as $sector): ?>
+                            <?php echo $sector['weight_percent']; ?>,
+                        <?php endforeach; ?>
+                    ],
+                    backgroundColor: [
+                        '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', 
+                        '#06B6D4', '#84CC16', '#F97316', '#EC4899', '#6B7280'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
             },
-            tooltip: {
-                callbacks: {
-                    label: function(context) {
-                        return context.label + ': ' + context.parsed.toFixed(1) + '%';
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            usePointStyle: true,
+                            font: { size: 11 }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + context.parsed.toFixed(1) + '%';
+                            }
+                        }
                     }
                 }
             }
-        }
-    });
+        });
     }
     <?php endif; ?>
 
@@ -560,47 +542,48 @@ document.addEventListener('DOMContentLoaded', function() {
     const currencyCtx = document.getElementById('currencyChart');
     if (currencyCtx) {
         const currencyChart = new Chart(currencyCtx.getContext('2d'), {
-    type: 'pie',
-    data: {
-        labels: [
-            <?php foreach ($currencyAllocation as $currency): ?>
-                '<?php echo addslashes($currency['currency']); ?>',
-            <?php endforeach; ?>
-        ],
-        datasets: [{
-            data: [
-                <?php foreach ($currencyAllocation as $currency): ?>
-                    <?php echo $currency['weight_percent']; ?>,
-                <?php endforeach; ?>
-            ],
-            backgroundColor: [
-                '#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4'
-            ],
-            borderWidth: 2,
-            borderColor: '#ffffff'
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                position: 'bottom',
-                labels: {
-                    padding: 15,
-                    usePointStyle: true,
-                    font: { size: 12 }
-                }
+            type: 'pie',
+            data: {
+                labels: [
+                    <?php foreach ($currencyAllocation as $currency): ?>
+                        '<?php echo addslashes($currency['currency']); ?>',
+                    <?php endforeach; ?>
+                ],
+                datasets: [{
+                    data: [
+                        <?php foreach ($currencyAllocation as $currency): ?>
+                            <?php echo $currency['weight_percent']; ?>,
+                        <?php endforeach; ?>
+                    ],
+                    backgroundColor: [
+                        '#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
             },
-            tooltip: {
-                callbacks: {
-                    label: function(context) {
-                        return context.label + ': ' + context.parsed.toFixed(1) + '%';
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            usePointStyle: true,
+                            font: { size: 12 }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + context.parsed.toFixed(1) + '%';
+                            }
+                        }
                     }
                 }
             }
-        }
-    });
+        });
     }
     <?php endif; ?>
 
@@ -610,52 +593,53 @@ document.addEventListener('DOMContentLoaded', function() {
     const positionSizeCtx = document.getElementById('positionSizeChart');
     if (positionSizeCtx) {
         const positionSizeChart = new Chart(positionSizeCtx.getContext('2d'), {
-    type: 'bar',
-    data: {
-        labels: [
-            <?php foreach ($positionSizeAllocation as $size): ?>
-                '<?php echo addslashes($size['position_size']); ?>',
-            <?php endforeach; ?>
-        ],
-        datasets: [{
-            label: 'Portfolio Weight %',
-            data: [
-                <?php foreach ($positionSizeAllocation as $size): ?>
-                    <?php echo $size['weight_percent']; ?>,
-                <?php endforeach; ?>
-            ],
-            backgroundColor: '#3B82F6',
-            borderColor: '#2563EB',
-            borderWidth: 1,
-            borderRadius: 4
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                display: false
+            type: 'bar',
+            data: {
+                labels: [
+                    <?php foreach ($positionSizeAllocation as $size): ?>
+                        '<?php echo addslashes($size['position_size']); ?>',
+                    <?php endforeach; ?>
+                ],
+                datasets: [{
+                    label: 'Portfolio Weight %',
+                    data: [
+                        <?php foreach ($positionSizeAllocation as $size): ?>
+                            <?php echo $size['weight_percent']; ?>,
+                        <?php endforeach; ?>
+                    ],
+                    backgroundColor: '#3B82F6',
+                    borderColor: '#2563EB',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
             },
-            tooltip: {
-                callbacks: {
-                    label: function(context) {
-                        return context.parsed.y.toFixed(1) + '% of portfolio';
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y.toFixed(1) + '% of portfolio';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
                     }
                 }
             }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: {
-                    callback: function(value) {
-                        return value + '%';
-                    }
-                }
-            }
-        }
-    });
+        });
     }
     <?php endif; ?>
     
