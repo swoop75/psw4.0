@@ -20,11 +20,11 @@ try {
     $foundationDb = Database::getConnection('foundation');
     $marketDb = Database::getConnection('marketdata');
     
-    // Get portfolio holdings with current market data (fixed GROUP BY)
+    // Get portfolio holdings (no JOIN to avoid duplicates)
     $sql = "SELECT 
                 p.*,
-                COALESCE(ml.name, p.company_name) as company_name,
-                ml.country,
+                p.company_name,
+                'Sweden' as country,
                 'Unknown' as sector,
                 p.currency_local as base_currency,
                 
@@ -42,13 +42,22 @@ try {
                 p.current_value_sek as calculated_value_sek
                 
             FROM psw_portfolio.portfolio p
-            LEFT JOIN psw_foundation.masterlist ml ON p.isin COLLATE utf8mb4_unicode_ci = ml.isin COLLATE utf8mb4_unicode_ci
             WHERE p.is_active = 1 AND p.shares_held > 0
             ORDER BY p.current_value_sek DESC";
     
     $stmt = $portfolioDb->prepare($sql);
     $stmt->execute();
     $holdings = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Debug: Check for duplicates in PHP array
+    $uniqueHoldings = [];
+    foreach ($holdings as $holding) {
+        $key = $holding['isin'] . '_' . $holding['portfolio_id'];
+        if (!isset($uniqueHoldings[$key])) {
+            $uniqueHoldings[$key] = $holding;
+        }
+    }
+    $holdings = array_values($uniqueHoldings);
     
     // Calculate portfolio totals
     $totalValueSek = 0;
