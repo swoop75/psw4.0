@@ -25,7 +25,7 @@ try {
                 p.*,
                 ml.name as company_name,
                 ml.country,
-                COALESCE(s1.name, 'Unknown') as sector,
+                'Unknown' as sector,
                 COALESCE(ni.stockPriceCurrency, gi.stockPriceCurrency, p.currency_local) as base_currency,
                 
                 -- Use portfolio data with correct column names
@@ -45,7 +45,6 @@ try {
             LEFT JOIN psw_foundation.masterlist ml ON p.isin COLLATE utf8mb4_unicode_ci = ml.isin COLLATE utf8mb4_unicode_ci
             LEFT JOIN psw_marketdata.nordic_instruments ni ON p.isin COLLATE utf8mb4_unicode_ci = ni.isin COLLATE utf8mb4_unicode_ci
             LEFT JOIN psw_marketdata.global_instruments gi ON p.isin COLLATE utf8mb4_unicode_ci = gi.isin COLLATE utf8mb4_unicode_ci
-            LEFT JOIN psw_marketdata.sectors s1 ON ni.sectorID = s1.sectorId
             LEFT JOIN psw_marketdata.fx_rates_freecurrency fx ON p.currency_local COLLATE utf8mb4_unicode_ci = fx.base_currency COLLATE utf8mb4_unicode_ci AND fx.target_currency = 'SEK'
             WHERE p.is_active = 1 AND p.shares_held > 0
             ORDER BY p.current_value_sek DESC";
@@ -82,16 +81,12 @@ try {
     
     // Get sector allocation
     $sectorSql = "SELECT 
-                    COALESCE(s1.name, 'Unknown') as sector,
+                    'Unknown' as sector,
                     COUNT(*) as positions,
                     SUM(COALESCE(p.current_value_sek, 0)) as sector_value_sek
                   FROM psw_portfolio.portfolio p
-                  LEFT JOIN psw_foundation.masterlist ml ON p.isin = ml.isin
-                  LEFT JOIN psw_marketdata.nordic_instruments ni ON p.isin = ni.isin
-                  LEFT JOIN psw_marketdata.global_instruments gi ON p.isin = gi.isin
-                  LEFT JOIN psw_marketdata.sectors s1 ON ni.sectorID = s1.sectorId
                   WHERE p.is_active = 1 AND p.shares_held > 0
-                  GROUP BY COALESCE(s1.name, 'Unknown')
+                  GROUP BY 'Unknown'
                   ORDER BY sector_value_sek DESC";
     
     $sectorStmt = $portfolioDb->prepare($sectorSql);
