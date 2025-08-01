@@ -21,7 +21,7 @@ try {
     $marketDb = Database::getConnection('marketdata');
     
     // Get portfolio holdings with current market data
-    $sql = "SELECT 
+    $sql = "SELECT DISTINCT
                 p.*,
                 ml.name as company_name,
                 ml.country,
