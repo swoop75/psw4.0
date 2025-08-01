@@ -47,23 +47,15 @@ try {
     $stmt->execute();
     $holdings = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Debug: Print what we got from database (visible on page)
-    echo "<!-- DEBUG: Raw count from DB: " . count($holdings) . " -->\n";
-    foreach ($holdings as $i => $holding) {
-        echo "<!-- DEBUG [$i]: ID={$holding['portfolio_id']}, ISIN={$holding['isin']}, Ticker={$holding['ticker']}, Company={$holding['company_name']} -->\n";
-    }
+    // Portfolio data loaded successfully
     
-    // Remove the deduplication for now to see raw data
-    // $holdings = array_values($uniqueHoldings);
     
     // Calculate portfolio totals
     $totalValueSek = 0;
     $totalCostSek = 0;
     $totalPositions = count($holdings);
     
-    echo "<!-- CALC DEBUG: Before calculation loop, count: " . count($holdings) . " -->\n";
     foreach ($holdings as $i => $holding) {
-        echo "<!-- CALC [$i]: Processing {$holding['isin']} - {$holding['ticker']} -->\n";
         $currentValueSek = $holding['calculated_value_sek'] ?: $holding['current_value_sek'] ?: 0;
         $costSek = $holding['total_cost_sek'] ?: 0;
         
@@ -77,9 +69,7 @@ try {
     }
     
     // Calculate portfolio weight percentages
-    echo "<!-- WEIGHT DEBUG: Before weight loop, count: " . count($holdings) . " -->\n";
     foreach ($holdings as $i => $holding) {
-        echo "<!-- WEIGHT [$i]: Processing {$holding['isin']} - {$holding['ticker']} -->\n";
         $holdings[$i]['portfolio_weight_percent'] = $totalValueSek > 0 ? ($holdings[$i]['display_value_sek'] / $totalValueSek) * 100 : 0;
     }
     
@@ -231,16 +221,7 @@ ob_start();
                         </tr>
                     </thead>
                     <tbody>
-                        <?php 
-                        echo "<!-- TABLE DEBUG: About to render " . count($holdings) . " holdings -->\n";
-                        // Debug: Show final array state
-                        foreach ($holdings as $i => $h) {
-                            echo "<!-- FINAL [$i]: {$h['isin']} - {$h['ticker']} - {$h['company_name']} -->\n";
-                        }
-                        
-                        foreach ($holdings as $i => $holding): 
-                        echo "<!-- TABLE ROW [$i]: {$holding['isin']} - {$holding['ticker']} -->\n";
-                        ?>
+                        <?php foreach ($holdings as $holding): ?>
                             <tr>
                                 <td style="font-family: var(--font-family-mono); font-size: 0.875rem;">
                                     <?php echo htmlspecialchars($holding['isin']); ?>
