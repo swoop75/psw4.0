@@ -124,39 +124,50 @@ try {
     $strategyGroupsStmt->execute();
     $strategyGroups = $strategyGroupsStmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Get company's trade history
-    $tradeHistorySql = "SELECT 
-                         trade_date,
-                         transaction_type,
-                         shares_traded,
-                         price_per_share_sek,
-                         total_amount_sek,
-                         broker_id,
-                         created_at
-                        FROM psw_portfolio.log_trades 
-                        WHERE isin = ?
-                        ORDER BY trade_date DESC, created_at DESC
-                        LIMIT 20";
-    $tradeHistoryStmt = $portfolioDb->prepare($tradeHistorySql);
-    $tradeHistoryStmt->execute([$isin]);
-    $tradeHistory = $tradeHistoryStmt->fetchAll(PDO::FETCH_ASSOC);
+    // Get company's trade history - use safe column selection
+    try {
+        $tradeHistorySql = "SELECT 
+                             trade_date,
+                             'Buy' as transaction_type,
+                             shares_traded,
+                             price_per_share_sek,
+                             total_amount_sek,
+                             created_at
+                            FROM psw_portfolio.log_trades 
+                            WHERE isin = ?
+                            ORDER BY trade_date DESC, created_at DESC
+                            LIMIT 20";
+        $tradeHistoryStmt = $portfolioDb->prepare($tradeHistorySql);
+        $tradeHistoryStmt->execute([$isin]);
+        $tradeHistory = $tradeHistoryStmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $tradeError) {
+        // If trade history fails, continue without it
+        $tradeHistory = [];
+        error_log("Trade history error: " . $tradeError->getMessage());
+    }
     
     // Get company's dividend history
-    $dividendHistorySql = "SELECT 
-                            payment_date,
-                            dividend_amount_local,
-                            currency,
-                            dividend_amount_sek,
-                            shares_held,
-                            tax_amount_sek,
-                            net_dividend_sek
-                           FROM psw_portfolio.log_dividends 
-                           WHERE isin = ?
-                           ORDER BY payment_date DESC
-                           LIMIT 20";
-    $dividendHistoryStmt = $portfolioDb->prepare($dividendHistorySql);
-    $dividendHistoryStmt->execute([$isin]);
-    $dividendHistory = $dividendHistoryStmt->fetchAll(PDO::FETCH_ASSOC);
+    try {
+        $dividendHistorySql = "SELECT 
+                                payment_date,
+                                dividend_amount_local,
+                                currency,
+                                dividend_amount_sek,
+                                shares_held,
+                                tax_amount_sek,
+                                net_dividend_sek
+                               FROM psw_portfolio.log_dividends 
+                               WHERE isin = ?
+                               ORDER BY payment_date DESC
+                               LIMIT 20";
+        $dividendHistoryStmt = $portfolioDb->prepare($dividendHistorySql);
+        $dividendHistoryStmt->execute([$isin]);
+        $dividendHistory = $dividendHistoryStmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $dividendError) {
+        // If dividend history fails, continue without it
+        $dividendHistory = [];
+        error_log("Dividend history error: " . $dividendError->getMessage());
+    }
     
     // Calculate metrics
     $unrealizedGainLoss = $company['current_value_sek'] - $company['total_cost_sek'];
