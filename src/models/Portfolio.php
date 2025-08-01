@@ -80,14 +80,14 @@ class Portfolio {
                 'total_companies' => $dividendStats['dividend_companies'] ?? 0,
                 'total_cost' => $totalCost,
                 'total_unrealized_pnl' => $totalUnrealizedPnl,
-                'dividend_payments_ytd' => $dividendStats['ytd_count'],
-                'dividend_payments_all_time' => $dividendStats['all_time_count']
+                'dividend_payments_ytd' => 0, // Will be calculated when dividend data is available
+                'dividend_payments_all_time' => 0 // Will be calculated when dividend data is available
             ];
             
-            Logger::debug('Calculated portfolio summary from dividend data', [
-                'estimated_value' => $estimatedPortfolioValue,
-                'ytd_dividends' => $dividendStats['ytd_total'],
-                'unique_companies' => $uniqueCompanies
+            Logger::debug('Calculated portfolio summary from portfolio table', [
+                'total_value' => $totalValue,
+                'total_cost' => $totalCost,
+                'active_positions' => $activePositions
             ]);
             
             return $result;
