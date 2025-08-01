@@ -28,29 +28,18 @@ try {
                 COALESCE(s1.name, s2.name, 'Unknown') as sector,
                 COALESCE(ni.stockPriceCurrency, gi.stockPriceCurrency, p.currency_local) as base_currency,
                 
-                -- Get latest price from nordic prices only
-                nlp.price as latest_price,
-                COALESCE(nlp.currency, p.currency_local) as price_currency,
-                nlp.last_updated as price_updated,
+                -- Use portfolio data for now (external price tables may not exist)
+                p.current_price_local as latest_price,
+                p.currency_local as price_currency,
+                p.updated_at as price_updated,
                 
                 -- FX rate for conversion to SEK
                 fx.rate as fx_rate,
                 fx.last_updated as fx_updated,
                 
-                -- Calculate current values
-                CASE 
-                    WHEN nlp.price IS NOT NULL THEN
-                        p.shares_held * nlp.price
-                    ELSE p.current_value_local
-                END as calculated_value_local,
-                
-                CASE 
-                    WHEN nlp.price IS NOT NULL AND fx.rate IS NOT NULL THEN
-                        p.shares_held * nlp.price * fx.rate
-                    WHEN nlp.price IS NOT NULL AND p.currency_local = 'SEK' THEN
-                        p.shares_held * nlp.price
-                    ELSE p.current_value_sek
-                END as calculated_value_sek
+                -- Use existing calculated values from portfolio table
+                p.current_value_local as calculated_value_local,
+                p.current_value_sek as calculated_value_sek
                 
             FROM psw_portfolio.portfolio p
             LEFT JOIN psw_foundation.masterlist ml ON p.isin = ml.isin
@@ -58,7 +47,6 @@ try {
             LEFT JOIN psw_marketdata.global_instruments gi ON p.isin = gi.isin
             LEFT JOIN psw_marketdata.sectors s1 ON ni.sectorID = s1.sectorId
             LEFT JOIN psw_marketdata.sectors s2 ON gi.sectorId = s2.sectorId
-            LEFT JOIN psw_marketdata.nordic_latest_prices nlp ON p.ticker = nlp.ticker
             LEFT JOIN psw_marketdata.fx_rates_freecurrency fx ON p.currency_local = fx.from_currency AND fx.to_currency = 'SEK'
             WHERE p.is_active = 1 AND p.shares_held > 0
             ORDER BY p.current_value_sek DESC";
