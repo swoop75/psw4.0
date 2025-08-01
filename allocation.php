@@ -267,16 +267,91 @@ ob_start();
                 </div>
             </div>
             <div class="psw-card-content">
-                <div id="worldMapContainer" style="position: relative; height: 400px; background: var(--bg-secondary); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; border: 2px dashed var(--border-primary);">
-                    <div style="text-align: center; color: var(--text-muted);">
-                        <i class="fas fa-globe" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                        <h3 style="margin-bottom: 0.5rem;">Interactive World Map</h3>
-                        <p>Future enhancement: Interactive world map showing geographic allocation</p>
-                        <p style="font-size: 0.875rem; margin-top: 1rem;">
-                            Integration possibilities: Leaflet.js, D3.js, or Google Maps API
-                        </p>
+                <?php if (!empty($geographicAllocation)): ?>
+                    <div id="worldMapContainer" style="position: relative; height: 400px; background: var(--bg-secondary); border-radius: var(--radius-md); padding: 2rem;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; height: 100%;">
+                            <?php foreach ($geographicAllocation as $index => $allocation): ?>
+                                <div class="country-allocation-card" style="
+                                    background: var(--bg-card);
+                                    border: 2px solid var(--border-primary);
+                                    border-radius: var(--radius-md);
+                                    padding: 1rem;
+                                    display: flex;
+                                    flex-direction: column;
+                                    justify-content: center;
+                                    text-align: center;
+                                    position: relative;
+                                    transition: all 0.3s ease;
+                                    cursor: pointer;
+                                    <?php 
+                                    $colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4'];
+                                    $color = $colors[$index % count($colors)];
+                                    ?>
+                                    border-color: <?php echo $color; ?>;
+                                    " onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.15)';" 
+                                       onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';">
+                                    
+                                    <div style="width: 40px; height: 40px; background: <?php echo $color; ?>; border-radius: 50%; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-<?php 
+                                            // Country-specific icons
+                                            $countryIcons = [
+                                                'Sweden' => 'flag',
+                                                'United States' => 'star',
+                                                'Denmark' => 'crown',
+                                                'Norway' => 'mountain',
+                                                'Finland' => 'tree',
+                                                'Germany' => 'industry',
+                                                'France' => 'wine-glass',
+                                                'United Kingdom' => 'pound-sign',
+                                                'Netherlands' => 'bicycle',
+                                                'Switzerland' => 'mountain',
+                                                'Canada' => 'leaf',
+                                                'Australia' => 'sun',
+                                                'Japan' => 'yen-sign',
+                                                'Hong Kong' => 'building',
+                                                'Singapore' => 'ship'
+                                            ];
+                                            echo $countryIcons[$allocation['country']] ?? 'globe';
+                                        ?>" style="color: white; font-size: 1.2rem;"></i>
+                                    </div>
+                                    
+                                    <h4 style="margin: 0 0 0.5rem 0; font-size: 1rem; font-weight: 600; color: var(--text-primary);">
+                                        <?php echo htmlspecialchars($allocation['country']); ?>
+                                    </h4>
+                                    
+                                    <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+                                        <?php echo htmlspecialchars($allocation['region']); ?>
+                                    </div>
+                                    
+                                    <div style="font-size: 1.25rem; font-weight: 700; color: <?php echo $color; ?>; margin-bottom: 0.25rem;">
+                                        <?php echo number_format($allocation['weight_percent'], 1); ?>%
+                                    </div>
+                                    
+                                    <div style="font-size: 0.875rem; color: var(--text-primary); font-weight: 600;">
+                                        <?php echo Localization::formatCurrency($allocation['value_sek'], 0, 'SEK'); ?>
+                                    </div>
+                                    
+                                    <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                                        <?php echo $allocation['positions']; ?> position<?php echo $allocation['positions'] != 1 ? 's' : ''; ?>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                        
+                        <div style="position: absolute; bottom: 1rem; right: 1rem; font-size: 0.75rem; color: var(--text-muted);">
+                            <i class="fas fa-info-circle" style="margin-right: 0.25rem;"></i>
+                            Interactive world map coming soon
+                        </div>
                     </div>
-                </div>
+                <?php else: ?>
+                    <div id="worldMapContainer" style="position: relative; height: 400px; background: var(--bg-secondary); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; border: 2px dashed var(--border-primary);">
+                        <div style="text-align: center; color: var(--text-muted);">
+                            <i class="fas fa-globe" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                            <h3 style="margin-bottom: 0.5rem;">No Geographic Data</h3>
+                            <p>No geographic allocation data available.</p>
+                        </div>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
 
