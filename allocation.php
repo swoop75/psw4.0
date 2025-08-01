@@ -268,80 +268,145 @@ ob_start();
             </div>
             <div class="psw-card-content">
                 <?php if (!empty($geographicAllocation)): ?>
-                    <div id="worldMapContainer" style="position: relative; height: 400px; background: var(--bg-secondary); border-radius: var(--radius-md); padding: 2rem;">
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; height: 100%;">
-                            <?php foreach ($geographicAllocation as $index => $allocation): ?>
-                                <div class="country-allocation-card" style="
-                                    background: var(--bg-card);
-                                    border: 2px solid var(--border-primary);
-                                    border-radius: var(--radius-md);
-                                    padding: 1rem;
-                                    display: flex;
-                                    flex-direction: column;
-                                    justify-content: center;
-                                    text-align: center;
-                                    position: relative;
-                                    transition: all 0.3s ease;
-                                    cursor: pointer;
+                    <div id="worldMapContainer" style="position: relative; height: 400px; background: var(--bg-secondary); border-radius: var(--radius-md); overflow: hidden;">
+                        <!-- Simple SVG World Map -->
+                        <svg width="100%" height="100%" viewBox="0 0 1000 500" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);">
+                            <!-- World map background -->
+                            <rect width="1000" height="500" fill="url(#oceanGradient)"/>
+                            
+                            <!-- Gradient definitions -->
+                            <defs>
+                                <linearGradient id="oceanGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#1e3a8a;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
+                                </linearGradient>
+                                <filter id="glow">
+                                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                                    <feMerge> 
+                                        <feMergeNode in="coloredBlur"/>
+                                        <feMergeNode in="SourceGraphic"/> 
+                                    </feMerge>
+                                </filter>
+                            </defs>
+                            
+                            <!-- Simplified country shapes -->
+                            <?php
+                            // Create country allocation lookup
+                            $countryData = [];
+                            $maxWeight = 0;
+                            foreach ($geographicAllocation as $allocation) {
+                                $countryData[$allocation['country']] = $allocation;
+                                $maxWeight = max($maxWeight, $allocation['weight_percent']);
+                            }
+                            
+                            // Define simple country shapes and positions
+                            $countries = [
+                                'Sweden' => ['x' => 520, 'y' => 120, 'width' => 30, 'height' => 60],
+                                'Norway' => ['x' => 500, 'y' => 100, 'width' => 25, 'height' => 80],
+                                'Finland' => ['x' => 550, 'y' => 110, 'width' => 35, 'height' => 70],
+                                'Denmark' => ['x' => 510, 'y' => 160, 'width' => 20, 'height' => 15],
+                                'Germany' => ['x' => 500, 'y' => 180, 'width' => 35, 'height' => 40],
+                                'France' => ['x' => 460, 'y' => 190, 'width' => 40, 'height' => 45],
+                                'United Kingdom' => ['x' => 440, 'y' => 160, 'width' => 30, 'height' => 50],
+                                'Netherlands' => ['x' => 490, 'y' => 170, 'width' => 15, 'height' => 20],
+                                'Switzerland' => ['x' => 500, 'y' => 200, 'width' => 15, 'height' => 15],
+                                'United States' => ['x' => 150, 'y' => 180, 'width' => 200, 'height' => 120],
+                                'Canada' => ['x' => 100, 'y' => 100, 'width' => 250, 'height' => 100],
+                                'Japan' => ['x' => 850, 'y' => 200, 'width' => 40, 'height' => 80],
+                                'Australia' => ['x' => 780, 'y' => 350, 'width' => 100, 'height' => 60],
+                                'Hong Kong' => ['x' => 800, 'y' => 250, 'width' => 8, 'height' => 8],
+                                'Singapore' => ['x' => 790, 'y' => 280, 'width' => 6, 'height' => 6]
+                            ];
+                            ?>
+                            
+                            <!-- Draw countries -->
+                            <?php foreach ($countries as $countryName => $coords): ?>
+                                <?php if (isset($countryData[$countryName])): ?>
                                     <?php 
-                                    $colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4'];
-                                    $color = $colors[$index % count($colors)];
+                                    $allocation = $countryData[$countryName];
+                                    $intensity = $allocation['weight_percent'] / max($maxWeight, 1);
+                                    $color = $intensity > 0.7 ? '#ef4444' : ($intensity > 0.4 ? '#f59e0b' : '#10b981');
                                     ?>
-                                    border-color: <?php echo $color; ?>;
-                                    " onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.15)';" 
-                                       onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';">
+                                    <rect 
+                                        x="<?php echo $coords['x']; ?>" 
+                                        y="<?php echo $coords['y']; ?>" 
+                                        width="<?php echo $coords['width']; ?>" 
+                                        height="<?php echo $coords['height']; ?>"
+                                        fill="<?php echo $color; ?>"
+                                        stroke="#ffffff"
+                                        stroke-width="1"
+                                        opacity="0.9"
+                                        filter="url(#glow)"
+                                        style="cursor: pointer;"
+                                        onmouseover="showCountryTooltip(evt, '<?php echo addslashes($countryName); ?>', '<?php echo number_format($allocation['weight_percent'], 1); ?>%', '<?php echo Localization::formatCurrency($allocation['value_sek'], 0, 'SEK'); ?>', '<?php echo $allocation['positions']; ?>')"
+                                        onmouseout="hideCountryTooltip()">
+                                        <title><?php echo $countryName; ?>: <?php echo number_format($allocation['weight_percent'], 1); ?>%</title>
+                                    </rect>
                                     
-                                    <div style="width: 40px; height: 40px; background: <?php echo $color; ?>; border-radius: 50%; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center;">
-                                        <i class="fas fa-<?php 
-                                            // Country-specific icons
-                                            $countryIcons = [
-                                                'Sweden' => 'flag',
-                                                'United States' => 'star',
-                                                'Denmark' => 'crown',
-                                                'Norway' => 'mountain',
-                                                'Finland' => 'tree',
-                                                'Germany' => 'industry',
-                                                'France' => 'wine-glass',
-                                                'United Kingdom' => 'pound-sign',
-                                                'Netherlands' => 'bicycle',
-                                                'Switzerland' => 'mountain',
-                                                'Canada' => 'leaf',
-                                                'Australia' => 'sun',
-                                                'Japan' => 'yen-sign',
-                                                'Hong Kong' => 'building',
-                                                'Singapore' => 'ship'
-                                            ];
-                                            echo $countryIcons[$allocation['country']] ?? 'globe';
-                                        ?>" style="color: white; font-size: 1.2rem;"></i>
-                                    </div>
+                                    <!-- Country label -->
+                                    <text 
+                                        x="<?php echo $coords['x'] + $coords['width']/2; ?>" 
+                                        y="<?php echo $coords['y'] + $coords['height'] + 15; ?>"
+                                        text-anchor="middle"
+                                        fill="#ffffff"
+                                        font-size="10"
+                                        font-weight="600"
+                                        style="text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
+                                        <?php echo $countryName; ?>
+                                    </text>
                                     
-                                    <h4 style="margin: 0 0 0.5rem 0; font-size: 1rem; font-weight: 600; color: var(--text-primary);">
-                                        <?php echo htmlspecialchars($allocation['country']); ?>
-                                    </h4>
-                                    
-                                    <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
-                                        <?php echo htmlspecialchars($allocation['region']); ?>
-                                    </div>
-                                    
-                                    <div style="font-size: 1.25rem; font-weight: 700; color: <?php echo $color; ?>; margin-bottom: 0.25rem;">
+                                    <!-- Percentage label -->
+                                    <text 
+                                        x="<?php echo $coords['x'] + $coords['width']/2; ?>" 
+                                        y="<?php echo $coords['y'] + $coords['height']/2 + 3; ?>"
+                                        text-anchor="middle"
+                                        fill="#ffffff"
+                                        font-size="12"
+                                        font-weight="700"
+                                        style="text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
                                         <?php echo number_format($allocation['weight_percent'], 1); ?>%
-                                    </div>
-                                    
-                                    <div style="font-size: 0.875rem; color: var(--text-primary); font-weight: 600;">
-                                        <?php echo Localization::formatCurrency($allocation['value_sek'], 0, 'SEK'); ?>
-                                    </div>
-                                    
-                                    <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">
-                                        <?php echo $allocation['positions']; ?> position<?php echo $allocation['positions'] != 1 ? 's' : ''; ?>
-                                    </div>
-                                </div>
+                                    </text>
+                                <?php else: ?>
+                                    <!-- Inactive countries -->
+                                    <rect 
+                                        x="<?php echo $coords['x']; ?>" 
+                                        y="<?php echo $coords['y']; ?>" 
+                                        width="<?php echo $coords['width']; ?>" 
+                                        height="<?php echo $coords['height']; ?>"
+                                        fill="#64748b"
+                                        stroke="#475569"
+                                        stroke-width="1"
+                                        opacity="0.3">
+                                    </rect>
+                                <?php endif; ?>
                             <?php endforeach; ?>
-                        </div>
+                            
+                            <!-- Legend -->
+                            <g transform="translate(20, 20)">
+                                <rect x="0" y="0" width="200" height="80" fill="rgba(0,0,0,0.7)" rx="5"/>
+                                <text x="10" y="20" fill="#ffffff" font-size="12" font-weight="600">Portfolio Allocation</text>
+                                <rect x="10" y="30" width="15" height="10" fill="#10b981"/>
+                                <text x="30" y="39" fill="#ffffff" font-size="10">Low (0-40%)</text>
+                                <rect x="10" y="45" width="15" height="10" fill="#f59e0b"/>
+                                <text x="30" y="54" fill="#ffffff" font-size="10">Medium (40-70%)</text>
+                                <rect x="10" y="60" width="15" height="10" fill="#ef4444"/>
+                                <text x="30" y="69" fill="#ffffff" font-size="10">High (70%+)</text>
+                            </g>
+                        </svg>
                         
-                        <div style="position: absolute; bottom: 1rem; right: 1rem; font-size: 0.75rem; color: var(--text-muted);">
-                            <i class="fas fa-info-circle" style="margin-right: 0.25rem;"></i>
-                            Interactive world map coming soon
-                        </div>
+                        <!-- Tooltip -->
+                        <div id="countryTooltip" style="
+                            position: absolute;
+                            background: rgba(0,0,0,0.9);
+                            color: white;
+                            padding: 0.5rem;
+                            border-radius: 4px;
+                            font-size: 0.875rem;
+                            pointer-events: none;
+                            opacity: 0;
+                            transition: opacity 0.3s;
+                            z-index: 1000;
+                        "></div>
                     </div>
                 <?php else: ?>
                     <div id="worldMapContainer" style="position: relative; height: 400px; background: var(--bg-secondary); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; border: 2px dashed var(--border-primary);">
@@ -719,6 +784,28 @@ document.addEventListener('DOMContentLoaded', function() {
     <?php endif; ?>
     
 }); // End DOMContentLoaded
+
+function showCountryTooltip(evt, country, percentage, value, positions) {
+    const tooltip = document.getElementById('countryTooltip');
+    if (tooltip) {
+        tooltip.innerHTML = `
+            <strong>${country}</strong><br>
+            Allocation: ${percentage}<br>
+            Value: ${value}<br>
+            Positions: ${positions}
+        `;
+        tooltip.style.left = (evt.clientX + 10) + 'px';
+        tooltip.style.top = (evt.clientY - 10) + 'px';
+        tooltip.style.opacity = '1';
+    }
+}
+
+function hideCountryTooltip() {
+    const tooltip = document.getElementById('countryTooltip');
+    if (tooltip) {
+        tooltip.style.opacity = '0';
+    }
+}
 
 function refreshAllocation() {
     location.reload();
