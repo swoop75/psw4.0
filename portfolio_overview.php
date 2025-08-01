@@ -28,8 +28,8 @@ try {
                 COALESCE(s1.name, s2.name, 'Unknown') as sector,
                 COALESCE(ni.stockPriceCurrency, gi.stockPriceCurrency, p.currency_local) as base_currency,
                 
-                -- Use portfolio data for now (external price tables may not exist)
-                p.current_price_local as latest_price,
+                -- Use portfolio data with correct column names
+                p.latest_price_local as latest_price,
                 p.currency_local as price_currency,
                 p.updated_at as price_updated,
                 
