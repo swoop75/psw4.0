@@ -44,6 +44,7 @@ try {
             FROM psw_portfolio.portfolio p
             LEFT JOIN psw_foundation.masterlist ml ON p.isin COLLATE utf8mb4_unicode_ci = ml.isin COLLATE utf8mb4_unicode_ci
             WHERE p.is_active = 1 AND p.shares_held > 0
+            GROUP BY p.portfolio_id
             ORDER BY p.current_value_sek DESC";
     
     $stmt = $portfolioDb->prepare($sql);
