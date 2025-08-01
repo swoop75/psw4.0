@@ -11,6 +11,7 @@ require_once __DIR__ . '/config/constants.php';
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/src/middleware/Auth.php';
 require_once __DIR__ . '/src/utils/Localization.php';
+require_once __DIR__ . '/src/utils/DataValidator.php';
 
 // Require admin authentication
 Auth::requireAuth();
@@ -30,6 +31,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (isset($_POST['action'])) {
             switch ($_POST['action']) {
                 case 'add_company':
+                    // Sanitize input data
+                    $companyData = DataValidator::sanitizeManualCompanyData($_POST);
+                    
+                    // Validate all data
+                    $validation = DataValidator::validateManualCompanyData($companyData);
+                    
+                    if (!$validation['valid']) {
+                        $errorMessages = array_values($validation['errors']);
+                        $message = "Validation failed: " . implode('; ', $errorMessages);
+                        $messageType = "error";
+                        break;
+                    }
+                    
+                    // Check for duplicates
+                    $duplicateCheck = DataValidator::checkDuplicateCompany($companyData['isin'], $foundationDb);
+                    if ($duplicateCheck['duplicate']) {
+                        $message = "Company already exists in " . $duplicateCheck['source'] . ": " . $companyData['isin'];
+                        $messageType = "error";
+                        break;
+                    }
+                    
                     $sql = "INSERT INTO manual_company_data 
                             (isin, ticker, company_name, country, sector, branch, market_exchange, 
                              currency, company_type, dividend_frequency, notes, created_by) 
@@ -37,17 +59,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     
                     $stmt = $foundationDb->prepare($sql);
                     $stmt->execute([
-                        $_POST['isin'],
-                        $_POST['ticker'] ?: null,
-                        $_POST['company_name'],
-                        $_POST['country'],
-                        $_POST['sector'] ?: null,
-                        $_POST['branch'] ?: null,
-                        $_POST['market_exchange'] ?: null,
-                        $_POST['currency'] ?: null,
-                        $_POST['company_type'],
-                        $_POST['dividend_frequency'],
-                        $_POST['notes'] ?: null,
+                        $companyData['isin'],
+                        $companyData['ticker'] ?: null,
+                        $companyData['company_name'],
+                        $companyData['country'],
+                        $companyData['sector'] ?: null,
+                        $companyData['branch'] ?: null,
+                        $companyData['market_exchange'] ?: null,
+                        $companyData['currency'] ?: null,
+                        $companyData['company_type'],
+                        $companyData['dividend_frequency'],
+                        $companyData['notes'] ?: null,
                         Auth::getUsername() ?: 'admin'
                     ]);
                     
@@ -563,6 +585,7 @@ ob_start();
                             <option value="SEK">SEK</option>
                             <option value="NOK">NOK</option>
                             <option value="DKK">DKK</option>
+                            <option value="CZK">CZK</option>
                         </select>
                     </div>
                 </div>
@@ -618,7 +641,7 @@ ob_start();
                 <button type="button" class="psw-btn psw-btn-secondary" onclick="closeCompanyModal()">
                     Cancel
                 </button>
-                <button type="submit" class="psw-btn psw-btn-primary">
+                <button type="submit" class="psw-btn psw-btn-primary" onclick="return validateForm()">
                     <i class="fas fa-save psw-btn-icon"></i>
                     Save Company
                 </button>
@@ -628,6 +651,143 @@ ob_start();
 </div>
 
 <script>
+// Client-side validation functions
+function validateISIN(isin) {
+    isin = isin.toUpperCase().trim();
+    
+    if (isin.length !== 12) {
+        return { valid: false, error: 'ISIN must be exactly 12 characters' };
+    }
+    
+    if (!/^[A-Z]{2}[A-Z0-9]{9}[0-9]$/.test(isin)) {
+        return { valid: false, error: 'Invalid ISIN format. Must be 2 letters + 9 alphanumeric + 1 digit' };
+    }
+    
+    // Validate checksum
+    let numString = '';
+    for (let i = 0; i < 11; i++) {
+        const char = isin[i];
+        if (/[0-9]/.test(char)) {
+            numString += char;
+        } else {
+            numString += (char.charCodeAt(0) - 55);
+        }
+    }
+    
+    let sum = 0;
+    let pos = 1;
+    for (let i = numString.length - 1; i >= 0; i--) {
+        let digit = parseInt(numString[i]);
+        if (pos % 2 === 0) {
+            digit *= 2;
+            if (digit > 9) {
+                digit -= 9;
+            }
+        }
+        sum += digit;
+        pos++;
+    }
+    
+    const checkDigit = (10 - (sum % 10)) % 10;
+    const actualCheckDigit = parseInt(isin[11]);
+    
+    if (checkDigit !== actualCheckDigit) {
+        console.warn('ISIN checksum validation failed for: ' + isin + ' (expected: ' + checkDigit + ', got: ' + actualCheckDigit + ')');
+        // Allow invalid checksums but warn - broker data might use different formats
+    }
+    
+    return { valid: true, error: null };
+}
+
+function validateCompanyName(name) {
+    name = name.trim();
+    if (name.length < 2) {
+        return { valid: false, error: 'Company name must be at least 2 characters' };
+    }
+    if (name.length > 255) {
+        return { valid: false, error: 'Company name must not exceed 255 characters' };
+    }
+    if (/^[0-9]+$/.test(name)) {
+        return { valid: false, error: 'Company name cannot be only numbers' };
+    }
+    return { valid: true, error: null };
+}
+
+function validateCountry(country) {
+    const validCountries = [
+        'Austria', 'Belgium', 'Canada', 'Czech Republic', 'Denmark', 'Finland',
+        'France', 'Germany', 'Ireland', 'Italy', 'Netherlands', 'Norway',
+        'Poland', 'Spain', 'Sweden', 'Switzerland', 'United Kingdom', 'United States',
+        'Australia', 'Japan', 'South Korea', 'Singapore', 'Hong Kong'
+    ];
+    
+    if (!country.trim()) {
+        return { valid: false, error: 'Country is required' };
+    }
+    
+    if (!validCountries.includes(country)) {
+        return { valid: false, error: 'Unsupported country. Please contact admin to add new countries.' };
+    }
+    
+    return { valid: true, error: null };
+}
+
+function showValidationError(fieldId, errorMessage) {
+    const field = document.getElementById(fieldId);
+    const existingError = field.parentNode.querySelector('.validation-error');
+    
+    if (existingError) {
+        existingError.remove();
+    }
+    
+    if (errorMessage) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'validation-error';
+        errorDiv.style.cssText = 'color: var(--danger-color); font-size: 0.875rem; margin-top: 0.25rem;';
+        errorDiv.textContent = errorMessage;
+        field.parentNode.appendChild(errorDiv);
+        field.style.borderColor = 'var(--danger-color)';
+    } else {
+        field.style.borderColor = '';
+    }
+}
+
+function validateForm() {
+    let isValid = true;
+    
+    // Validate ISIN
+    const isin = document.getElementById('isin').value;
+    const isinValidation = validateISIN(isin);
+    if (!isinValidation.valid) {
+        showValidationError('isin', isinValidation.error);
+        isValid = false;
+    } else {
+        showValidationError('isin', null);
+    }
+    
+    // Validate Company Name
+    const companyName = document.getElementById('companyName').value;
+    const nameValidation = validateCompanyName(companyName);
+    if (!nameValidation.valid) {
+        showValidationError('companyName', nameValidation.error);
+        isValid = false;
+    } else {
+        showValidationError('companyName', null);
+    }
+    
+    // Validate Country
+    const country = document.getElementById('country').value;
+    const countryValidation = validateCountry(country);
+    if (!countryValidation.valid) {
+        showValidationError('country', countryValidation.error);
+        isValid = false;
+    } else {
+        showValidationError('country', null);
+    }
+    
+    return isValid;
+}
+
 function showAddCompanyModal() {
     document.getElementById('modalTitle').textContent = 'Add New Company';
     document.getElementById('formAction').value = 'add_company';
@@ -635,6 +795,10 @@ function showAddCompanyModal() {
     document.getElementById('manualId').value = '';
     document.getElementById('isin').readOnly = false;
     document.getElementById('companyModal').style.display = 'flex';
+    
+    // Clear any validation errors
+    document.querySelectorAll('.validation-error').forEach(error => error.remove());
+    document.querySelectorAll('.psw-form-input').forEach(input => input.style.borderColor = '');
 }
 
 function addCompanyFromAnalysis(isin, ticker, country) {
@@ -696,6 +860,55 @@ document.getElementById('companyModal').addEventListener('click', function(e) {
     if (e.target === this) {
         closeCompanyModal();
     }
+});
+
+// Add real-time validation event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // ISIN field validation
+    document.getElementById('isin').addEventListener('blur', function() {
+        if (this.value) {
+            const validation = validateISIN(this.value);
+            showValidationError('isin', validation.valid ? null : validation.error);
+        }
+    });
+    
+    // Company name validation
+    document.getElementById('companyName').addEventListener('blur', function() {
+        if (this.value) {
+            const validation = validateCompanyName(this.value);
+            showValidationError('companyName', validation.valid ? null : validation.error);
+        }
+    });
+    
+    // Country validation
+    document.getElementById('country').addEventListener('blur', function() {
+        if (this.value) {
+            const validation = validateCountry(this.value);
+            showValidationError('country', validation.valid ? null : validation.error);
+        }
+    });
+    
+    // Clear validation errors on input
+    document.querySelectorAll('.psw-form-input').forEach(input => {
+        input.addEventListener('input', function() {
+            const errorDiv = this.parentNode.querySelector('.validation-error');
+            if (errorDiv && this.value.trim()) {
+                // Re-validate on input for immediate feedback
+                let validation = { valid: true };
+                if (this.id === 'isin') {
+                    validation = validateISIN(this.value);
+                } else if (this.id === 'companyName') {
+                    validation = validateCompanyName(this.value);
+                } else if (this.id === 'country') {
+                    validation = validateCountry(this.value);
+                }
+                
+                if (validation.valid) {
+                    showValidationError(this.id, null);
+                }
+            }
+        });
+    });
 });
 </script>
 
