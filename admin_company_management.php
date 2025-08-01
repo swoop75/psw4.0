@@ -91,11 +91,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     break;
                     
                 case 'check_unsupported':
-                    // Direct query instead of stored procedure
+                    // Enhanced query to categorize companies properly
+                    $analysisResults = [];
+                    
+                    // 1. Find truly unsupported (not in Börsdata, not in masterlist, not manual)
                     $unsupportedSql = "
                         SELECT DISTINCT 
                             p_isin.isin, 
                             p_isin.ticker,
+                            'unsupported' as category,
                             CASE 
                                 WHEN p_isin.isin LIKE 'AT%' THEN 'Austria'
                                 WHEN p_isin.isin LIKE 'CA%' THEN 'Canada'  
@@ -104,7 +108,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 WHEN p_isin.isin LIKE 'CZ%' THEN 'Czech Republic'
                                 WHEN p_isin.isin LIKE 'IE%' THEN 'Ireland'
                                 ELSE 'Unknown Country'
-                            END as likely_country
+                            END as likely_country,
+                            NULL as company_name,
+                            NULL as delisted_date
                         FROM (
                             SELECT DISTINCT isin, ticker FROM psw_portfolio.portfolio WHERE isin IS NOT NULL
                             UNION
@@ -114,18 +120,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         ) p_isin
                         LEFT JOIN psw_marketdata.nordic_instruments ni ON p_isin.isin COLLATE utf8mb4_unicode_ci = ni.isin COLLATE utf8mb4_unicode_ci
                         LEFT JOIN psw_marketdata.global_instruments gi ON p_isin.isin COLLATE utf8mb4_unicode_ci = gi.isin COLLATE utf8mb4_unicode_ci
+                        LEFT JOIN psw_foundation.masterlist ml ON p_isin.isin = ml.isin
                         LEFT JOIN psw_foundation.manual_company_data mcd ON p_isin.isin = mcd.isin
-                        WHERE ni.isin IS NULL AND gi.isin IS NULL AND mcd.isin IS NULL
-                        ORDER BY likely_country, p_isin.isin
+                        WHERE ni.isin IS NULL AND gi.isin IS NULL AND ml.isin IS NULL AND mcd.isin IS NULL
+                    ";
+                    
+                    // 2. Find delisted companies
+                    $delistedSql = "
+                        SELECT DISTINCT 
+                            p_isin.isin, 
+                            p_isin.ticker,
+                            'delisted' as category,
+                            ml.country as likely_country,
+                            ml.name as company_name,
+                            ml.delisted_date
+                        FROM (
+                            SELECT DISTINCT isin, ticker FROM psw_portfolio.portfolio WHERE isin IS NOT NULL
+                            UNION
+                            SELECT DISTINCT isin, ticker FROM psw_portfolio.log_trades WHERE isin IS NOT NULL
+                            UNION
+                            SELECT DISTINCT isin, ticker FROM psw_portfolio.log_dividends WHERE isin IS NOT NULL
+                        ) p_isin
+                        LEFT JOIN psw_marketdata.nordic_instruments ni ON p_isin.isin COLLATE utf8mb4_unicode_ci = ni.isin COLLATE utf8mb4_unicode_ci
+                        LEFT JOIN psw_marketdata.global_instruments gi ON p_isin.isin COLLATE utf8mb4_unicode_ci = gi.isin COLLATE utf8mb4_unicode_ci
+                        INNER JOIN psw_foundation.masterlist ml ON p_isin.isin = ml.isin
+                        WHERE ni.isin IS NULL AND gi.isin IS NULL AND ml.delisted = 1
                     ";
                     
                     $stmt = $foundationDb->prepare($unsupportedSql);
                     $stmt->execute();
                     $unsupported = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     
-                    $count = count($unsupported);
-                    $message = "Found $count unsupported companies: " . implode(', ', array_column($unsupported, 'isin'));
+                    $stmt = $foundationDb->prepare($delistedSql);
+                    $stmt->execute();
+                    $delisted = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    
+                    $unsupportedCount = count($unsupported);
+                    $delistedCount = count($delisted);
+                    
+                    $message = "Analysis complete: $unsupportedCount truly unsupported companies";
+                    if ($delistedCount > 0) {
+                        $message .= ", $delistedCount delisted companies found";
+                    }
                     $messageType = "info";
+                    
+                    // Store results for display
+                    $_SESSION['analysis_results'] = [
+                        'unsupported' => $unsupported,
+                        'delisted' => $delisted
+                    ];
                     break;
                     
                 case 'check_missing':
@@ -168,17 +211,13 @@ try {
     ");
     $syncLogs = $syncLogStmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Get data source summary
-    $sourceSummaryStmt = $foundationDb->query("
-        SELECT 
-            data_source,
-            COUNT(*) as total,
-            SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active,
-            SUM(CASE WHEN status = 'missing' THEN 1 ELSE 0 END) as missing
-        FROM company_data_sources 
-        GROUP BY data_source
-    ");
-    $sourceSummary = $sourceSummaryStmt->fetchAll(PDO::FETCH_ASSOC);
+    // Get analysis results from session if available
+    $analysisResults = $_SESSION['analysis_results'] ?? ['unsupported' => [], 'delisted' => []];
+    
+    // Get data source summary (simplified for now)
+    $sourceSummary = [
+        ['data_source' => 'manual', 'total' => count($manualCompanies), 'active' => count($manualCompanies), 'missing' => 0]
+    ];
     
 } catch (Exception $e) {
     $error = "Error loading data: " . $e->getMessage();
@@ -345,6 +384,102 @@ ob_start();
         </div>
     </div>
 
+    <!-- Analysis Results -->
+    <?php if (!empty($analysisResults['unsupported']) || !empty($analysisResults['delisted'])): ?>
+        <div class="psw-card" style="margin-bottom: 1.5rem;">
+            <div class="psw-card-header">
+                <div class="psw-card-title">
+                    <i class="fas fa-search psw-card-title-icon"></i>
+                    Company Analysis Results
+                </div>
+            </div>
+            <div class="psw-card-content">
+                <!-- Truly Unsupported Companies -->
+                <?php if (!empty($analysisResults['unsupported'])): ?>
+                    <div style="margin-bottom: 2rem;">
+                        <h4 style="color: var(--warning-color); margin-bottom: 1rem;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Unsupported Companies (<?php echo count($analysisResults['unsupported']); ?>) - Need Manual Entry
+                        </h4>
+                        <table class="psw-table">
+                            <thead>
+                                <tr>
+                                    <th>ISIN</th>
+                                    <th>Ticker</th>
+                                    <th>Likely Country</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($analysisResults['unsupported'] as $company): ?>
+                                    <tr>
+                                        <td style="font-family: var(--font-family-mono);">
+                                            <?php echo htmlspecialchars($company['isin']); ?>
+                                        </td>
+                                        <td style="font-family: var(--font-family-mono);">
+                                            <?php echo htmlspecialchars($company['ticker'] ?? '-'); ?>
+                                        </td>
+                                        <td><?php echo htmlspecialchars($company['likely_country']); ?></td>
+                                        <td>
+                                            <button type="button" class="psw-btn psw-btn-sm psw-btn-primary" 
+                                                    onclick="addCompanyFromAnalysis('<?php echo $company['isin']; ?>', '<?php echo $company['ticker'] ?? ''; ?>', '<?php echo $company['likely_country']; ?>')">
+                                                <i class="fas fa-plus"></i> Add Manual Entry
+                                            </button>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif; ?>
+
+                <!-- Delisted Companies -->
+                <?php if (!empty($analysisResults['delisted'])): ?>
+                    <div style="margin-bottom: 1rem;">
+                        <h4 style="color: var(--text-secondary); margin-bottom: 1rem;">
+                            <i class="fas fa-info-circle"></i>
+                            Delisted Companies (<?php echo count($analysisResults['delisted']); ?>) - Already in System
+                        </h4>
+                        <table class="psw-table">
+                            <thead>
+                                <tr>
+                                    <th>ISIN</th>
+                                    <th>Company Name</th>
+                                    <th>Ticker</th>
+                                    <th>Country</th>
+                                    <th>Delisted Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($analysisResults['delisted'] as $company): ?>
+                                    <tr style="opacity: 0.7;">
+                                        <td style="font-family: var(--font-family-mono);">
+                                            <?php echo htmlspecialchars($company['isin']); ?>
+                                        </td>
+                                        <td><?php echo htmlspecialchars($company['company_name']); ?></td>
+                                        <td style="font-family: var(--font-family-mono);">
+                                            <?php echo htmlspecialchars($company['ticker'] ?? '-'); ?>
+                                        </td>
+                                        <td><?php echo htmlspecialchars($company['likely_country']); ?></td>
+                                        <td style="font-size: 0.875rem;">
+                                            <?php echo $company['delisted_date'] ? date('Y-m-d', strtotime($company['delisted_date'])) : '-'; ?>
+                                        </td>
+                                        <td>
+                                            <span class="psw-badge" style="background-color: var(--text-secondary); color: white;">
+                                                Delisted
+                                            </span>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    <?php endif; ?>
+
     <!-- Notifications -->
     <?php if (!empty($notifications)): ?>
         <div class="psw-card" style="margin-bottom: 1.5rem;">
@@ -499,6 +634,21 @@ function showAddCompanyModal() {
     document.getElementById('companyForm').reset();
     document.getElementById('manualId').value = '';
     document.getElementById('isin').readOnly = false;
+    document.getElementById('companyModal').style.display = 'flex';
+}
+
+function addCompanyFromAnalysis(isin, ticker, country) {
+    document.getElementById('modalTitle').textContent = 'Add Unsupported Company';
+    document.getElementById('formAction').value = 'add_company';
+    document.getElementById('companyForm').reset();
+    document.getElementById('manualId').value = '';
+    
+    // Pre-fill known data
+    document.getElementById('isin').value = isin;
+    document.getElementById('isin').readOnly = true;
+    document.getElementById('ticker').value = ticker;
+    document.getElementById('country').value = country;
+    
     document.getElementById('companyModal').style.display = 'flex';
 }
 
