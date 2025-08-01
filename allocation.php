@@ -52,7 +52,32 @@ try {
                         (SUM(COALESCE(p.current_value_sek, 0)) / NULLIF((SELECT SUM(current_value_sek) FROM psw_portfolio.portfolio WHERE is_active = 1 AND shares_held > 0), 0)) * 100 as weight_percent
                       FROM psw_portfolio.portfolio p
                       WHERE p.is_active = 1 AND p.shares_held > 0
-                      GROUP BY country, region
+                      GROUP BY 
+                        CASE 
+                            WHEN LEFT(p.isin, 2) = 'SE' THEN 'Sweden'
+                            WHEN LEFT(p.isin, 2) = 'US' THEN 'United States'
+                            WHEN LEFT(p.isin, 2) = 'DK' THEN 'Denmark'
+                            WHEN LEFT(p.isin, 2) = 'NO' THEN 'Norway'
+                            WHEN LEFT(p.isin, 2) = 'FI' THEN 'Finland'
+                            WHEN LEFT(p.isin, 2) = 'DE' THEN 'Germany'
+                            WHEN LEFT(p.isin, 2) = 'FR' THEN 'France'
+                            WHEN LEFT(p.isin, 2) = 'GB' THEN 'United Kingdom'
+                            WHEN LEFT(p.isin, 2) = 'NL' THEN 'Netherlands'
+                            WHEN LEFT(p.isin, 2) = 'CH' THEN 'Switzerland'
+                            WHEN LEFT(p.isin, 2) = 'CA' THEN 'Canada'
+                            WHEN LEFT(p.isin, 2) = 'AU' THEN 'Australia'
+                            WHEN LEFT(p.isin, 2) = 'JP' THEN 'Japan'
+                            WHEN LEFT(p.isin, 2) = 'HK' THEN 'Hong Kong'
+                            WHEN LEFT(p.isin, 2) = 'SG' THEN 'Singapore'
+                            ELSE 'Other'
+                        END,
+                        CASE 
+                            WHEN LEFT(p.isin, 2) IN ('SE', 'DK', 'NO', 'FI') THEN 'Nordic'
+                            WHEN LEFT(p.isin, 2) IN ('DE', 'FR', 'GB', 'NL', 'CH') THEN 'Europe'
+                            WHEN LEFT(p.isin, 2) IN ('US', 'CA') THEN 'North America'
+                            WHEN LEFT(p.isin, 2) IN ('AU', 'JP', 'HK', 'SG') THEN 'Asia-Pacific'
+                            ELSE 'Other'
+                        END
                       ORDER BY value_sek DESC";
     
     $geographicStmt = $portfolioDb->prepare($geographicSql);
