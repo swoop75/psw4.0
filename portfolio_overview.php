@@ -20,28 +20,32 @@ try {
     $foundationDb = Database::getConnection('foundation');
     $marketDb = Database::getConnection('marketdata');
     
-    // Use exact same query that worked in MySQL directly
+    // Get portfolio holdings with proper sector information
     $sql = "SELECT 
-                portfolio_id,
-                isin, 
-                ticker,
-                company_name,
-                shares_held,
-                average_cost_price_sek,
-                total_cost_sek,
-                latest_price_local as latest_price,
-                currency_local as price_currency,
-                updated_at as price_updated,
+                p.portfolio_id,
+                p.isin, 
+                p.ticker,
+                p.company_name,
+                p.shares_held,
+                p.average_cost_price_sek,
+                p.total_cost_sek,
+                p.latest_price_local as latest_price,
+                p.currency_local as price_currency,
+                p.updated_at as price_updated,
                 NULL as fx_rate,
                 NULL as fx_updated,
-                current_value_local as calculated_value_local,
-                current_value_sek as calculated_value_sek,
-                currency_local as base_currency,
+                p.current_value_local as calculated_value_local,
+                p.current_value_sek as calculated_value_sek,
+                p.currency_local as base_currency,
                 'Sweden' as country,
-                'Unknown' as sector
-            FROM psw_portfolio.portfolio 
-            WHERE is_active = 1 AND shares_held > 0
-            ORDER BY isin, portfolio_id";
+                COALESCE(s1.nameEn, s2.nameEn, 'Unknown') as sector
+            FROM psw_portfolio.portfolio p
+            LEFT JOIN psw_marketdata.nordic_instruments ni ON p.isin COLLATE utf8mb4_unicode_ci = ni.isin COLLATE utf8mb4_unicode_ci
+            LEFT JOIN psw_marketdata.global_instruments gi ON p.isin COLLATE utf8mb4_unicode_ci = gi.isin COLLATE utf8mb4_unicode_ci
+            LEFT JOIN psw_marketdata.sectors s1 ON ni.sectorID = s1.id
+            LEFT JOIN psw_marketdata.sectors s2 ON gi.sectorId = s2.id
+            WHERE p.is_active = 1 AND p.shares_held > 0
+            ORDER BY p.current_value_sek DESC";
     
     $stmt = $portfolioDb->prepare($sql);
     $stmt->execute();
@@ -78,12 +82,16 @@ try {
     
     // Get sector allocation
     $sectorSql = "SELECT 
-                    'Unknown' as sector,
+                    COALESCE(s1.nameEn, s2.nameEn, 'Unknown') as sector,
                     COUNT(*) as positions,
                     SUM(COALESCE(p.current_value_sek, 0)) as sector_value_sek
                   FROM psw_portfolio.portfolio p
+                  LEFT JOIN psw_marketdata.nordic_instruments ni ON p.isin COLLATE utf8mb4_unicode_ci = ni.isin COLLATE utf8mb4_unicode_ci
+                  LEFT JOIN psw_marketdata.global_instruments gi ON p.isin COLLATE utf8mb4_unicode_ci = gi.isin COLLATE utf8mb4_unicode_ci
+                  LEFT JOIN psw_marketdata.sectors s1 ON ni.sectorID = s1.id
+                  LEFT JOIN psw_marketdata.sectors s2 ON gi.sectorId = s2.id
                   WHERE p.is_active = 1 AND p.shares_held > 0
-                  GROUP BY 'Unknown'
+                  GROUP BY COALESCE(s1.nameEn, s2.nameEn, 'Unknown')
                   ORDER BY sector_value_sek DESC";
     
     $sectorStmt = $portfolioDb->prepare($sectorSql);
