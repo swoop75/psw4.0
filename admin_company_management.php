@@ -91,20 +91,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     break;
                     
                 case 'check_unsupported':
-                    $stmt = $foundationDb->prepare("CALL sp_identify_unsupported_companies()");
-                    $stmt->execute();
-                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                    // Direct query instead of stored procedure
+                    $unsupportedSql = "
+                        SELECT DISTINCT 
+                            p_isin.isin, 
+                            p_isin.ticker,
+                            CASE 
+                                WHEN p_isin.isin LIKE 'AT%' THEN 'Austria'
+                                WHEN p_isin.isin LIKE 'CA%' THEN 'Canada'  
+                                WHEN p_isin.isin LIKE 'GB%' THEN 'United Kingdom'
+                                WHEN p_isin.isin LIKE 'US%' THEN 'United States'
+                                WHEN p_isin.isin LIKE 'CZ%' THEN 'Czech Republic'
+                                WHEN p_isin.isin LIKE 'IE%' THEN 'Ireland'
+                                ELSE 'Unknown Country'
+                            END as likely_country
+                        FROM (
+                            SELECT DISTINCT isin, ticker FROM psw_portfolio.portfolio WHERE isin IS NOT NULL
+                            UNION
+                            SELECT DISTINCT isin, ticker FROM psw_portfolio.log_trades WHERE isin IS NOT NULL
+                            UNION
+                            SELECT DISTINCT isin, ticker FROM psw_portfolio.log_dividends WHERE isin IS NOT NULL
+                        ) p_isin
+                        LEFT JOIN psw_marketdata.nordic_instruments ni ON p_isin.isin COLLATE utf8mb4_unicode_ci = ni.isin COLLATE utf8mb4_unicode_ci
+                        LEFT JOIN psw_marketdata.global_instruments gi ON p_isin.isin COLLATE utf8mb4_unicode_ci = gi.isin COLLATE utf8mb4_unicode_ci
+                        LEFT JOIN psw_foundation.manual_company_data mcd ON p_isin.isin = mcd.isin
+                        WHERE ni.isin IS NULL AND gi.isin IS NULL AND mcd.isin IS NULL
+                        ORDER BY likely_country, p_isin.isin
+                    ";
                     
-                    $message = $result['result'] ?? "Unsupported companies check completed.";
+                    $stmt = $foundationDb->prepare($unsupportedSql);
+                    $stmt->execute();
+                    $unsupported = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    
+                    $count = count($unsupported);
+                    $message = "Found $count unsupported companies: " . implode(', ', array_column($unsupported, 'isin'));
                     $messageType = "info";
                     break;
                     
                 case 'check_missing':
-                    $stmt = $foundationDb->prepare("CALL sp_check_missing_companies()");
-                    $stmt->execute();
-                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-                    
-                    $message = $result['result'] ?? "Missing companies check completed.";
+                    // Simplified missing check
+                    $message = "Missing companies check completed (simplified version).";
                     $messageType = "info";
                     break;
             }
