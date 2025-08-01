@@ -33,9 +33,6 @@ try {
     $summaryStmt->execute();
     $summary = $summaryStmt->fetch(PDO::FETCH_ASSOC);
     
-    // Debug output (remove this after debugging)
-    error_log("Dashboard summary query result: " . print_r($summary, true));
-    
     // Get top 10 holdings
     $topHoldingsSql = "SELECT 
                         p.isin,
@@ -81,13 +78,14 @@ try {
     // Get recent dividend activity (last 30 days)
     $recentDividendsSql = "SELECT 
                             ld.isin,
-                            ld.company_name,
+                            COALESCE(p.company_name, 'Unknown Company') as company_name,
                             ld.payment_date,
                             ld.dividend_amount_local,
                             ld.currency,
                             ld.dividend_amount_sek,
                             ld.shares_held
                            FROM psw_portfolio.log_dividends ld
+                           LEFT JOIN psw_portfolio.portfolio p ON ld.isin = p.isin
                            WHERE ld.payment_date >= DATE_SUB(CURRENT_DATE, INTERVAL 30 DAY)
                            ORDER BY ld.payment_date DESC
                            LIMIT 10";
@@ -108,8 +106,6 @@ try {
     $recentDividends = [];
     $totalUnrealizedPercent = 0;
     
-    // Debug output (remove this after debugging)
-    error_log("Dashboard error: " . $e->getMessage());
 }
 
 // Initialize variables for template
