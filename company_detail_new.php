@@ -41,11 +41,20 @@ if ($_POST['action'] ?? '' === 'update_strategy_group') {
         if ($checkStmt->rowCount() === 0) {
             // Add strategy_group_id column to portfolio table
             $addColumnSql = "ALTER TABLE psw_portfolio.portfolio 
-                            ADD COLUMN strategy_group_id INT NULL,
-                            ADD CONSTRAINT fk_portfolio_strategy_group 
-                            FOREIGN KEY (strategy_group_id) 
-                            REFERENCES psw_foundation.portfolio_strategy_groups(strategy_group_id)";
+                            ADD COLUMN strategy_group_id INT NULL";
             $portfolioDb->exec($addColumnSql);
+            
+            // Add foreign key constraint separately to avoid potential issues
+            try {
+                $addConstraintSql = "ALTER TABLE psw_portfolio.portfolio 
+                                   ADD CONSTRAINT fk_portfolio_strategy_group 
+                                   FOREIGN KEY (strategy_group_id) 
+                                   REFERENCES psw_foundation.portfolio_strategy_groups(strategy_group_id)";
+                $portfolioDb->exec($addConstraintSql);
+            } catch (Exception $fkError) {
+                // Foreign key constraint failed, but column was added - continue
+                error_log("Foreign key constraint failed: " . $fkError->getMessage());
+            }
         }
         
         // Update strategy group
@@ -67,6 +76,15 @@ try {
     $foundationDb = Database::getConnection('foundation');
     $marketDb = Database::getConnection('marketdata');
     
+    // Check if strategy_group_id column exists
+    $checkColumnSql = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+                      WHERE TABLE_SCHEMA = 'psw_portfolio' 
+                      AND TABLE_NAME = 'portfolio' 
+                      AND COLUMN_NAME = 'strategy_group_id'";
+    $checkStmt = $portfolioDb->prepare($checkColumnSql);
+    $checkStmt->execute();
+    $hasStrategyColumn = $checkStmt->rowCount() > 0;
+    
     // Get company details from portfolio
     $companySql = "SELECT 
                     p.portfolio_id,
@@ -79,7 +97,7 @@ try {
                     p.latest_price_local as latest_price,
                     p.currency_local as price_currency,
                     p.current_value_sek,
-                    p.strategy_group_id,
+                    " . ($hasStrategyColumn ? "p.strategy_group_id," : "NULL as strategy_group_id,") . "
                     p.updated_at as price_updated,
                     COALESCE(s1.nameEn, s2.nameEn, 'Unknown') as sector,
                     COALESCE(s1.nameSv, s2.nameSv) as sector_sv,
