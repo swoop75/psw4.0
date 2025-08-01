@@ -443,11 +443,22 @@ ob_start();
 <script>
 console.log('Allocation page loaded');
 
-// Regional allocation chart
-<?php if (!empty($regionalAllocation)): ?>
-console.log('Creating regional chart with data:', <?php echo json_encode($regionalAllocation); ?>);
-const regionalCtx = document.getElementById('regionalChart').getContext('2d');
-const regionalChart = new Chart(regionalCtx, {
+// Wait for Chart.js to load and DOM to be ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if Chart.js is loaded
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js is not loaded');
+        return;
+    }
+    
+    console.log('Chart.js is available, creating charts...');
+
+    // Regional allocation chart
+    <?php if (!empty($regionalAllocation)): ?>
+    console.log('Creating regional chart with data:', <?php echo json_encode($regionalAllocation); ?>);
+    const regionalCtx = document.getElementById('regionalChart');
+    if (regionalCtx) {
+        const regionalChart = new Chart(regionalCtx.getContext('2d'), {
     type: 'doughnut',
     data: {
         labels: [
@@ -488,15 +499,16 @@ const regionalChart = new Chart(regionalCtx, {
                 }
             }
         }
+    });
     }
-});
-<?php endif; ?>
+    <?php endif; ?>
 
-// Sector allocation chart
-<?php if (!empty($sectorAllocation)): ?>
-console.log('Creating sector chart with data:', <?php echo json_encode($sectorAllocation); ?>);
-const sectorCtx = document.getElementById('sectorChart').getContext('2d');
-const sectorChart = new Chart(sectorCtx, {
+    // Sector allocation chart
+    <?php if (!empty($sectorAllocation)): ?>
+    console.log('Creating sector chart with data:', <?php echo json_encode($sectorAllocation); ?>);
+    const sectorCtx = document.getElementById('sectorChart');
+    if (sectorCtx) {
+        const sectorChart = new Chart(sectorCtx.getContext('2d'), {
     type: 'doughnut',
     data: {
         labels: [
@@ -538,15 +550,16 @@ const sectorChart = new Chart(sectorCtx, {
                 }
             }
         }
+    });
     }
-});
-<?php endif; ?>
+    <?php endif; ?>
 
-// Currency allocation chart
-<?php if (!empty($currencyAllocation)): ?>
-console.log('Creating currency chart with data:', <?php echo json_encode($currencyAllocation); ?>);
-const currencyCtx = document.getElementById('currencyChart').getContext('2d');
-const currencyChart = new Chart(currencyCtx, {
+    // Currency allocation chart
+    <?php if (!empty($currencyAllocation)): ?>
+    console.log('Creating currency chart with data:', <?php echo json_encode($currencyAllocation); ?>);
+    const currencyCtx = document.getElementById('currencyChart');
+    if (currencyCtx) {
+        const currencyChart = new Chart(currencyCtx.getContext('2d'), {
     type: 'pie',
     data: {
         labels: [
@@ -587,15 +600,16 @@ const currencyChart = new Chart(currencyCtx, {
                 }
             }
         }
+    });
     }
-});
-<?php endif; ?>
+    <?php endif; ?>
 
-// Position size distribution chart
-<?php if (!empty($positionSizeAllocation)): ?>
-console.log('Creating position size chart with data:', <?php echo json_encode($positionSizeAllocation); ?>);
-const positionSizeCtx = document.getElementById('positionSizeChart').getContext('2d');
-const positionSizeChart = new Chart(positionSizeCtx, {
+    // Position size distribution chart
+    <?php if (!empty($positionSizeAllocation)): ?>
+    console.log('Creating position size chart with data:', <?php echo json_encode($positionSizeAllocation); ?>);
+    const positionSizeCtx = document.getElementById('positionSizeChart');
+    if (positionSizeCtx) {
+        const positionSizeChart = new Chart(positionSizeCtx.getContext('2d'), {
     type: 'bar',
     data: {
         labels: [
@@ -641,9 +655,11 @@ const positionSizeChart = new Chart(positionSizeCtx, {
                 }
             }
         }
+    });
     }
-});
-<?php endif; ?>
+    <?php endif; ?>
+    
+}); // End DOMContentLoaded
 
 function refreshAllocation() {
     location.reload();
