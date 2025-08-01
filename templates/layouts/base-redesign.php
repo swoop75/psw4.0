@@ -148,6 +148,9 @@ $userTheme = $_SESSION['user_theme'] ?? 'light';
                                     <i class="fas fa-chevron-down psw-nav-expand"></i>
                                 </a>
                                 <div class="psw-nav-submenu">
+                                    <a href="<?php echo BASE_URL; ?>/dashboard.php" class="psw-nav-submenu-link <?php echo (basename($_SERVER['PHP_SELF']) == 'dashboard.php') ? 'active' : ''; ?>">
+                                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                                    </a>
                                     <a href="<?php echo BASE_URL; ?>/portfolio_overview.php" class="psw-nav-submenu-link <?php echo (basename($_SERVER['PHP_SELF']) == 'portfolio_overview.php') ? 'active' : ''; ?>">
                                         <i class="fas fa-eye"></i> Overview
                                     </a>
