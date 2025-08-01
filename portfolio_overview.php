@@ -26,7 +26,7 @@ try {
                 ml.name as company_name,
                 ml.country,
                 COALESCE(s1.name, s2.name, 'Unknown') as sector,
-                ml.currency as base_currency,
+                COALESCE(ni.stockPriceCurrency, gi.stockPriceCurrency, p.currency_local) as base_currency,
                 
                 -- Try to get latest price from global prices first, then nordic
                 COALESCE(glp.price, nlp.price) as latest_price,
