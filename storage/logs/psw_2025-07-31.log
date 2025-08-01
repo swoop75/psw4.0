@@ -163,3 +163,12 @@
 {"timestamp":"2025-07-31 22:18:27","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"Monthly trends found: 6"}
 {"timestamp":"2025-07-31 22:18:27","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"Insights total payments: 11"}
 {"timestamp":"2025-07-31 22:18:27","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"User action: dashboard_viewed","context":{"action":"dashboard_viewed","details":"User accessed redesigned dashboard","user_id":1}}
+{"timestamp":"2025-07-31 22:44:30","level":"DEBUG","user_id":1,"ip":"100.120.9.63","message":"Calculated portfolio summary from dividend data","context":{"estimated_value":null,"ytd_dividends":null,"unique_companies":null}}
+{"timestamp":"2025-07-31 22:44:30","level":"DEBUG","user_id":1,"ip":"100.120.9.63","message":"Retrieved recent dividends from database","context":{"count":10,"limit":10,"user_id":1,"is_admin":true}}
+{"timestamp":"2025-07-31 22:44:30","level":"DEBUG","user_id":1,"ip":"100.120.9.63","message":"Calculated country allocation from dividend data","context":{"countries":0,"total_dividends":0}}
+{"timestamp":"2025-07-31 22:44:30","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"Total dividend records: 11"}
+{"timestamp":"2025-07-31 22:44:30","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"Top payers found: 5"}
+{"timestamp":"2025-07-31 22:44:30","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"Best days found: 5"}
+{"timestamp":"2025-07-31 22:44:30","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"Monthly trends found: 6"}
+{"timestamp":"2025-07-31 22:44:30","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"Insights total payments: 11"}
+{"timestamp":"2025-07-31 22:44:30","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"User action: dashboard_viewed","context":{"action":"dashboard_viewed","details":"User accessed redesigned dashboard","user_id":1}}
