@@ -20,22 +20,22 @@ try {
     $foundationDb = Database::getConnection('foundation');
     $marketDb = Database::getConnection('marketdata');
     
-    // Get portfolio holdings with current market data
-    $sql = "SELECT DISTINCT
+    // Get portfolio holdings with current market data (simplified to avoid duplicates)
+    $sql = "SELECT 
                 p.*,
                 ml.name as company_name,
                 ml.country,
                 'Unknown' as sector,
-                COALESCE(ni.stockPriceCurrency, gi.stockPriceCurrency, p.currency_local) as base_currency,
+                p.currency_local as base_currency,
                 
                 -- Use portfolio data with correct column names
                 p.latest_price_local as latest_price,
                 p.currency_local as price_currency,
                 p.updated_at as price_updated,
                 
-                -- FX rate for conversion to SEK (using correct column names)
-                fx.exchange_rate as fx_rate,
-                fx.updated_at as fx_updated,
+                -- FX rate placeholder (will be NULL for now)
+                NULL as fx_rate,
+                NULL as fx_updated,
                 
                 -- Use existing calculated values from portfolio table
                 p.current_value_local as calculated_value_local,
@@ -43,9 +43,6 @@ try {
                 
             FROM psw_portfolio.portfolio p
             LEFT JOIN psw_foundation.masterlist ml ON p.isin COLLATE utf8mb4_unicode_ci = ml.isin COLLATE utf8mb4_unicode_ci
-            LEFT JOIN psw_marketdata.nordic_instruments ni ON p.isin COLLATE utf8mb4_unicode_ci = ni.isin COLLATE utf8mb4_unicode_ci
-            LEFT JOIN psw_marketdata.global_instruments gi ON p.isin COLLATE utf8mb4_unicode_ci = gi.isin COLLATE utf8mb4_unicode_ci
-            LEFT JOIN psw_marketdata.fx_rates_freecurrency fx ON p.currency_local COLLATE utf8mb4_unicode_ci = fx.base_currency COLLATE utf8mb4_unicode_ci AND fx.target_currency = 'SEK'
             WHERE p.is_active = 1 AND p.shares_held > 0
             ORDER BY p.current_value_sek DESC";
     
