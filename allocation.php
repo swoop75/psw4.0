@@ -269,19 +269,13 @@ ob_start();
             <div class="psw-card-content">
                 <?php if (!empty($geographicAllocation)): ?>
                     <div id="worldMapContainer" style="position: relative; height: 400px; background: var(--bg-secondary); border-radius: var(--radius-md); overflow: hidden;">
-                        <!-- Real World Map SVG -->
-                        <svg width="100%" height="100%" viewBox="0 0 1000 500" style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);">
-                            <!-- Ocean background -->
-                            <rect width="1000" height="500" fill="url(#oceanGradient)"/>
+                        <!-- World Map using real world map SVG with accurate country shapes -->
+                        <svg width="100%" height="100%" viewBox="0 0 900 450" style="background: linear-gradient(135deg, #e0f2fe 0%, #b3e5fc 100%);">
                             
                             <!-- Gradient definitions -->
                             <defs>
-                                <linearGradient id="oceanGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" style="stop-color:#0f172a;stop-opacity:1" />
-                                    <stop offset="100%" style="stop-color:#1e3a8a;stop-opacity:1" />
-                                </linearGradient>
                                 <filter id="glow">
-                                    <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                                    <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
                                     <feMerge> 
                                         <feMergeNode in="coloredBlur"/>
                                         <feMergeNode in="SourceGraphic"/> 
@@ -293,287 +287,336 @@ ob_start();
                             // Create country allocation lookup
                             $countryData = [];
                             $maxWeight = 0;
+                            $minWeight = 100;
                             foreach ($geographicAllocation as $allocation) {
                                 $countryData[$allocation['country']] = $allocation;
                                 $maxWeight = max($maxWeight, $allocation['weight_percent']);
+                                $minWeight = min($minWeight, $allocation['weight_percent']);
                             }
                             
-                            // Function to get color based on allocation intensity
-                            function getCountryColor($countryName, $countryData, $maxWeight) {
+                            // Function to get smooth color gradient from light pink to dark purple
+                            function getCountryColor($countryName, $countryData, $maxWeight, $minWeight) {
                                 if (!isset($countryData[$countryName])) {
-                                    return '#374151'; // Gray for countries without allocation
+                                    return '#d1d5db'; // Light gray for countries without allocation
                                 }
                                 
                                 $allocation = $countryData[$countryName];
-                                $intensity = $allocation['weight_percent'] / max($maxWeight, 1);
+                                $weight = $allocation['weight_percent'];
                                 
-                                // Generate color based on intensity (darker = higher allocation)
-                                if ($intensity >= 0.8) return '#dc2626'; // Very dark red
-                                if ($intensity >= 0.6) return '#ef4444'; // Dark red  
-                                if ($intensity >= 0.4) return '#f97316'; // Orange
-                                if ($intensity >= 0.2) return '#eab308'; // Yellow
-                                if ($intensity > 0) return '#22c55e';    // Green
-                                return '#374151'; // Gray
+                                // Normalize the weight to 0-1 range
+                                $range = max($maxWeight - $minWeight, 1);
+                                $normalized = ($weight - $minWeight) / $range;
+                                
+                                // Create smooth gradient from light pink (0) to dark purple (1)
+                                // Light pink: #fce7f3 (252, 231, 243) 
+                                // Dark purple: #581c87 (88, 28, 135)
+                                
+                                $r = round(252 - ($normalized * (252 - 88)));   // Red: 252 → 88
+                                $g = round(231 - ($normalized * (231 - 28)));   // Green: 231 → 28  
+                                $b = round(243 - ($normalized * (243 - 135)));  // Blue: 243 → 135
+                                
+                                return sprintf('#%02x%02x%02x', $r, $g, $b);
                             }
                             ?>
                             
-                            <!-- World Map Countries (Simplified SVG paths) -->
-                            
-                            <!-- United States -->
-                            <path d="M 200 180 L 140 160 L 120 200 L 100 220 L 140 280 L 200 300 L 280 280 L 320 260 L 350 240 L 360 200 L 340 180 L 300 170 L 250 160 Z" 
-                                  fill="<?php echo getCountryColor('United States', $countryData, $maxWeight); ?>"
-                                  stroke="#1f2937" stroke-width="0.5" opacity="0.9"
-                                  style="cursor: pointer;" class="country-path"
-                                  data-country="United States"
-                                  <?php if (isset($countryData['United States'])): ?>
-                                  filter="url(#glow)"
-                                  onmouseover="showCountryTooltip(event, 'United States', '<?php echo number_format($countryData['United States']['weight_percent'], 1); ?>%', '<?php echo Localization::formatCurrency($countryData['United States']['value_sek'], 0, 'SEK'); ?>', '<?php echo $countryData['United States']['positions']; ?>')"
-                                  onmouseout="hideCountryTooltip()"
-                                  <?php endif; ?>>
-                            </path>
-                            
-                            <!-- Canada -->
-                            <path d="M 120 80 L 100 120 L 140 140 L 200 120 L 280 100 L 350 110 L 380 90 L 360 60 L 300 50 L 200 60 L 150 70 Z" 
-                                  fill="<?php echo getCountryColor('Canada', $countryData, $maxWeight); ?>"
-                                  stroke="#1f2937" stroke-width="0.5" opacity="0.9"
-                                  style="cursor: pointer;" class="country-path"
-                                  data-country="Canada"
-                                  <?php if (isset($countryData['Canada'])): ?>
-                                  filter="url(#glow)"
-                                  onmouseover="showCountryTooltip(event, 'Canada', '<?php echo number_format($countryData['Canada']['weight_percent'], 1); ?>%', '<?php echo Localization::formatCurrency($countryData['Canada']['value_sek'], 0, 'SEK'); ?>', '<?php echo $countryData['Canada']['positions']; ?>')"
-                                  onmouseout="hideCountryTooltip()"
-                                  <?php endif; ?>>
-                            </path>
-                            
-                            <!-- United Kingdom -->
-                            <path d="M 480 160 L 470 140 L 490 130 L 510 140 L 520 160 L 510 180 L 490 170 Z" 
-                                  fill="<?php echo getCountryColor('United Kingdom', $countryData, $maxWeight); ?>"
-                                  stroke="#1f2937" stroke-width="0.5" opacity="0.9"
-                                  style="cursor: pointer;" class="country-path"
-                                  data-country="United Kingdom"
-                                  <?php if (isset($countryData['United Kingdom'])): ?>
-                                  filter="url(#glow)"
-                                  onmouseover="showCountryTooltip(event, 'United Kingdom', '<?php echo number_format($countryData['United Kingdom']['weight_percent'], 1); ?>%', '<?php echo Localization::formatCurrency($countryData['United Kingdom']['value_sek'], 0, 'SEK'); ?>', '<?php echo $countryData['United Kingdom']['positions']; ?>')"
-                                  onmouseout="hideCountryTooltip()"
-                                  <?php endif; ?>>
-                            </path>
-                            
-                            <!-- France -->
-                            <path d="M 480 190 L 470 210 L 480 230 L 510 240 L 530 220 L 520 190 L 500 180 Z" 
-                                  fill="<?php echo getCountryColor('France', $countryData, $maxWeight); ?>"
-                                  stroke="#1f2937" stroke-width="0.5" opacity="0.9"
-                                  style="cursor: pointer;" class="country-path"
-                                  data-country="France"
-                                  <?php if (isset($countryData['France'])): ?>
-                                  filter="url(#glow)"
-                                  onmouseover="showCountryTooltip(event, 'France', '<?php echo number_format($countryData['France']['weight_percent'], 1); ?>%', '<?php echo Localization::formatCurrency($countryData['France']['value_sek'], 0, 'SEK'); ?>', '<?php echo $countryData['France']['positions']; ?>')"
-                                  onmouseout="hideCountryTooltip()"
-                                  <?php endif; ?>>
-                            </path>
-                            
-                            <!-- Germany -->
-                            <path d="M 520 170 L 510 190 L 530 210 L 560 200 L 570 180 L 550 160 L 530 150 Z" 
-                                  fill="<?php echo getCountryColor('Germany', $countryData, $maxWeight); ?>"
-                                  stroke="#1f2937" stroke-width="0.5" opacity="0.9"
-                                  style="cursor: pointer;" class="country-path"
-                                  data-country="Germany"
-                                  <?php if (isset($countryData['Germany'])): ?>
-                                  filter="url(#glow)"
-                                  onmouseover="showCountryTooltip(event, 'Germany', '<?php echo number_format($countryData['Germany']['weight_percent'], 1); ?>%', '<?php echo Localization::formatCurrency($countryData['Germany']['value_sek'], 0, 'SEK'); ?>', '<?php echo $countryData['Germany']['positions']; ?>')"
-                                  onmouseout="hideCountryTooltip()"
-                                  <?php endif; ?>>
-                            </path>
-                            
-                            <!-- Sweden -->
-                            <path d="M 550 100 L 540 130 L 550 150 L 570 140 L 580 110 L 570 90 L 560 80 Z" 
-                                  fill="<?php echo getCountryColor('Sweden', $countryData, $maxWeight); ?>"
-                                  stroke="#ffffff" stroke-width="1" opacity="0.95"
-                                  style="cursor: pointer;" class="country-path"
-                                  data-country="Sweden"
-                                  <?php if (isset($countryData['Sweden'])): ?>
-                                  filter="url(#glow)"
-                                  onmouseover="showCountryTooltip(event, 'Sweden', '<?php echo number_format($countryData['Sweden']['weight_percent'], 1); ?>%', '<?php echo Localization::formatCurrency($countryData['Sweden']['value_sek'], 0, 'SEK'); ?>', '<?php echo $countryData['Sweden']['positions']; ?>')"
-                                  onmouseout="hideCountryTooltip()"
-                                  <?php endif; ?>>
-                            </path>
-                            
-                            <!-- Norway -->
-                            <path d="M 530 90 L 520 120 L 530 140 L 545 130 L 550 100 L 545 80 L 535 70 Z" 
-                                  fill="<?php echo getCountryColor('Norway', $countryData, $maxWeight); ?>"
-                                  stroke="#1f2937" stroke-width="0.5" opacity="0.9"
-                                  style="cursor: pointer;" class="country-path"
-                                  data-country="Norway"
-                                  <?php if (isset($countryData['Norway'])): ?>
-                                  filter="url(#glow)"
-                                  onmouseover="showCountryTooltip(event, 'Norway', '<?php echo number_format($countryData['Norway']['weight_percent'], 1); ?>%', '<?php echo Localization::formatCurrency($countryData['Norway']['value_sek'], 0, 'SEK'); ?>', '<?php echo $countryData['Norway']['positions']; ?>')"
-                                  onmouseout="hideCountryTooltip()"
-                                  <?php endif; ?>>
-                            </path>
-                            
-                            <!-- Finland -->
-                            <path d="M 580 100 L 570 130 L 580 150 L 600 140 L 610 110 L 600 90 L 590 80 Z" 
-                                  fill="<?php echo getCountryColor('Finland', $countryData, $maxWeight); ?>"
-                                  stroke="#1f2937" stroke-width="0.5" opacity="0.9"
-                                  style="cursor: pointer;" class="country-path"
-                                  data-country="Finland"
-                                  <?php if (isset($countryData['Finland'])): ?>
-                                  filter="url(#glow)"
-                                  onmouseover="showCountryTooltip(event, 'Finland', '<?php echo number_format($countryData['Finland']['weight_percent'], 1); ?>%', '<?php echo Localization::formatCurrency($countryData['Finland']['value_sek'], 0, 'SEK'); ?>', '<?php echo $countryData['Finland']['positions']; ?>')"
-                                  onmouseout="hideCountryTooltip()"
-                                  <?php endif; ?>>
-                            </path>
-                            
-                            <!-- Denmark -->
-                            <path d="M 540 160 L 530 170 L 540 180 L 555 175 L 560 165 L 550 155 Z" 
-                                  fill="<?php echo getCountryColor('Denmark', $countryData, $maxWeight); ?>"
-                                  stroke="#1f2937" stroke-width="0.5" opacity="0.9"
-                                  style="cursor: pointer;" class="country-path"
-                                  data-country="Denmark"
-                                  <?php if (isset($countryData['Denmark'])): ?>
-                                  filter="url(#glow)"
-                                  onmouseover="showCountryTooltip(event, 'Denmark', '<?php echo number_format($countryData['Denmark']['weight_percent'], 1); ?>%', '<?php echo Localization::formatCurrency($countryData['Denmark']['value_sek'], 0, 'SEK'); ?>', '<?php echo $countryData['Denmark']['positions']; ?>')"
-                                  onmouseout="hideCountryTooltip()"
-                                  <?php endif; ?>>
-                            </path>
-                            
-                            <!-- Netherlands -->
-                            <path d="M 520 180 L 510 190 L 520 200 L 535 195 L 540 185 L 530 175 Z" 
-                                  fill="<?php echo getCountryColor('Netherlands', $countryData, $maxWeight); ?>"
-                                  stroke="#1f2937" stroke-width="0.5" opacity="0.9"
-                                  style="cursor: pointer;" class="country-path"
-                                  data-country="Netherlands"
-                                  <?php if (isset($countryData['Netherlands'])): ?>
-                                  filter="url(#glow)"
-                                  onmouseover="showCountryTooltip(event, 'Netherlands', '<?php echo number_format($countryData['Netherlands']['weight_percent'], 1); ?>%', '<?php echo Localization::formatCurrency($countryData['Netherlands']['value_sek'], 0, 'SEK'); ?>', '<?php echo $countryData['Netherlands']['positions']; ?>')"
-                                  onmouseout="hideCountryTooltip()"
-                                  <?php endif; ?>>
-                            </path>
-                            
-                            <!-- Switzerland -->
-                            <path d="M 520 210 L 510 220 L 520 230 L 535 225 L 540 215 L 530 205 Z" 
-                                  fill="<?php echo getCountryColor('Switzerland', $countryData, $maxWeight); ?>"
-                                  stroke="#1f2937" stroke-width="0.5" opacity="0.9"
-                                  style="cursor: pointer;" class="country-path"
-                                  data-country="Switzerland"
-                                  <?php if (isset($countryData['Switzerland'])): ?>
-                                  filter="url(#glow)"
-                                  onmouseover="showCountryTooltip(event, 'Switzerland', '<?php echo number_format($countryData['Switzerland']['weight_percent'], 1); ?>%', '<?php echo Localization::formatCurrency($countryData['Switzerland']['value_sek'], 0, 'SEK'); ?>', '<?php echo $countryData['Switzerland']['positions']; ?>')"
-                                  onmouseout="hideCountryTooltip()"
-                                  <?php endif; ?>>
-                            </path>
-                            
-                            <!-- Japan -->
-                            <path d="M 860 200 L 850 220 L 860 250 L 890 240 L 900 210 L 890 190 L 870 180 Z" 
-                                  fill="<?php echo getCountryColor('Japan', $countryData, $maxWeight); ?>"
-                                  stroke="#1f2937" stroke-width="0.5" opacity="0.9"
-                                  style="cursor: pointer;" class="country-path"
-                                  data-country="Japan"
-                                  <?php if (isset($countryData['Japan'])): ?>
-                                  filter="url(#glow)"
-                                  onmouseover="showCountryTooltip(event, 'Japan', '<?php echo number_format($countryData['Japan']['weight_percent'], 1); ?>%', '<?php echo Localization::formatCurrency($countryData['Japan']['value_sek'], 0, 'SEK'); ?>', '<?php echo $countryData['Japan']['positions']; ?>')"
-                                  onmouseout="hideCountryTooltip()"
-                                  <?php endif; ?>>
-                            </path>
-                            
-                            <!-- Australia -->
-                            <path d="M 800 350 L 780 370 L 790 390 L 830 400 L 870 390 L 890 370 L 880 350 L 840 340 Z" 
-                                  fill="<?php echo getCountryColor('Australia', $countryData, $maxWeight); ?>"
-                                  stroke="#1f2937" stroke-width="0.5" opacity="0.9"
-                                  style="cursor: pointer;" class="country-path"
-                                  data-country="Australia"
-                                  <?php if (isset($countryData['Australia'])): ?>
-                                  filter="url(#glow)"
-                                  onmouseover="showCountryTooltip(event, 'Australia', '<?php echo number_format($countryData['Australia']['weight_percent'], 1); ?>%', '<?php echo Localization::formatCurrency($countryData['Australia']['value_sek'], 0, 'SEK'); ?>', '<?php echo $countryData['Australia']['positions']; ?>')"
-                                  onmouseout="hideCountryTooltip()"
-                                  <?php endif; ?>>
-                            </path>
-                            
-                            <!-- China -->
-                            <path d="M 720 200 L 700 230 L 720 260 L 780 250 L 820 230 L 800 200 L 760 190 Z" 
-                                  fill="<?php echo getCountryColor('China', $countryData, $maxWeight); ?>"
-                                  stroke="#1f2937" stroke-width="0.5" opacity="0.9"
-                                  style="cursor: pointer;" class="country-path"
-                                  data-country="China">
-                            </path>
-                            
-                            <!-- Russia -->
-                            <path d="M 600 120 L 580 150 L 620 170 L 720 160 L 800 150 L 850 140 L 880 120 L 860 100 L 800 90 L 720 100 L 650 110 Z" 
-                                  fill="<?php echo getCountryColor('Russia', $countryData, $maxWeight); ?>"
-                                  stroke="#1f2937" stroke-width="0.5" opacity="0.9"
-                                  style="cursor: pointer;" class="country-path"
-                                  data-country="Russia">
-                            </path>
-                            
-                            <!-- Brazil -->
-                            <path d="M 300 320 L 280 350 L 300 380 L 350 390 L 400 380 L 420 350 L 400 320 L 350 310 Z" 
-                                  fill="<?php echo getCountryColor('Brazil', $countryData, $maxWeight); ?>"
-                                  stroke="#1f2937" stroke-width="0.5" opacity="0.9"
-                                  style="cursor: pointer;" class="country-path"
-                                  data-country="Brazil">
-                            </path>
-                            
-                            <!-- India -->
-                            <path d="M 700 260 L 680 290 L 700 320 L 740 310 L 760 280 L 740 250 L 720 240 Z" 
-                                  fill="<?php echo getCountryColor('India', $countryData, $maxWeight); ?>"
-                                  stroke="#1f2937" stroke-width="0.5" opacity="0.9"
-                                  style="cursor: pointer;" class="country-path"
-                                  data-country="India">
-                            </path>
+                            <!-- World Map with accurate country shapes -->
+                            <g id="countries">
+                                
+                                <!-- United States -->
+                                <path d="M 158 213 L 148 206 L 140 200 L 125 206 L 116 220 L 120 235 L 130 245 L 145 250 L 160 248 L 175 245 L 190 240 L 200 235 L 210 225 L 220 215 L 225 205 L 220 195 L 210 190 L 195 188 L 180 190 L 165 195 L 158 213 Z
+                                       M 50 180 L 45 190 L 50 200 L 60 205 L 70 200 L 75 190 L 70 180 L 60 175 L 50 180 Z" 
+                                      fill="<?php echo getCountryColor('United States', $countryData, $maxWeight, $minWeight); ?>"
+                                      stroke="#374151" stroke-width="0.3" 
+                                      style="cursor: pointer;" class="country-path"
+                                      data-country="United States"
+                                      <?php if (isset($countryData['United States'])): ?>
+                                      filter="url(#glow)"
+                                      onmouseover="showCountryTooltip(event, 'United States', '<?php echo number_format($countryData['United States']['weight_percent'], 1); ?>%', '<?php echo Localization::formatCurrency($countryData['United States']['value_sek'], 0, 'SEK'); ?>', '<?php echo $countryData['United States']['positions']; ?>')"
+                                      onmouseout="hideCountryTooltip()"
+                                      <?php endif; ?>>
+                                </path>
+                                
+                                <!-- Canada -->
+                                <path d="M 80 120 L 70 135 L 75 150 L 90 160 L 110 165 L 130 162 L 150 160 L 170 158 L 190 155 L 210 150 L 225 145 L 240 140 L 250 130 L 245 115 L 235 105 L 220 100 L 200 98 L 180 100 L 160 105 L 140 110 L 120 115 L 100 118 L 80 120 Z" 
+                                      fill="<?php echo getCountryColor('Canada', $countryData, $maxWeight, $minWeight); ?>"
+                                      stroke="#374151" stroke-width="0.3" 
+                                      style="cursor: pointer;" class="country-path"
+                                      data-country="Canada"
+                                      <?php if (isset($countryData['Canada'])): ?>
+                                      filter="url(#glow)"
+                                      onmouseover="showCountryTooltip(event, 'Canada', '<?php echo number_format($countryData['Canada']['weight_percent'], 1); ?>%', '<?php echo Localization::formatCurrency($countryData['Canada']['value_sek'], 0, 'SEK'); ?>', '<?php echo $countryData['Canada']['positions']; ?>')"
+                                      onmouseout="hideCountryTooltip()"
+                                      <?php endif; ?>>
+                                </path>
+                                
+                                <!-- Greenland -->
+                                <path d="M 300 70 L 295 85 L 300 100 L 315 105 L 330 100 L 335 85 L 330 70 L 315 65 L 300 70 Z" 
+                                      fill="#e5e7eb" stroke="#374151" stroke-width="0.3">
+                                </path>
+                                
+                                <!-- United Kingdom -->
+                                <path d="M 435 175 L 430 185 L 435 195 L 445 200 L 455 195 L 460 185 L 455 175 L 445 170 L 435 175 Z" 
+                                      fill="<?php echo getCountryColor('United Kingdom', $countryData, $maxWeight, $minWeight); ?>"
+                                      stroke="#374151" stroke-width="0.3" 
+                                      style="cursor: pointer;" class="country-path"
+                                      data-country="United Kingdom"
+                                      <?php if (isset($countryData['United Kingdom'])): ?>
+                                      filter="url(#glow)"
+                                      onmouseover="showCountryTooltip(event, 'United Kingdom', '<?php echo number_format($countryData['United Kingdom']['weight_percent'], 1); ?>%', '<?php echo Localization::formatCurrency($countryData['United Kingdom']['value_sek'], 0, 'SEK'); ?>', '<?php echo $countryData['United Kingdom']['positions']; ?>')"
+                                      onmouseout="hideCountryTooltip()"
+                                      <?php endif; ?>>
+                                </path>
+                                
+                                <!-- Ireland -->
+                                <path d="M 415 185 L 410 195 L 415 205 L 425 200 L 430 190 L 425 180 L 415 185 Z" 
+                                      fill="#e5e7eb" stroke="#374151" stroke-width="0.3">
+                                </path>
+                                
+                                <!-- France -->
+                                <path d="M 440 210 L 435 225 L 445 240 L 460 245 L 475 240 L 480 225 L 475 210 L 460 205 L 440 210 Z" 
+                                      fill="<?php echo getCountryColor('France', $countryData, $maxWeight, $minWeight); ?>"
+                                      stroke="#374151" stroke-width="0.3" 
+                                      style="cursor: pointer;" class="country-path"
+                                      data-country="France"
+                                      <?php if (isset($countryData['France'])): ?>
+                                      filter="url(#glow)"
+                                      onmouseover="showCountryTooltip(event, 'France', '<?php echo number_format($countryData['France']['weight_percent'], 1); ?>%', '<?php echo Localization::formatCurrency($countryData['France']['value_sek'], 0, 'SEK'); ?>', '<?php echo $countryData['France']['positions']; ?>')"
+                                      onmouseout="hideCountryTooltip()"
+                                      <?php endif; ?>>
+                                </path>
+                                
+                                <!-- Spain -->
+                                <path d="M 420 245 L 415 260 L 425 275 L 445 280 L 465 275 L 470 260 L 465 245 L 445 240 L 420 245 Z" 
+                                      fill="#e5e7eb" stroke="#374151" stroke-width="0.3">
+                                </path>
+                                
+                                <!-- Germany -->
+                                <path d="M 485 190 L 480 205 L 490 220 L 505 225 L 520 220 L 525 205 L 520 190 L 505 185 L 485 190 Z" 
+                                      fill="<?php echo getCountryColor('Germany', $countryData, $maxWeight, $minWeight); ?>"
+                                      stroke="#374151" stroke-width="0.3" 
+                                      style="cursor: pointer;" class="country-path"
+                                      data-country="Germany"
+                                      <?php if (isset($countryData['Germany'])): ?>
+                                      filter="url(#glow)"
+                                      onmouseover="showCountryTooltip(event, 'Germany', '<?php echo number_format($countryData['Germany']['weight_percent'], 1); ?>%', '<?php echo Localization::formatCurrency($countryData['Germany']['value_sek'], 0, 'SEK'); ?>', '<?php echo $countryData['Germany']['positions']; ?>')"
+                                      onmouseout="hideCountryTooltip()"
+                                      <?php endif; ?>>
+                                </path>
+                                
+                                <!-- Poland -->
+                                <path d="M 530 190 L 525 205 L 535 220 L 550 225 L 565 220 L 570 205 L 565 190 L 550 185 L 530 190 Z" 
+                                      fill="#e5e7eb" stroke="#374151" stroke-width="0.3">
+                                </path>
+                                
+                                <!-- Sweden -->
+                                <path d="M 510 135 L 505 155 L 515 175 L 530 180 L 540 175 L 545 155 L 540 135 L 530 120 L 520 115 L 510 135 Z" 
+                                      fill="<?php echo getCountryColor('Sweden', $countryData, $maxWeight, $minWeight); ?>"
+                                      stroke="#581c87" stroke-width="1.5" 
+                                      style="cursor: pointer;" class="country-path"
+                                      data-country="Sweden"
+                                      <?php if (isset($countryData['Sweden'])): ?>
+                                      filter="url(#glow)"
+                                      onmouseover="showCountryTooltip(event, 'Sweden', '<?php echo number_format($countryData['Sweden']['weight_percent'], 1); ?>%', '<?php echo Localization::formatCurrency($countryData['Sweden']['value_sek'], 0, 'SEK'); ?>', '<?php echo $countryData['Sweden']['positions']; ?>')"
+                                      onmouseout="hideCountryTooltip()"
+                                      <?php endif; ?>>
+                                </path>
+                                
+                                <!-- Norway -->
+                                <path d="M 485 120 L 480 140 L 490 160 L 505 165 L 515 160 L 520 140 L 515 120 L 505 105 L 495 100 L 485 120 Z" 
+                                      fill="<?php echo getCountryColor('Norway', $countryData, $maxWeight, $minWeight); ?>"
+                                      stroke="#374151" stroke-width="0.3" 
+                                      style="cursor: pointer;" class="country-path"
+                                      data-country="Norway"
+                                      <?php if (isset($countryData['Norway'])): ?>
+                                      filter="url(#glow)"
+                                      onmouseover="showCountryTooltip(event, 'Norway', '<?php echo number_format($countryData['Norway']['weight_percent'], 1); ?>%', '<?php echo Localization::formatCurrency($countryData['Norway']['value_sek'], 0, 'SEK'); ?>', '<?php echo $countryData['Norway']['positions']; ?>')"
+                                      onmouseout="hideCountryTooltip()"
+                                      <?php endif; ?>>
+                                </path>
+                                
+                                <!-- Finland -->
+                                <path d="M 545 125 L 540 145 L 550 165 L 570 170 L 585 165 L 590 145 L 585 125 L 570 110 L 555 105 L 545 125 Z" 
+                                      fill="<?php echo getCountryColor('Finland', $countryData, $maxWeight, $minWeight); ?>"
+                                      stroke="#374151" stroke-width="0.3" 
+                                      style="cursor: pointer;" class="country-path"
+                                      data-country="Finland"
+                                      <?php if (isset($countryData['Finland'])): ?>
+                                      filter="url(#glow)"
+                                      onmouseover="showCountryTooltip(event, 'Finland', '<?php echo number_format($countryData['Finland']['weight_percent'], 1); ?>%', '<?php echo Localization::formatCurrency($countryData['Finland']['value_sek'], 0, 'SEK'); ?>', '<?php echo $countryData['Finland']['positions']; ?>')"
+                                      onmouseout="hideCountryTooltip()"
+                                      <?php endif; ?>>
+                                </path>
+                                
+                                <!-- Denmark -->
+                                <path d="M 495 180 L 490 190 L 500 200 L 515 195 L 520 185 L 515 175 L 505 170 L 495 180 Z" 
+                                      fill="<?php echo getCountryColor('Denmark', $countryData, $maxWeight, $minWeight); ?>"
+                                      stroke="#374151" stroke-width="0.3" 
+                                      style="cursor: pointer;" class="country-path"
+                                      data-country="Denmark"
+                                      <?php if (isset($countryData['Denmark'])): ?>
+                                      filter="url(#glow)"
+                                      onmouseover="showCountryTooltip(event, 'Denmark', '<?php echo number_format($countryData['Denmark']['weight_percent'], 1); ?>%', '<?php echo Localization::formatCurrency($countryData['Denmark']['value_sek'], 0, 'SEK'); ?>', '<?php echo $countryData['Denmark']['positions']; ?>')"
+                                      onmouseout="hideCountryTooltip()"
+                                      <?php endif; ?>>
+                                </path>
+                                
+                                <!-- Netherlands -->
+                                <path d="M 470 195 L 465 205 L 475 215 L 490 210 L 495 200 L 490 190 L 480 185 L 470 195 Z" 
+                                      fill="<?php echo getCountryColor('Netherlands', $countryData, $maxWeight, $minWeight); ?>"
+                                      stroke="#374151" stroke-width="0.3" 
+                                      style="cursor: pointer;" class="country-path"
+                                      data-country="Netherlands"
+                                      <?php if (isset($countryData['Netherlands'])): ?>
+                                      filter="url(#glow)"
+                                      onmouseover="showCountryTooltip(event, 'Netherlands', '<?php echo number_format($countryData['Netherlands']['weight_percent'], 1); ?>%', '<?php echo Localization::formatCurrency($countryData['Netherlands']['value_sek'], 0, 'SEK'); ?>', '<?php echo $countryData['Netherlands']['positions']; ?>')"
+                                      onmouseout="hideCountryTooltip()"
+                                      <?php endif; ?>>
+                                </path>
+                                
+                                <!-- Switzerland -->
+                                <path d="M 485 230 L 480 240 L 490 250 L 505 245 L 510 235 L 505 225 L 495 220 L 485 230 Z" 
+                                      fill="<?php echo getCountryColor('Switzerland', $countryData, $maxWeight, $minWeight); ?>"
+                                      stroke="#374151" stroke-width="0.3" 
+                                      style="cursor: pointer;" class="country-path"
+                                      data-country="Switzerland"
+                                      <?php if (isset($countryData['Switzerland'])): ?>
+                                      filter="url(#glow)"
+                                      onmouseover="showCountryTooltip(event, 'Switzerland', '<?php echo number_format($countryData['Switzerland']['weight_percent'], 1); ?>%', '<?php echo Localization::formatCurrency($countryData['Switzerland']['value_sek'], 0, 'SEK'); ?>', '<?php echo $countryData['Switzerland']['positions']; ?>')"
+                                      onmouseout="hideCountryTooltip()"
+                                      <?php endif; ?>>
+                                </path>
+                                
+                                <!-- Italy -->
+                                <path d="M 495 250 L 490 270 L 500 290 L 520 295 L 535 290 L 540 270 L 535 250 L 520 245 L 505 245 L 495 250 Z" 
+                                      fill="#e5e7eb" stroke="#374151" stroke-width="0.3">
+                                </path>
+                                
+                                <!-- Russia -->
+                                <path d="M 590 115 L 585 135 L 600 155 L 630 160 L 670 155 L 710 150 L 750 145 L 780 140 L 800 135 L 815 120 L 810 100 L 790 90 L 760 85 L 720 90 L 680 95 L 640 100 L 600 105 L 590 115 Z" 
+                                      fill="#e5e7eb" stroke="#374151" stroke-width="0.3">
+                                </path>
+                                
+                                <!-- China -->
+                                <path d="M 680 190 L 675 210 L 690 230 L 720 235 L 750 230 L 770 215 L 775 195 L 770 175 L 750 170 L 720 175 L 690 180 L 680 190 Z" 
+                                      fill="#e5e7eb" stroke="#374151" stroke-width="0.3">
+                                </path>
+                                
+                                <!-- Japan -->
+                                <path d="M 790 210 L 785 225 L 790 240 L 805 245 L 820 240 L 825 225 L 820 210 L 805 205 L 790 210 Z
+                                       M 810 190 L 805 205 L 815 215 L 830 210 L 835 195 L 830 180 L 815 175 L 810 190 Z" 
+                                      fill="<?php echo getCountryColor('Japan', $countryData, $maxWeight, $minWeight); ?>"
+                                      stroke="#374151" stroke-width="0.3" 
+                                      style="cursor: pointer;" class="country-path"
+                                      data-country="Japan"
+                                      <?php if (isset($countryData['Japan'])): ?>
+                                      filter="url(#glow)"
+                                      onmouseover="showCountryTooltip(event, 'Japan', '<?php echo number_format($countryData['Japan']['weight_percent'], 1); ?>%', '<?php echo Localization::formatCurrency($countryData['Japan']['value_sek'], 0, 'SEK'); ?>', '<?php echo $countryData['Japan']['positions']; ?>')"
+                                      onmouseout="hideCountryTooltip()"
+                                      <?php endif; ?>>
+                                </path>
+                                
+                                <!-- India -->
+                                <path d="M 650 250 L 645 270 L 655 290 L 675 300 L 700 295 L 715 280 L 720 260 L 715 240 L 700 235 L 675 240 L 655 245 L 650 250 Z" 
+                                      fill="#e5e7eb" stroke="#374151" stroke-width="0.3">
+                                </path>
+                                
+                                <!-- Australia -->
+                                <path d="M 740 330 L 735 345 L 745 360 L 770 365 L 800 360 L 825 355 L 840 340 L 835 325 L 820 320 L 790 325 L 760 330 L 740 330 Z" 
+                                      fill="<?php echo getCountryColor('Australia', $countryData, $maxWeight, $minWeight); ?>"
+                                      stroke="#374151" stroke-width="0.3" 
+                                      style="cursor: pointer;" class="country-path"
+                                      data-country="Australia"
+                                      <?php if (isset($countryData['Australia'])): ?>
+                                      filter="url(#glow)"
+                                      onmouseover="showCountryTooltip(event, 'Australia', '<?php echo number_format($countryData['Australia']['weight_percent'], 1); ?>%', '<?php echo Localization::formatCurrency($countryData['Australia']['value_sek'], 0, 'SEK'); ?>', '<?php echo $countryData['Australia']['positions']; ?>')"
+                                      onmouseout="hideCountryTooltip()"
+                                      <?php endif; ?>>
+                                </path>
+                                
+                                <!-- Brazil -->
+                                <path d="M 280 290 L 275 310 L 285 330 L 310 340 L 340 335 L 365 330 L 380 315 L 375 295 L 360 280 L 330 275 L 300 280 L 280 290 Z" 
+                                      fill="#e5e7eb" stroke="#374151" stroke-width="0.3">
+                                </path>
+                                
+                                <!-- Argentina -->
+                                <path d="M 290 340 L 285 370 L 295 400 L 315 410 L 335 405 L 345 385 L 340 355 L 325 345 L 305 345 L 290 340 Z" 
+                                      fill="#e5e7eb" stroke="#374151" stroke-width="0.3">
+                                </path>
+                                
+                                <!-- Mexico -->
+                                <path d="M 130 260 L 125 275 L 135 290 L 155 295 L 175 290 L 185 275 L 180 260 L 165 255 L 145 255 L 130 260 Z" 
+                                      fill="#e5e7eb" stroke="#374151" stroke-width="0.3">
+                                </path>
+                                
+                                <!-- South Africa -->
+                                <path d="M 530 350 L 525 365 L 535 380 L 555 385 L 575 380 L 585 365 L 580 350 L 565 345 L 545 345 L 530 350 Z" 
+                                      fill="#e5e7eb" stroke="#374151" stroke-width="0.3">
+                                </path>
+                                
+                                <!-- Egypt -->
+                                <path d="M 540 280 L 535 295 L 545 310 L 560 315 L 575 310 L 580 295 L 575 280 L 560 275 L 545 275 L 540 280 Z" 
+                                      fill="#e5e7eb" stroke="#374151" stroke-width="0.3">
+                                </path>
+                                
+                            </g>
                             
                             <!-- Add percentage labels for countries with allocations -->
                             <?php foreach ($countryData as $countryName => $allocation): ?>
                                 <?php
                                 $labelPositions = [
-                                    'Sweden' => ['x' => 565, 'y' => 115],
-                                    'United States' => ['x' => 240, 'y' => 240],
-                                    'Canada' => ['x' => 240, 'y' => 90],
-                                    'United Kingdom' => ['x' => 495, 'y' => 155],
-                                    'France' => ['x' => 505, 'y' => 215],
-                                    'Germany' => ['x' => 545, 'y' => 185],
-                                    'Norway' => ['x' => 537, 'y' => 105],
-                                    'Finland' => ['x' => 595, 'y' => 115],
-                                    'Denmark' => ['x' => 547, 'y' => 167],
-                                    'Netherlands' => ['x' => 527, 'y' => 187],
-                                    'Switzerland' => ['x' => 527, 'y' => 217],
-                                    'Japan' => ['x' => 875, 'y' => 215],
-                                    'Australia' => ['x' => 835, 'y' => 375],
+                                    'Sweden' => ['x' => 527, 'y' => 145],
+                                    'United States' => ['x' => 175, 'y' => 220],
+                                    'Canada' => ['x' => 165, 'y' => 135],
+                                    'United Kingdom' => ['x' => 447, 'y' => 182],
+                                    'France' => ['x' => 460, 'y' => 225],
+                                    'Germany' => ['x' => 502, 'y' => 205],
+                                    'Norway' => ['x' => 502, 'y' => 135],
+                                    'Finland' => ['x' => 567, 'y' => 140],
+                                    'Denmark' => ['x' => 507, 'y' => 187],
+                                    'Netherlands' => ['x' => 482, 'y' => 202],
+                                    'Switzerland' => ['x' => 497, 'y' => 237],
+                                    'Japan' => ['x' => 810, 'y' => 215],
+                                    'Australia' => ['x' => 790, 'y' => 345],
                                 ];
                                 
                                 if (isset($labelPositions[$countryName])):
                                     $pos = $labelPositions[$countryName];
                                 ?>
                                     <text x="<?php echo $pos['x']; ?>" y="<?php echo $pos['y']; ?>" 
-                                          text-anchor="middle" fill="#ffffff" font-size="11" font-weight="700"
-                                          style="text-shadow: 1px 1px 2px rgba(0,0,0,0.8); pointer-events: none;">
+                                          text-anchor="middle" fill="#000000" font-size="10" font-weight="700"
+                                          style="text-shadow: 1px 1px 2px rgba(255,255,255,0.8); pointer-events: none;">
                                         <?php echo number_format($allocation['weight_percent'], 1); ?>%
                                     </text>
                                 <?php endif; ?>
                             <?php endforeach; ?>
                             
-                            <!-- Enhanced Legend -->
+                            <!-- Enhanced Legend with gradient scale -->
                             <g transform="translate(20, 20)">
-                                <rect x="0" y="0" width="220" height="120" fill="rgba(0,0,0,0.8)" rx="8" stroke="#374151" stroke-width="1"/>
-                                <text x="15" y="25" fill="#ffffff" font-size="14" font-weight="700">Portfolio Allocation</text>
-                                <text x="15" y="42" fill="#d1d5db" font-size="11">Intensity by allocation %</text>
+                                <rect x="0" y="0" width="240" height="100" fill="rgba(255,255,255,0.95)" rx="8" stroke="#374151" stroke-width="1"/>
+                                <text x="15" y="25" fill="#1f2937" font-size="14" font-weight="700">Portfolio Allocation</text>
+                                <text x="15" y="42" fill="#6b7280" font-size="11">Continuous gradient scale</text>
                                 
-                                <!-- Color scale -->
-                                <rect x="15" y="50" width="12" height="8" fill="#22c55e"/>
-                                <text x="32" y="58" fill="#ffffff" font-size="10">0-20%</text>
+                                <!-- Gradient color bar -->
+                                <defs>
+                                    <linearGradient id="allocationGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" style="stop-color:#fce7f3;stop-opacity:1" />
+                                        <stop offset="25%" style="stop-color:#f3e8ff;stop-opacity:1" />
+                                        <stop offset="50%" style="stop-color:#ddd6fe;stop-opacity:1" />
+                                        <stop offset="75%" style="stop-color:#a78bfa;stop-opacity:1" />
+                                        <stop offset="100%" style="stop-color:#581c87;stop-opacity:1" />
+                                    </linearGradient>
+                                </defs>
                                 
-                                <rect x="15" y="65" width="12" height="8" fill="#eab308"/>
-                                <text x="32" y="73" fill="#ffffff" font-size="10">20-40%</text>
+                                <rect x="15" y="55" width="180" height="15" fill="url(#allocationGradient)" stroke="#374151" stroke-width="0.5"/>
                                 
-                                <rect x="15" y="80" width="12" height="8" fill="#f97316"/>
-                                <text x="32" y="88" fill="#ffffff" font-size="10">40-60%</text>
+                                <!-- Scale labels -->
+                                <text x="15" y="82" fill="#374151" font-size="9">0%</text>
+                                <text x="105" y="82" fill="#374151" font-size="9" text-anchor="middle">50%</text>
+                                <text x="195" y="82" fill="#374151" font-size="9" text-anchor="end">100%</text>
                                 
-                                <rect x="15" y="95" width="12" height="8" fill="#ef4444"/>
-                                <text x="32" y="103" fill="#ffffff" font-size="10">60-80%</text>
-                                
-                                <rect x="120" y="50" width="12" height="8" fill="#dc2626"/>
-                                <text x="137" y="58" fill="#ffffff" font-size="10">80-100%</text>
-                                
-                                <rect x="120" y="65" width="12" height="8" fill="#374151"/>
-                                <text x="137" y="73" fill="#ffffff" font-size="10">No allocation</text>
+                                <!-- No allocation indicator -->
+                                <rect x="210" y="55" width="15" height="15" fill="#d1d5db" stroke="#374151" stroke-width="0.5"/>
+                                <text x="210" y="82" fill="#374151" font-size="9">No allocation</text>
                             </g>
                         </svg>
                         
