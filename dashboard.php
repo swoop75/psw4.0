@@ -22,12 +22,12 @@ try {
     // Get portfolio summary
     $summarySql = "SELECT 
                     COUNT(*) as total_positions,
-                    SUM(COALESCE(current_value_sek, 0)) as total_value_sek,
-                    SUM(COALESCE(total_cost_sek, 0)) as total_cost_sek,
-                    SUM(COALESCE(current_value_sek, 0) - COALESCE(total_cost_sek, 0)) as total_unrealized_pnl,
-                    COUNT(DISTINCT LEFT(isin, 2)) as countries_count
-                   FROM psw_portfolio.portfolio 
-                   WHERE is_active = 1 AND shares_held > 0";
+                    SUM(COALESCE(p.current_value_sek, 0)) as total_value_sek,
+                    SUM(COALESCE(p.total_cost_sek, 0)) as total_cost_sek,
+                    SUM(COALESCE(p.current_value_sek, 0) - COALESCE(p.total_cost_sek, 0)) as total_unrealized_pnl,
+                    COUNT(DISTINCT LEFT(p.isin, 2)) as countries_count
+                   FROM psw_portfolio.portfolio p
+                   WHERE p.is_active = 1 AND p.shares_held > 0";
     
     $summaryStmt = $portfolioDb->prepare($summarySql);
     $summaryStmt->execute();
@@ -41,7 +41,7 @@ try {
                         p.shares_held,
                         p.current_value_sek,
                         p.total_cost_sek,
-                        (p.current_value_sek / (SELECT SUM(current_value_sek) FROM psw_portfolio.portfolio WHERE is_active = 1 AND shares_held > 0)) * 100 as portfolio_weight,
+                        (p.current_value_sek / NULLIF((SELECT SUM(current_value_sek) FROM psw_portfolio.portfolio WHERE is_active = 1 AND shares_held > 0), 0)) * 100 as portfolio_weight,
                         COALESCE(s1.nameEn, s2.nameEn, 'Unknown') as sector
                        FROM psw_portfolio.portfolio p
                        LEFT JOIN psw_marketdata.nordic_instruments ni ON p.isin COLLATE utf8mb4_unicode_ci = ni.isin COLLATE utf8mb4_unicode_ci
@@ -61,7 +61,7 @@ try {
                     COALESCE(s1.nameEn, s2.nameEn, 'Unknown') as sector,
                     COUNT(*) as positions,
                     SUM(COALESCE(p.current_value_sek, 0)) as sector_value_sek,
-                    (SUM(COALESCE(p.current_value_sek, 0)) / (SELECT SUM(current_value_sek) FROM psw_portfolio.portfolio WHERE is_active = 1 AND shares_held > 0)) * 100 as sector_weight
+                    (SUM(COALESCE(p.current_value_sek, 0)) / NULLIF((SELECT SUM(current_value_sek) FROM psw_portfolio.portfolio WHERE is_active = 1 AND shares_held > 0), 0)) * 100 as sector_weight
                   FROM psw_portfolio.portfolio p
                   LEFT JOIN psw_marketdata.nordic_instruments ni ON p.isin COLLATE utf8mb4_unicode_ci = ni.isin COLLATE utf8mb4_unicode_ci
                   LEFT JOIN psw_marketdata.global_instruments gi ON p.isin COLLATE utf8mb4_unicode_ci = gi.isin COLLATE utf8mb4_unicode_ci
@@ -222,7 +222,10 @@ ob_start();
                             <?php foreach ($topHoldings as $holding): ?>
                                 <tr>
                                     <td style="font-weight: 600;">
-                                        <?php echo htmlspecialchars($holding['company_name'] ?? 'Unknown'); ?>
+                                        <a href="<?php echo BASE_URL; ?>/company_detail_new.php?isin=<?php echo urlencode($holding['isin']); ?>" 
+                                           style="color: var(--primary-accent); text-decoration: none;">
+                                            <?php echo htmlspecialchars($holding['company_name'] ?? 'Unknown'); ?>
+                                        </a>
                                     </td>
                                     <td style="font-family: var(--font-family-mono); font-size: 0.875rem;">
                                         <?php echo htmlspecialchars($holding['ticker'] ?? '-'); ?>
