@@ -369,7 +369,7 @@ ob_start();
                         <div class="psw-form-group">
                             <label class="psw-form-label" for="net_amount_sek">Net Amount (SEK) *</label>
                             <input type="number" id="net_amount_sek" name="net_amount_sek" class="psw-form-input" 
-                                   step="0.01" min="0" placeholder="247337.26"
+                                   step="0.01" placeholder="-247337.26 (negative for cash outflow)"
                                    value="<?php echo $_POST['net_amount_sek'] ?? ''; ?>" required>
                         </div>
                     </div>
@@ -889,15 +889,20 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const tradeType = document.getElementById('trade_type_id');
         const selectedOption = tradeType.options[tradeType.selectedIndex];
-        const isBuy = selectedOption.text.includes('BUY') || selectedOption.text.includes('Buy');
+        
+        // Define cash outflow transaction types (investor pays money)
+        const cashOutflowTypes = ['BUY', 'RIGHTS_ISSUE', 'RIGHTS ISSUE', 'DIVIDEND_REINVEST', 'DIVIDEND REINVEST', 'TRANSFER_IN', 'TRANSFER IN', 'BONUS_ISSUE', 'BONUS ISSUE'];
+        const isCashOutflow = cashOutflowTypes.some(type => 
+            selectedOption.text.toUpperCase().includes(type.toUpperCase())
+        );
         
         if (totalLocal > 0) {
-            const netLocal = isBuy ? totalLocal + feesLocal + taxLocal : totalLocal - feesLocal - taxLocal;
+            const netLocal = isCashOutflow ? -(totalLocal + feesLocal + taxLocal) : (totalLocal - feesLocal - taxLocal);
             document.getElementById('net_amount_local').value = netLocal.toFixed(2);
         }
         
         if (totalSek > 0) {
-            const netSek = isBuy ? totalSek + feesSek + taxSek : totalSek - feesSek - taxSek;
+            const netSek = isCashOutflow ? -(totalSek + feesSek + taxSek) : (totalSek - feesSek - taxSek);
             document.getElementById('net_amount_sek').value = netSek.toFixed(2);
         }
     }
