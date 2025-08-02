@@ -29,7 +29,9 @@
       "WebFetch(domain:app.scrab.com)",
       "WebFetch(domain:scrab.com)",
       "Bash(del \"C:\\Users\\laoan\\Documents\\GitHub\\psw\\psw4.0\\test_api.php\")",
-      "Bash(del debug_trades.php)"
+      "Bash(del debug_trades.php)",
+      "WebFetch(domain:www.avanza.se)",
+      "WebFetch(domain:www.nordnet.se)"
     ],
     "deny": []
   }
