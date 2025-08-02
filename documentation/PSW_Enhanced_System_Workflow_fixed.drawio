@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" version="28.0.7">
+  <diagram name="PSW-Complete-System-Flow" id="enhanced-psw-workflow">
+    <mxGraphModel dx="1400" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="1600" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- START -->
+        <mxCell id="start" value="START: Investment Research" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="500" y="40" width="140" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- COMPANY DATA VALIDATION -->
+        <mxCell id="company-check" value="Company in Börsdata API?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="530" y="120" width="80" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- BÖRSDATA PATH -->
+        <mxCell id="borsdata-path" value="Use Börsdata Data&#10;(Nordic/Global)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="680" y="145" width="100" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- MANUAL DATA CHECK -->
+        <mxCell id="manual-check" value="In manual_company_data?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="350" y="120" width="80" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- MANUAL DATA MANAGEMENT -->
+        <mxCell id="manual-mgmt" value="ADD TO MANUAL SYSTEM&#10;admin_company_management.php&#10;- Check masterlist&#10;- Validate data&#10;- Insert manual_company_data" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="320" y="240" width="140" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- POSITION CHECK -->
+        <mxCell id="position-check" value="Do you currently own this stock?&#10;(Check portfolio table)" style="rhombus;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="525" y="360" width="90" height="90" as="geometry" />
+        </mxCell>
+        
+        <!-- EXISTING POSITION BRANCH -->
+        <mxCell id="existing-position" value="Current Position Analysis" style="rhombus;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="380" y="500" width="80" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- NO POSITION BRANCH -->
+        <mxCell id="want-to-own" value="Do you want to own it?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="670" y="500" width="80" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- BUY BRANCH -->
+        <mxCell id="buy-branch" value="BUY BRANCH" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="500" y="640" width="100" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="buy-execute" value="Execute Purchase&#10;(External: Broker)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="420" y="700" width="100" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="buy-record" value="Record Transaction&#10;- log_trades table&#10;- Link to company data&#10;- Calculate costs" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="420" y="760" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="buy-update" value="Update Portfolio&#10;- portfolio table&#10;- Average cost&#10;- Share count&#10;- Position value" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="420" y="840" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- SELL BRANCH -->
+        <mxCell id="sell-branch" value="SELL BRANCH" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="200" y="640" width="100" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="sell-execute" value="Execute Sale&#10;(External: Broker)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="120" y="700" width="100" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="sell-record" value="Record Transaction&#10;- log_trades (negative)&#10;- Calculate realized P&L&#10;- Link to company data" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="120" y="760" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="sell-update" value="Update Portfolio&#10;- Reduce shares&#10;- Adjust cost basis&#10;- Close if full sale" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="120" y="840" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- MONITORING BRANCH -->
+        <mxCell id="monitor-branch" value="MONITORING BRANCH" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="800" y="640" width="120" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="monitor-updates" value="Regular Updates&#10;- Börsdata: Auto&#10;- Manual: Manual&#10;- Delisting checks" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="780" y="700" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="monitor-dividends" value="Dividend Processing&#10;- log_dividends table&#10;- Yield calculations&#10;- Portfolio updates" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="780" y="780" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- UNIFIED SYSTEM VIEW -->
+        <mxCell id="unified-view" value="UNIFIED SYSTEM VIEW&#10;vw_unified_companies&#10;- Börsdata + Manual&#10;- Complete portfolio&#10;- All positions tracked" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0f0f0;strokeColor=#666666;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="450" y="950" width="140" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- DO NOTHING -->
+        <mxCell id="do-nothing" value="Do Nothing" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="880" y="515" width="70" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- DECISION CONNECTIONS -->
+        <mxCell id="edge1" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="start" target="company-check">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="570" y="200" as="sourcePoint" />
+            <mxPoint x="620" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge2" value="YES" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="company-check" target="borsdata-path">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="570" y="200" as="sourcePoint" />
+            <mxPoint x="620" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge3" value="NO" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="company-check" target="manual-check">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="570" y="200" as="sourcePoint" />
+            <mxPoint x="620" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge4" value="NO" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="manual-check" target="manual-mgmt">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="570" y="200" as="sourcePoint" />
+            <mxPoint x="620" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge5" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="borsdata-path" target="position-check">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="570" y="200" as="sourcePoint" />
+            <mxPoint x="620" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge6" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="manual-check" target="position-check">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="570" y="200" as="sourcePoint" />
+            <mxPoint x="620" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge7" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="manual-mgmt" target="position-check">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="570" y="200" as="sourcePoint" />
+            <mxPoint x="620" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge8" value="YES" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="position-check" target="existing-position">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="570" y="200" as="sourcePoint" />
+            <mxPoint x="620" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge9" value="NO" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="position-check" target="want-to-own">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="570" y="200" as="sourcePoint" />
+            <mxPoint x="620" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge10" value="Increase/Buy" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="existing-position" target="buy-branch">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="570" y="200" as="sourcePoint" />
+            <mxPoint x="620" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge11" value="Reduce/Sell" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="existing-position" target="sell-branch">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="570" y="200" as="sourcePoint" />
+            <mxPoint x="620" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge12" value="Monitor" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="existing-position" target="monitor-branch">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="570" y="200" as="sourcePoint" />
+            <mxPoint x="620" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge13" value="YES" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="want-to-own" target="buy-branch">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="570" y="200" as="sourcePoint" />
+            <mxPoint x="620" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge14" value="NO" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="want-to-own" target="do-nothing">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="570" y="200" as="sourcePoint" />
+            <mxPoint x="620" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- BUY BRANCH FLOW -->
+        <mxCell id="edge15" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="buy-branch" target="buy-execute">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="570" y="200" as="sourcePoint" />
+            <mxPoint x="620" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge16" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="buy-execute" target="buy-record">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="570" y="200" as="sourcePoint" />
+            <mxPoint x="620" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge17" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="buy-record" target="buy-update">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="570" y="200" as="sourcePoint" />
+            <mxPoint x="620" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- SELL BRANCH FLOW -->
+        <mxCell id="edge18" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="sell-branch" target="sell-execute">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="570" y="200" as="sourcePoint" />
+            <mxPoint x="620" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge19" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="sell-execute" target="sell-record">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="570" y="200" as="sourcePoint" />
+            <mxPoint x="620" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge20" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="sell-record" target="sell-update">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="570" y="200" as="sourcePoint" />
+            <mxPoint x="620" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- MONITOR BRANCH FLOW -->
+        <mxCell id="edge21" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="monitor-branch" target="monitor-updates">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="570" y="200" as="sourcePoint" />
+            <mxPoint x="620" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge22" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="monitor-updates" target="monitor-dividends">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="570" y="200" as="sourcePoint" />
+            <mxPoint x="620" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- ALL PATHS TO UNIFIED VIEW -->
+        <mxCell id="edge23" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="buy-update" target="unified-view">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="570" y="200" as="sourcePoint" />
+            <mxPoint x="620" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge24" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="sell-update" target="unified-view">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="570" y="200" as="sourcePoint" />
+            <mxPoint x="620" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge25" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="monitor-dividends" target="unified-view">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="570" y="200" as="sourcePoint" />
+            <mxPoint x="620" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- LABELS FOR SYSTEM COMPONENTS -->
+        <mxCell id="label1" value="System Components:" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="100" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="label2" value="• admin_company_management.php" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="60" width="200" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="label3" value="• manual_company_data table" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="200" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="label4" value="• portfolio/log_trades tables" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="100" width="200" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="label5" value="• vw_unified_companies view" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="120" width="200" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="label6" value="• DataValidator.php" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="140" width="200" height="20" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

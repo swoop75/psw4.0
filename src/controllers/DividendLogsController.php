@@ -228,7 +228,11 @@ class DividendLogsController {
                         ld.dividend_amount_sek,
                         ld.tax_rate_percent as withholding_tax_percent,
                         ld.tax_amount_sek as withholding_tax_sek,
+                        ld.broker_fee_local,
+                        ld.broker_fee_sek,
+                        ld.broker_fee_percent,
                         ld.net_dividend_sek,
+                        ld.net_dividend_after_fees_sek,
                         ld.fx_rate_to_sek,
                         m.company_name,
                         m.ticker_symbol,
@@ -273,7 +277,11 @@ class DividendLogsController {
                     'dividend_amount_sek' => (float) $result['dividend_amount_sek'],
                     'withholding_tax_percent' => (float) $result['withholding_tax_percent'],
                     'withholding_tax_sek' => (float) $result['withholding_tax_sek'],
+                    'broker_fee_local' => (float) ($result['broker_fee_local'] ?? 0),
+                    'broker_fee_sek' => (float) ($result['broker_fee_sek'] ?? 0),
+                    'broker_fee_percent' => (float) ($result['broker_fee_percent'] ?? 0),
                     'net_dividend_sek' => (float) $result['net_dividend_sek'],
+                    'net_dividend_after_fees_sek' => (float) ($result['net_dividend_after_fees_sek'] ?? $result['net_dividend_sek']),
                     'fx_rate_to_sek' => (float) $result['fx_rate_to_sek']
                 ];
             }

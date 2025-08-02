@@ -318,13 +318,14 @@ if (!empty($filters['date_from']) || !empty($filters['date_to'])) {
                                 <th class="psw-text-right">Total Original</th>
                                 <th class="psw-text-right">Total SEK</th>
                                 <th class="psw-text-right">Tax SEK</th>
+                                <th class="psw-text-right">Fee %</th>
                                 <th class="psw-text-right">Net SEK</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php foreach ($dividends as $dividend): ?>
                                 <tr class="psw-table-row">
-                                    <td><?php echo date('Y-m-d', strtotime($dividend['ex_date'])); ?></td>
+                                    <td><?php echo date('Y-m-d', strtotime($dividend['payment_date'])); ?></td>
                                     <td><?php echo date('Y-m-d', strtotime($dividend['pay_date'])); ?></td>
                                     <td>
                                         <div class="psw-company-info">
@@ -356,12 +357,23 @@ if (!empty($filters['date_from']) || !empty($filters['date_to'])) {
                                     </td>
                                     <td class="psw-text-right">
                                         <div class="psw-amount-highlight">
-                                            <?php echo number_format($dividend['dividend_total_sek'], 2); ?> SEK
+                                            <?php echo number_format($dividend['dividend_amount_sek'], 2); ?> SEK
                                         </div>
                                     </td>
                                     <td class="psw-text-right">
                                         <div class="psw-tax-amount">
                                             <?php echo number_format($dividend['withholding_tax_sek'], 2); ?> SEK
+                                        </div>
+                                    </td>
+                                    <td class="psw-text-right">
+                                        <div class="psw-fee-percentage">
+                                            <?php 
+                                            if ($dividend['broker_fee_percent'] > 0) {
+                                                echo number_format($dividend['broker_fee_percent'], 2) . '%';
+                                            } else {
+                                                echo '-';
+                                            }
+                                            ?>
                                         </div>
                                     </td>
                                     <td class="psw-text-right">
@@ -1127,6 +1139,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .psw-tax-amount {
     color: var(--warning-color);
+}
+
+.psw-fee-percentage {
+    color: var(--error-color);
+    font-weight: 500;
 }
 
 .psw-net-amount {
