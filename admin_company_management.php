@@ -354,6 +354,24 @@ $pageDescription = 'Manage non-Börsdata company data and monitoring';
 $additionalCSS = [];
 $additionalJS = [];
 
+// Add CSS to fix text visibility
+$additionalCSS[] = '
+<style>
+.psw-form-input, .psw-form-input:focus, .psw-form-input:active {
+    color: #333 !important;
+    background-color: white !important;
+    border: 1px solid #ddd !important;
+}
+.psw-form-input option {
+    color: #333 !important;
+    background-color: white !important;
+}
+.psw-modal .psw-form-input {
+    color: #333 !important;
+    background-color: white !important;
+}
+</style>';
+
 // Prepare content
 ob_start();
 ?>
@@ -405,6 +423,11 @@ ob_start();
                 <button type="button" class="psw-btn psw-btn-success" onclick="showAddCompanyModal()">
                     <i class="fas fa-plus psw-btn-icon"></i>
                     Add New Company
+                </button>
+                
+                <button type="button" class="psw-btn psw-btn-info" onclick="testFormFill()">
+                    <i class="fas fa-flask psw-btn-icon"></i>
+                    Test GB Company
                 </button>
             </div>
         </div>
@@ -591,7 +614,7 @@ ob_start();
                                                 Delisted
                                             </span>
                                             <button type="button" class="psw-btn psw-btn-sm psw-btn-primary" style="margin-left: 0.5rem;"
-                                                    onclick="addCompanyFromDelisted('<?php echo $company['isin']; ?>', '<?php echo $company['ticker'] ?? ''; ?>', '<?php echo $company['company_name']; ?>', '<?php echo $company['likely_country']; ?>')">
+                                                    onclick="addCompanyFromDelisted('<?php echo htmlspecialchars($company['isin']); ?>', '<?php echo htmlspecialchars($company['ticker'] ?? ''); ?>', '<?php echo htmlspecialchars($company['company_name']); ?>', '<?php echo htmlspecialchars($company['likely_country']); ?>')">
                                                 <i class="fas fa-plus"></i> Add Manual Entry
                                             </button>
                                         </td>
@@ -1002,35 +1025,55 @@ function addCompanyFromAnalysis(isin, ticker, country) {
 }
 
 function addCompanyFromDelisted(isin, ticker, companyName, country) {
+    console.log('Adding from delisted:', {isin, ticker, companyName, country}); // Debug log
+    
     document.getElementById('modalTitle').textContent = 'Add Company from Masterlist';
     document.getElementById('formAction').value = 'add_company';
     document.getElementById('companyForm').reset();
     document.getElementById('manualId').value = '';
     
-    // Pre-fill known data from masterlist
-    document.getElementById('isin').value = isin;
-    document.getElementById('isin').readOnly = true;
-    document.getElementById('ticker').value = ticker || '';
-    document.getElementById('companyName').value = companyName || '';
-    document.getElementById('country').value = country || '';
-    
-    // Set appropriate currency based on country
-    if (country === 'United Kingdom') {
-        document.getElementById('currency').value = 'GBP';
-    } else if (country === 'Canada') {
-        document.getElementById('currency').value = 'CAD';
-    } else if (country === 'United States') {
-        document.getElementById('currency').value = 'USD';
-    } else if (country === 'Czech Republic') {
-        document.getElementById('currency').value = 'CZK';
-    } else if (country === 'Ireland') {
-        document.getElementById('currency').value = 'EUR';
-    }
-    
-    // Add note about source
-    document.getElementById('notes').value = 'Added from masterlist - previously delisted company';
+    // Wait a moment for form to reset, then populate
+    setTimeout(function() {
+        // Pre-fill known data from masterlist
+        if (isin) {
+            document.getElementById('isin').value = isin;
+            document.getElementById('isin').readOnly = true;
+        }
+        if (ticker) {
+            document.getElementById('ticker').value = ticker;
+        }
+        if (companyName) {
+            document.getElementById('companyName').value = companyName;
+        }
+        if (country) {
+            document.getElementById('country').value = country;
+        }
+        
+        // Set appropriate currency based on country
+        if (country === 'United Kingdom') {
+            document.getElementById('currency').value = 'GBP';
+        } else if (country === 'Canada') {
+            document.getElementById('currency').value = 'CAD';
+        } else if (country === 'United States') {
+            document.getElementById('currency').value = 'USD';
+        } else if (country === 'Czech Republic') {
+            document.getElementById('currency').value = 'CZK';
+        } else if (country === 'Ireland') {
+            document.getElementById('currency').value = 'EUR';
+        }
+        
+        // Add note about source
+        document.getElementById('notes').value = 'Added from masterlist - previously delisted company';
+        
+        console.log('Form populated'); // Debug log
+    }, 100);
     
     document.getElementById('companyModal').style.display = 'flex';
+}
+
+function testFormFill() {
+    // Test function to manually fill GB0001990497
+    addCompanyFromDelisted('GB0001990497', 'TEST', 'Test UK Company', 'United Kingdom');
 }
 
 function editCompany(company) {
