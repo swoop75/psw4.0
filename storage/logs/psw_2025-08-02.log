@@ -4,3 +4,5 @@
 {"timestamp":"2025-08-02 07:26:39","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"User session destroyed","context":{"user_id":1,"username":"swoop"}}
 {"timestamp":"2025-08-02 07:26:46","level":"INFO","user_id":"anonymous","ip":"100.120.9.63","message":"Successful login for user: swoop","context":{"username":"swoop","success":true,"reason":"","user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/138.0.0.0 Safari\/537.36"}}
 {"timestamp":"2025-08-02 07:26:46","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"User session created","context":{"user_id":1,"username":"swoop"}}
+{"timestamp":"2025-08-02 11:35:16","level":"INFO","user_id":"anonymous","ip":"100.120.9.63","message":"Successful login for user: swoop","context":{"username":"swoop","success":true,"reason":"","user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/138.0.0.0 Safari\/537.36"}}
+{"timestamp":"2025-08-02 11:35:16","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"User session created","context":{"user_id":1,"username":"swoop"}}
