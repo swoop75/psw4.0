@@ -114,84 +114,124 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     break;
                     
                 case 'check_unsupported':
-                    // Enhanced query to categorize companies properly
+                    // Simplified approach to avoid collation issues
                     $analysisResults = [];
+                    $unsupported = [];
+                    $delisted = [];
                     
-                    // 1. Find truly unsupported (not in Börsdata, not in masterlist, not manual)
-                    $unsupportedSql = "
-                        SELECT DISTINCT 
-                            p_isin.isin, 
-                            p_isin.ticker,
-                            'unsupported' as category,
-                            CASE 
-                                WHEN p_isin.isin LIKE 'AT%' THEN 'Austria'
-                                WHEN p_isin.isin LIKE 'CA%' THEN 'Canada'  
-                                WHEN p_isin.isin LIKE 'GB%' THEN 'United Kingdom'
-                                WHEN p_isin.isin LIKE 'US%' THEN 'United States'
-                                WHEN p_isin.isin LIKE 'CZ%' THEN 'Czech Republic'
-                                WHEN p_isin.isin LIKE 'IE%' THEN 'Ireland'
-                                ELSE 'Unknown Country'
-                            END as likely_country,
-                            NULL as company_name,
-                            NULL as delisted_date
-                        FROM (
-                            SELECT DISTINCT isin, ticker FROM psw_portfolio.portfolio WHERE isin IS NOT NULL
+                    try {
+                        // Get all ISINs from portfolio/trades/dividends
+                        $portfolioDb = Database::getConnection('portfolio');
+                        $stmt = $portfolioDb->query("
+                            SELECT DISTINCT isin, ticker FROM portfolio WHERE isin IS NOT NULL
                             UNION
-                            SELECT DISTINCT isin, ticker FROM psw_portfolio.log_trades WHERE isin IS NOT NULL
+                            SELECT DISTINCT isin, ticker FROM log_trades WHERE isin IS NOT NULL  
                             UNION
-                            SELECT DISTINCT isin, ticker FROM psw_portfolio.log_dividends WHERE isin IS NOT NULL
-                        ) p_isin
-                        LEFT JOIN psw_marketdata.nordic_instruments ni ON p_isin.isin COLLATE utf8mb4_unicode_ci = ni.isin COLLATE utf8mb4_unicode_ci
-                        LEFT JOIN psw_marketdata.global_instruments gi ON p_isin.isin COLLATE utf8mb4_unicode_ci = gi.isin COLLATE utf8mb4_unicode_ci
-                        LEFT JOIN psw_foundation.masterlist ml ON p_isin.isin = ml.isin
-                        LEFT JOIN psw_foundation.manual_company_data mcd ON p_isin.isin = mcd.isin
-                        WHERE ni.isin IS NULL AND gi.isin IS NULL AND ml.isin IS NULL AND mcd.isin IS NULL
-                    ";
-                    
-                    // 2. Find delisted companies
-                    $delistedSql = "
-                        SELECT DISTINCT 
-                            p_isin.isin, 
-                            p_isin.ticker,
-                            'delisted' as category,
-                            ml.country as likely_country,
-                            ml.name as company_name,
-                            ml.delisted_date
-                        FROM (
-                            SELECT DISTINCT isin, ticker FROM psw_portfolio.portfolio WHERE isin IS NOT NULL
-                            UNION
-                            SELECT DISTINCT isin, ticker FROM psw_portfolio.log_trades WHERE isin IS NOT NULL
-                            UNION
-                            SELECT DISTINCT isin, ticker FROM psw_portfolio.log_dividends WHERE isin IS NOT NULL
-                        ) p_isin
-                        LEFT JOIN psw_marketdata.nordic_instruments ni ON p_isin.isin COLLATE utf8mb4_unicode_ci = ni.isin COLLATE utf8mb4_unicode_ci
-                        LEFT JOIN psw_marketdata.global_instruments gi ON p_isin.isin COLLATE utf8mb4_unicode_ci = gi.isin COLLATE utf8mb4_unicode_ci
-                        INNER JOIN psw_foundation.masterlist ml ON p_isin.isin = ml.isin
-                        WHERE ni.isin IS NULL AND gi.isin IS NULL AND ml.delisted = 1
-                    ";
-                    
-                    $stmt = $foundationDb->prepare($unsupportedSql);
-                    $stmt->execute();
-                    $unsupported = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                    
-                    $stmt = $foundationDb->prepare($delistedSql);
-                    $stmt->execute();
-                    $delisted = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                    
-                    $unsupportedCount = count($unsupported);
-                    $delistedCount = count($delisted);
-                    
-                    $message = "Analysis complete: $unsupportedCount truly unsupported companies";
-                    if ($delistedCount > 0) {
-                        $message .= ", $delistedCount delisted companies found";
+                            SELECT DISTINCT isin, ticker FROM log_dividends WHERE isin IS NOT NULL
+                        ");
+                        $allPortfolioISINs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                        
+                        // Check each ISIN individually to avoid collation issues
+                        foreach ($allPortfolioISINs as $portfolioItem) {
+                            $isin = $portfolioItem['isin'];
+                            $ticker = $portfolioItem['ticker'];
+                            
+                            $foundInBorsdata = false;
+                            $foundInMasterlist = false;
+                            $foundInManual = false;
+                            
+                            // Check if in manual data (safe - same database)
+                            $stmt = $foundationDb->prepare("SELECT COUNT(*) as count FROM manual_company_data WHERE isin = ?");
+                            $stmt->execute([$isin]);
+                            if ($stmt->fetch(PDO::FETCH_ASSOC)['count'] > 0) {
+                                $foundInManual = true;
+                                continue; // Skip if already in manual data
+                            }
+                            
+                            // Check masterlist (safe - same database)
+                            $stmt = $foundationDb->prepare("SELECT name, country, delisted, delisted_date FROM masterlist WHERE isin = ?");
+                            $stmt->execute([$isin]);
+                            $masterlistData = $stmt->fetch(PDO::FETCH_ASSOC);
+                            if ($masterlistData) {
+                                $foundInMasterlist = true;
+                                if ($masterlistData['delisted'] == 1) {
+                                    $delisted[] = [
+                                        'isin' => $isin,
+                                        'ticker' => $ticker,
+                                        'category' => 'delisted',
+                                        'likely_country' => $masterlistData['country'],
+                                        'company_name' => $masterlistData['name'],
+                                        'delisted_date' => $masterlistData['delisted_date']
+                                    ];
+                                    continue;
+                                }
+                            }
+                            
+                            // Try to check Börsdata (with error handling for collation issues)
+                            try {
+                                $marketDataDb = Database::getConnection('marketdata');
+                                
+                                // Check Nordic
+                                $stmt = $marketDataDb->prepare("SELECT COUNT(*) as count FROM nordic_instruments WHERE isin = ?");
+                                $stmt->execute([$isin]);
+                                if ($stmt->fetch(PDO::FETCH_ASSOC)['count'] > 0) {
+                                    $foundInBorsdata = true;
+                                    continue;
+                                }
+                                
+                                // Check Global
+                                $stmt = $marketDataDb->prepare("SELECT COUNT(*) as count FROM global_instruments WHERE isin = ?");
+                                $stmt->execute([$isin]);
+                                if ($stmt->fetch(PDO::FETCH_ASSOC)['count'] > 0) {
+                                    $foundInBorsdata = true;
+                                    continue;
+                                }
+                            } catch (Exception $e) {
+                                // If Börsdata check fails, assume it's not found and continue
+                                error_log("Börsdata check failed for $isin: " . $e->getMessage());
+                            }
+                            
+                            // If not found anywhere, it's unsupported
+                            if (!$foundInBorsdata && !$foundInMasterlist && !$foundInManual) {
+                                $country = 'Unknown Country';
+                                if (preg_match('/^AT/', $isin)) $country = 'Austria';
+                                elseif (preg_match('/^CA/', $isin)) $country = 'Canada';
+                                elseif (preg_match('/^GB/', $isin)) $country = 'United Kingdom';
+                                elseif (preg_match('/^US/', $isin)) $country = 'United States';
+                                elseif (preg_match('/^CZ/', $isin)) $country = 'Czech Republic';
+                                elseif (preg_match('/^IE/', $isin)) $country = 'Ireland';
+                                
+                                $unsupported[] = [
+                                    'isin' => $isin,
+                                    'ticker' => $ticker,
+                                    'category' => 'unsupported',
+                                    'likely_country' => $country,
+                                    'company_name' => null,
+                                    'delisted_date' => null
+                                ];
+                            }
+                        }
+                        
+                        $unsupportedCount = count($unsupported);
+                        $delistedCount = count($delisted);
+                        
+                        $message = "Analysis complete: $unsupportedCount truly unsupported companies";
+                        if ($delistedCount > 0) {
+                            $message .= ", $delistedCount delisted companies found";
+                        }
+                        $messageType = "success";
+                        
+                        // Store results for display
+                        $_SESSION['analysis_results'] = [
+                            'unsupported' => $unsupported,
+                            'delisted' => $delisted
+                        ];
+                        
+                    } catch (Exception $e) {
+                        $message = "Analysis failed: " . $e->getMessage();
+                        $messageType = "error";
+                        $_SESSION['analysis_results'] = ['unsupported' => [], 'delisted' => []];
                     }
-                    $messageType = "info";
-                    
-                    // Store results for display
-                    $_SESSION['analysis_results'] = [
-                        'unsupported' => $unsupported,
-                        'delisted' => $delisted
-                    ];
                     break;
                     
                 case 'check_missing':
@@ -234,7 +274,7 @@ try {
     ");
     $syncLogs = $syncLogStmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Get analysis results from session if available
+    // Get analysis results from session if available (clear old results)
     $analysisResults = $_SESSION['analysis_results'] ?? ['unsupported' => [], 'delisted' => []];
     
     // Get data source summary (simplified for now)
