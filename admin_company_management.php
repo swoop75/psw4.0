@@ -235,9 +235,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     break;
                     
                 case 'check_missing':
-                    // Simplified missing check
-                    $message = "Missing companies check completed (simplified version).";
-                    $messageType = "info";
+                    // Check for companies that were previously available but now missing from Börsdata
+                    try {
+                        $missingCompanies = [];
+                        
+                        // Get companies from masterlist that are not delisted
+                        $stmt = $foundationDb->prepare("
+                            SELECT isin, name, country 
+                            FROM masterlist 
+                            WHERE delisted = 0 OR delisted IS NULL
+                        ");
+                        $stmt->execute();
+                        $activeCompanies = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                        
+                        foreach ($activeCompanies as $company) {
+                            $isin = $company['isin'];
+                            $foundInBorsdata = false;
+                            
+                            // Check if still in Börsdata
+                            try {
+                                $marketDataDb = Database::getConnection('marketdata');
+                                
+                                // Check Nordic
+                                $stmt = $marketDataDb->prepare("SELECT COUNT(*) as count FROM nordic_instruments WHERE isin = ?");
+                                $stmt->execute([$isin]);
+                                if ($stmt->fetch(PDO::FETCH_ASSOC)['count'] > 0) {
+                                    $foundInBorsdata = true;
+                                }
+                                
+                                // Check Global if not found in Nordic
+                                if (!$foundInBorsdata) {
+                                    $stmt = $marketDataDb->prepare("SELECT COUNT(*) as count FROM global_instruments WHERE isin = ?");
+                                    $stmt->execute([$isin]);
+                                    if ($stmt->fetch(PDO::FETCH_ASSOC)['count'] > 0) {
+                                        $foundInBorsdata = true;
+                                    }
+                                }
+                            } catch (Exception $e) {
+                                error_log("Missing check failed for $isin: " . $e->getMessage());
+                            }
+                            
+                            // If not found in Börsdata but was previously active, it's missing
+                            if (!$foundInBorsdata) {
+                                $missingCompanies[] = $company;
+                            }
+                        }
+                        
+                        $missingCount = count($missingCompanies);
+                        $message = "Missing companies check completed: $missingCount companies previously in Börsdata are now missing";
+                        $messageType = $missingCount > 0 ? "warning" : "success";
+                        
+                        // Store missing companies for display
+                        $_SESSION['missing_companies'] = $missingCompanies;
+                        
+                    } catch (Exception $e) {
+                        $message = "Missing companies check failed: " . $e->getMessage();
+                        $messageType = "error";
+                        $_SESSION['missing_companies'] = [];
+                    }
                     break;
             }
         }
@@ -274,8 +329,11 @@ try {
     ");
     $syncLogs = $syncLogStmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Get analysis results from session if available (clear old results)
+    // Get analysis results from session if available
     $analysisResults = $_SESSION['analysis_results'] ?? ['unsupported' => [], 'delisted' => []];
+    
+    // Get missing companies results
+    $missingCompanies = $_SESSION['missing_companies'] ?? [];
     
     // Get data source summary (simplified for now)
     $sourceSummary = [
@@ -543,6 +601,52 @@ ob_start();
         </div>
     <?php endif; ?>
 
+    <!-- Missing Companies Results -->
+    <?php if (!empty($missingCompanies)): ?>
+        <div class="psw-card" style="margin-bottom: 1.5rem;">
+            <div class="psw-card-header">
+                <div class="psw-card-title">
+                    <i class="fas fa-exclamation-triangle psw-card-title-icon" style="color: var(--warning-color);"></i>
+                    Missing Companies (<?php echo count($missingCompanies); ?>) - Previously in Börsdata
+                </div>
+            </div>
+            <div class="psw-card-content">
+                <div style="margin-bottom: 1rem; padding: 1rem; background-color: var(--warning-bg); border-left: 4px solid var(--warning-color); border-radius: 4px;">
+                    <p style="margin: 0; color: var(--warning-text);">
+                        <strong>⚠️ Alert:</strong> These companies were previously available in Börsdata but are now missing. 
+                        They may have been delisted, moved to a different exchange, or temporarily unavailable.
+                    </p>
+                </div>
+                <table class="psw-table">
+                    <thead>
+                        <tr>
+                            <th>ISIN</th>
+                            <th>Company Name</th>
+                            <th>Country</th>
+                            <th>Action Needed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($missingCompanies as $company): ?>
+                            <tr>
+                                <td style="font-family: var(--font-family-mono);">
+                                    <?php echo htmlspecialchars($company['isin']); ?>
+                                </td>
+                                <td><?php echo htmlspecialchars($company['name']); ?></td>
+                                <td><?php echo htmlspecialchars($company['country']); ?></td>
+                                <td>
+                                    <span class="psw-badge" style="background-color: var(--warning-color); color: white;">
+                                        Investigation Required
+                                    </span>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    <?php endif; ?>
+
     <!-- Notifications -->
     <?php if (!empty($notifications)): ?>
         <div class="psw-card" style="margin-bottom: 1.5rem;">
@@ -612,7 +716,32 @@ ob_start();
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="psw-form-group">
                         <label class="psw-form-label">Country *</label>
-                        <input type="text" name="country" id="country" class="psw-form-input" required>
+                        <select name="country" id="country" class="psw-form-input" required>
+                            <option value="">Select country...</option>
+                            <option value="Austria">Austria</option>
+                            <option value="Belgium">Belgium</option>
+                            <option value="Canada">Canada</option>
+                            <option value="Czech Republic">Czech Republic</option>
+                            <option value="Denmark">Denmark</option>
+                            <option value="Finland">Finland</option>
+                            <option value="France">France</option>
+                            <option value="Germany">Germany</option>
+                            <option value="Ireland">Ireland</option>
+                            <option value="Italy">Italy</option>
+                            <option value="Netherlands">Netherlands</option>
+                            <option value="Norway">Norway</option>
+                            <option value="Poland">Poland</option>
+                            <option value="Spain">Spain</option>
+                            <option value="Sweden">Sweden</option>
+                            <option value="Switzerland">Switzerland</option>
+                            <option value="United Kingdom">United Kingdom</option>
+                            <option value="United States">United States</option>
+                            <option value="Australia">Australia</option>
+                            <option value="Japan">Japan</option>
+                            <option value="South Korea">South Korea</option>
+                            <option value="Singapore">Singapore</option>
+                            <option value="Hong Kong">Hong Kong</option>
+                        </select>
                     </div>
                     
                     <div class="psw-form-group">
