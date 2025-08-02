@@ -95,6 +95,7 @@ try {
                     dividend_amount_sek, tax_amount_sek, net_dividend_sek, 
                     exchange_rate_used, portfolio_account_group_id,
                     broker_id, dividend_type_id, distribution_classification_id, currency_id,
+                    broker_fee_local, broker_fee_sek, broker_fee_percent,
                     is_complete, incomplete_fields, created_at
                 ) VALUES (
                     ?, ?, ?, ?, 
@@ -102,9 +103,16 @@ try {
                     ?, ?, ?, 
                     ?, ?, 
                     ?, NULL, NULL, NULL,
+                    ?, ?, ?,
                     ?, NULL, NOW()
                 )
             ");
+            
+            // Calculate broker fee percentage
+            $brokerFeePercent = 0;
+            if ($dividend['broker_fee_sek'] > 0 && $dividend['dividend_amount_sek'] > 0) {
+                $brokerFeePercent = ($dividend['broker_fee_sek'] / $dividend['dividend_amount_sek']) * 100;
+            }
             
             $stmt->execute([
                 $dividend['payment_date'],
@@ -120,6 +128,9 @@ try {
                 $dividend['exchange_rate_used'],
                 $portfolioAccountGroupId,
                 $dividend['broker_id'] ?? null, // Use the broker_id from CSV lookup
+                $dividend['broker_fee_local'] ?? 0,
+                $dividend['broker_fee_sek'] ?? 0,
+                $brokerFeePercent,
                 $dividend['is_complete']
             ]);
             
