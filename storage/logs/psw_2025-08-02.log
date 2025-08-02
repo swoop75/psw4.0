@@ -1,0 +1,3 @@
+{"timestamp":"2025-08-02 05:45:44","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"User session destroyed","context":{"user_id":1,"username":"swoop"}}
+{"timestamp":"2025-08-02 06:02:07","level":"INFO","user_id":"anonymous","ip":"100.120.9.63","message":"Successful login for user: swoop","context":{"username":"swoop","success":true,"reason":"","user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/138.0.0.0 Safari\/537.36"}}
+{"timestamp":"2025-08-02 06:02:08","level":"INFO","user_id":1,"ip":"100.120.9.63","message":"User session created","context":{"user_id":1,"username":"swoop"}}
