@@ -263,11 +263,52 @@ class DataValidator {
      */
     public static function checkDuplicateCompany($isin, $db) {
         try {
-            $stmt = $db->prepare("SELECT psw_foundation.check_duplicate_company(?) as duplicate_source");
-            $stmt->execute([$isin]);
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            // Direct queries with explicit collation handling to avoid stored procedure collation issues
+            $duplicateSource = null;
             
-            $duplicateSource = $result['duplicate_source'];
+            // Check Nordic instruments with explicit collation
+            $stmt = $db->prepare("
+                SELECT COUNT(*) as count 
+                FROM psw_marketdata.nordic_instruments 
+                WHERE isin COLLATE utf8mb4_unicode_ci = ? COLLATE utf8mb4_unicode_ci
+            ");
+            $stmt->execute([$isin]);
+            if ($stmt->fetch(PDO::FETCH_ASSOC)['count'] > 0) {
+                $duplicateSource = 'Börsdata Nordic';
+            } else {
+                // Check Global instruments with explicit collation
+                $stmt = $db->prepare("
+                    SELECT COUNT(*) as count 
+                    FROM psw_marketdata.global_instruments 
+                    WHERE isin COLLATE utf8mb4_unicode_ci = ? COLLATE utf8mb4_unicode_ci
+                ");
+                $stmt->execute([$isin]);
+                if ($stmt->fetch(PDO::FETCH_ASSOC)['count'] > 0) {
+                    $duplicateSource = 'Börsdata Global';
+                } else {
+                    // Check manual company data
+                    $stmt = $db->prepare("
+                        SELECT COUNT(*) as count 
+                        FROM psw_foundation.manual_company_data 
+                        WHERE isin = ?
+                    ");
+                    $stmt->execute([$isin]);
+                    if ($stmt->fetch(PDO::FETCH_ASSOC)['count'] > 0) {
+                        $duplicateSource = 'Manual Data';
+                    } else {
+                        // Check masterlist
+                        $stmt = $db->prepare("
+                            SELECT COUNT(*) as count 
+                            FROM psw_foundation.masterlist 
+                            WHERE isin = ?
+                        ");
+                        $stmt->execute([$isin]);
+                        if ($stmt->fetch(PDO::FETCH_ASSOC)['count'] > 0) {
+                            $duplicateSource = 'Masterlist';
+                        }
+                    }
+                }
+            }
             
             return [
                 'duplicate' => !empty($duplicateSource),

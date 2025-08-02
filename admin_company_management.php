@@ -12,6 +12,7 @@ require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/src/middleware/Auth.php';
 require_once __DIR__ . '/src/utils/Localization.php';
 require_once __DIR__ . '/src/utils/DataValidator.php';
+require_once __DIR__ . '/src/utils/SimpleDuplicateChecker.php';
 
 // Require admin authentication
 Auth::requireAuth();
@@ -44,8 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         break;
                     }
                     
-                    // Check for duplicates
-                    $duplicateCheck = DataValidator::checkDuplicateCompany($companyData['isin'], $foundationDb);
+                    // Check for duplicates using simple checker to avoid collation issues
+                    $duplicateCheck = SimpleDuplicateChecker::checkDuplicate($companyData['isin'], $foundationDb);
                     if ($duplicateCheck['duplicate']) {
                         $message = "Company already exists in " . $duplicateCheck['source'] . ": " . $companyData['isin'];
                         $messageType = "error";
