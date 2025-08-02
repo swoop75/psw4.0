@@ -26,13 +26,13 @@ SELECT
     END as company_name,
     SUM(CASE 
         WHEN lt.trade_type_id = 1 THEN lt.shares_traded  -- BUY
-        WHEN lt.trade_type_id = 9 THEN -lt.shares_traded -- SELL (assuming 9 is sell)
+        WHEN lt.trade_type_id = 9 THEN lt.shares_traded  -- RIGHTS_ISSUE (adds shares)
         ELSE 0 
     END) as shares_held,
     AVG(lt.price_per_share_sek) as average_cost_price_sek,
     SUM(CASE 
-        WHEN lt.trade_type_id = 1 THEN lt.total_amount_sek
-        WHEN lt.trade_type_id = 9 THEN -lt.total_amount_sek
+        WHEN lt.trade_type_id = 1 THEN lt.total_amount_sek  -- BUY (cost increases)
+        WHEN lt.trade_type_id = 9 THEN lt.total_amount_sek  -- RIGHTS_ISSUE (cost increases)
         ELSE 0 
     END) as total_cost_sek,
     lt.currency_local,
