@@ -590,6 +590,10 @@ ob_start();
                                             <span class="psw-badge" style="background-color: var(--text-secondary); color: white;">
                                                 Delisted
                                             </span>
+                                            <button type="button" class="psw-btn psw-btn-sm psw-btn-primary" style="margin-left: 0.5rem;"
+                                                    onclick="addCompanyFromDelisted('<?php echo $company['isin']; ?>', '<?php echo $company['ticker'] ?? ''; ?>', '<?php echo $company['company_name']; ?>', '<?php echo $company['likely_country']; ?>')">
+                                                <i class="fas fa-plus"></i> Add Manual Entry
+                                            </button>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -699,24 +703,28 @@ ob_start();
                     <div class="psw-form-group">
                         <label class="psw-form-label">ISIN *</label>
                         <input type="text" name="isin" id="isin" class="psw-form-input" required 
-                               pattern="[A-Z]{2}[A-Z0-9]{9}[0-9]" title="Must be a valid ISIN format">
+                               pattern="[A-Z]{2}[A-Z0-9]{9}[0-9]" title="Must be a valid ISIN format"
+                               style="color: #333 !important; background-color: white !important;">
                     </div>
                     
                     <div class="psw-form-group">
                         <label class="psw-form-label">Ticker</label>
-                        <input type="text" name="ticker" id="ticker" class="psw-form-input">
+                        <input type="text" name="ticker" id="ticker" class="psw-form-input"
+                               style="color: #333 !important; background-color: white !important;">
                     </div>
                 </div>
                 
                 <div class="psw-form-group">
                     <label class="psw-form-label">Company Name *</label>
-                    <input type="text" name="company_name" id="companyName" class="psw-form-input" required>
+                    <input type="text" name="company_name" id="companyName" class="psw-form-input" required
+                           style="color: #333 !important; background-color: white !important;">
                 </div>
                 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="psw-form-group">
                         <label class="psw-form-label">Country *</label>
-                        <select name="country" id="country" class="psw-form-input" required>
+                        <select name="country" id="country" class="psw-form-input" required
+                                style="color: #333 !important; background-color: white !important;">
                             <option value="">Select country...</option>
                             <option value="Austria">Austria</option>
                             <option value="Belgium">Belgium</option>
@@ -746,7 +754,8 @@ ob_start();
                     
                     <div class="psw-form-group">
                         <label class="psw-form-label">Currency</label>
-                        <select name="currency" id="currency" class="psw-form-input">
+                        <select name="currency" id="currency" class="psw-form-input"
+                                style="color: #333 !important; background-color: white !important;">
                             <option value="">Select currency...</option>
                             <option value="EUR">EUR</option>
                             <option value="GBP">GBP</option>
@@ -763,19 +772,22 @@ ob_start();
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="psw-form-group">
                         <label class="psw-form-label">Sector</label>
-                        <input type="text" name="sector" id="sector" class="psw-form-input">
+                        <input type="text" name="sector" id="sector" class="psw-form-input"
+                               style="color: #333 !important; background-color: white !important;">
                     </div>
                     
                     <div class="psw-form-group">
                         <label class="psw-form-label">Branch</label>
-                        <input type="text" name="branch" id="branch" class="psw-form-input">
+                        <input type="text" name="branch" id="branch" class="psw-form-input"
+                               style="color: #333 !important; background-color: white !important;">
                     </div>
                 </div>
                 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="psw-form-group">
                         <label class="psw-form-label">Company Type</label>
-                        <select name="company_type" id="companyType" class="psw-form-input">
+                        <select name="company_type" id="companyType" class="psw-form-input"
+                                style="color: #333 !important; background-color: white !important;">
                             <option value="stock">Stock</option>
                             <option value="etf">ETF</option>
                             <option value="closed_end_fund">Closed End Fund</option>
@@ -786,7 +798,8 @@ ob_start();
                     
                     <div class="psw-form-group">
                         <label class="psw-form-label">Dividend Frequency</label>
-                        <select name="dividend_frequency" id="dividendFrequency" class="psw-form-input">
+                        <select name="dividend_frequency" id="dividendFrequency" class="psw-form-input"
+                                style="color: #333 !important; background-color: white !important;">
                             <option value="quarterly">Quarterly</option>
                             <option value="annual">Annual</option>
                             <option value="semi_annual">Semi Annual</option>
@@ -799,12 +812,14 @@ ob_start();
                 
                 <div class="psw-form-group">
                     <label class="psw-form-label">Market/Exchange</label>
-                    <input type="text" name="market_exchange" id="marketExchange" class="psw-form-input">
+                    <input type="text" name="market_exchange" id="marketExchange" class="psw-form-input"
+                           style="color: #333 !important; background-color: white !important;">
                 </div>
                 
                 <div class="psw-form-group">
                     <label class="psw-form-label">Notes</label>
-                    <textarea name="notes" id="notes" class="psw-form-input" rows="3"></textarea>
+                    <textarea name="notes" id="notes" class="psw-form-input" rows="3"
+                              style="color: #333 !important; background-color: white !important;"></textarea>
                 </div>
             </div>
             <div class="psw-modal-footer">
@@ -982,6 +997,38 @@ function addCompanyFromAnalysis(isin, ticker, country) {
     document.getElementById('isin').readOnly = true;
     document.getElementById('ticker').value = ticker;
     document.getElementById('country').value = country;
+    
+    document.getElementById('companyModal').style.display = 'flex';
+}
+
+function addCompanyFromDelisted(isin, ticker, companyName, country) {
+    document.getElementById('modalTitle').textContent = 'Add Company from Masterlist';
+    document.getElementById('formAction').value = 'add_company';
+    document.getElementById('companyForm').reset();
+    document.getElementById('manualId').value = '';
+    
+    // Pre-fill known data from masterlist
+    document.getElementById('isin').value = isin;
+    document.getElementById('isin').readOnly = true;
+    document.getElementById('ticker').value = ticker || '';
+    document.getElementById('companyName').value = companyName || '';
+    document.getElementById('country').value = country || '';
+    
+    // Set appropriate currency based on country
+    if (country === 'United Kingdom') {
+        document.getElementById('currency').value = 'GBP';
+    } else if (country === 'Canada') {
+        document.getElementById('currency').value = 'CAD';
+    } else if (country === 'United States') {
+        document.getElementById('currency').value = 'USD';
+    } else if (country === 'Czech Republic') {
+        document.getElementById('currency').value = 'CZK';
+    } else if (country === 'Ireland') {
+        document.getElementById('currency').value = 'EUR';
+    }
+    
+    // Add note about source
+    document.getElementById('notes').value = 'Added from masterlist - previously delisted company';
     
     document.getElementById('companyModal').style.display = 'flex';
 }
