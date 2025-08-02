@@ -32,6 +32,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (isset($_POST['action'])) {
             switch ($_POST['action']) {
                 case 'add_company':
+                    // Handle custom sector/branch values
+                    if ($_POST['sector'] === '__custom__' && !empty($_POST['sector_custom'])) {
+                        $_POST['sector'] = $_POST['sector_custom'];
+                    }
+                    if ($_POST['branch'] === '__custom__' && !empty($_POST['branch_custom'])) {
+                        $_POST['branch'] = $_POST['branch_custom'];
+                    }
+                    
                     // Sanitize input data
                     $companyData = DataValidator::sanitizeManualCompanyData($_POST);
                     
@@ -312,6 +320,9 @@ try {
     ");
     $manualCompanies = $manualCompaniesStmt->fetchAll(PDO::FETCH_ASSOC);
     
+    // Debug: log manual companies count
+    error_log("Manual companies found: " . count($manualCompanies));
+    
     // Get recent notifications
     $notificationsStmt = $foundationDb->query("
         SELECT * FROM notification_queue 
@@ -334,6 +345,25 @@ try {
     
     // Get missing companies results
     $missingCompanies = $_SESSION['missing_companies'] ?? [];
+    
+    // Get sectors and branches from existing data for dropdowns
+    $sectorsStmt = $foundationDb->query("
+        SELECT DISTINCT sector FROM (
+            SELECT sector FROM manual_company_data WHERE sector IS NOT NULL AND sector != ''
+            UNION
+            SELECT sector FROM masterlist WHERE sector IS NOT NULL AND sector != ''
+        ) AS sectors ORDER BY sector
+    ");
+    $sectors = $sectorsStmt->fetchAll(PDO::FETCH_COLUMN);
+    
+    $branchesStmt = $foundationDb->query("
+        SELECT DISTINCT branch FROM (
+            SELECT branch FROM manual_company_data WHERE branch IS NOT NULL AND branch != ''
+            UNION  
+            SELECT branch FROM masterlist WHERE branch IS NOT NULL AND branch != ''
+        ) AS branches ORDER BY branch
+    ");
+    $branches = $branchesStmt->fetchAll(PDO::FETCH_COLUMN);
     
     // Get data source summary (simplified for now)
     $sourceSummary = [
@@ -462,6 +492,11 @@ ob_start();
             <div class="psw-card-title">
                 <i class="fas fa-table psw-card-title-icon"></i>
                 Manual Company Data (<?php echo count($manualCompanies); ?>)
+            </div>
+            <div>
+                <button type="button" class="psw-btn psw-btn-sm psw-btn-secondary" onclick="location.reload()">
+                    <i class="fas fa-refresh"></i> Refresh
+                </button>
             </div>
         </div>
         <div class="psw-card-content" style="padding: 0;">
@@ -795,14 +830,36 @@ ob_start();
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="psw-form-group">
                         <label class="psw-form-label">Sector</label>
-                        <input type="text" name="sector" id="sector" class="psw-form-input"
-                               style="color: #333 !important; background-color: white !important;">
+                        <select name="sector" id="sector" class="psw-form-input"
+                                style="color: #333 !important; background-color: white !important;">
+                            <option value="">Select sector...</option>
+                            <?php foreach ($sectors as $sector): ?>
+                                <option value="<?php echo htmlspecialchars($sector); ?>">
+                                    <?php echo htmlspecialchars($sector); ?>
+                                </option>
+                            <?php endforeach; ?>
+                            <option value="__custom__">+ Add new sector</option>
+                        </select>
+                        <input type="text" name="sector_custom" id="sectorCustom" class="psw-form-input" 
+                               style="display: none; margin-top: 0.5rem; color: #333 !important; background-color: white !important;"
+                               placeholder="Enter new sector name">
                     </div>
                     
                     <div class="psw-form-group">
                         <label class="psw-form-label">Branch</label>
-                        <input type="text" name="branch" id="branch" class="psw-form-input"
-                               style="color: #333 !important; background-color: white !important;">
+                        <select name="branch" id="branch" class="psw-form-input"
+                                style="color: #333 !important; background-color: white !important;">
+                            <option value="">Select branch...</option>
+                            <?php foreach ($branches as $branch): ?>
+                                <option value="<?php echo htmlspecialchars($branch); ?>">
+                                    <?php echo htmlspecialchars($branch); ?>
+                                </option>
+                            <?php endforeach; ?>
+                            <option value="__custom__">+ Add new branch</option>
+                        </select>
+                        <input type="text" name="branch_custom" id="branchCustom" class="psw-form-input" 
+                               style="display: none; margin-top: 0.5rem; color: #333 !important; background-color: white !important;"
+                               placeholder="Enter new branch name">
                     </div>
                 </div>
                 
@@ -1124,6 +1181,30 @@ document.getElementById('companyModal').addEventListener('click', function(e) {
 
 // Add real-time validation event listeners
 document.addEventListener('DOMContentLoaded', function() {
+    // Handle custom sector input
+    document.getElementById('sector').addEventListener('change', function() {
+        const customInput = document.getElementById('sectorCustom');
+        if (this.value === '__custom__') {
+            customInput.style.display = 'block';
+            customInput.focus();
+        } else {
+            customInput.style.display = 'none';
+            customInput.value = '';
+        }
+    });
+    
+    // Handle custom branch input
+    document.getElementById('branch').addEventListener('change', function() {
+        const customInput = document.getElementById('branchCustom');
+        if (this.value === '__custom__') {
+            customInput.style.display = 'block';
+            customInput.focus();
+        } else {
+            customInput.style.display = 'none';
+            customInput.value = '';
+        }
+    });
+    
     // ISIN field validation
     document.getElementById('isin').addEventListener('blur', function() {
         if (this.value) {
